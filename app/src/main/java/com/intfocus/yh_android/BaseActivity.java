@@ -84,12 +84,10 @@ public class BaseActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        String runningActivity = activityManager.getRunningTasks(1).get(0).topActivity.getClassName();
-        System.out.println("runningActivity:" + runningActivity);
-        if (!(runningActivity.equalsIgnoreCase("com.intfocus.yh_android.MainActivity"))) {
-                mActivities.add(this);
-        }
+//        System.out.println("runningActivity:" + runningActivity);
+//        if (!(runningActivity.equalsIgnoreCase("com.intfocus.yh_android.MainActivity"))) {
+//                mActivities.add(this);
+//        }
 
         // for (Activity a : mActivities) {
         //    System.out.println("mActivityName: " + a.toString());
@@ -154,8 +152,8 @@ public class BaseActivity extends Activity {
 
     @Override
     public void onDestroy() {
-        mActivities.remove(this);
-        System.out.println("activityDestroy: " + this.toString());
+//        mActivities.remove(this);
+//        System.out.println("activityDestroy: " + this.toString());
         fixInputMethodManager();
         super.onDestroy();
     }

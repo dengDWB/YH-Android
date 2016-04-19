@@ -1,6 +1,7 @@
 package com.intfocus.yh_android;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -40,8 +41,12 @@ public class YHApplication extends Application implements Application.ActivityLi
         @Override
         public void onReceive(Context context, Intent intent) {
 
+
+            ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+            String runningActivity = activityManager.getRunningTasks(1).get(0).topActivity.getClassName();
+
             if (intent.getAction().equals(Intent.ACTION_SCREEN_ON) && // 开屏状态
-                    BaseActivity.mActivities.size() > 0 && // 应用活动Activity数量大于零
+                    runningActivity != null && // 应用活动Activity数量大于零
                     !currentActivityName.contains("ConfirmPassCodeActivity") && // 当前活动的Activity非解锁界面
                     FileUtil.checkIsLocked(mContext)) { // 应用处于登录状态，并且开启了密码锁
 
