@@ -41,7 +41,7 @@ public class MainActivity extends BaseActivity {
         mWebView.loadUrl(urlStringForLoading);
 
         try {
-            urlString = String.format(URLs.KPI_PATH, URLs.HOST, user.getString("role_id"), user.getString("group_id"));
+            urlString = String.format(URLs.KPI_PATH, URLs.HOST, currentUIVersion(), user.getString("role_id"), user.getString("group_id"));
             objectType = 1;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -142,26 +142,28 @@ public class MainActivity extends BaseActivity {
             mCurrentTab.setActive(true);
 
             mWebView.loadUrl(String.format("file:///%s/loading/loading.html", FileUtil.sharedPath(mContext)));
+            String currentUIVersion = currentUIVersion();
             try {
                 switch (v.getId()) {
                     case R.id.tab_kpi:
                         objectType = 1;
-                        urlString = String.format(URLs.KPI_PATH, URLs.HOST, user.getString("role_id"), user.getString("group_id"));
+                        urlString = String.format(URLs.KPI_PATH, URLs.HOST, currentUIVersion, user.getString("role_id"), user.getString("group_id"));
                         break;
                     case R.id.tab_analysis:
                         objectType = 2;
-                        urlString = String.format(URLs.ANALYSE_PATH, URLs.HOST, user.getString("role_id"));
+                        urlString = String.format(URLs.ANALYSE_PATH, URLs.HOST, currentUIVersion, user.getString("role_id"));
                         break;
                     case R.id.tab_app:
                         objectType = 3;
-                        urlString = String.format(URLs.APPLICATION_PATH, URLs.HOST, user.getString("role_id"));
+                        urlString = String.format(URLs.APPLICATION_PATH, URLs.HOST, currentUIVersion, user.getString("role_id"));
                         break;
                     case R.id.tab_message:
                         objectType = 5;
-                        urlString = String.format(URLs.MESSAGE_PATH, URLs.HOST, user.getString("role_id"), user.getString("group_id"), user.getString("user_id"));
+                        urlString = String.format(URLs.MESSAGE_PATH, URLs.HOST, currentUIVersion, user.getString("role_id"), user.getString("group_id"), user.getString("user_id"));
                         break;
                     default:
-                        urlString = String.format(URLs.KPI_PATH, URLs.HOST, user.getString("role_id"), user.getString("group_id"));
+                        objectType = 1;
+                        urlString = String.format(URLs.KPI_PATH, URLs.HOST, currentUIVersion, user.getString("role_id"), user.getString("group_id"));
                         break;
                 }
 

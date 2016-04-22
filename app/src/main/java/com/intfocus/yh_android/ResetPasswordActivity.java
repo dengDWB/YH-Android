@@ -43,7 +43,7 @@ public class ResetPasswordActivity extends BaseActivity {
         mWebView.loadUrl(urlStringForLoading);
 
 
-        urlString = String.format(URLs.RESET_PASSWORD_PATH, URLs.HOST);
+        urlString = String.format(URLs.RESET_PASSWORD_PATH, URLs.HOST, currentUIVersion());
         new Thread(mRunnableForDetecting).start();
     }
 

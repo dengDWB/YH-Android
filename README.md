@@ -23,6 +23,11 @@
 ## 更新日志
 
 
+* 16/04/22
+
+	* add: switch ui version with setting
+	* optimized: clean all cache header file when click setting check
+	
 * 16/04/11
 
 	* add: push data with umeng

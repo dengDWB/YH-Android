@@ -53,10 +53,9 @@ public class CommentActivity extends BaseActivity {
         objectType = intent.getIntExtra("objectType", -1);
 
         mTitle.setText(bannerName);
-        urlString = String.format(URLs.COMMENT_PATH, URLs.HOST, objectID, objectType);
+        urlString = String.format(URLs.COMMENT_PATH, URLs.HOST, currentUIVersion(), objectID, objectType);
 
         new Thread(mRunnableForDetecting).start();
-
 
         List<ImageView> colorViews = new ArrayList<>();
         colorViews.add((ImageView) findViewById(R.id.colorView0));

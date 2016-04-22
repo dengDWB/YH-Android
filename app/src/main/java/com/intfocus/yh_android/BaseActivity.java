@@ -2,7 +2,6 @@ package com.intfocus.yh_android;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -53,7 +52,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,25 +73,12 @@ public class BaseActivity extends Activity {
     String urlStringForLoading;
     JSONObject logParams = new JSONObject();
     private ProgressDialog mProgressDialog;
-    final static ArrayList<Activity> mActivities = new ArrayList<>(3);
-
     Context mContext;
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        System.out.println("runningActivity:" + runningActivity);
-//        if (!(runningActivity.equalsIgnoreCase("com.intfocus.yh_android.MainActivity"))) {
-//                mActivities.add(this);
-//        }
-
-        // for (Activity a : mActivities) {
-        //    System.out.println("mActivityName: " + a.toString());
-        // }
-
-        // finishLoginActivityWhenInMainAcitivty(this);
 
         mContext = BaseActivity.this;
         sharedPath = FileUtil.sharedPath(mContext);
@@ -158,8 +143,7 @@ public class BaseActivity extends Activity {
         super.onDestroy();
     }
 
-    private void fixInputMethodManager()
-    {
+    private void fixInputMethodManager() {
         final Object imm = getSystemService(Context.INPUT_METHOD_SERVICE);
 
         final TypedObject windowToken
@@ -172,24 +156,6 @@ public class BaseActivity extends Activity {
 
         view.invokeMethodExceptionSafe(imm, "startGettingWindowFocus", view);
     }
-
-//    public static void finishAll() {
-//        for (Activity activity : mActivities) {
-//            activity.finish();
-//        }
-//        mActivities.clear();
-//    }
-
-//    void finishLoginActivityWhenInMainAcitivty(Activity activity) {
-//        if (activity.getClass().toString().contains("MainActivity")) {
-//            for (Activity a : mActivities) {
-//                if (a.getClass().toString().contains("LoginActivity")) {
-//                    a.finish();
-//                    Log.i("finishLoginActivity", mActivities.toString());
-//                }
-//            }
-//        }
-//    }
 
     /*
      * ********************
@@ -401,36 +367,6 @@ public class BaseActivity extends Activity {
         }
     };
 
-    /*
-     * deprecate idea
-     *
-    public void showDialogForWithoutNetwork() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(BaseActivity.this);
-        alertDialog.setTitle("温馨提示");
-        alertDialog.setMessage("网络环境不稳定");
-
-        alertDialog.setPositiveButton(
-                "刷新",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        new Thread(mRunnableForDetecting).start();
-                    }
-                }
-        );
-        alertDialog.setNegativeButton(
-                "先这样",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }
-        );
-        alertDialog.show();
-    }
-    */
-
     private void showWebViewForWithoutNetwork() {
         urlStringForLoading = String.format("file:///%s/loading/network_400.html", FileUtil.sharedPath(mContext));
         mWebView.loadUrl(urlStringForLoading);
@@ -493,6 +429,20 @@ public class BaseActivity extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    final String currentUIVersion() {
+        try {
+            String betaConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.BETA_CONFIG_FILENAME);
+            JSONObject betaJSON = new JSONObject();
+            if(new File(betaConfigPath).exists()) {
+                betaJSON = FileUtil.readConfigFile(betaConfigPath);
+            }
+            return betaJSON.has("new_ui") && betaJSON.getBoolean("new_ui") ? "v2" : "v1";
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return "v1";
     }
 
 

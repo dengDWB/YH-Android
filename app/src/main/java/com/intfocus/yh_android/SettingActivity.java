@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 
 public class SettingActivity extends BaseActivity {
     private TextView mUserID;
@@ -35,6 +36,7 @@ public class SettingActivity extends BaseActivity {
     private TextView mPushState;
     private TextView mApiDomain;
     private Switch mLockSwitch;
+    private Switch mUISwitch;
     private String screenLockInfo;
 
     @Override
@@ -63,12 +65,15 @@ public class SettingActivity extends BaseActivity {
         screenLockInfo = "取消锁屏成功";
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));
         mCheckAssets.setOnClickListener(mCheckAssetsListener);
+        mUISwitch = (Switch) findViewById(R.id.ui_switch);
+        mUISwitch.setChecked(currentUIVersion() == "v2");
 
         mChangeLock.setOnClickListener(mChangeLockListener);
         mChangePWD.setOnClickListener(mChangePWDListener);
         mLogout.setOnClickListener(mLogoutListener);
         mCheckUpgrade.setOnClickListener(mCheckUpgradeListener);
         mLockSwitch.setOnCheckedChangeListener(mSwitchLockListener);
+        mUISwitch.setOnCheckedChangeListener(mSwitchUIListener);
 
         initializeUI();
     }
@@ -203,6 +208,8 @@ public class SettingActivity extends BaseActivity {
              */
             String headerPath = String.format("%s/%s", FileUtil.sharedPath(mContext), URLs.CACHED_HEADER_FILENAME);
             new File(headerPath).delete();
+            headerPath = String.format("%s/%s", FileUtil.dirPath(mContext, URLs.HTML_DIRNAME), URLs.CACHED_HEADER_FILENAME);
+            new File(headerPath).delete();
 
             FileUtil.checkAssets(mContext, "assets", false);
             FileUtil.checkAssets(mContext, "loading", false);
@@ -258,4 +265,30 @@ public class SettingActivity extends BaseActivity {
             }
         }
     };
+
+
+    /*
+     * 切换UI
+     */
+    private final CompoundButton.OnCheckedChangeListener mSwitchUIListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            // TODO Auto-generated method stub
+            try {
+                String betaConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.BETA_CONFIG_FILENAME);
+                JSONObject betaJSON = new JSONObject();
+                if(new File(betaConfigPath).exists()) {
+                    betaJSON = FileUtil.readConfigFile(betaConfigPath);
+                }
+                betaJSON.put("new_ui", isChecked);
+                FileUtil.writeFile(betaConfigPath, betaJSON.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+
 }

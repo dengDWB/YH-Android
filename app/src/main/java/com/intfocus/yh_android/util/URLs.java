@@ -23,21 +23,21 @@ public class URLs implements Serializable {
     public final static String HOST1 = "http://10.0.3.2:4567";
     public final static String HOST3 = "http://www.google.com";
 
-    public final static String API_USER_PATH = "%s/api/v1/%s/%s/%s/authentication";
-    public final static String API_DATA_PATH = "%s/api/v1/group/%s/report/%s/attachment";
-    public final static String API_COMMENT_PATH = "%s/api/v1/user/%d/id/%d/type/%d";
-    public final static String API_SCREEN_LOCK_PATH = "%s/api/v1/user_device/%s/screen_lock";
-    public final static String API_DEVICE_STATE_PATH = "%s/api/v1/user_device/%d/state";
+    public final static String API_USER_PATH           = "%s/api/v1/%s/%s/%s/authentication";
+    public final static String API_DATA_PATH           = "%s/api/v1/group/%s/report/%s/attachment";
+    public final static String API_COMMENT_PATH        = "%s/api/v1/user/%d/id/%d/type/%d";
+    public final static String API_SCREEN_LOCK_PATH    = "%s/api/v1/user_device/%s/screen_lock";
+    public final static String API_DEVICE_STATE_PATH   = "%s/api/v1/user_device/%d/state";
     public final static String API_RESET_PASSWORD_PATH = "%s/api/v1/update/%s/password";
-    public final static String API_ACTION_LOG_PATH = "%s/api/v1/android/logger";
-    public final static String API_ASSETS_PATH = "%s/api/v1/download/%s.zip";
+    public final static String API_ACTION_LOG_PATH     = "%s/api/v1/android/logger";
+    public final static String API_ASSETS_PATH         = "%s/api/v1/download/%s.zip";
 
-    public final static String KPI_PATH = "%s/mobile/v2/role/%s/group/%s/kpi";
-    public final static String MESSAGE_PATH = "%s/mobile/v2/role/%s/group/%s/user/%s/message";
-    public final static String APPLICATION_PATH = "%s/mobile/v2/role/%s/app";
-    public final static String ANALYSE_PATH = "%s/mobile/v2/role/%s/analyse";
-    public final static String COMMENT_PATH = "%s/mobile/v2/id/%s/type/%s/comment";
-    public final static String RESET_PASSWORD_PATH = "%s/mobile/v2/update_user_password";
+    public final static String KPI_PATH            = "%s/mobile/%s/role/%s/group/%s/kpi";
+    public final static String MESSAGE_PATH        = "%s/mobile/%s/role/%s/group/%s/user/%s/message";
+    public final static String APPLICATION_PATH    = "%s/mobile/%s/role/%s/app";
+    public final static String ANALYSE_PATH        = "%s/mobile/%s/role/%s/analyse";
+    public final static String COMMENT_PATH        = "%s/mobile/%s/id/%s/type/%s/comment";
+    public final static String RESET_PASSWORD_PATH = "%s/mobile/%s/update_user_password";
 
     public final static String REPORT_DATA_FILENAME = "template_data_group_%s_report_%s.js";
 
@@ -53,6 +53,7 @@ public class URLs implements Serializable {
     public final static String USER_CONFIG_FILENAME = "user.plist";
     public final static String CONFIG_DIRNAME = "Configs";
     public final static String SETTINGS_CONFIG_FILENAME = "Setting.plist";
+    public final static String BETA_CONFIG_FILENAME = "Beta.plist";
     public final static String TABINDEX_CONFIG_FILENAME = "page_tab_index.plist";
     public final static String GESTURE_PASSWORD_FILENAME = "gesture_password.plist";
     public final static String HTML_DIRNAME = "HTML";
