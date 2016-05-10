@@ -41,8 +41,8 @@ public class MainActivity extends BaseActivity {
         mWebView.loadUrl(urlStringForLoading);
 
         try {
-            urlString = String.format(URLs.KPI_PATH, URLs.HOST, currentUIVersion(), user.getString("role_id"), user.getString("group_id"));
             objectType = 1;
+            urlString = String.format(URLs.KPI_PATH, URLs.HOST, currentUIVersion(), user.getString("group_id"), user.getString("role_id"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -163,7 +163,7 @@ public class MainActivity extends BaseActivity {
                         break;
                     default:
                         objectType = 1;
-                        urlString = String.format(URLs.KPI_PATH, URLs.HOST, currentUIVersion, user.getString("role_id"), user.getString("group_id"));
+                        urlString = String.format(URLs.KPI_PATH, URLs.HOST, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
                         break;
                 }
 
