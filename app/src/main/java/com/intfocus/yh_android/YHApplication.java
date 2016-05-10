@@ -1,5 +1,6 @@
 package com.intfocus.yh_android;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
@@ -9,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -23,6 +25,7 @@ import org.OpenUDID.OpenUDID_manager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by lijunjie on 16/1/15.
@@ -38,15 +41,14 @@ public class YHApplication extends Application implements Application.ActivityLi
      */
     private final BroadcastReceiver broadcastScreenOnAndOff = new BroadcastReceiver() {
 
+        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onReceive(Context context, Intent intent) {
-
-
             ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-            String runningActivity = activityManager.getRunningTasks(1).get(0).topActivity.getClassName();
+            List<ActivityManager.AppTask> appTasks = activityManager.getAppTasks();
 
             if (intent.getAction().equals(Intent.ACTION_SCREEN_ON) && // 开屏状态
-                    runningActivity != null && // 应用活动Activity数量大于零
+                    !appTasks.isEmpty() && // 应用活动Activity数量大于零
                     !currentActivityName.contains("ConfirmPassCodeActivity") && // 当前活动的Activity非解锁界面
                     FileUtil.checkIsLocked(mContext)) { // 应用处于登录状态，并且开启了密码锁
 

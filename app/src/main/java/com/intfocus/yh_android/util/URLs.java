@@ -23,26 +23,29 @@ public class URLs implements Serializable {
     public final static String HOST1 = "http://10.0.3.2:4567";
     public final static String HOST3 = "http://www.google.com";
 
-    public final static String API_USER_PATH           = "%s/api/v1/%s/%s/%s/authentication";
-    public final static String API_DATA_PATH           = "%s/api/v1/group/%s/report/%s/attachment";
-    public final static String API_COMMENT_PATH        = "%s/api/v1/user/%d/id/%d/type/%d";
-    public final static String API_SCREEN_LOCK_PATH    = "%s/api/v1/user_device/%s/screen_lock";
-    public final static String API_DEVICE_STATE_PATH   = "%s/api/v1/user_device/%d/state";
-    public final static String API_RESET_PASSWORD_PATH = "%s/api/v1/update/%s/password";
-    public final static String API_ACTION_LOG_PATH     = "%s/api/v1/android/logger";
-    public final static String API_ASSETS_PATH         = "%s/api/v1/download/%s.zip";
+    public final static String API_USER_PATH            = "%s/api/v1/%s/%s/%s/authentication";
+    public final static String API_DATA_DEPRECATED_PATH = "%s/api/v1/group/%s/report/%s/attachment";
+    public final static String API_DATA_PATH            = "%s/api/v1/group/%s/template/%s/report/%s/attachment";
+    public final static String API_COMMENT_PATH         = "%s/api/v1/user/%d/id/%d/type/%d";
+    public final static String API_SCREEN_LOCK_PATH     = "%s/api/v1/user_device/%s/screen_lock";
+    public final static String API_DEVICE_STATE_PATH    = "%s/api/v1/user_device/%d/state";
+    public final static String API_RESET_PASSWORD_PATH  = "%s/api/v1/update/%s/password";
+    public final static String API_ACTION_LOG_PATH      = "%s/api/v1/android/logger";
+    public final static String API_ASSETS_PATH          = "%s/api/v1/download/%s.zip";
 
-    public final static String KPI_PATH            = "%s/mobile/%s/role/%s/group/%s/kpi";
-    public final static String MESSAGE_PATH        = "%s/mobile/%s/role/%s/group/%s/user/%s/message";
-    public final static String APPLICATION_PATH    = "%s/mobile/%s/role/%s/app";
-    public final static String ANALYSE_PATH        = "%s/mobile/%s/role/%s/analyse";
-    public final static String COMMENT_PATH        = "%s/mobile/%s/id/%s/type/%s/comment";
-    public final static String RESET_PASSWORD_PATH = "%s/mobile/%s/update_user_password";
+    public final static String KPI_DEPRECATED_PATH      = "%s/mobile/%s/role/%s/group/%s/kpi";
+    public final static String KPI_PATH                 = "%s/mobile/%s/group/%s/role/%s/kpi";
+    public final static String MESSAGE_PATH             = "%s/mobile/%s/role/%s/group/%s/user/%s/message";
+    public final static String APPLICATION_PATH         = "%s/mobile/%s/role/%s/app";
+    public final static String ANALYSE_PATH             = "%s/mobile/%s/role/%s/analyse";
+    public final static String COMMENT_PATH             = "%s/mobile/%s/id/%s/type/%s/comment";
+    public final static String RESET_PASSWORD_PATH      = "%s/mobile/%s/update_user_password";
 
-    public final static String REPORT_DATA_FILENAME = "template_data_group_%s_report_%s.js";
+    public final static String REPORT_DATA_DEPRECATED_FILENAME = "template_data_group_%s_report_%s.js";
+    public final static String REPORT_DATA_FILENAME            = "group_%s_template_%s_report_%s.js";
 
-    // public final static String STORAGE_BASE            = String.format("%s/com.intfocus.yh_android", Environment.getExternalStorageDirectory().getAbsolutePath());
-    public final static String TimeStamp = new SimpleDateFormat("yyyyMMddKKmmss").format(new Date());
+    // public final static String STORAGE_BASE = String.format("%s/com.intfocus.yh_android", Environment.getExternalStorageDirectory().getAbsolutePath());
+    public final static String TimeStamp       = new SimpleDateFormat("yyyyMMddKKmmss").format(new Date());
 
     /*
      *  sd path: /storage/emulated/0

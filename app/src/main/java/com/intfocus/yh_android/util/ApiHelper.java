@@ -109,11 +109,11 @@ public class ApiHelper {
     /*
      *  获取报表网页数据
      */
-    public static void reportData(Context context, String groupID, String reportID) {
+    public static void reportData(Context context, String groupID, String templateID, String reportID) {
         String assetsPath = FileUtil.sharedPath(context);
-        String urlString = String.format(URLs.API_DATA_PATH, URLs.HOST, groupID, reportID);
+        String urlString = String.format(URLs.API_DATA_PATH, URLs.HOST, groupID, templateID, reportID);
 
-        String fileName = String.format(URLs.REPORT_DATA_FILENAME, groupID, reportID);
+        String fileName = String.format(URLs.REPORT_DATA_FILENAME, groupID, templateID, reportID);
         String filePath = String.format("%s/assets/javascripts/%s", assetsPath, fileName);
 
         Map<String, String> headers = ApiHelper.checkResponseHeader(urlString, assetsPath);

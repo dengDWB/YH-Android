@@ -147,7 +147,7 @@ public class MainActivity extends BaseActivity {
                 switch (v.getId()) {
                     case R.id.tab_kpi:
                         objectType = 1;
-                        urlString = String.format(URLs.KPI_PATH, URLs.HOST, currentUIVersion, user.getString("role_id"), user.getString("group_id"));
+                        urlString = String.format(URLs.KPI_PATH, URLs.HOST, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
                         break;
                     case R.id.tab_analysis:
                         objectType = 2;

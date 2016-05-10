@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebSettings;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -38,13 +39,11 @@ import static java.lang.String.format;
 
 public class SubjectActivity extends BaseActivity implements OnPageChangeListener {
     private Boolean isInnerLink;
-    private String reportID;
+    private String templateID, reportID;
     private PDFView mPDFView;
     private File pdfFile;
     private String bannerName, link;
-    private int objectID;
-    private int objectType;
-    private int groupID;
+    private int groupID, objectID, objectType;
     private String userNum;
     private RelativeLayout bannerView;
 
@@ -150,21 +149,29 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     }
 
     private void dealWithURL() {
+        WebSettings webSettings = mWebView.getSettings();
         if (isInnerLink) {
-            reportID = TextUtils.split(link, "/")[3];
+            // format: /mobile/v1/group/:group_id/template/:template_id/report/:report_id
+            // deprecated
+            // format: /mobile/report/:report_id/group/:group_id
+            templateID = TextUtils.split(link, "/")[6];
+            reportID = TextUtils.split(link, "/")[8];
             String urlPath = format(link.replace("%@", "%d"), groupID);
             urlString = String.format("%s%s", URLs.HOST, urlPath);
+            webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    ApiHelper.reportData(mContext, String.format("%d", groupID), reportID);
+                    ApiHelper.reportData(mContext, String.format("%d", groupID), templateID, reportID);
 
                     new Thread(mRunnableForDetecting).start();
                 }
             }).start();
         } else {
             urlString = link;
+            webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -269,10 +276,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                     urlKey = urlString.contains("?") ? TextUtils.split(urlString, "?")[0] : urlString;
                     ApiHelper.clearResponseHeader(urlKey, assetsPath);
                 }
-                urlKey = String.format(URLs.API_DATA_PATH, URLs.HOST, groupID, reportID);
+                urlKey = String.format(URLs.API_DATA_PATH, URLs.HOST, groupID, templateID, reportID);
                 ApiHelper.clearResponseHeader(urlKey, FileUtil.sharedPath(mContext));
 
-                ApiHelper.reportData(mContext, String.format("%d", groupID), reportID);
+                ApiHelper.reportData(mContext, String.format("%d", groupID), templateID, reportID);
                 new Thread(mRunnableForDetecting).start();
 
 
