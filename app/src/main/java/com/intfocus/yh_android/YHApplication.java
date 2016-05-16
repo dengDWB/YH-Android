@@ -45,11 +45,20 @@ public class YHApplication extends Application implements Application.ActivityLi
         @Override
         public void onReceive(Context context, Intent intent) {
             ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-            List<ActivityManager.AppTask> appTasks = activityManager.getAppTasks();
+            List<ActivityManager.RunningAppProcessInfo> procInfos = activityManager.getRunningAppProcesses();
+            boolean isRunning = false;
+            for(int i = 0; i < procInfos.size(); i++) {
+                if(!isRunning && procInfos.get(i).processName.equals("com.intfocus.yh_android")) {
+                    isRunning = true;
+                }
+            }
 
+            Log.i("currentActivityName", "[" + currentActivityName + "]");
+            Log.i("isCurrent", currentActivityName.trim().equals("ConfirmPassCodeActivity") ? "YES" : "NO");
+            Log.i("CheckCurrent", "ConfirmPassCodeActivity".equals("ConfirmPassCodeActivity") ? "YES" : "NO");
             if (intent.getAction().equals(Intent.ACTION_SCREEN_ON) && // 开屏状态
-                    !appTasks.isEmpty() && // 应用活动Activity数量大于零
-                    !currentActivityName.contains("ConfirmPassCodeActivity") && // 当前活动的Activity非解锁界面
+                    isRunning && // 应用活动Activity数量大于零
+                    (currentActivityName == null || !currentActivityName.trim().equals("ConfirmPassCodeActivity")) && // 当前活动的Activity非解锁界面
                     FileUtil.checkIsLocked(mContext)) { // 应用处于登录状态，并且开启了密码锁
 
                 Intent i = new Intent(getApplicationContext(), ConfirmPassCodeActivity.class);
@@ -183,7 +192,7 @@ public class YHApplication extends Application implements Application.ActivityLi
          * 1. 如果用户已使用锁屏功能，则进入验证密码界面
          * 2. 如果未使用锁屏功能，则进入登录状态
          */
-        currentActivityName = activity.getClass().toString();
+        currentActivityName = activity.getClass().getSimpleName();
     }
 
     @Override
@@ -195,7 +204,7 @@ public class YHApplication extends Application implements Application.ActivityLi
          * 1. 如果用户已使用锁屏功能，则进入验证密码界面
          * 2. 如果未使用锁屏功能，则进入登录状态
          */
-        currentActivityName = activity.getClass().toString();
+        currentActivityName = activity.getClass().getSimpleName();
     }
 
     @Override
