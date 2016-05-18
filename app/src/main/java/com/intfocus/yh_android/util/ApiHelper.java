@@ -30,6 +30,9 @@ public class ApiHelper {
      */
     public static String authentication(Context context, String username, String password) {
         String ret = "success";
+        if(!HttpUtil.isConnected(context)) {
+            return "请检查网络环境";
+        }
 
         String urlString = String.format(URLs.API_USER_PATH, URLs.HOST, "android", username, password);
         try {
@@ -47,7 +50,6 @@ public class ApiHelper {
 
             Map<String, String> response = HttpUtil.httpPost(urlString, params);
 
-            JSONObject responseJSON = new JSONObject(response.get("body"));
 
             String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), URLs.USER_CONFIG_FILENAME);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
@@ -55,15 +57,19 @@ public class ApiHelper {
             userJSON.put("is_login", response.get("code").equals("200"));
 
             if (response.get("code").equals("400")) {
-                return "网络未连接";
-            } else if (response.get("code").equals("401")) {
+                return "请检查网络环境";
+            }
+            else if (response.get("code").equals("401")) {
                 return "用户名或密码不正确";
-            } else if (response.get("code").equals("408")) {
+            }
+            else if (response.get("code").equals("408")) {
                 return "连接超时";
-            } else if (!response.get("code").equals("200")) {
-                return responseJSON.getString("info");
+            }
+            else if (!response.get("code").equals("200")) {
+                return "错误代号:(" + response.get("code") + ")";
             }
             // FileUtil.dirPath 需要优先写入登录用户信息
+            JSONObject responseJSON = new JSONObject(response.get("body"));
             userJSON = ApiHelper.merge(userJSON, responseJSON);
             FileUtil.writeFile(userConfigPath, userJSON.toString());
 

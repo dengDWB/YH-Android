@@ -90,7 +90,8 @@ public class LoginActivity extends BaseActivity {
                         LoginActivity.this.startActivity(intent);
 
                         finish();
-                    } else {
+                    }
+                    else {
                         Toast.makeText(LoginActivity.this, info, Toast.LENGTH_SHORT).show();
                     }
 
@@ -105,7 +106,8 @@ public class LoginActivity extends BaseActivity {
                     logParams = new JSONObject();
                     logParams.put("action", "登录");
                     new Thread(mRunnableForLogger).start();
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     e.printStackTrace();
                 }
             } else {

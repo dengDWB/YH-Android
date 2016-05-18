@@ -277,7 +277,6 @@ public class BaseActivity extends Activity {
             Map<String, String> response = HttpUtil.httpGet(urlStringForDetecting, new HashMap<String, String>());
             int statusCode = Integer.parseInt(response.get("code"));
             if (statusCode == 200 && !urlStringForDetecting.equals(URLs.HOST)) {
-                Log.i("StatusCode", response.get("body"));
                 try {
                     JSONObject json = new JSONObject(response.get("body"));
                     statusCode = json.getBoolean("device_state") ? 200 : 401;
@@ -285,7 +284,6 @@ public class BaseActivity extends Activity {
                     e.printStackTrace();
                 }
             }
-            Log.i("Detecting", response.get("code"));
 
             Message message = mHandlerForDetecting.obtainMessage();
             message.what = statusCode;

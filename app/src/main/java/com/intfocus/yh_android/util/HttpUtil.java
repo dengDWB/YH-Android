@@ -1,15 +1,20 @@
 package com.intfocus.yh_android.util;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Headers;
 import okhttp3.MediaType;
@@ -17,6 +22,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.telephony.TelephonyManager;
 
 public class HttpUtil {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -29,67 +38,60 @@ public class HttpUtil {
      */
     //@throws UnsupportedEncodingException
     public static Map<String, String> httpGet(String urlString, Map<String, String> headers) {
-        Log.i("HttpMethod#Get", urlString);
+        Log.i("GET", urlString);
         Map<String, String> retMap = new HashMap<>();
-        OkHttpClient client = new OkHttpClient();
-        Request request;
-        Response response;
-        if (headers.containsKey("ETag") && headers.containsKey("Last-Modified")) {
-            request = new Request.Builder()
-                    .url(urlString)
-                    .addHeader("User-Agent", HttpUtil.webViewUserAgent())
-                    .addHeader("IF-None-Match", headers.get("ETag"))
-                    .addHeader("If-Modified-Since", headers.get("Last-Modified"))
-                    .build();
-        } else if (headers.containsKey("ETag")) {
-            request = new Request.Builder()
-                    .url(urlString)
-                    .addHeader("User-Agent", HttpUtil.webViewUserAgent())
-                    .addHeader("IF-None-Match", headers.get("ETag"))
-                    .build();
-        } else if (headers.containsKey("Last-Modified")) {
-            request = new Request.Builder()
-                    .url(urlString)
-                    .addHeader("User-Agent", HttpUtil.webViewUserAgent())
-                    .addHeader("If-Modified-Since", headers.get("Last-Modified"))
-                    .build();
-        } else {
-            request = new Request.Builder()
-                    .url(urlString)
-                    .addHeader("User-Agent", HttpUtil.webViewUserAgent())
-                    .build();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(3, TimeUnit.SECONDS)
+                .writeTimeout(3, TimeUnit.SECONDS)
+                .readTimeout(3, TimeUnit.SECONDS)
+                .build();
+        okhttp3.Request.Builder builder = new Request.Builder()
+                .url(urlString)
+                .addHeader("User-Agent", HttpUtil.webViewUserAgent());
+
+        if (headers.containsKey("ETag")) {
+            builder = builder.addHeader("IF-None-Match", headers.get("ETag"));
         }
-
+        if (headers.containsKey("Last-Modified")) {
+            builder = builder.addHeader("If-Modified-Since", headers.get("Last-Modified"));
+        }
+        Response response;
+        Request request = builder.build();
         try {
-
             response = client.newCall(request).execute();
-
             Headers responseHeaders = response.headers();
-            int headerSize = responseHeaders.size();
-            for (int i = 0; i < headerSize; i++) {
+            boolean isJSON = false;
+            for (int i = 0, len = responseHeaders.size(); i < len; i++) {
                 retMap.put(responseHeaders.name(i), responseHeaders.value(i));
-                Log.i("HEADER", String.format("Key : %s, Value: %s", responseHeaders.name(i), responseHeaders.value(i)));
+                // Log.i("HEADER", String.format("Key : %s, Value: %s", responseHeaders.name(i), responseHeaders.value(i)));
+                if(responseHeaders.name(i).equalsIgnoreCase("Content-Type") && responseHeaders.value(i).contains("application/json")) {
+                    isJSON = true;
+                }
             }
+            retMap.put("code", String.format("%d", response.code()));
+            retMap.put("body", response.body().string());
 
-            int code = response.code();
-            Log.i("CODE", code + "");
-            retMap.put("code", String.format("%d", code));
-
-            if (code == 200) {
-                String responseBody = response.body().string();
-                retMap.put("body", responseBody);
+            if(isJSON) {
+                Log.i("code", retMap.get("code"));
                 Log.i("responseBody", retMap.get("body"));
             }
-
-        } catch (Exception e) {
-            Log.i("GETBUG", e.getMessage());
-            e.printStackTrace();
-            if (e.getMessage().contains("timed out")) {
-                retMap.put("code", "408");
-                retMap.put("body", "{\"info\": \"连接超时\"}");
-            } else if (e.getMessage().contains("Unable to resolve host")) {
+        }
+        catch (UnknownHostException e) {
+            // 400: Unable to resolve host "yonghui.idata.mobi": No address associated with hostname
+            Log.i("UnknownHostException", e.getMessage());
+            retMap.put("code", "400");
+            retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+        }
+        catch (Exception e) {
+            String errorMessage = e.getMessage().toLowerCase();
+            Log.i("Exception", errorMessage);
+            if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
                 retMap.put("code", "400");
-                retMap.put("body", "{\"info\": \"网络未连接\"}");
+                retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+            }
+            else if (errorMessage.contains("unauthorized")) {
+                retMap.put("code", "401");
+                retMap.put("body", "{\"info\": \"用户名或密码错误\"}");
             }
         }
         return retMap;
@@ -101,13 +103,16 @@ public class HttpUtil {
     //@throws UnsupportedEncodingException
     //@throws JSONException
     public static Map<String, String> httpPost(String urlString, Map params){
-        Log.i("HttpMethod#Post", urlString);
+        Log.i("POST", urlString);
         Map<String, String> retMap = new HashMap<>();
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(3, TimeUnit.SECONDS)
+                .writeTimeout(3, TimeUnit.SECONDS)
+                .readTimeout(3, TimeUnit.SECONDS)
+                .build();
         Request request;
         Response response;
         Request.Builder requestBuilder = new Request.Builder();
-
         if (params != null) {
             try {
                 Iterator iter = params.entrySet().iterator();
@@ -126,7 +131,8 @@ public class HttpUtil {
                             data.put((String) pairs2.getKey(), pairs2.getValue());
                             holder.put(key, data);
                         }
-                    } else {
+                    }
+                    else {
                         holder.put(key, pairs.getValue());
                     }
                 }
@@ -151,16 +157,28 @@ public class HttpUtil {
                 Log.i("HEADER", String.format("Key : %s, Value: %s", responseHeaders.name(i), responseHeaders.value(i)));
             }
 
-            int code = response.code();
-            Log.i("CODE", code + "");
-            retMap.put("code", String.format("%d", code));
+            retMap.put("code", String.format("%d", response.code()));
+            retMap.put("body", response.body().string());
 
-            String responseBody = response.body().string();
-            retMap.put("body", responseBody);
+            Log.i("code", retMap.get("code"));
             Log.i("responseBody", retMap.get("body"));
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        }
+        catch (UnknownHostException e) {
+            Log.i("UnknownHostException", e.getMessage());
+            retMap.put("code", "400");
+            retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+        }
+        catch (Exception e) {
+            String errorMessage = e.getMessage().toLowerCase();
+            Log.i("Exception", errorMessage);
+            if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
+                retMap.put("code", "400");
+                retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+            }
+            else if (errorMessage.contains("unauthorized")) {
+                retMap.put("code", "401");
+                retMap.put("body", "{\"info\": \"用户名或密码错误\"}");
+            }
         }
         return retMap;
     }
@@ -170,17 +188,19 @@ public class HttpUtil {
      * ִ执行一个HTTP POST请求，返回请求响应的HTML
      */
     public static Map<String, String> httpPost(String urlString, JSONObject params) {
-        Log.i("HttpMethod#Post2", urlString);
+        Log.i("POST2", urlString);
 
         Map<String, String> retMap = new HashMap<>();
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(3, TimeUnit.SECONDS)
+                .writeTimeout(3, TimeUnit.SECONDS)
+                .readTimeout(3, TimeUnit.SECONDS)
+                .build();
         Request request;
         Response response;
         Request.Builder requestBuilder = new Request.Builder();
 
-        if (params != null) {
-                requestBuilder.post(RequestBody.create(JSON, params.toString()));
-        }
+        if (params != null) { requestBuilder.post(RequestBody.create(JSON, params.toString())); }
         try {
             request = requestBuilder
                     .url(urlString)
@@ -196,24 +216,25 @@ public class HttpUtil {
                 retMap.put(responseHeaders.name(i), responseHeaders.value(i));
                 Log.i("HEADER", String.format("Key : %s, Value: %s", responseHeaders.name(i), responseHeaders.value(i)));
             }
+            retMap.put("code", String.format("%d", response.code()));
+            retMap.put("body", response.body().string());
 
-            int code = response.code();
-            Log.i("CODE", code + "");
-            retMap.put("code", String.format("%d", code));
-
-            String responseBody = response.body().string();
-            retMap.put("body", responseBody);
-
+            Log.i("code", retMap.get("code"));
             Log.i("responseBody", retMap.get("body"));
-        } catch (IOException e) {
-            e.printStackTrace();
-            // 400: Unable to resolve host "yonghui.idata.mobi": No address associated with hostname
-
-            Log.i("DDEBUG", e.getMessage());
-            if (e.getMessage().contains("Unable to resolve host")) {
+        }
+        catch (UnknownHostException e) {
+            Log.i("UnknownHostException2", e.getMessage());
+            retMap.put("code", "400");
+            retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+        }
+        catch (Exception e) {
+            String errorMessage = e.getMessage().toLowerCase();
+            Log.i("Exception2", errorMessage);
+            if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
                 retMap.put("code", "400");
-                retMap.put("body", "{\"info\": \"网络未连接\"}");
-            } else if (e.getMessage().contains("Unauthorized")) {
+                retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+            }
+            else if (errorMessage.contains("unauthorized")) {
                 retMap.put("code", "401");
                 retMap.put("body", "{\"info\": \"用户名或密码错误\"}");
             }
@@ -242,4 +263,128 @@ public class HttpUtil {
         return userAgent;
     }
 
+    private static void dealWithException(String errorMessage, Map<String, String> retMap) {
+        Log.i("DDEBUG", errorMessage);
+        errorMessage = errorMessage.toLowerCase();
+        if (errorMessage.contains("timed out") || errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
+            retMap.put("code", "408");
+            retMap.put("body", "{\"info\": \"连接超时,请检查网络环境\"}");
+        }
+    }
+
+
+
+    /*
+     * http://stackoverflow.com/questions/2802472/detect-network-connection-type-on-android
+     */
+
+    /**
+     * Get the network info
+     * @param context
+     * @return
+     */
+    public static NetworkInfo getNetworkInfo(Context context){
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo();
+    }
+
+    /**
+     * Check if there is any connectivity
+     * @param context
+     * @return
+     */
+    public static boolean isConnected(Context context){
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = cm.getActiveNetworkInfo();
+        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        return (info != null && info.isConnected() && HttpUtil.isConnectionFast(info.getType(), tm.getNetworkType()));
+    }
+
+    /**
+     * Check if there is any connectivity to a Wifi network
+     * @param context
+     * @param type
+     * @return
+     */
+    public static boolean isConnectedWifi(Context context){
+        NetworkInfo info = HttpUtil.getNetworkInfo(context);
+        return (info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_WIFI);
+    }
+
+    /**
+     * Check if there is any connectivity to a mobile network
+     * @param context
+     * @param type
+     * @return
+     */
+    public static boolean isConnectedMobile(Context context){
+        NetworkInfo info = HttpUtil.getNetworkInfo(context);
+        return (info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_MOBILE);
+    }
+
+    /**
+     * Check if there is fast connectivity
+     * @param context
+     * @return
+     */
+    public static boolean isConnectedFast(Context context){
+        NetworkInfo info = HttpUtil.getNetworkInfo(context);
+        return (info != null && info.isConnected() && HttpUtil.isConnectionFast(info.getType(),info.getSubtype()));
+    }
+
+    /**
+     * Check if the connection is fast
+     * @param type
+     * @param subType
+     * @return
+     */
+    public static boolean isConnectionFast(int type, int subType){
+        if(type== ConnectivityManager.TYPE_WIFI){
+            return true;
+        }else if(type==ConnectivityManager.TYPE_MOBILE){
+            switch(subType){
+                case TelephonyManager.NETWORK_TYPE_1xRTT:
+                    return false; // ~ 50-100 kbps
+                case TelephonyManager.NETWORK_TYPE_CDMA:
+                    return false; // ~ 14-64 kbps
+                case TelephonyManager.NETWORK_TYPE_EDGE:
+                    return false; // ~ 50-100 kbps
+                case TelephonyManager.NETWORK_TYPE_EVDO_0:
+                    return true; // ~ 400-1000 kbps
+                case TelephonyManager.NETWORK_TYPE_EVDO_A:
+                    return true; // ~ 600-1400 kbps
+                case TelephonyManager.NETWORK_TYPE_GPRS:
+                    return false; // ~ 100 kbps
+                case TelephonyManager.NETWORK_TYPE_HSDPA:
+                    return true; // ~ 2-14 Mbps
+                case TelephonyManager.NETWORK_TYPE_HSPA:
+                    return true; // ~ 700-1700 kbps
+                case TelephonyManager.NETWORK_TYPE_HSUPA:
+                    return true; // ~ 1-23 Mbps
+                case TelephonyManager.NETWORK_TYPE_UMTS:
+                    return true; // ~ 400-7000 kbps
+            /*
+             * Above API level 7, make sure to set android:targetSdkVersion
+             * to appropriate level to use these
+             */
+                case TelephonyManager.NETWORK_TYPE_EHRPD: // API level 11
+                    return true; // ~ 1-2 Mbps
+                case TelephonyManager.NETWORK_TYPE_EVDO_B: // API level 9
+                    return true; // ~ 5 Mbps
+                case TelephonyManager.NETWORK_TYPE_HSPAP: // API level 13
+                    return true; // ~ 10-20 Mbps
+                case TelephonyManager.NETWORK_TYPE_IDEN: // API level 8
+                    return false; // ~25 kbps
+                case TelephonyManager.NETWORK_TYPE_LTE: // API level 11
+                    return true; // ~ 10+ Mbps
+                // Unknown
+                case TelephonyManager.NETWORK_TYPE_UNKNOWN:
+                default:
+                    return false;
+            }
+        }
+        else{
+            return false;
+        }
+    }
 }
