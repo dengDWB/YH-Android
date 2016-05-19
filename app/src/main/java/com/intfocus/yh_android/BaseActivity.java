@@ -61,26 +61,25 @@ import java.util.Map;
  */
 public class BaseActivity extends Activity {
 
+    private String sharedPath;
+    private String relativeAssetsPath;
+    private String urlStringForDetecting;
+    private ProgressDialog mProgressDialog;
+    protected YHApplication mMyApp;
     PullToRefreshWebView pullToRefreshWebView;
     android.webkit.WebView mWebView;
     JSONObject user;
     int userID = 0;
     String urlString;
     String assetsPath;
-    private String sharedPath;
-    private String relativeAssetsPath;
-    private String urlStringForDetecting;
     String urlStringForLoading;
     JSONObject logParams = new JSONObject();
-    private ProgressDialog mProgressDialog;
     Context mContext;
-    protected YHApplication mMyApp;
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         mMyApp = (YHApplication)this.getApplicationContext();
         mContext = BaseActivity.this;
@@ -100,7 +99,8 @@ public class BaseActivity extends Activity {
                     urlStringForDetecting = String.format(URLs.API_DEVICE_STATE_PATH, URLs.HOST, user.getInt("user_device_id"));
                     relativeAssetsPath = "../../Shared/assets";
                 }
-            } catch (JSONException e) {
+            }
+            catch (JSONException e) {
                 e.printStackTrace();
             }
         }
@@ -126,9 +126,11 @@ public class BaseActivity extends Activity {
                             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
                             userJSON.put("umeng_device_id", registrationId);
                             FileUtil.writeFile(userConfigPath, userJSON.toString());
-                        } catch (JSONException e) {
+                        }
+                        catch (JSONException e) {
                             e.printStackTrace();
-                        } catch (IOException e) {
+                        }
+                        catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
@@ -153,8 +155,9 @@ public class BaseActivity extends Activity {
 
     private void clearReferences(){
         Activity currActivity = mMyApp.getCurrentActivity();
-        if (this.equals(currActivity))
+        if (this.equals(currActivity)) {
             mMyApp.setCurrentActivity(null);
+        }
     }
 
     private void fixInputMethodManager() {
