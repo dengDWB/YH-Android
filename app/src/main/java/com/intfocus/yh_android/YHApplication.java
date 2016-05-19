@@ -2,7 +2,6 @@ package com.intfocus.yh_android;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,7 +10,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.util.Log;
 
 import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
@@ -25,14 +23,12 @@ import org.OpenUDID.OpenUDID_manager;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by lijunjie on 16/1/15.
  */
-public class YHApplication extends Application implements Application.ActivityLifecycleCallbacks {
+public class YHApplication extends Application {
 
-    private String currentActivityName;
     private Context mContext;
     private RefWatcher refWatcher;
 
@@ -44,22 +40,17 @@ public class YHApplication extends Application implements Application.ActivityLi
         @TargetApi(Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onReceive(Context context, Intent intent) {
-            ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-            List<ActivityManager.RunningAppProcessInfo> procInfos = activityManager.getRunningAppProcesses();
-            boolean isRunning = false;
-            for(int i = 0; i < procInfos.size(); i++) {
-                if(!isRunning && procInfos.get(i).processName.equals("com.intfocus.yh_android")) {
-                    isRunning = true;
-                }
-            }
+            if(!intent.getAction().equals(Intent.ACTION_SCREEN_ON)) return;
 
+            String currentActivityName = null;
+            Activity currentActivity = ((YHApplication)context.getApplicationContext()).getCurrentActivity();
+            if(currentActivity != null) {
+                currentActivityName = currentActivity.getClass().getSimpleName();
+                Log.i("currentActivityName", currentActivityName.trim().equals("ConfirmPassCodeActivity") ? "YES" : "NO");
+            }
             Log.i("currentActivityName", "[" + currentActivityName + "]");
-            Log.i("isCurrent", currentActivityName.trim().equals("ConfirmPassCodeActivity") ? "YES" : "NO");
-            Log.i("CheckCurrent", "ConfirmPassCodeActivity".equals("ConfirmPassCodeActivity") ? "YES" : "NO");
-            if (intent.getAction().equals(Intent.ACTION_SCREEN_ON) && // 开屏状态
-                    isRunning && // 应用活动Activity数量大于零
-                    (currentActivityName == null || !currentActivityName.trim().equals("ConfirmPassCodeActivity")) && // 当前活动的Activity非解锁界面
-                    FileUtil.checkIsLocked(mContext)) { // 应用处于登录状态，并且开启了密码锁
+            if ((currentActivityName != null && !currentActivityName.trim().equals("ConfirmPassCodeActivity")) && // 当前活动的Activity非解锁界面
+                FileUtil.checkIsLocked(mContext)) { // 应用处于登录状态，并且开启了密码锁
 
                 Intent i = new Intent(getApplicationContext(), ConfirmPassCodeActivity.class);
                 i.putExtra("is_from_login", false);
@@ -73,7 +64,7 @@ public class YHApplication extends Application implements Application.ActivityLi
     public void onCreate() {
         super.onCreate();
 
-        currentActivityName = "";
+        // currentActivityName = "";
         mContext = YHApplication.this;
         String sharedPath = FileUtil.sharedPath(mContext), basePath = FileUtil.basePath(mContext);
 
@@ -144,9 +135,6 @@ public class YHApplication extends Application implements Application.ActivityLi
         FileUtil.checkAssets(mContext, "stylesheets", true);
         FileUtil.checkAssets(mContext, "javascripts", true);
 
-
-        registerActivityLifecycleCallbacks(this);
-
         /*
          *  手机待机再激活时发送开屏广播
          */
@@ -161,61 +149,8 @@ public class YHApplication extends Application implements Application.ActivityLi
 
     @Override
     public void onTerminate() {
-        unregisterActivityLifecycleCallbacks(this);
-
-        Log.i("YHApplication", "onTerminate");
         super.onTerminate();
     }
-
-    @Override
-    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        Log.i("YHApplication", "onActivityCreated - " + activity.getClass());
-    }
-
-    @Override
-    public void onActivityStarted(Activity activity) {
-        Log.i("YHApplication", "onActivityStarted - " + activity.getClass());
-    }
-
-    @Override
-    public void onActivityResumed(Activity activity) {
-        Log.i("YHApplication", "onActivityResumed - " + activity.getClass());
-    }
-
-    @Override
-    public void onActivityPaused(Activity activity) {
-        Log.i("YHApplication", "onActivityPaused - " + activity.getClass());
-
-        /*
-         * 进入待机状态，会优先触发puased， 然后stopped.
-         * 如果用户使用app时，进入待机状态前的最后一个ctivit
-         * 1. 如果用户已使用锁屏功能，则进入验证密码界面
-         * 2. 如果未使用锁屏功能，则进入登录状态
-         */
-        currentActivityName = activity.getClass().getSimpleName();
-    }
-
-    @Override
-    public void onActivityStopped(Activity activity) {
-        Log.i("YHApplication", "onActivityStopped - " + activity.getClass());
-        /*
-         * 进入待机状态，会优先触发puased， 然后stopped.
-         * 如果用户使用app时，进入待机状态前的最后一个ctivit
-         * 1. 如果用户已使用锁屏功能，则进入验证密码界面
-         * 2. 如果未使用锁屏功能，则进入登录状态
-         */
-        currentActivityName = activity.getClass().getSimpleName();
-    }
-
-    @Override
-    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-    }
-
-    @Override
-    public void onActivityDestroyed(Activity activity) {
-        Log.i("YHApplication", "onActivityDestroyed");
-    }
-
 
     public static RefWatcher getRefWatcher(Context context) {
         YHApplication application = (YHApplication) context.getApplicationContext();
@@ -225,5 +160,14 @@ public class YHApplication extends Application implements Application.ActivityLi
     private void makeSureFolderExist(String folderName) {
         String cachedPath = String.format("%s/%s", FileUtil.basePath(mContext), folderName);
         FileUtil.makeSureFolderExist(cachedPath);
+    }
+
+
+    private Activity mCurrentActivity = null;
+    public Activity getCurrentActivity(){
+        return mCurrentActivity;
+    }
+    public void setCurrentActivity(Activity mCurrentActivity){
+        this.mCurrentActivity = mCurrentActivity;
     }
 }

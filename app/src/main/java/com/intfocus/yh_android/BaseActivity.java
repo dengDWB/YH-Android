@@ -74,12 +74,15 @@ public class BaseActivity extends Activity {
     JSONObject logParams = new JSONObject();
     private ProgressDialog mProgressDialog;
     Context mContext;
+    protected YHApplication mMyApp;
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        mMyApp = (YHApplication)this.getApplicationContext();
         mContext = BaseActivity.this;
         sharedPath = FileUtil.sharedPath(mContext);
         assetsPath = sharedPath;
@@ -134,13 +137,24 @@ public class BaseActivity extends Activity {
         });
         mPushAgent.onAppStart();
     }
-
-    @Override
-    public void onDestroy() {
-//        mActivities.remove(this);
-//        System.out.println("activityDestroy: " + this.toString());
+    protected void onResume() {
+        super.onResume();
+        mMyApp.setCurrentActivity(this);
+    }
+    protected void onPause() {
+        clearReferences();
+        super.onPause();
+    }
+    protected void onDestroy() {
+        clearReferences();
         fixInputMethodManager();
         super.onDestroy();
+    }
+
+    private void clearReferences(){
+        Activity currActivity = mMyApp.getCurrentActivity();
+        if (this.equals(currActivity))
+            mMyApp.setCurrentActivity(null);
     }
 
     private void fixInputMethodManager() {
