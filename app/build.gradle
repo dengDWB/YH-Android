@@ -33,8 +33,8 @@ dependencies {
     compile 'commons-io:commons-io:+'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile project(':lib:pull-to-refresh')
-    compile project(':Pushlib')
     compile project(':android-pdfview')
+    compile project(':Pushlib')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.3'

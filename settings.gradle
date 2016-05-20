@@ -1,2 +1,3 @@
-include ':app', ':lib:pull-to-refresh', ':Pushlib'
+include ':app', ':lib:pull-to-refresh', ':Pushlib', ':android-pdfview'
 project(':Pushlib').projectDir = new File('lib/Pushlib')
+project(':android-pdfview').projectDir = new File('lib/android-pdfview')

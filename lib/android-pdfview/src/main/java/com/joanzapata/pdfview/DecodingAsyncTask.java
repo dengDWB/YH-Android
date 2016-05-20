@@ -28,7 +28,7 @@ import org.vudroid.core.DecodeService;
 import org.vudroid.core.DecodeServiceBase;
 import org.vudroid.pdfdroid.codec.PdfContext;
 
-class DecodingAsyncTask extends AsyncTask<Void, Void, Void> {
+class DecodingAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
     /** The decode service used for decoding the PDF */
     private DecodeService decodeService;
@@ -46,16 +46,35 @@ class DecodingAsyncTask extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected Boolean doInBackground(Void... params) {
         decodeService = new DecodeServiceBase(new PdfContext());
         decodeService.setContentResolver(pdfView.getContext().getContentResolver());
-        decodeService.open(uri);
-        return null;
+        try {
+            decodeService.open(uri);
+        }
+        catch(Exception e) {
+            // Prevent  java.lang.RuntimeException: PDF file is corrupted
+            Log.i("DecodingAsyncTask#1", e.getLocalizedMessage());
+            return true;
+        }
+        return false;
     }
 
-    protected void onPostExecute(Void result) {
-        if (!cancelled) {
-            pdfView.loadComplete(decodeService);
+    protected void onPostExecute(Boolean isErrorOccured) {
+        if (isErrorOccured) {
+            pdfView.errorOccurred("Exception", "abort before catch");
+        }
+        else if (!isErrorOccured && !cancelled) {
+            try {
+                pdfView.loadComplete(decodeService);
+            }
+            catch(RuntimeException e) {
+                pdfView.errorOccurred("RuntimeException", e.getLocalizedMessage());
+
+            }
+            catch(Exception e) {
+                pdfView.errorOccurred("Exception", e.getLocalizedMessage());
+            }
         }
     }
 

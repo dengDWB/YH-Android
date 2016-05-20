@@ -49,8 +49,6 @@ public class ApiHelper {
             params.put("app_version", String.format("a%s", packageInfo.versionName));
 
             Map<String, String> response = HttpUtil.httpPost(urlString, params);
-
-
             String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), URLs.USER_CONFIG_FILENAME);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
             userJSON.put("password", password);

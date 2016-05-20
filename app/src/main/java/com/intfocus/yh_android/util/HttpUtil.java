@@ -83,15 +83,21 @@ public class HttpUtil {
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
         }
         catch (Exception e) {
-            String errorMessage = e.getMessage().toLowerCase();
-            Log.i("Exception", errorMessage);
-            if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
-                retMap.put("code", "400");
-                retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
-            }
-            else if (errorMessage.contains("unauthorized")) {
-                retMap.put("code", "401");
-                retMap.put("body", "{\"info\": \"用户名或密码错误\"}");
+            // Default Response
+            retMap.put("code", "400");
+            retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+
+            if(e != null && e.getMessage() != null) {
+                String errorMessage = e.getMessage().toLowerCase();
+                Log.i("Exception", errorMessage);
+                if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
+                    retMap.put("code", "400");
+                    retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+                }
+                else if (errorMessage.contains("unauthorized")) {
+                    retMap.put("code", "401");
+                    retMap.put("body", "{\"info\": \"用户名或密码错误\"}");
+                }
             }
         }
         return retMap;
@@ -137,7 +143,8 @@ public class HttpUtil {
                     }
                 }
                 requestBuilder.post(RequestBody.create(JSON, holder.toString()));
-            } catch (JSONException e) {
+            }
+            catch (JSONException e) {
                 e.printStackTrace();
             }
         }
@@ -169,15 +176,21 @@ public class HttpUtil {
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
         }
         catch (Exception e) {
-            String errorMessage = e.getMessage().toLowerCase();
-            Log.i("Exception", errorMessage);
-            if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
-                retMap.put("code", "400");
-                retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
-            }
-            else if (errorMessage.contains("unauthorized")) {
-                retMap.put("code", "401");
-                retMap.put("body", "{\"info\": \"用户名或密码错误\"}");
+            // Default Response
+            retMap.put("code", "400");
+            retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+
+            if(e != null && e.getMessage() != null) {
+                String errorMessage = e.getMessage().toLowerCase();
+                Log.i("Exception", errorMessage);
+                if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
+                    retMap.put("code", "400");
+                    retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+                }
+                else if (errorMessage.contains("unauthorized")) {
+                    retMap.put("code", "401");
+                    retMap.put("body", "{\"info\": \"用户名或密码错误\"}");
+                }
             }
         }
         return retMap;
@@ -228,15 +241,21 @@ public class HttpUtil {
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
         }
         catch (Exception e) {
-            String errorMessage = e.getMessage().toLowerCase();
-            Log.i("Exception2", errorMessage);
-            if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
-                retMap.put("code", "400");
-                retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
-            }
-            else if (errorMessage.contains("unauthorized")) {
-                retMap.put("code", "401");
-                retMap.put("body", "{\"info\": \"用户名或密码错误\"}");
+            // Default Response
+            retMap.put("code", "400");
+            retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+
+            if(e != null && e.getMessage() != null) {
+                String errorMessage = e.getMessage().toLowerCase();
+                Log.i("Exception2", errorMessage);
+                if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
+                    retMap.put("code", "400");
+                    retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+                }
+                else if (errorMessage.contains("unauthorized")) {
+                    retMap.put("code", "401");
+                    retMap.put("body", "{\"info\": \"用户名或密码错误\"}");
+                }
             }
         }
         return retMap;

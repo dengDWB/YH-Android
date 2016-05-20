@@ -16,7 +16,6 @@ import android.webkit.WebSettings;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
@@ -24,6 +23,8 @@ import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.joanzapata.pdfview.PDFView;
+import com.joanzapata.pdfview.listener.OnErrorOccurredListener;
+import com.joanzapata.pdfview.listener.OnLoadCompleteListener;
 import com.joanzapata.pdfview.listener.OnPageChangeListener;
 
 import org.json.JSONException;
@@ -37,7 +38,7 @@ import java.util.List;
 
 import static java.lang.String.format;
 
-public class SubjectActivity extends BaseActivity implements OnPageChangeListener {
+public class SubjectActivity extends BaseActivity implements OnPageChangeListener, OnLoadCompleteListener, OnErrorOccurredListener {
     private Boolean isInnerLink;
     private String templateID, reportID;
     private PDFView mPDFView;
@@ -121,6 +122,25 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         initColorView(colorViews);
     }
 
+    /**
+     * PDFView OnPageChangeListener CallBack
+     *
+     * @param page      the new page displayed, starting from 1
+     * @param pageCount the total page count, starting from 1
+     */
+    public void onPageChanged(int page, int pageCount) {
+        Log.i("onPageChanged", format("%s %d / %d", bannerName, page, pageCount));
+    }
+
+    public void loadComplete(int nbPages) {
+        Log.d("loadComplete", "f");
+    }
+
+    public void errorOccured(String errorType, String errorMessage) {
+        Log.d("errorOccured", format("type: %s, message: %s", errorType, errorMessage));
+    }
+
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -201,24 +221,23 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             //Log.i("PDF", pdfFile.getAbsolutePath());
             if (pdfFile.exists()) {
                 mPDFView.fromFile(pdfFile)
+                        .defaultPage(1)
                         .showMinimap(true)
                         .enableSwipe(true)
                         .swipeVertical(true)
+                        .onLoad(SubjectActivity.this)
+                        .onPageChange(SubjectActivity.this)
+                        .onErrorOccured(SubjectActivity.this)
                         .load();
                 mWebView.setVisibility(View.INVISIBLE);
                 mPDFView.setVisibility(View.VISIBLE);
-            } else {
-                Toast.makeText(SubjectActivity.this, "加载PDF失败", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                toast("加载PDF失败");
             }
 
         }
     };
-
-
-    @Override
-    public void onPageChanged(int page, int pageCount) {
-        Log.i("onPageChanged", String.format("page: %d, count: %d", page, pageCount));
-    }
 
     private final Runnable mRunnableForPDF = new Runnable() {
         @Override
@@ -291,7 +310,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                     logParams.put("action", "刷新/浏览器");
                     logParams.put("obj_title", urlString);
                     new Thread(mRunnableForLogger).start();
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -325,7 +345,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                 config.put(pageName, tabIndex);
 
                 FileUtil.writeFile(filePath, config.toString());
-            } catch (JSONException | IOException e) {
+            }
+            catch (JSONException | IOException e) {
                 e.printStackTrace();
             }
         }
@@ -342,7 +363,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                     config = new JSONObject(fileContent);
                 }
                 tabIndex = config.getInt(pageName);
-            } catch (JSONException e) {
+            }
+            catch (JSONException e) {
                 //e.printStackTrace();
             }
 
@@ -361,7 +383,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                 logParams.put("obj_type", objectType);
                 logParams.put("obj_title", String.format("主题页面/%s/%s", bannerName, ex));
                 new Thread(mRunnableForLogger).start();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
         }
