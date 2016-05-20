@@ -638,6 +638,9 @@ public class BaseActivity extends Activity {
         return false;
     }
 
+    protected void toast(String info) {
+        Toast.makeText(mContext, info, Toast.LENGTH_SHORT).show();
+    }
 
     // usually, subclasses of AsyncTask are declared inside the activity class.
     // that way, you can easily modify the UI thread from here

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.webkit.JavascriptInterface;
-import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
@@ -15,7 +14,6 @@ import com.intfocus.yh_android.util.URLs;
 import org.json.JSONObject;
 
 public class LoginActivity extends BaseActivity {
-
     @Override
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +69,13 @@ public class LoginActivity extends BaseActivity {
         checkVersionUpgrade(assetsPath);
     }
 
+    protected void onDestroy() {
+        mContext = null;
+        mWebView = null;
+        user = null;
+        super.onDestroy();
+    }
+
     private class JavaScriptInterface extends JavaScriptBase {
         /*
          * JS 接口，暴露给JS的方法使用@JavascriptInterface装饰
@@ -78,13 +83,14 @@ public class LoginActivity extends BaseActivity {
         @JavascriptInterface
         public void login(final String username, String password) {
             if (username.length() == 0 || password.length() == 0) {
-                Toast.makeText(LoginActivity.this, "请输入用户名与密码", Toast.LENGTH_SHORT).show();
+                toast("请输入用户名与密码");
                 return;
             }
+            toast("验证中...");
             try {
                 String info = ApiHelper.authentication(mContext, username, URLs.MD5(password));
                 if (info.compareTo("success") > 0) {
-                    Toast.makeText(LoginActivity.this, info, Toast.LENGTH_SHORT).show();
+                    toast(info);
                     return;
                 }
 
@@ -114,6 +120,7 @@ public class LoginActivity extends BaseActivity {
             }
             catch (Exception e) {
                 e.printStackTrace();
+                toast(e.getLocalizedMessage());
             }
         }
 
