@@ -40,7 +40,7 @@ public class TabView extends LinearLayout {
         mActive = a.getBoolean(R.styleable.TabView_active, false);
         mDrawable = a.getDrawable(R.styleable.TabView_src);
         mActiveDrawable = a.getDrawable(R.styleable.TabView_active_src);
-        String mText = a.getString(R.styleable.TabView_tab_view_text);
+        String mText = a.getString(R.styleable.TabView_text);
         int srcHeight = a.getDimensionPixelOffset(R.styleable.TabView_src_height, 20);
         a.recycle();
 

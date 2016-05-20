@@ -6,13 +6,14 @@
          ?android:attr/buttonBarStyle is new as of API 11 so this is
          necessary to support previous API levels.
     -->
+    <attr name="text" format="string" />
     <declare-styleable name="ButtonBarContainerTheme">
         <attr name="metaButtonBarStyle" format="reference" />
         <attr name="metaButtonBarButtonStyle" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="TabView">
-        <attr name="tab_view_text" format="string" />
+        <attr name="text" />
         <attr name="active" format="boolean" />
         <attr name="src" format="reference" />
         <attr name="active_src" format="reference" />
@@ -20,7 +21,6 @@
     </declare-styleable>
 
     <declare-styleable name="ProgressWheel">
-        <attr name="text" format="string" />
         <attr name="textColor" format="color" />
         <attr name="textSize" format="dimension" />
         <attr name="barColor" format="color" />
