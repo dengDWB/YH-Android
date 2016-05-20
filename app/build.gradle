@@ -26,14 +26,15 @@ repositories {
 dependencies {
     // compile 'com.makeramen:roundedimageview:2.2.1'
     // compile 'com.github.Todd-Davies:ProgressWheel:1.0'
+    // compile 'com.joanzapata.pdfview:android-pdfview:1.0.4@aar'
     compile 'com.android.support:appcompat-v7:22.1.0'
     compile 'com.android.support:support-v4:22.1.0'
     compile 'com.pgyersdk:sdk:2.2.2'
     compile 'commons-io:commons-io:+'
-    compile 'com.joanzapata.pdfview:android-pdfview:1.0.4@aar'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile project(':lib:pull-to-refresh')
     compile project(':Pushlib')
+    compile project(':android-pdfview')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.3'
