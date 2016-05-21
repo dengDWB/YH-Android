@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.intfocus.yh_android.screen_lock.InitPassCodeActivity;
+import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.umeng.message.PushAgent;
@@ -104,9 +105,11 @@ public class SettingActivity extends BaseActivity {
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             mAppVersion.setText(packageInfo.versionName);
             mAppIdentifier.setText(packageInfo.packageName);
-        } catch (JSONException e) {
+        }
+        catch (JSONException e) {
             e.printStackTrace();
-        } catch (NameNotFoundException e) {
+        }
+        catch (NameNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -137,7 +140,8 @@ public class SettingActivity extends BaseActivity {
                 configJSON.put("is_login", false);
 
                 modifiedUserConfig(configJSON);
-            } catch (JSONException e) {
+            }
+            catch (JSONException e) {
                 e.printStackTrace();
             }
 
@@ -154,7 +158,8 @@ public class SettingActivity extends BaseActivity {
                 logParams = new JSONObject();
                 logParams.put("action", "退出登录");
                 new Thread(mRunnableForLogger).start();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -176,7 +181,8 @@ public class SettingActivity extends BaseActivity {
                 logParams = new JSONObject();
                 logParams.put("action", "点击/设置页面/修改密码");
                 new Thread(mRunnableForLogger).start();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -198,11 +204,21 @@ public class SettingActivity extends BaseActivity {
     private final View.OnClickListener mCheckAssetsListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        ApiHelper.authentication(SettingActivity.this, user.getString("user_num"), user.getString("password"));
+                    }
+                    catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
             /*
              * 检测服务器静态资源是否更新，并下载
              */
             checkAssetsUpdated(false);
-
             /*
              * 用户报表数据js文件存放在公共区域
              */
@@ -230,25 +246,24 @@ public class SettingActivity extends BaseActivity {
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             // TODO Auto-generated method stub
             if(isChecked) {
-
                 startActivity(InitPassCodeActivity.createIntent(mContext));
-            } else {
+            }
+            else {
                 try {
                     String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
                     if((new File(userConfigPath)).exists()) {
                         JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
                         userJSON.put("use_gesture_password", false);
-                        if(!userJSON.has("gesture_password")) {
-                            userJSON.put("gesture_password", "");
-                        }
+                        if(!userJSON.has("gesture_password")) { userJSON.put("gesture_password", ""); }
 
                         FileUtil.writeFile(userConfigPath, userJSON.toString());
                         String settingsConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
                         FileUtil.writeFile(settingsConfigPath, userJSON.toString());
                     }
 
-                    Toast.makeText(mContext, screenLockInfo, Toast.LENGTH_SHORT).show();
-                } catch (Exception e) {
+                    toast(screenLockInfo);
+                }
+                catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -260,12 +275,12 @@ public class SettingActivity extends BaseActivity {
                 logParams = new JSONObject();
                 logParams.put("action", String.format("点击/设置页面/%s锁屏", isChecked ? "开启" : "禁用"));
                 new Thread(mRunnableForLogger).start();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
         }
     };
-
 
     /*
      * 切换UI
@@ -282,13 +297,13 @@ public class SettingActivity extends BaseActivity {
                 }
                 betaJSON.put("new_ui", isChecked);
                 FileUtil.writeFile(betaConfigPath, betaJSON.toString());
-            } catch (JSONException e) {
+            }
+            catch (JSONException e) {
                 e.printStackTrace();
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 e.printStackTrace();
             }
         }
     };
-
-
 }

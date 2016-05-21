@@ -43,7 +43,8 @@ public class MainActivity extends BaseActivity {
         try {
             objectType = 1;
             urlString = String.format(URLs.KPI_PATH, URLs.HOST, currentUIVersion(), user.getString("group_id"), user.getString("role_id"));
-        } catch (JSONException e) {
+        }
+        catch (JSONException e) {
             e.printStackTrace();
         }
 
@@ -77,7 +78,8 @@ public class MainActivity extends BaseActivity {
                             userJSON.put("is_login", false);
                             FileUtil.writeFile(userConfigPath, userJSON.toString());
                         }
-                    } catch (JSONException | IOException e) {
+                    }
+                    catch (JSONException | IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -92,6 +94,13 @@ public class MainActivity extends BaseActivity {
          */
         checkAssetsUpdated(true);
         new Thread(mRunnableForDetecting).start();
+    }
+
+    protected void onDestroy() {
+        mContext = null;
+        mWebView = null;
+        user = null;
+        super.onDestroy();
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -134,9 +143,8 @@ public class MainActivity extends BaseActivity {
     private final View.OnClickListener mTabChangeListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (v == mCurrentTab) {
-                return;
-            }
+            if (v == mCurrentTab) return;
+
             mCurrentTab.setActive(false);
             mCurrentTab = (TabView) v;
             mCurrentTab.setActive(true);
@@ -168,7 +176,8 @@ public class MainActivity extends BaseActivity {
                 }
 
                 new Thread(mRunnableForDetecting).start();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -180,7 +189,8 @@ public class MainActivity extends BaseActivity {
                 logParams.put("action", "点击/主页面/标签栏");
                 logParams.put("obj_type", objectType);
                 new Thread(mRunnableForLogger).start();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -218,7 +228,8 @@ public class MainActivity extends BaseActivity {
                 logParams.put("obj_type", objectType);
                 logParams.put("obj_title", bannerName);
                 new Thread(mRunnableForLogger).start();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -236,7 +247,8 @@ public class MainActivity extends BaseActivity {
                 config.put(pageName, tabIndex);
 
                 FileUtil.writeFile(filePath, config.toString());
-            } catch (JSONException | IOException e) {
+            }
+            catch (JSONException | IOException e) {
                 e.printStackTrace();
             }
         }
@@ -254,7 +266,8 @@ public class MainActivity extends BaseActivity {
                 }
                 tabIndex = config.getInt(pageName);
 
-            } catch (JSONException e) {
+            }
+            catch (JSONException e) {
                 // e.printStackTrace();
             }
 
@@ -272,7 +285,8 @@ public class MainActivity extends BaseActivity {
                 logParams.put("obj_type", objectType);
                 logParams.put("obj_title", String.format("主页面/%s", ex));
                 new Thread(mRunnableForLogger).start();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
         }

@@ -150,6 +150,7 @@ public class BaseActivity extends Activity {
     protected void onDestroy() {
         clearReferences();
         fixInputMethodManager();
+        mMyApp = null;
         super.onDestroy();
     }
 
@@ -174,6 +175,25 @@ public class BaseActivity extends Activity {
         view.invokeMethodExceptionSafe(imm, "startGettingWindowFocus", view);
     }
 
+    protected void failedOpenURL(String type, String message, String url) {
+        String htmlPath = String.format("%s/loading/failed_open_url.html", sharedPath);
+        if(!(new File(htmlPath)).exists()) {
+            toast("链接打开失败 - " + url);
+            return;
+        }
+        try {
+            String htmlContent = FileUtil.readFile(htmlPath), outputPath = String.format("%s/loading/failed_open_url.output.html", sharedPath);
+//            htmlContent = htmlContent.replace("$exception_type$", type);
+//            htmlContent = htmlContent.replace("$exception_message$", message);
+//            htmlContent = htmlContent.replace("$visit_url$", url);
+
+            FileUtil.writeFile(outputPath, htmlContent);
+            mWebView.loadUrl(String.format("file:///%s", htmlPath));
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     /*
      * ********************
      * WebView Setting
@@ -361,7 +381,7 @@ public class BaseActivity extends Activity {
                     break;
                 default:
                     String msg = String.format("访问服务器失败（%d)", message.what);
-                    Toast.makeText(BaseActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    toast(msg);
                     break;
             }
         }
@@ -371,12 +391,14 @@ public class BaseActivity extends Activity {
         @Override
         public void run() {
             try {
-                if (!logParams.getString("action").equals("登录") && !logParams.getString("action").equals("解屏"))
+                if (!logParams.getString("action").equals("登录") && !logParams.getString("action").equals("解屏")) {
                     return;
+                }
 
                 ApiHelper.actionLog(mContext, logParams);
                 System.out.println("logParams: " + logParams.get("action").toString());
-            } catch (JSONException e) {
+            }
+            catch (JSONException e) {
                 e.printStackTrace();
             }
         }
@@ -386,7 +408,6 @@ public class BaseActivity extends Activity {
         urlStringForLoading = String.format("file:///%s/loading/network_400.html", FileUtil.sharedPath(mContext));
         mWebView.loadUrl(urlStringForLoading);
     }
-
 
     private void showDialogForDeviceForbided() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(BaseActivity.this);

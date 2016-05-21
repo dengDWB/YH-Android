@@ -116,8 +116,8 @@ public class FileUtil {
             bufferedReader.close();
             inputStreamReader.close();
             string = stringBuilder.toString();
-
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -132,7 +132,8 @@ public class FileUtil {
         try {
             String string = FileUtil.readFile(pathName);
             jsonObject = new JSONObject(string);
-        } catch (JSONException e) {
+        }
+        catch (JSONException e) {
             e.printStackTrace();
         }
         return jsonObject;
@@ -142,12 +143,8 @@ public class FileUtil {
      * 字符串写入本地文件
      */
     public static void writeFile(String pathName, String content) throws IOException {
-        Log.i("PathName", pathName);
         File file = new File(pathName);
-
-        if (file.exists()) {
-            file.delete();
-        }
+        if (file.exists()) { file.delete(); }
 
         file.createNewFile();
         FileOutputStream out = new FileOutputStream(file, true);

@@ -29,12 +29,7 @@ public class ApiHelper {
      * params: {device: {name, platform, os, os_version, uuid}}
      */
     public static String authentication(Context context, String username, String password) {
-        String ret = "success";
-        if(!HttpUtil.isConnected(context)) {
-            return "请检查网络环境";
-        }
-
-        String urlString = String.format(URLs.API_USER_PATH, URLs.HOST, "android", username, password);
+        String ret = "success", urlString = String.format(URLs.API_USER_PATH, URLs.HOST, "android", username, password);
         try {
             JSONObject device = new JSONObject();
             device.put("name", android.os.Build.MODEL);
@@ -47,6 +42,7 @@ public class ApiHelper {
             params.put("device", device);
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             params.put("app_version", String.format("a%s", packageInfo.versionName));
+            Log.i("DeviceParams", params.toString());
 
             Map<String, String> response = HttpUtil.httpPost(urlString, params);
             String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), URLs.USER_CONFIG_FILENAME);
@@ -74,17 +70,10 @@ public class ApiHelper {
             String settingsConfigPath = FileUtil.dirPath(context, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
             if ((new File(settingsConfigPath)).exists()) {
                 JSONObject settingJSON = FileUtil.readConfigFile(settingsConfigPath);
-                if (settingJSON.has("use_gesture_password")) {
-                    userJSON.put("use_gesture_password", settingJSON.getBoolean("use_gesture_password"));
-                } else {
-                    userJSON.put("use_gesture_password", false);
-                }
-                if (settingJSON.has("gesture_password")) {
-                    userJSON.put("gesture_password", settingJSON.getString("gesture_password"));
-                } else {
-                    userJSON.put("gesture_password", "");
-                }
-            } else {
+                userJSON.put("use_gesture_password", settingJSON.has("use_gesture_password") ? settingJSON.getBoolean("use_gesture_password") : false);
+                userJSON.put("gesture_password", settingJSON.has("gesture_password") ? settingJSON.getString("gesture_password") : "");
+            }
+            else {
                 userJSON.put("use_gesture_password", false);
                 userJSON.put("gesture_password", "");
             }
@@ -100,10 +89,12 @@ public class ApiHelper {
             Log.i("CurrentUser", userJSON.toString());
             if (response.get("code").equals("200")) {
                 FileUtil.writeFile(settingsConfigPath, userJSON.toString());
-            } else {
+            }
+            else {
                 ret = responseJSON.getString("info");
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
             ret = e.getMessage();
         }

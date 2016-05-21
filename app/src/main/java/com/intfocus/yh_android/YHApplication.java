@@ -64,7 +64,6 @@ public class YHApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        // currentActivityName = "";
         mContext = YHApplication.this;
         String sharedPath = FileUtil.sharedPath(mContext), basePath = FileUtil.basePath(mContext);
 
@@ -88,39 +87,7 @@ public class YHApplication extends Application {
          *  新安装、或升级后，把代码包中的静态资源重新拷贝覆盖一下
          *  避免再从服务器下载更新，浪费用户流量
          */
-        try {
-            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            String versionConfigPath = String.format("%s/%s", basePath, URLs.CURRENT_VERSION__FILENAME);
-
-            boolean isUpgrade = true;
-            String localVersion = "new-installer";
-            if ((new File(versionConfigPath)).exists()) {
-                localVersion = FileUtil.readFile(versionConfigPath);
-                if (localVersion.equals(packageInfo.versionName)) {
-                    isUpgrade = false;
-                }
-            }
-
-            if (isUpgrade) {
-                Log.i("VersionUpgrade", String.format("%s => %s remove %s/%s", localVersion, packageInfo.versionName, basePath, URLs.CACHED_HEADER_FILENAME));
-
-                String assetZipPath;
-                File assetZipFile;
-                String[] assetsName = {"assets.zip", "loading.zip", "fonts.zip", "images.zip", "stylesheets.zip", "javascripts.zip"};
-                for (String string : assetsName) {
-                    assetZipPath = String.format("%s/%s", sharedPath, string);
-                    assetZipFile = new File(assetZipPath);
-                    if (!assetZipFile.exists()) {
-                        assetZipFile.delete();
-                    }
-                    FileUtil.copyAssetFile(mContext, string, assetZipPath);
-                }
-
-                FileUtil.writeFile(versionConfigPath, packageInfo.versionName);
-            }
-        } catch (PackageManager.NameNotFoundException | IOException e) {
-            e.printStackTrace();
-        }
+        copyAssetFiles(basePath, sharedPath);
 
         /*
          *  校正静态资源
@@ -145,6 +112,19 @@ public class YHApplication extends Application {
          *  监测内存泄漏
          */
         refWatcher = LeakCanary.install(this);
+
+        /*
+         * Debug
+         */
+        try {
+            File sharedFolder = new File(sharedPath + "/loading");
+            for(File path:sharedFolder.listFiles()) {
+               Log.i("SharedFolder", path.getAbsolutePath());
+           }
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -160,6 +140,40 @@ public class YHApplication extends Application {
     private void makeSureFolderExist(String folderName) {
         String cachedPath = String.format("%s/%s", FileUtil.basePath(mContext), folderName);
         FileUtil.makeSureFolderExist(cachedPath);
+    }
+
+    /**
+     *  新安装、或升级后，把代码包中的静态资源重新拷贝覆盖一下
+     *  避免再从服务器下载更新，浪费用户流量
+     */
+    private void copyAssetFiles(String basePath, String sharedPath) {
+        try {
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            String versionConfigPath = String.format("%s/%s", basePath, URLs.CURRENT_VERSION__FILENAME);
+
+            boolean isUpgrade = true;
+            String localVersion = "new-installer";
+            if ((new File(versionConfigPath)).exists()) {
+                localVersion = FileUtil.readFile(versionConfigPath);
+                isUpgrade = !localVersion.equals(packageInfo.versionName);
+            }
+            if (!isUpgrade) return;
+            Log.i("VersionUpgrade", String.format("%s => %s remove %s/%s", localVersion, packageInfo.versionName, basePath, URLs.CACHED_HEADER_FILENAME));
+
+            String assetZipPath;
+            File assetZipFile;
+            String[] assetsName = {"assets.zip", "loading.zip", "fonts.zip", "images.zip", "stylesheets.zip", "javascripts.zip"};
+            for (String string : assetsName) {
+                assetZipPath = String.format("%s/%s", sharedPath, string);
+                assetZipFile = new File(assetZipPath);
+                if (!assetZipFile.exists()) { assetZipFile.delete(); }
+                FileUtil.copyAssetFile(mContext, string, assetZipPath);
+            }
+            FileUtil.writeFile(versionConfigPath, packageInfo.versionName);
+        }
+        catch (PackageManager.NameNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
     }
 
 

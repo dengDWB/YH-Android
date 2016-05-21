@@ -63,10 +63,11 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         try {
             groupID = user.getInt("group_id");
             userNum = user.getString("user_num");
-        } catch (JSONException e) {
+        }
+        catch (JSONException e) {
             e.printStackTrace();
             groupID = -2;
-            userNum = "mobile-not-get";
+            userNum = "not-set";
         }
 
         bannerView = (RelativeLayout) findViewById(R.id.actionBar);
@@ -112,7 +113,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         mTitle.setText(bannerName);
         checkInterfaceOrientation(this.getResources().getConfiguration());
 
-
         List<ImageView> colorViews = new ArrayList<>();
         colorViews.add((ImageView) findViewById(R.id.colorView0));
         colorViews.add((ImageView) findViewById(R.id.colorView1));
@@ -133,13 +133,17 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     }
 
     public void loadComplete(int nbPages) {
-        Log.d("loadComplete", "f");
+        Log.d("loadComplete", "load pdf done");
     }
 
-    public void errorOccured(String errorType, String errorMessage) {
-        Log.d("errorOccured", format("type: %s, message: %s", errorType, errorMessage));
+    public void errorOccured(final String errorType, final String errorMessage) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                failedOpenURL(errorType, errorMessage, link);
+            }
+        });
     }
-
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -158,7 +162,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             lp.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
             getWindow().setAttributes(lp);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        } else {
+        }
+        else {
             WindowManager.LayoutParams attr = getWindow().getAttributes();
             attr.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
             getWindow().setAttributes(attr);

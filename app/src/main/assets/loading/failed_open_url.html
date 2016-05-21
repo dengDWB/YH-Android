@@ -1,0 +1,76 @@
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
+    <title>Failed Open URL</title>
+    <link href="assets/stylesheets/bootstrap.min.css" rel = "stylesheet" />
+    <style type="text/css">
+      body { background: #f7f7f7; }
+      .container { padding-left:0px;padding-right:0px;}
+      .row, .col-xs-12 { width:100%; padding-left:0px; padding-right:0px;margin-left:0px; margin-right:0px;}
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-12">
+          <h3>链接打开失败</h3>
+          <p>
+            <span>异常:</span>
+            <span id="exception_type">$exception_type$</span>
+          </p>
+          <p>
+            <span>明细:</span>
+            <span id="exception_message">$exception_message$</span>
+          </p>
+          <p>
+            <span>链接:</span>
+            <span id="visit_url">$visit_url$</span>
+          </p>
+          <p><a class="btn btn-primary btn-sm pull-right">浏览器打开</a></p>
+        </div>
+      </div>
+    </div> 
+
+    <script type="text/javascript">
+      (function(){
+        window.Mobile = {
+          isIOS: function() {
+            return navigator.userAgent.match(/iPhone|iPad/i);
+          },
+          isAndroid: function() {
+            return navigator.userAgent.match(/Android/i);
+          }
+        }
+        window.FailedOpenurl = {
+          connectWebViewJavascriptBridge: function(callback) {
+            if(window.WebViewJavascriptBridge) {
+              callback(WebViewJavascriptBridge)
+            }
+            else {
+              document.addEventListener('WebViewJavascriptBridgeReady', function() {
+                callback(WebViewJavascriptBridge)
+              }, false)
+            }
+          },
+          openURLWithSystemBrowser: function() {
+            if(Mobile.isIOS()) {
+              var visit_url = document.getElementById("visit_url").innerText;
+              FailedOpenurl.connectWebViewJavascriptBridge(function(bridge){
+                bridge.callHandler('openURLWithSystemBrowser', { "visit_url": visit_url }, function(response) {
+                });
+              })
+            }
+            else if(Mobile.isAndroid()) {
+              window.AndroidJSBridge.openURLWithSystemBrowser(visit_url);
+            }
+            else {
+              alert("未知设备浏览器:" + navigator.userAgent);
+            }
+          },
+        }
+      }).call(this);
+    </script>
+  </body>
+</html>

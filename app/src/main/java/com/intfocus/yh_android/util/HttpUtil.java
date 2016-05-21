@@ -213,7 +213,9 @@ public class HttpUtil {
         Response response;
         Request.Builder requestBuilder = new Request.Builder();
 
-        if (params != null) { requestBuilder.post(RequestBody.create(JSON, params.toString())); }
+        if (params != null) {
+            requestBuilder.post(RequestBody.create(JSON, params.toString()));
+        }
         try {
             request = requestBuilder
                     .url(urlString)
@@ -222,10 +224,8 @@ public class HttpUtil {
                     .addHeader("User-Agent", HttpUtil.webViewUserAgent())
                     .build();
             response = client.newCall(request).execute();
-
             Headers responseHeaders = response.headers();
-            int headerSize = responseHeaders.size();
-            for (int i = 0; i < headerSize; i++) {
+            for (int i = 0, headerSize = responseHeaders.size(); i < headerSize; i++) {
                 retMap.put(responseHeaders.name(i), responseHeaders.value(i));
                 Log.i("HEADER", String.format("Key : %s, Value: %s", responseHeaders.name(i), responseHeaders.value(i)));
             }
@@ -241,11 +241,11 @@ public class HttpUtil {
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
         }
         catch (Exception e) {
-            // Default Response
             retMap.put("code", "400");
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
 
             if(e != null && e.getMessage() != null) {
+                Log.i("Exception2", e.getMessage());
                 String errorMessage = e.getMessage().toLowerCase();
                 Log.i("Exception2", errorMessage);
                 if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
