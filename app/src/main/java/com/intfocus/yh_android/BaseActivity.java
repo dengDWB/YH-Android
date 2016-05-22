@@ -61,10 +61,10 @@ import java.util.Map;
  */
 public class BaseActivity extends Activity {
 
-    private String sharedPath;
-    private String relativeAssetsPath;
-    private String urlStringForDetecting;
-    private ProgressDialog mProgressDialog;
+    protected String sharedPath;
+    protected String relativeAssetsPath;
+    protected String urlStringForDetecting;
+    protected ProgressDialog mProgressDialog;
     protected YHApplication mMyApp;
     PullToRefreshWebView pullToRefreshWebView;
     android.webkit.WebView mWebView;
@@ -87,7 +87,7 @@ public class BaseActivity extends Activity {
         assetsPath = sharedPath;
         urlStringForDetecting = URLs.HOST;
         relativeAssetsPath = "assets";
-        urlStringForLoading = String.format("file:///%s/loading/loading.html", sharedPath);
+        urlStringForLoading = loadingPath("loading");
 
         String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
         if ((new File(userConfigPath)).exists()) {
@@ -175,24 +175,30 @@ public class BaseActivity extends Activity {
         view.invokeMethodExceptionSafe(imm, "startGettingWindowFocus", view);
     }
 
+    protected String loadingPath(String htmlName) {
+        return String.format("file:///%s/loading/%s.html", sharedPath, htmlName);
+    }
     protected void failedOpenURL(String type, String message, String url) {
-        String htmlPath = String.format("%s/loading/failed_open_url.html", sharedPath);
+        String htmlPath = String.format("%s/loading/%s.html", sharedPath, "failed_open_url");
         if(!(new File(htmlPath)).exists()) {
             toast("链接打开失败 - " + url);
             return;
         }
-        try {
-            String htmlContent = FileUtil.readFile(htmlPath), outputPath = String.format("%s/loading/failed_open_url.output.html", sharedPath);
+//        try {
+//            String htmlContent = FileUtil.readFile(htmlPath), outputPath = String.format("%s/loading/%s.html", sharedPath, "failed_open_url.output");
 //            htmlContent = htmlContent.replace("$exception_type$", type);
 //            htmlContent = htmlContent.replace("$exception_message$", message);
 //            htmlContent = htmlContent.replace("$visit_url$", url);
 
-            FileUtil.writeFile(outputPath, htmlContent);
+//            FileUtil.writeFile(outputPath, htmlContent);
+
+
+            toast(htmlPath);
             mWebView.loadUrl(String.format("file:///%s", htmlPath));
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
     /*
      * ********************
@@ -288,7 +294,8 @@ public class BaseActivity extends Activity {
                 logParams.put("action", "刷新/浏览器");
                 logParams.put("obj_title", urlString);
                 new Thread(mRunnableForLogger).start();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -308,7 +315,7 @@ public class BaseActivity extends Activity {
      * WebView display UI
      * ********************
      */
-    final Runnable mRunnableForDetecting = new Runnable() {
+    protected final Runnable mRunnableForDetecting = new Runnable() {
         @Override
         public void run() {
             Map<String, String> response = HttpUtil.httpGet(urlStringForDetecting, new HashMap<String, String>());
@@ -317,7 +324,8 @@ public class BaseActivity extends Activity {
                 try {
                     JSONObject json = new JSONObject(response.get("body"));
                     statusCode = json.getBoolean("device_state") ? 200 : 401;
-                } catch (JSONException e) {
+                }
+                catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
@@ -366,7 +374,7 @@ public class BaseActivity extends Activity {
         }
     };
 
-    private final Handler mHandlerWithAPI = new Handler() {
+    protected final Handler mHandlerWithAPI = new Handler() {
         public void handleMessage(Message message) {
             switch (message.what) {
                 case 200:
@@ -405,7 +413,7 @@ public class BaseActivity extends Activity {
     };
 
     private void showWebViewForWithoutNetwork() {
-        urlStringForLoading = String.format("file:///%s/loading/network_400.html", FileUtil.sharedPath(mContext));
+        urlStringForLoading = loadingPath("network_400");
         mWebView.loadUrl(urlStringForLoading);
     }
 

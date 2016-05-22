@@ -45,7 +45,7 @@ public class URLs implements Serializable {
     public final static String REPORT_DATA_FILENAME            = "group_%s_template_%s_report_%s.js";
 
     // public final static String STORAGE_BASE = String.format("%s/com.intfocus.yh_android", Environment.getExternalStorageDirectory().getAbsolutePath());
-    public final static String TimeStamp       = new SimpleDateFormat("yyyyMMddKKmmss").format(new Date());
+    //public final static String TimeStamp       = new SimpleDateFormat("yyyyMMddKKmmss").format(new Date());
 
     /*
      *  sd path: /storage/emulated/0
@@ -74,6 +74,10 @@ public class URLs implements Serializable {
         //        path =String.format("%s/com.intfocus.yh_android", context.getApplicationContext().getFilesDir());
         //    }
         return context.getApplicationContext().getFilesDir().toString();
+    }
+
+    public static String timestamp() {
+        return (new SimpleDateFormat("yyyyMMddKKmmss")).format(new Date());
     }
 
     /**

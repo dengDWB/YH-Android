@@ -60,8 +60,7 @@ public class LoginActivity extends BaseActivity {
         /*
          * 登录界面
          */
-        urlStringForLoading = String.format("file:///%s/loading/login.html", FileUtil.sharedPath(mContext));
-        mWebView.loadUrl(urlStringForLoading);
+        mWebView.loadUrl(loadingPath("login"));
 
         /*
          * 检测登录界面，版本是否升级

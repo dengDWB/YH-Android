@@ -140,7 +140,11 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                failedOpenURL(errorType, errorMessage, link);
+                Message message = mHandlerWithAPI.obtainMessage();
+                message.what = 200;
+                message.obj = String.format("%s/loading/%s.html", sharedPath, "login");
+
+                mHandlerWithAPI.sendMessage(message);
             }
         });
     }
@@ -193,7 +197,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                     new Thread(mRunnableForDetecting).start();
                 }
             }).start();
-        } else {
+        }
+        else {
             urlString = link;
             webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
@@ -202,19 +207,15 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                 public void run() {
                     if (urlString.toLowerCase().endsWith(".pdf")) {
                         new Thread(mRunnableForPDF).start();
-                    } else {
+                    }
+                    else {
                         /*
-                         * 外部链接传参: userNum, timestamp
+                         * 外部链接传参: user_num, timestamp
                          */
-                        String appendParams = String.format("?user_num=%s&timestamp=%s", userNum, URLs.TimeStamp);
-
-                        if (!urlString.contains("?")) {
-                            urlString = String.format("%s%s", urlString, appendParams);
-                        } else {
-                            urlString = urlString.replace("?", appendParams);
-                        }
-                        Log.i("OutLink", urlString);
+                        String appendParams = String.format("?user_num=%s&timestamp=%s", userNum, URLs.timestamp());
+                        urlString = urlString.contains("?") ? urlString.replace("?", appendParams) : String.format("%s%s", urlString, appendParams);
                         mWebView.loadUrl(urlString);
+                        Log.i("OutLink", urlString);
                     }
                 }
             });
@@ -305,8 +306,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 
                 ApiHelper.reportData(mContext, String.format("%d", groupID), templateID, reportID);
                 new Thread(mRunnableForDetecting).start();
-
-
                 /*
                  * 用户行为记录, 单独异常处理，不可影响用户体验
                  */

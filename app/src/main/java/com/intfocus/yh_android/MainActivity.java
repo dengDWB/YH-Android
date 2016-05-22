@@ -149,7 +149,7 @@ public class MainActivity extends BaseActivity {
             mCurrentTab = (TabView) v;
             mCurrentTab.setActive(true);
 
-            mWebView.loadUrl(String.format("file:///%s/loading/loading.html", FileUtil.sharedPath(mContext)));
+            mWebView.loadUrl(loadingPath("loading"));
             String currentUIVersion = currentUIVersion();
             try {
                 switch (v.getId()) {

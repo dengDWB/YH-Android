@@ -166,7 +166,8 @@ public class ApiHelper {
             else {
                 retMap.put("code", statusCode);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             retMap.put("code", "500");
             e.printStackTrace();
         }
