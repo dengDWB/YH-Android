@@ -1000,7 +1000,7 @@ public class PDFView extends SurfaceView {
 
         private boolean enableSwipe = true;
 
-	    private boolean enableDoubletap = true ;
+	      private boolean enableDoubletap = true ;
 
         private OnDrawListener onDrawListener;
 

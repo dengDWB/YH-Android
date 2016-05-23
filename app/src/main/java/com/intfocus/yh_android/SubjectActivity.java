@@ -16,7 +16,6 @@ import android.webkit.WebSettings;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
@@ -26,15 +25,13 @@ import com.joanzapata.pdfview.PDFView;
 import com.joanzapata.pdfview.listener.OnErrorOccurredListener;
 import com.joanzapata.pdfview.listener.OnLoadCompleteListener;
 import com.joanzapata.pdfview.listener.OnPageChangeListener;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import static java.lang.String.format;
 
@@ -136,17 +133,34 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         Log.d("loadComplete", "load pdf done");
     }
 
-    public void errorOccured(final String errorType, final String errorMessage) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Message message = mHandlerWithAPI.obtainMessage();
-                message.what = 200;
-                message.obj = String.format("%s/loading/%s.html", sharedPath, "login");
+    public void errorOccured(String errorType, String errorMessage) {
+        String htmlPath = String.format("%s/loading/%s.html", sharedPath, "failed_open_url"),
+               outputPath = String.format("%s/loading/%s.html", sharedPath, "failed_open_url.output");
 
-                mHandlerWithAPI.sendMessage(message);
-            }
-        });
+        if(!(new File(htmlPath)).exists()) {
+            toast(String.format("链接打开失败: %s", link));
+            return;
+        }
+
+        mWebView.setVisibility(View.VISIBLE);
+        mPDFView.setVisibility(View.INVISIBLE);
+
+        String htmlContent = FileUtil.readFile(htmlPath);
+        htmlContent = htmlContent.replace("$exception_type$", errorType);
+        htmlContent = htmlContent.replace("$exception_message$", errorMessage);
+        htmlContent = htmlContent.replace("$visit_url$", link);
+
+        try {
+            FileUtil.writeFile(outputPath, htmlContent);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Message message = mHandlerWithAPI.obtainMessage();
+        message.what = 200;
+        message.obj = outputPath;
+
+        mHandlerWithAPI.sendMessage(message);
     }
 
     @Override
@@ -267,9 +281,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 
             mContext.startActivity(intent);
 
-                /*
-                 * 用户行为记录, 单独异常处理，不可影响用户体验
-                 */
+            /*
+             * 用户行为记录, 单独异常处理，不可影响用户体验
+             */
             try {
                 logParams = new JSONObject();
                 logParams.put("action", "点击/主题页面/评论");

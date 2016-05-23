@@ -6,9 +6,12 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,10 +25,10 @@ import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.handmark.pulltorefresh.library.ILoadingLayout;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
@@ -40,10 +43,6 @@ import com.pgyersdk.update.UpdateManagerListener;
 import com.squareup.leakcanary.RefWatcher;
 import com.umeng.message.IUmengRegisterCallback;
 import com.umeng.message.PushAgent;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -55,6 +54,8 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by lijunjie on 16/1/14.
@@ -222,6 +223,28 @@ public class BaseActivity extends Activity {
                 view.loadUrl(url);
                 return true;
             }
+
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                super.onPageStarted(view, url, favicon);
+
+                Log.i("onPageStarted", String.format("%s - %s", URLs.timestamp(), url));
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+
+                Log.i("onPageFinished", String.format("%s - %s", URLs.timestamp(), url));
+            }
+
+            @Override
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                super.onReceivedError(view, errorCode, description, failingUrl);
+
+                Log.i("onReceivedError", String.format("%errorCode: %d, description: %s, url: %s", errorCode, description, failingUrl));
+            }
+
         });
 
         mWebView.setOnKeyListener(new View.OnKeyListener() {
@@ -294,8 +317,7 @@ public class BaseActivity extends Activity {
                 logParams.put("action", "刷新/浏览器");
                 logParams.put("obj_title", urlString);
                 new Thread(mRunnableForLogger).start();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -790,5 +812,18 @@ public class BaseActivity extends Activity {
             new Thread(mRunnableForDetecting).start();
         }
 
+        @JavascriptInterface
+        public void openURLWithSystemBrowser(final String url) {
+            runOnUiThread(new Runnable() {
+                @Override public void run() {
+                    if (url == null || (!url.startsWith("http://") && !url.startsWith("https://"))) {
+                        toast(String.format("无效链接: %s",  url));
+                        return;
+                    }
+                    Intent browserIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(browserIntent);
+                }
+            });
+        }
     }
 }
