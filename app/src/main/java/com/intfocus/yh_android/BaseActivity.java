@@ -238,13 +238,9 @@ public class BaseActivity extends Activity {
                 Log.i("onPageFinished", String.format("%s - %s", URLs.timestamp(), url));
             }
 
-            @Override
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                super.onReceivedError(view, errorCode, description, failingUrl);
-
-                Log.i("onReceivedError", String.format("%errorCode: %d, description: %s, url: %s", errorCode, description, failingUrl));
+                Log.i("onReceivedError", String.format("errorCode: %d, description: %s, url: %s", errorCode, description, failingUrl));
             }
-
         });
 
         mWebView.setOnKeyListener(new View.OnKeyListener() {
@@ -435,7 +431,7 @@ public class BaseActivity extends Activity {
     };
 
     private void showWebViewForWithoutNetwork() {
-        urlStringForLoading = loadingPath("network_400");
+        urlStringForLoading = loadingPath("400");
         mWebView.loadUrl(urlStringForLoading);
     }
 

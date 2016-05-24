@@ -134,8 +134,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     }
 
     public void errorOccured(String errorType, String errorMessage) {
-        String htmlPath = String.format("%s/loading/%s.html", sharedPath, "failed_open_url"),
-               outputPath = String.format("%s/loading/%s.html", sharedPath, "failed_open_url.output");
+        String htmlPath = String.format("%s/loading/%s.html", sharedPath, "500"),
+               outputPath = String.format("%s/loading/%s.html", sharedPath, "500.output");
 
         if(!(new File(htmlPath)).exists()) {
             toast(String.format("链接打开失败: %s", link));

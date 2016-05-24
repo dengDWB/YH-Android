@@ -18,9 +18,9 @@ import java.util.Date;
  */
 public class URLs implements Serializable {
 
-    public final static String HOST1 = "http://yonghui.idata.mobi";
+    public final static String HOST = "http://yonghui.idata.mobi";
     public final static String HOST2  = "http://121.199.38.185:4567";
-    public final static String HOST = "http://10.0.3.2:4567";
+    public final static String HOST1 = "http://10.0.3.2:4567";
     public final static String HOST3 = "http://www.google.com";
 
     public final static String API_USER_PATH            = "%s/api/v1/%s/%s/%s/authentication";
@@ -47,12 +47,7 @@ public class URLs implements Serializable {
     // public final static String STORAGE_BASE = String.format("%s/com.intfocus.yh_android", Environment.getExternalStorageDirectory().getAbsolutePath());
     //public final static String TimeStamp       = new SimpleDateFormat("yyyyMMddKKmmss").format(new Date());
 
-    /*
-     *  sd path: /storage/emulated/0
-     *  /storage/emulated/0/Shared/{assets,loading}
-     *  /storage/emulated/0/user.plist
-     *  /storage/emulated/0/user-(user-id)/{config, HTML}
-     */
+
     public final static String USER_CONFIG_FILENAME = "user.plist";
     public final static String CONFIG_DIRNAME = "Configs";
     public final static String SETTINGS_CONFIG_FILENAME = "Setting.plist";
