@@ -140,13 +140,9 @@ public class BaseActivity extends Activity {
         });
         mPushAgent.onAppStart();
     }
+
     protected void onResume() {
         super.onResume();
-        mMyApp.setCurrentActivity(this);
-    }
-    protected void onPause() {
-        clearReferences();
-        super.onPause();
     }
     protected void onDestroy() {
         clearReferences();
@@ -179,28 +175,7 @@ public class BaseActivity extends Activity {
     protected String loadingPath(String htmlName) {
         return String.format("file:///%s/loading/%s.html", sharedPath, htmlName);
     }
-    protected void failedOpenURL(String type, String message, String url) {
-        String htmlPath = String.format("%s/loading/%s.html", sharedPath, "failed_open_url");
-        if(!(new File(htmlPath)).exists()) {
-            toast("链接打开失败 - " + url);
-            return;
-        }
-//        try {
-//            String htmlContent = FileUtil.readFile(htmlPath), outputPath = String.format("%s/loading/%s.html", sharedPath, "failed_open_url.output");
-//            htmlContent = htmlContent.replace("$exception_type$", type);
-//            htmlContent = htmlContent.replace("$exception_message$", message);
-//            htmlContent = htmlContent.replace("$visit_url$", url);
 
-//            FileUtil.writeFile(outputPath, htmlContent);
-
-
-            toast(htmlPath);
-            mWebView.loadUrl(String.format("file:///%s", htmlPath));
-//        }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//        }
-    }
     /*
      * ********************
      * WebView Setting

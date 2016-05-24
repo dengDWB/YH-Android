@@ -50,6 +50,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subject);
+        mMyApp.setCurrentActivity(this);
 
         findViewById(R.id.back).setOnClickListener(mOnBackListener);
         findViewById(R.id.back_text).setOnClickListener(mOnBackListener);
@@ -117,6 +118,11 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         colorViews.add((ImageView) findViewById(R.id.colorView3));
         colorViews.add((ImageView) findViewById(R.id.colorView4));
         initColorView(colorViews);
+    }
+
+    protected void onResume() {
+        mMyApp.setCurrentActivity(this);
+        super.onResume();
     }
 
     /**

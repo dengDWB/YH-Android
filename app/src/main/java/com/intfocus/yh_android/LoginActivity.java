@@ -32,16 +32,14 @@ public class LoginActivity extends BaseActivity {
             LoginActivity.this.startActivity(intent);
 
             finish();
-        }
-        else if (FileUtil.checkIsLocked(mContext)) {
+        } else if (FileUtil.checkIsLocked(mContext)) {
             intent = new Intent(this, ConfirmPassCodeActivity.class);
             intent.putExtra("is_from_login", true);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             this.startActivity(intent);
 
             finish();
-        }
-        else {
+        } else {
             /*
              *  检测版本更新
              *    1. 与锁屏界面互斥；取消解屏时，返回登录界面，则不再检测版本更新；
@@ -66,6 +64,11 @@ public class LoginActivity extends BaseActivity {
          * 检测登录界面，版本是否升级
          */
         checkVersionUpgrade(assetsPath);
+    }
+
+    protected void onResume() {
+        mMyApp.setCurrentActivity(this);
+        super.onResume();
     }
 
     protected void onDestroy() {

@@ -44,6 +44,7 @@ public class SettingActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
+        mMyApp.setCurrentActivity(this);
 
         findViewById(R.id.back).setOnClickListener(mOnBackListener);
         findViewById(R.id.back_text).setOnClickListener(mOnBackListener);
@@ -83,6 +84,7 @@ public class SettingActivity extends BaseActivity {
         super.onResume();  // Always call the superclass method first
         // Get the Camera instance as the activity achieves full user focus
 
+        mMyApp.setCurrentActivity(this);
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));
     }
 
@@ -105,11 +107,9 @@ public class SettingActivity extends BaseActivity {
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             mAppVersion.setText(packageInfo.versionName);
             mAppIdentifier.setText(packageInfo.packageName);
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
-        }
-        catch (NameNotFoundException e) {
+        } catch (NameNotFoundException e) {
             e.printStackTrace();
         }
     }

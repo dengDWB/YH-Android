@@ -29,6 +29,7 @@ public class ResetPasswordActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reset_password);
+        mMyApp.setCurrentActivity(this);
 
 
         findViewById(R.id.back).setOnClickListener(mOnBackListener);
@@ -45,6 +46,11 @@ public class ResetPasswordActivity extends BaseActivity {
 
         urlString = String.format(URLs.RESET_PASSWORD_PATH, URLs.HOST, currentUIVersion());
         new Thread(mRunnableForDetecting).start();
+    }
+
+    protected void onResume() {
+        mMyApp.setCurrentActivity(this);
+        super.onResume();
     }
 
     private final View.OnClickListener mOnBackListener = new View.OnClickListener() {

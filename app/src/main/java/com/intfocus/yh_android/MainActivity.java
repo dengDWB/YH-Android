@@ -30,6 +30,7 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mMyApp.setCurrentActivity(this);
 
         findViewById(R.id.setting).setOnClickListener(mSettingListener);
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
@@ -94,6 +95,11 @@ public class MainActivity extends BaseActivity {
          */
         checkAssetsUpdated(true);
         new Thread(mRunnableForDetecting).start();
+    }
+
+    protected void onResume() {
+        mMyApp.setCurrentActivity(this);
+        super.onResume();
     }
 
     protected void onDestroy() {

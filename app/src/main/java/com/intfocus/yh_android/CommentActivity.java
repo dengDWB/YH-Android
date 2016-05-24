@@ -66,6 +66,11 @@ public class CommentActivity extends BaseActivity {
         initColorView(colorViews);
     }
 
+    protected void onResume() {
+        mMyApp.setCurrentActivity(this);
+        super.onResume();
+    }
+
     private final View.OnClickListener mOnBackListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {

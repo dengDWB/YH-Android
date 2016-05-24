@@ -41,6 +41,8 @@ public class YHApplication extends Application {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(!intent.getAction().equals(Intent.ACTION_SCREEN_ON)) return;
+            Log.i("BroadcastReceiver", "Screen On");
+
 
             String currentActivityName = null;
             Activity currentActivity = ((YHApplication)context.getApplicationContext()).getCurrentActivity();
@@ -181,7 +183,8 @@ public class YHApplication extends Application {
     public Activity getCurrentActivity(){
         return mCurrentActivity;
     }
-    public void setCurrentActivity(Activity mCurrentActivity){
+    public void setCurrentActivity(Activity mCurrentActivity) {
+        Log.i("setCurrentActivity", mCurrentActivity == null ? "null" : mCurrentActivity.getClass().getSimpleName());
         this.mCurrentActivity = mCurrentActivity;
     }
 }
