@@ -13,18 +13,15 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.intfocus.yh_android.screen_lock.InitPassCodeActivity;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.umeng.message.PushAgent;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.IOException;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class SettingActivity extends BaseActivity {
     private TextView mUserID;
@@ -150,7 +147,6 @@ public class SettingActivity extends BaseActivity {
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//它可以关掉所要到的界面中间的activity
             startActivity(intent);
 
-
             /*
              * 用户行为记录, 单独异常处理，不可影响用户体验
              */
@@ -181,8 +177,7 @@ public class SettingActivity extends BaseActivity {
                 logParams = new JSONObject();
                 logParams.put("action", "点击/设置页面/修改密码");
                 new Thread(mRunnableForLogger).start();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -208,33 +203,38 @@ public class SettingActivity extends BaseActivity {
                 @Override
                 public void run() {
                     try {
+                        /*
+                         * 用户报表数据js文件存放在公共区域
+                         */
+                        String headerPath = String.format("%s/%s", FileUtil.sharedPath(mContext), URLs.CACHED_HEADER_FILENAME);
+                        new File(headerPath).delete();
+                        headerPath = String.format("%s/%s", FileUtil.dirPath(mContext, URLs.HTML_DIRNAME), URLs.CACHED_HEADER_FILENAME);
+                        new File(headerPath).delete();
+
                         ApiHelper.authentication(SettingActivity.this, user.getString("user_num"), user.getString("password"));
-                    }
-                    catch (JSONException e) {
+
+                        /*
+                         * 检测服务器静态资源是否更新，并下载
+                         */
+                        runOnUiThread(new Runnable() {
+                            @Override public void run() {
+                                checkAssetsUpdated(false);
+
+                                FileUtil.checkAssets(mContext, "assets", false);
+                                FileUtil.checkAssets(mContext, "loading", false);
+                                FileUtil.checkAssets(mContext, "fonts",true);
+                                FileUtil.checkAssets(mContext, "images", true);
+                                FileUtil.checkAssets(mContext, "javascripts", true);
+                                FileUtil.checkAssets(mContext, "stylesheets", true);
+
+                                toast("校正完成");
+                            }
+                        });
+                    } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
             }).start();
-            /*
-             * 检测服务器静态资源是否更新，并下载
-             */
-            checkAssetsUpdated(false);
-            /*
-             * 用户报表数据js文件存放在公共区域
-             */
-            String headerPath = String.format("%s/%s", FileUtil.sharedPath(mContext), URLs.CACHED_HEADER_FILENAME);
-            new File(headerPath).delete();
-            headerPath = String.format("%s/%s", FileUtil.dirPath(mContext, URLs.HTML_DIRNAME), URLs.CACHED_HEADER_FILENAME);
-            new File(headerPath).delete();
-
-            FileUtil.checkAssets(mContext, "assets", false);
-            FileUtil.checkAssets(mContext, "loading", false);
-            FileUtil.checkAssets(mContext, "fonts",true);
-            FileUtil.checkAssets(mContext, "images", true);
-            FileUtil.checkAssets(mContext, "javascripts", true);
-            FileUtil.checkAssets(mContext, "stylesheets", true);
-
-            Toast.makeText(mContext, "校正完成", Toast.LENGTH_SHORT).show();
         }
     };
 

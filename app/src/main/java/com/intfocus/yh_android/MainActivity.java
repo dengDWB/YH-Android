@@ -30,7 +30,6 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mMyApp.setCurrentActivity(this);
 
         findViewById(R.id.setting).setOnClickListener(mSettingListener);
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
@@ -44,8 +43,7 @@ public class MainActivity extends BaseActivity {
         try {
             objectType = 1;
             urlString = String.format(URLs.KPI_PATH, URLs.HOST, currentUIVersion(), user.getString("group_id"), user.getString("role_id"));
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
 
@@ -66,7 +64,6 @@ public class MainActivity extends BaseActivity {
             checkVersionUpgrade(assetsPath);
             checkUpgrade(false);
 
-
             new Thread(new Runnable() {
                 @Override
                 public synchronized void run() {
@@ -75,18 +72,16 @@ public class MainActivity extends BaseActivity {
                         JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
                         String info = ApiHelper.authentication(mContext, userJSON.getString("user_num"), userJSON.getString("password"));
-                        if (info.equals("用户名或密码不正确")) {
+                        if (info.length() > 0 && info.contains("不存在") || info.contains("不正确")) {
                             userJSON.put("is_login", false);
                             FileUtil.writeFile(userConfigPath, userJSON.toString());
                         }
-                    }
-                    catch (JSONException | IOException e) {
+                    } catch (JSONException | IOException e) {
                         e.printStackTrace();
                     }
                 }
             }).start();
-        }
-        else {
+        } else {
             mWebView.clearCache(true);
         }
 
@@ -182,8 +177,7 @@ public class MainActivity extends BaseActivity {
                 }
 
                 new Thread(mRunnableForDetecting).start();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 

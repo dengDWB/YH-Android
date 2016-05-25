@@ -181,7 +181,6 @@ public class FileUtil {
         return String.format("%s%s", FileUtil.sharedPath(context), folderName);
     }
 
-
     /*
      * Generage MD5 value for ZIP file
      */
@@ -318,9 +317,7 @@ public class FileUtil {
             JSONObject userJSON = new JSONObject();
             if ((new File(userConfigPath)).exists()) {
                 userJSON = FileUtil.readConfigFile(userConfigPath);
-                if (userJSON.has(keyName) && userJSON.getString(keyName).equals(md5String)) {
-                    isShouldUnZip = false;
-                }
+                isShouldUnZip = !(userJSON.has(keyName) && userJSON.getString(keyName).equals(md5String));
             }
 
             if (isShouldUnZip) {

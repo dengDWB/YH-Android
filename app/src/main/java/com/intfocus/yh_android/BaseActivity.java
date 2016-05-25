@@ -582,9 +582,7 @@ public class BaseActivity extends Activity {
             boolean isUpgrade = true;
             if ((new File(versionConfigPath)).exists()) {
                 localVersion = FileUtil.readFile(versionConfigPath);
-                if (localVersion.equals(packageInfo.versionName)) {
-                    isUpgrade = false;
-                }
+                isUpgrade = !localVersion.equals(packageInfo.versionName);
             }
 
             if (isUpgrade) {
@@ -595,9 +593,7 @@ public class BaseActivity extends Activity {
                  */
                 String headerPath = String.format("%s/%s", sharedPath, URLs.CACHED_HEADER_FILENAME);
                 File headerFile = new File(headerPath);
-                if (headerFile.exists()) {
-                    headerFile.delete();
-                }
+                if (headerFile.exists()) { headerFile.delete(); }
 
                 FileUtil.writeFile(versionConfigPath, packageInfo.versionName);
             }
@@ -619,26 +615,18 @@ public class BaseActivity extends Activity {
     }
 
     private boolean checkAssetUpdated(boolean shouldReloadUIThread, String assetName, boolean isInAssets) {
-        boolean isShouldUpdateAssets = false;
-
         try {
+            boolean isShouldUpdateAssets = false;
             String assetZipPath = String.format("%s/%s.zip", sharedPath, assetName);
-
-            if (!(new File(assetZipPath)).exists()) {
-                isShouldUpdateAssets = true;
-            }
+            isShouldUpdateAssets = !(new File(assetZipPath)).exists();
 
             String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
             String localKeyName = String.format("local_%s_md5", assetName);
             String keyName = String.format("%s_md5", assetName);
-            if (!isShouldUpdateAssets && !userJSON.getString(localKeyName).equals(userJSON.getString(keyName))) {
-                isShouldUpdateAssets = true;
-            }
+            isShouldUpdateAssets = !isShouldUpdateAssets && !userJSON.getString(localKeyName).equals(userJSON.getString(keyName));
 
-            if (!isShouldUpdateAssets) {
-                return false;
-            }
+            if (!isShouldUpdateAssets) return false;
 
             Log.i("checkAssetUpdated", String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName), userJSON.getString(keyName)));
             // instantiate it within the onCreate method
