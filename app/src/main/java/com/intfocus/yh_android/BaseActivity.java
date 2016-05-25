@@ -529,9 +529,8 @@ public class BaseActivity extends Activity {
 
                 // 偶数时为正式版本
                 if (Integer.parseInt(versionCode) % 2 == 1) {
-                    if (isShowToast) {
-                        Toast.makeText(mContext, "已是最新版本", Toast.LENGTH_SHORT).show();
-                    }
+                    if(isShowToast) toast("已是最新版本");
+
                     return;
                 }
 
@@ -561,9 +560,7 @@ public class BaseActivity extends Activity {
 
             @Override
             public void onNoUpdateAvailable() {
-                if (isShowToast) {
-                    Toast.makeText(mContext, "已是最新版本", Toast.LENGTH_SHORT).show();
-                }
+                if(isShowToast) toast("已是最新版本");
             }
         };
 

@@ -54,13 +54,13 @@ public class ApiHelper {
                 return "请检查网络环境";
             }
             else if (response.get("code").equals("401")) {
-                return "用户名或密码不正确";
+                return new JSONObject(response.get("body")).getString("info");
             }
             else if (response.get("code").equals("408")) {
                 return "连接超时";
             }
             else if (!response.get("code").equals("200")) {
-                return "错误代号:(" + response.get("code") + ")";
+                return response.get("body");
             }
             // FileUtil.dirPath 需要优先写入登录用户信息
             JSONObject responseJSON = new JSONObject(response.get("body"));

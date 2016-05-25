@@ -1,6 +1,7 @@
 package com.intfocus.yh_android;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.webkit.JavascriptInterface;
@@ -83,47 +84,54 @@ public class LoginActivity extends BaseActivity {
          * JS 接口，暴露给JS的方法使用@JavascriptInterface装饰
          */
         @JavascriptInterface
-        public void login(final String username, String password) {
-            if (username.length() == 0 || password.length() == 0) {
-                toast("请输入用户名与密码");
-                return;
-            }
-            toast("验证中...");
-            try {
-                String info = ApiHelper.authentication(mContext, username, URLs.MD5(password));
-                if (info.compareTo("success") > 0) {
-                    toast(info);
-                    return;
+        public void login(final String username, final String password) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (username.isEmpty() || password.isEmpty()) {
+                        toast("请输入用户名与密码");
+                        return;
+                    }
+
+                    mProgressDialog = ProgressDialog.show(LoginActivity.this, "稍等", "验证用户信息...");
+                    try {
+                        String info = ApiHelper.authentication(mContext, username, URLs.MD5(password));
+                        if (info.compareTo("success") > 0) {
+                            mProgressDialog.dismiss();
+                            toast(info);
+                            return;
+                        }
+
+                        // 检测用户空间，版本是否升级
+                        assetsPath = FileUtil.dirPath(mContext, URLs.HTML_DIRNAME);
+                        checkVersionUpgrade(assetsPath);
+
+                        /*
+                         * 用户行为记录, 单独异常处理，不可影响用户体验
+                         */
+                        try {
+                            logParams = new JSONObject();
+                            logParams.put("action", "登录");
+                            new Thread(mRunnableForLogger).start();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        // 跳转至主界面
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        intent.putExtra("from_activity", this.getClass().toString());
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        LoginActivity.this.startActivity(intent);
+
+                        mProgressDialog.dismiss();
+                        finish();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        mProgressDialog.dismiss();
+                        toast(e.getLocalizedMessage());
+                    }
                 }
-
-                // 检测用户空间，版本是否升级
-                assetsPath = FileUtil.dirPath(mContext, URLs.HTML_DIRNAME);
-                checkVersionUpgrade(assetsPath);
-
-                /*
-                 * 用户行为记录, 单独异常处理，不可影响用户体验
-                 */
-                try {
-                    logParams = new JSONObject();
-                    logParams.put("action", "登录");
-                    new Thread(mRunnableForLogger).start();
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // 跳转至主界面
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.putExtra("from_activity", this.getClass().toString());
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                LoginActivity.this.startActivity(intent);
-
-                finish();
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-                toast(e.getLocalizedMessage());
-            }
+            });
         }
 
         @JavascriptInterface
@@ -136,8 +144,7 @@ public class LoginActivity extends BaseActivity {
                 logParams.put("action", "JS异常");
                 logParams.put("obj_title", String.format("登录页面/%s", ex));
                 new Thread(mRunnableForLogger).start();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

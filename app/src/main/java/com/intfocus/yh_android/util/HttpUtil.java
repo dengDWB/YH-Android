@@ -64,9 +64,7 @@ public class HttpUtil {
             for (int i = 0, len = responseHeaders.size(); i < len; i++) {
                 retMap.put(responseHeaders.name(i), responseHeaders.value(i));
                 // Log.i("HEADER", String.format("Key : %s, Value: %s", responseHeaders.name(i), responseHeaders.value(i)));
-                if(responseHeaders.name(i).equalsIgnoreCase("Content-Type") && responseHeaders.value(i).contains("application/json")) {
-                    isJSON = true;
-                }
+                isJSON = responseHeaders.name(i).equalsIgnoreCase("Content-Type") && responseHeaders.value(i).contains("application/json");
             }
             retMap.put("code", String.format("%d", response.code()));
             retMap.put("body", response.body().string());
@@ -75,14 +73,12 @@ public class HttpUtil {
                 Log.i("code", retMap.get("code"));
                 Log.i("responseBody", retMap.get("body"));
             }
-        }
-        catch (UnknownHostException e) {
+        } catch (UnknownHostException e) {
             // 400: Unable to resolve host "yonghui.idata.mobi": No address associated with hostname
             Log.i("UnknownHostException", e.getMessage());
             retMap.put("code", "400");
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // Default Response
             retMap.put("code", "400");
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
@@ -93,8 +89,7 @@ public class HttpUtil {
                 if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
                     retMap.put("code", "400");
                     retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
-                }
-                else if (errorMessage.contains("unauthorized")) {
+                } else if (errorMessage.contains("unauthorized")) {
                     retMap.put("code", "401");
                     retMap.put("body", "{\"info\": \"用户名或密码错误\"}");
                 }
@@ -137,14 +132,12 @@ public class HttpUtil {
                             data.put((String) pairs2.getKey(), pairs2.getValue());
                             holder.put(key, data);
                         }
-                    }
-                    else {
+                    } else {
                         holder.put(key, pairs.getValue());
                     }
                 }
                 requestBuilder.post(RequestBody.create(JSON, holder.toString()));
-            }
-            catch (JSONException e) {
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
@@ -169,13 +162,11 @@ public class HttpUtil {
 
             Log.i("code", retMap.get("code"));
             Log.i("responseBody", retMap.get("body"));
-        }
-        catch (UnknownHostException e) {
+        } catch (UnknownHostException e) {
             Log.i("UnknownHostException", e.getMessage());
             retMap.put("code", "400");
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // Default Response
             retMap.put("code", "400");
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
@@ -186,8 +177,7 @@ public class HttpUtil {
                 if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
                     retMap.put("code", "400");
                     retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
-                }
-                else if (errorMessage.contains("unauthorized")) {
+                } else if (errorMessage.contains("unauthorized")) {
                     retMap.put("code", "401");
                     retMap.put("body", "{\"info\": \"用户名或密码错误\"}");
                 }
@@ -234,13 +224,12 @@ public class HttpUtil {
 
             Log.i("code", retMap.get("code"));
             Log.i("responseBody", retMap.get("body"));
-        }
-        catch (UnknownHostException e) {
+        } catch (UnknownHostException e) {
             Log.i("UnknownHostException2", e.getMessage());
             retMap.put("code", "400");
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
+            Log.i("Exception2", e.getMessage());
             retMap.put("code", "400");
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
 
@@ -251,8 +240,7 @@ public class HttpUtil {
                 if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
                     retMap.put("code", "400");
                     retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
-                }
-                else if (errorMessage.contains("unauthorized")) {
+                } else if (errorMessage.contains("unauthorized")) {
                     retMap.put("code", "401");
                     retMap.put("body", "{\"info\": \"用户名或密码错误\"}");
                 }
