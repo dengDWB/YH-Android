@@ -75,7 +75,9 @@ public class HttpUtil {
             }
         } catch (UnknownHostException e) {
             // 400: Unable to resolve host "yonghui.idata.mobi": No address associated with hostname
-            Log.i("UnknownHostException", e.getMessage());
+            if(e != null && e.getMessage() != null) {
+                Log.i("UnknownHostException2", e.getMessage());
+            }
             retMap.put("code", "400");
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
         } catch (Exception e) {
@@ -163,7 +165,9 @@ public class HttpUtil {
             Log.i("code", retMap.get("code"));
             Log.i("responseBody", retMap.get("body"));
         } catch (UnknownHostException e) {
-            Log.i("UnknownHostException", e.getMessage());
+            if(e != null && e.getMessage() != null) {
+                Log.i("UnknownHostException", e.getMessage());
+            }
             retMap.put("code", "400");
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
         } catch (Exception e) {
@@ -225,16 +229,16 @@ public class HttpUtil {
             Log.i("code", retMap.get("code"));
             Log.i("responseBody", retMap.get("body"));
         } catch (UnknownHostException e) {
-            Log.i("UnknownHostException2", e.getMessage());
+            if(e != null && e.getMessage() != null) {
+                Log.i("UnknownHostException2", e.getMessage());
+            }
             retMap.put("code", "400");
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
         } catch (Exception e) {
-            Log.i("Exception2", e.getMessage());
             retMap.put("code", "400");
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
 
             if(e != null && e.getMessage() != null) {
-                Log.i("Exception2", e.getMessage());
                 String errorMessage = e.getMessage().toLowerCase();
                 Log.i("Exception2", errorMessage);
                 if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
@@ -278,8 +282,6 @@ public class HttpUtil {
             retMap.put("body", "{\"info\": \"连接超时,请检查网络环境\"}");
         }
     }
-
-
 
     /*
      * http://stackoverflow.com/questions/2802472/detect-network-connection-type-on-android

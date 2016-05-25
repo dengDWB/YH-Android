@@ -26,7 +26,7 @@ public class LoginActivity extends BaseActivity {
          *  不是的话，相当于直接启动应用，则检测是否有设置锁屏
          */
         Intent intent = getIntent();
-        if (intent.hasExtra("from_activity") && intent.getStringExtra("from_activity").contains("ConfirmPassCodeActivity")) {
+        if (intent.hasExtra("from_activity") && intent.getStringExtra("from_activity").equals("ConfirmPassCodeActivity")) {
             intent = new Intent(LoginActivity.this, MainActivity.class);
             intent.putExtra("from_activity", this.getClass().toString());
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -85,53 +85,54 @@ public class LoginActivity extends BaseActivity {
          */
         @JavascriptInterface
         public void login(final String username, final String password) {
+            if (username.isEmpty() || password.isEmpty()) {
+                toast("请输入用户名与密码");
+                return;
+            }
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (username.isEmpty() || password.isEmpty()) {
-                        toast("请输入用户名与密码");
-                        return;
-                    }
-
                     mProgressDialog = ProgressDialog.show(LoginActivity.this, "稍等", "验证用户信息...");
-                    try {
-                        String info = ApiHelper.authentication(mContext, username, URLs.MD5(password));
-                        if (info.compareTo("success") > 0) {
-                            mProgressDialog.dismiss();
-                            toast(info);
-                            return;
-                        }
-
-                        // 检测用户空间，版本是否升级
-                        assetsPath = FileUtil.dirPath(mContext, URLs.HTML_DIRNAME);
-                        checkVersionUpgrade(assetsPath);
-
-                        /*
-                         * 用户行为记录, 单独异常处理，不可影响用户体验
-                         */
-                        try {
-                            logParams = new JSONObject();
-                            logParams.put("action", "登录");
-                            new Thread(mRunnableForLogger).start();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                        // 跳转至主界面
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        intent.putExtra("from_activity", this.getClass().toString());
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        LoginActivity.this.startActivity(intent);
-
-                        mProgressDialog.dismiss();
-                        finish();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        mProgressDialog.dismiss();
-                        toast(e.getLocalizedMessage());
-                    }
                 }
             });
+
+            try {
+                String info = ApiHelper.authentication(mContext, username, URLs.MD5(password));
+                if (info.compareTo("success") > 0) {
+                    mProgressDialog.dismiss();
+                    toast(info);
+                    return;
+                }
+
+                // 检测用户空间，版本是否升级
+                assetsPath = FileUtil.dirPath(mContext, URLs.HTML_DIRNAME);
+                checkVersionUpgrade(assetsPath);
+
+                /*
+                 * 用户行为记录, 单独异常处理，不可影响用户体验
+                 */
+                try {
+                    logParams = new JSONObject();
+                    logParams.put("action", "登录");
+                    new Thread(mRunnableForLogger).start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // 跳转至主界面
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                intent.putExtra("from_activity", this.getClass().getSimpleName());
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                LoginActivity.this.startActivity(intent);
+
+                mProgressDialog.dismiss();
+                finish();
+            } catch (Exception e) {
+                e.printStackTrace();
+                mProgressDialog.dismiss();
+                toast(e.getLocalizedMessage());
+            }
         }
 
         @JavascriptInterface

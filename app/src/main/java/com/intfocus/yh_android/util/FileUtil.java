@@ -38,7 +38,7 @@ public class FileUtil {
                     Log.i("ScreenLock", "use_gesture_password not set");
                 }
                 if (!userJSON.has("gesture_password")) {
-                    userJSON.put("gesture_password", false);
+                    userJSON.put("gesture_password", "");
                     Log.i("ScreenLock", "gesture_password not set");
                 }
                 if (!userJSON.has("is_login")) {
@@ -48,7 +48,7 @@ public class FileUtil {
 
                 FileUtil.writeFile(userConfigPath, userJSON.toString());
 
-                return userJSON.getBoolean("use_gesture_password") && userJSON.getBoolean("is_login");
+                return userJSON.getBoolean("is_login") && userJSON.getBoolean("use_gesture_password") && !userJSON.getString("gesture_password").isEmpty();
             } else {
                 Log.i("ScreenLock", "userConfigPath not exist");
 

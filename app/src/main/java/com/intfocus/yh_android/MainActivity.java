@@ -58,7 +58,7 @@ public class MainActivity extends BaseActivity {
         initColorView(colorViews);
 
         Intent intent = getIntent();
-        if (intent.hasExtra("from_activity") && intent.getStringExtra("from_activity").contains("ConfirmPassCodeActivity")) {
+        if (intent.hasExtra("from_activity") && intent.getStringExtra("from_activity").equals("ConfirmPassCodeActivity")) {
             Log.i("from_activity", intent.getStringExtra("from_activity"));
 
             checkVersionUpgrade(assetsPath);
@@ -72,7 +72,7 @@ public class MainActivity extends BaseActivity {
                         JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
                         String info = ApiHelper.authentication(mContext, userJSON.getString("user_num"), userJSON.getString("password"));
-                        if (info.length() > 0 && info.contains("不存在") || info.contains("不正确")) {
+                        if (!info.isEmpty() && info.contains("用户") || info.contains("密码")) {
                             userJSON.put("is_login", false);
                             FileUtil.writeFile(userConfigPath, userJSON.toString());
                         }

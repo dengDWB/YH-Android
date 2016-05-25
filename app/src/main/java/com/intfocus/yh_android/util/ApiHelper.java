@@ -52,14 +52,11 @@ public class ApiHelper {
 
             if (response.get("code").equals("400")) {
                 return "请检查网络环境";
-            }
-            else if (response.get("code").equals("401")) {
+            } else if (response.get("code").equals("401")) {
                 return new JSONObject(response.get("body")).getString("info");
-            }
-            else if (response.get("code").equals("408")) {
+            } else if (response.get("code").equals("408")) {
                 return "连接超时";
-            }
-            else if (!response.get("code").equals("200")) {
+            } else if (!response.get("code").equals("200")) {
                 return response.get("body");
             }
             // FileUtil.dirPath 需要优先写入登录用户信息
@@ -72,8 +69,7 @@ public class ApiHelper {
                 JSONObject settingJSON = FileUtil.readConfigFile(settingsConfigPath);
                 userJSON.put("use_gesture_password", settingJSON.has("use_gesture_password") ? settingJSON.getBoolean("use_gesture_password") : false);
                 userJSON.put("gesture_password", settingJSON.has("gesture_password") ? settingJSON.getString("gesture_password") : "");
-            }
-            else {
+            } else {
                 userJSON.put("use_gesture_password", false);
                 userJSON.put("gesture_password", "");
             }
@@ -89,12 +85,10 @@ public class ApiHelper {
             Log.i("CurrentUser", userJSON.toString());
             if (response.get("code").equals("200")) {
                 FileUtil.writeFile(settingsConfigPath, userJSON.toString());
-            }
-            else {
+            } else {
                 ret = responseJSON.getString("info");
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             ret = e.getMessage();
         }

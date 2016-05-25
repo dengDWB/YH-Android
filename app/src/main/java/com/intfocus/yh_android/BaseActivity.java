@@ -141,9 +141,6 @@ public class BaseActivity extends Activity {
         mPushAgent.onAppStart();
     }
 
-    protected void onResume() {
-        super.onResume();
-    }
     protected void onDestroy() {
         clearReferences();
         fixInputMethodManager();

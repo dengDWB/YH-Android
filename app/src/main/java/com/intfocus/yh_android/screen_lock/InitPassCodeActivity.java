@@ -167,8 +167,9 @@ public class InitPassCodeActivity extends Activity {
     public void onDelete(View view) {
         int length = stringBuilder.length();
         deleteCircleColor(length);
-        if (length != 0)
+        if (length != 0) {
             stringBuilder.deleteCharAt(length - 1);
+        }
     }
 
     private void deleteCircleColor(int length) {
@@ -224,8 +225,7 @@ public class InitPassCodeActivity extends Activity {
                         counter++;
                         text_main_pass.setText(TEXT_MAIN_CONFIRM);
                         text_sub_pass.setText(TEXT_SUB_CONFIRM);
-                        InitPassCodeActivity.this.password = Integer
-                                .parseInt(stringBuilder.toString());
+                        InitPassCodeActivity.this.password = Integer.parseInt(stringBuilder.toString());
                         initStringBuilder();
                         initCircleColor();
                     }
@@ -246,8 +246,6 @@ public class InitPassCodeActivity extends Activity {
                         }
                         userJSON.put("use_gesture_password", true);
                         userJSON.put("gesture_password", stringBuilder.toString());
-
-                        Log.i("confirmPassword2", "yes");
 
                         FileUtil.writeFile(userConfigPath, userJSON.toString());
                         String settingsConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);

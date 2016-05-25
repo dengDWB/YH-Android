@@ -214,7 +214,6 @@ public class ConfirmPassCodeActivity extends Activity {
 
     private void confirmPassword() {
         try {
-            int password = Integer.parseInt(stringBuilder.toString());
             Log.i("confirmPassword", "confirmPassword");
 
             String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
@@ -228,7 +227,7 @@ public class ConfirmPassCodeActivity extends Activity {
                  */
                 if (is_from_login) {
                     Intent intent = new Intent(mContext, LoginActivity.class);
-                    intent.putExtra("from_activity", this.getClass().toString());
+                    intent.putExtra("from_activity", this.getClass().getSimpleName());
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     mContext.startActivity(intent);
                 }
@@ -249,18 +248,13 @@ public class ConfirmPassCodeActivity extends Activity {
             } else {
                 Log.i("confirmPassword", "no");
 
-                //userJSON.put("use_gesture_password", false);
-                //FileUtil.writeFile(userConfigPath, userJSON.toString());
-
                 String TEXT_MAIN_MISTAKE = "请输入密码";
                 text_main_pass.setText(TEXT_MAIN_MISTAKE);
                 String TEXT_SUB_MISTAKE = "密码有误";
                 text_sub_pass.setText(TEXT_SUB_MISTAKE);
-                password = 0;
                 initStringBuilder();
                 initCircleColor();
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

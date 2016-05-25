@@ -1,12 +1,12 @@
 package com.intfocus.yh_android;
 
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -244,17 +244,16 @@ public class SettingActivity extends BaseActivity {
     private final CompoundButton.OnCheckedChangeListener mSwitchLockListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            // TODO Auto-generated method stub
+            Log.i("onCheckedChanged", isChecked ? "ON" : "OFF");
             if(isChecked) {
                 startActivity(InitPassCodeActivity.createIntent(mContext));
-            }
-            else {
+            } else {
                 try {
                     String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
                     if((new File(userConfigPath)).exists()) {
                         JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
                         userJSON.put("use_gesture_password", false);
-                        if(!userJSON.has("gesture_password")) { userJSON.put("gesture_password", ""); }
+                        userJSON.put("gesture_password", "");
 
                         FileUtil.writeFile(userConfigPath, userJSON.toString());
                         String settingsConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
@@ -262,8 +261,7 @@ public class SettingActivity extends BaseActivity {
                     }
 
                     toast(screenLockInfo);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
