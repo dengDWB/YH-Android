@@ -257,8 +257,7 @@ public class BaseActivity extends Activity {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String label = simpleDateFormat.format(System.currentTimeMillis());
                 // 显示最后更新的时间
-                refreshView.getLoadingLayoutProxy()
-                        .setLastUpdatedLabel(label);
+                refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
             }
         });
     }
@@ -452,7 +451,8 @@ public class BaseActivity extends Activity {
 
     void modifiedUserConfig(JSONObject configJSON) {
         try {
-            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
+            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext),
+                URLs.USER_CONFIG_FILENAME);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
             userJSON = ApiHelper.merge(userJSON, configJSON);
@@ -487,7 +487,7 @@ public class BaseActivity extends Activity {
     final View.OnClickListener mCheckUpgradeListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            checkUpgrade(true);
+            checkPgyerVersionUpgrade(true);
 
             /*
              * 用户行为记录, 单独异常处理，不可影响用户体验
@@ -502,14 +502,17 @@ public class BaseActivity extends Activity {
         }
     };
 
-    void checkUpgrade(final boolean isShowToast) {
+    /*
+     * 托管在蒲公英平台，对比版本号检测是否版本更新
+     * 奇数: 测试版本，仅提示
+     * 偶数: 正式版本，点击安装更新
+     */
+    void checkPgyerVersionUpgrade(final boolean isShowToast) {
         UpdateManagerListener updateManagerListener = new UpdateManagerListener() {
             @Override
             public void onUpdateAvailable(final String result) {
-                Log.i("PGYER", result);
-
-                String message;
-                String versionCode = "-1";
+                Log.i("checkPgyerUpgrade", result);
+                String message = "", versionCode = "-1", versionName = "-1";
                 try {
                     JSONObject response = new JSONObject(result);
                     message = response.getString("message");
@@ -517,26 +520,32 @@ public class BaseActivity extends Activity {
                         JSONObject responseData = response.getJSONObject("data");
                         message = responseData.getString("releaseNote");
                         versionCode = responseData.getString("versionCode");
+                        versionName = responseData.getString("versionName");
 
+                        String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.PGYER_VERSION_FILENAME);
+                        FileUtil.writeFile(pgyerVersionPath, result);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                     message = e.getMessage();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
 
                 // 偶数时为正式版本
                 if (Integer.parseInt(versionCode) % 2 == 1) {
-                    if(isShowToast) toast("已是最新版本");
+                    if(isShowToast) {
+                        toast(String.format("有测试版本发布(%s:%s)", versionName, versionCode));
+                    }
 
                     return;
                 }
-
 
                 // 将新版本信息封装到AppBean中
                 final AppBean appBean = getAppBeanFromString(result);
                 new AlertDialog.Builder(mContext)
                         .setTitle("版本更新")
-                        .setMessage(message.isEmpty() ? "没有升级简介" : message)
+                        .setMessage(message.isEmpty() ? "无升级简介" : message)
                         .setPositiveButton(
                                 "确定",
                                 new DialogInterface.OnClickListener() {
@@ -557,7 +566,9 @@ public class BaseActivity extends Activity {
 
             @Override
             public void onNoUpdateAvailable() {
-                if(isShowToast) toast("已是最新版本");
+                if(isShowToast) {
+                    toast("已是最新版本");
+                }
             }
         };
 
@@ -570,7 +581,7 @@ public class BaseActivity extends Activity {
     void checkVersionUpgrade(String assetsPath) {
         try {
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            String versionConfigPath = String.format("%s/%s", assetsPath, URLs.CURRENT_VERSION__FILENAME);
+            String versionConfigPath = String.format("%s/%s", assetsPath, URLs.CURRENT_VERSION_FILENAME);
 
             String localVersion = "new-installer";
             boolean isUpgrade = true;

@@ -151,7 +151,7 @@ public class YHApplication extends Application {
     private void copyAssetFiles(String basePath, String sharedPath) {
         try {
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            String versionConfigPath = String.format("%s/%s", basePath, URLs.CURRENT_VERSION__FILENAME);
+            String versionConfigPath = String.format("%s/%s", basePath, URLs.CURRENT_VERSION_FILENAME);
 
             boolean isUpgrade = true;
             String localVersion = "new-installer";

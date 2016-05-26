@@ -199,10 +199,10 @@
 
                 <TextView
                     style="@style/SettingValue"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="3dp"
                     android:textColor="@color/gray"
                     android:textSize="12dp"
-                    android:text="若界面显示异常，可进行校正" />
+                    android:text="若界面显示异常，请校正" />
             </RelativeLayout>
 
 
@@ -211,7 +211,15 @@
                 <TextView
                     android:id="@+id/check_upgrade"
                     style="@style/SettingButton"
-                    android:text="检测版本更新" />
+                    android:text="检测更新" />
+
+                <TextView
+                    android:id="@+id/pgyer_link"
+                    style="@style/SettingValue"
+                    android:layout_marginTop="3dp"
+                    android:textColor="#0000ff"
+                    android:textSize="12dp"
+                    android:text="有测试版本发布（1.2.33）" />
             </RelativeLayout>
 
             <View style="@style/Divider" />

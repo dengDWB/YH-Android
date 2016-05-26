@@ -4,14 +4,13 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.webkit.JavascriptInterface;
-
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.URLs;
-
 import org.json.JSONObject;
 
 public class LoginActivity extends BaseActivity {
@@ -27,8 +26,9 @@ public class LoginActivity extends BaseActivity {
          */
         Intent intent = getIntent();
         if (intent.hasExtra("from_activity") && intent.getStringExtra("from_activity").equals("ConfirmPassCodeActivity")) {
+            Log.i("getIndent", intent.getStringExtra("from_activity"));
             intent = new Intent(LoginActivity.this, MainActivity.class);
-            intent.putExtra("from_activity", this.getClass().toString());
+            intent.putExtra("from_activity", intent.getStringExtra("from_activity"));
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             LoginActivity.this.startActivity(intent);
 
@@ -46,7 +46,7 @@ public class LoginActivity extends BaseActivity {
              *    1. 与锁屏界面互斥；取消解屏时，返回登录界面，则不再检测版本更新；
              *    2. 原因：如果解屏成功，直接进入MainActivity,会在BaseActivity#finishLoginActivityWhenInMainAcitivty中结束LoginActivity,若此时有AlertDialog，会报错误:Activity has leaked window com.android.internal.policy.impl.PhoneWindow$DecorView@44f72ff0 that was originally added here
              */
-            checkUpgrade(false);
+            checkPgyerVersionUpgrade(false);
         }
 
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
@@ -122,7 +122,6 @@ public class LoginActivity extends BaseActivity {
 
                 // 跳转至主界面
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.putExtra("from_activity", this.getClass().getSimpleName());
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 LoginActivity.this.startActivity(intent);
 

@@ -3,23 +3,19 @@ package com.intfocus.yh_android;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.widget.ImageView;
-
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.URLs;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends BaseActivity {
     private int objectType;
@@ -58,11 +54,9 @@ public class MainActivity extends BaseActivity {
         initColorView(colorViews);
 
         Intent intent = getIntent();
-        if (intent.hasExtra("from_activity") && intent.getStringExtra("from_activity").equals("ConfirmPassCodeActivity")) {
-            Log.i("from_activity", intent.getStringExtra("from_activity"));
-
+        if (intent.hasExtra("from_activity")) {
             checkVersionUpgrade(assetsPath);
-            checkUpgrade(false);
+            checkPgyerVersionUpgrade(false);
 
             new Thread(new Runnable() {
                 @Override

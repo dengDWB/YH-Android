@@ -58,8 +58,9 @@ public class URLs implements Serializable {
     public final static String SHARED_DIRNAME = "Shared";
     public final static String CACHED_DIRNAME = "Cached";
 
-    public final static String CACHED_HEADER_FILENAME = "cached_header.plist";
-    public final static String CURRENT_VERSION__FILENAME = "current_version.txt";
+    public final static String CACHED_HEADER_FILENAME   = "cached_header.plist";
+    public final static String CURRENT_VERSION_FILENAME = "current_version.txt";
+    public final static String PGYER_VERSION_FILENAME   = "pgyer_version.txt";
 
     public static String storage_base(Context context) {
         //    String path = "";
