@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
@@ -69,6 +70,8 @@ public class LoginActivity extends BaseActivity {
 
     protected void onResume() {
         mMyApp.setCurrentActivity(this);
+        if(mProgressDialog != null)  mProgressDialog.dismiss();
+
         super.onResume();
     }
 
@@ -85,6 +88,7 @@ public class LoginActivity extends BaseActivity {
          */
         @JavascriptInterface
         public void login(final String username, final String password) {
+
             if (username.isEmpty() || password.isEmpty()) {
                 toast("请输入用户名与密码");
                 return;
@@ -93,6 +97,7 @@ public class LoginActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
                     mProgressDialog = ProgressDialog.show(LoginActivity.this, "稍等", "验证用户信息...");
                 }
             });
@@ -100,7 +105,7 @@ public class LoginActivity extends BaseActivity {
             try {
                 String info = ApiHelper.authentication(mContext, username, URLs.MD5(password));
                 if (info.compareTo("success") > 0) {
-                    mProgressDialog.dismiss();
+                    if(mProgressDialog != null)  mProgressDialog.dismiss();
                     toast(info);
                     return;
                 }
@@ -125,11 +130,11 @@ public class LoginActivity extends BaseActivity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 LoginActivity.this.startActivity(intent);
 
-                mProgressDialog.dismiss();
+                if(mProgressDialog != null)  mProgressDialog.dismiss();
                 finish();
             } catch (Exception e) {
                 e.printStackTrace();
-                mProgressDialog.dismiss();
+                if(mProgressDialog != null)  mProgressDialog.dismiss();
                 toast(e.getLocalizedMessage());
             }
         }

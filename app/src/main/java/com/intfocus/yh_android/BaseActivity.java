@@ -598,7 +598,9 @@ public class BaseActivity extends Activity {
                  */
                 String headerPath = String.format("%s/%s", sharedPath, URLs.CACHED_HEADER_FILENAME);
                 File headerFile = new File(headerPath);
-                if (headerFile.exists()) { headerFile.delete(); }
+                if (headerFile.exists()) {
+                    headerFile.delete();
+                }
 
                 FileUtil.writeFile(versionConfigPath, packageInfo.versionName);
             }
@@ -635,11 +637,11 @@ public class BaseActivity extends Activity {
 
             Log.i("checkAssetUpdated", String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName), userJSON.getString(keyName)));
             // instantiate it within the onCreate method
-            mProgressDialog = new ProgressDialog(mContext);
-            mProgressDialog.setMessage(String.format("更新%s库", assetName));
-            mProgressDialog.setIndeterminate(true);
-            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            mProgressDialog.setCancelable(true);
+            //mProgressDialog = new ProgressDialog(mContext);
+            //mProgressDialog.setMessage(String.format("更新%s库", assetName));
+            //mProgressDialog.setIndeterminate(true);
+            //mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            //mProgressDialog.setCancelable(true);
 
             // execute this when the downloader must be fired
             final DownloadAssetsTask downloadTask = new DownloadAssetsTask(mContext, shouldReloadUIThread, assetName, isInAssets);
@@ -739,22 +741,22 @@ public class BaseActivity extends Activity {
             mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                     getClass().getName());
             mWakeLock.acquire();
-            mProgressDialog.show();
+            //mProgressDialog.show();
         }
 
         @Override
         protected void onProgressUpdate(Integer... progress) {
             super.onProgressUpdate(progress);
             // if we get here, length is known, now set indeterminate to false
-            mProgressDialog.setIndeterminate(false);
-            mProgressDialog.setMax(100);
-            mProgressDialog.setProgress(progress[0]);
+            //mProgressDialog.setIndeterminate(false);
+            //mProgressDialog.setMax(100);
+            //mProgressDialog.setProgress(progress[0]);
         }
 
         @Override
         protected void onPostExecute(String result) {
             mWakeLock.release();
-            mProgressDialog.dismiss();
+            //mProgressDialog.dismiss();
 
             if (result != null) {
                 Toast.makeText(context, "静态资源更新失败", Toast.LENGTH_LONG).show();

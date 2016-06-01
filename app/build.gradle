@@ -6,8 +6,8 @@ android {
 
     defaultConfig {
         applicationId "com.intfocus.yh_android"
-        minSdkVersion 15
-        targetSdkVersion 18
+        minSdkVersion 11
+        targetSdkVersion 19
     }
 
     buildTypes {

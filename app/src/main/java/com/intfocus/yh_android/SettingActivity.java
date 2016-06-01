@@ -115,12 +115,9 @@ public class SettingActivity extends BaseActivity {
                 JSONObject pgyerJSON = FileUtil.readConfigFile(pgyerVersionPath);
                 JSONObject responseData = pgyerJSON.getJSONObject("data");
                 pgyerInfo = String.format("%s(%s)", responseData.getString("versionName"), responseData.getString("versionCode"));
-                Log.i("pgyer", pgyerInfo);
-                Log.i("local", versionInfo);
                 betaLink = pgyerInfo.equals(versionInfo) ? "" : pgyerInfo;
             }
-            // mPygerLink.setVisibility(betaLink.isEmpty() ? View.INVISIBLE : View.INVISIBLE);
-            mPygerLink.setText(betaLink.isEmpty() ? "已是最新版本" : String.format("有测试版本发布%s", pgyerInfo));
+            mPygerLink.setText(betaLink.isEmpty() ? "已是最新版本" : String.format("有发布测试版本%s", pgyerInfo));
         } catch (NameNotFoundException e) {
             e.printStackTrace();
         } catch (JSONException e) {
