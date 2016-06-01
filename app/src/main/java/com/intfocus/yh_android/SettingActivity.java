@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -118,6 +119,7 @@ public class SettingActivity extends BaseActivity {
                 betaLink = pgyerInfo.equals(versionInfo) ? "" : pgyerInfo;
             }
             mPygerLink.setText(betaLink.isEmpty() ? "已是最新版本" : String.format("有发布测试版本%s", pgyerInfo));
+            mPygerLink.setTextColor(Color.parseColor(betaLink.isEmpty() ? "#808080" : "#0000ff"));
         } catch (NameNotFoundException e) {
             e.printStackTrace();
         } catch (JSONException e) {

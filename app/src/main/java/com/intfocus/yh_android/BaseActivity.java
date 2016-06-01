@@ -535,7 +535,7 @@ public class BaseActivity extends Activity {
                 // 偶数时为正式版本
                 if (Integer.parseInt(versionCode) % 2 == 1) {
                     if(isShowToast) {
-                        toast(String.format("有测试版本发布(%s:%s)", versionName, versionCode));
+                        toast(String.format("有发布测试版本%s(%s)", versionName, versionCode));
                     }
 
                     return;
