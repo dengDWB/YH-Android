@@ -1,27 +1,15 @@
 ## 签名
 
-* 签名档: ./yh_android.key-store
+* 签名档: key-store/*.jks
+* 别名: filename
 * 密码: 123456
-* 别名: yh
-* 密码: 123456
-
----
-
-* 签名档: ./shengyiplus_android.key-store
-* 密码: 123456
-* 别名: shengyiplus
-* 密码: 123456
-
-
-## 蒲公英
-
-* [安装链接](http://www.pgyer.com/yh-a)
-* 扫码安装
-
-	![QR Code](http://static.pgyer.com/app/qrcode/yh-a)
 
 ## 更新日志
 
+
+* 16/06/02
+
+  * add: deploy multi apps with the same code
 
 * 16/04/22
 

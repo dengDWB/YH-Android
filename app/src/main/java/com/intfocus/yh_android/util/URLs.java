@@ -1,7 +1,6 @@
 package com.intfocus.yh_android.util;
 
 import android.content.Context;
-
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -16,11 +15,8 @@ import java.util.Date;
  * @version 1.0
  * @created 2016-01-06
  */
-public class URLs implements Serializable {
+public class URLs extends PrivateURLs implements Serializable {
 
-    public final static String HOST = "http://yonghui.idata.mobi";
-    public final static String HOST2  = "http://121.199.38.185:4567";
-    public final static String HOST1 = "http://10.0.3.2:4567";
 
     public final static String API_USER_PATH            = "%s/api/v1/%s/%s/%s/authentication";
     public final static String API_DATA_DEPRECATED_PATH = "%s/api/v1/group/%s/report/%s/attachment";
