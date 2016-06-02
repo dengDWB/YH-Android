@@ -1,3 +1,7 @@
+.current-app
+*.lock
+*.y[a]ml
+
 .DS_Store
 app/src/main/AndroidManifest.xml
 

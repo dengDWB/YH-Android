@@ -1,0 +1,27 @@
+pgyer:
+  user_key: ''
+  api_key: ''
+yonghui:
+  server: ''
+  pgyer:
+    ios: ''
+    android: ''
+  umeng: 
+    ios: ''
+    android: ''
+shengyiplus:
+  server: ''
+  pgyer:
+    ios: ''
+    android: ''
+  umeng: 
+    ios: ''
+    android: ''
+qiyoutong:
+  server: ''
+  pgyer:
+    ios: ''
+    android: ''
+  umeng: 
+    ios: ''
+    android: ''
