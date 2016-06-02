@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+case "$1" in
+  yonghui|shengyiplus|qiyoutong)
+    bundle exec ruby config/app_keeper.rb "$1"
+  ;;
+  *)
+  test -z "$1" && echo "current app: $(cat .current-app)" || echo "unknown argument - $1"
+  ;;
+esac
