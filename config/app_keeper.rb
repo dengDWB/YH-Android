@@ -47,8 +47,8 @@ gradle_path = 'app/build.gradle'
 gradle_text = IO.read(gradle_path)
 gradle_lines = gradle_text.split(/\n/)
 application_id_line = gradle_lines.find { |line| line.include?('applicationId') }
-application_id = application_id_line.strip.scan(/applicationId\s+'com\.intfocus\.(.*?)'/).flatten[0]
-new_application_id_line = application_id_line.sub(application_id, current_app)
+application_id = application_id_line.strip.scan(/applicationId\s+'(com\.intfocus\..*?)'/).flatten[0]
+new_application_id_line = application_id_line.sub(application_id, Settings.application_id)
 
 puts %(- done: applicationId: #{application_id})
 File.open(gradle_path, 'w:utf-8') do |file|
