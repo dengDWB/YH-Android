@@ -22,12 +22,12 @@ bundle_display_names = bundle_display_hash.keys.map(&:to_s)
 
 current_app = ARGV.shift || 'null' # File.read('.current-app').strip.freeze
 unless bundle_display_names.include?(current_app)
-  puts %(appname should in #{bundle_display_names}, but #{current_app})
+  puts %(Abort: appname should in #{bundle_display_names}, but #{current_app})
   exit
 end
 
 if IO.read('.current-app').strip == current_app
-  puts %(current app already: #{current_app})
+  puts %(Stopped: current app already: #{current_app})
   exit
 end
 
@@ -110,4 +110,25 @@ File.open('app/src/main/java/com/intfocus/yh_android/util/PrivateURLs.java', 'w:
 
     EOF
 end
+
+#
+# gradlew generate apk
+# 
+puts %(#{'-' * 25}\ngradlew generate apk...\n#{'-' * 25}\n\n)
+
+apk_path = 'app/build/outputs/apk/app-release.apk'
+key_store_path = File.join(Diw.pwd, Settings.key_store.path)
+unless File.exist?(key_store_pat)
+  puts %(Abort: key store file not exist - #{apk_path})
+  exit
+end
+
+`test -f #{apk_path} && rm -f #{apk_path}`
+`export KEYSTORE=#{key_store_path} KEYSTORE_PASSWORD=#{Settings.key_store.password} KEY_ALIAS=#{Settings.key_store.alias}} KEY_PASSWORD=#{Settings.key_store.alias_password} && /bin/bash ./gradlew assembleRelease`
+
+unless File.exist?(apk_path)
+  puts %(Abort: failed generate apk - #{apk_path})
+  exit
+end
+
 

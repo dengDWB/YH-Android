@@ -1,12 +1,12 @@
-## 签名
 
-* 签名档: key-store/*.jks
-* 别名: filename
-* 密码: 123456
 
 ## 更新日志
 
 
+* 16/06/03
+
+  * add: gradlew generate apk with command line
+  
 * 16/06/02
 
   * add: deploy multi apps with the same code

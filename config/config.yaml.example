@@ -2,6 +2,11 @@ pgyer:
   user_key: ''
   api_key: ''
 yonghui:
+  key_store:
+    path: 'key-store/app-name.jks'
+    password: ''
+    alias: 'app-name'
+    alias_password: ''
   server: ''
   pgyer:
     ios: ''
@@ -10,6 +15,11 @@ yonghui:
     ios: ''
     android: ''
 shengyiplus:
+  key_store:
+    path: 'key-store/app-name.jks'
+    password: ''
+    alias: 'app-name'
+    alias_password: ''
   server: ''
   pgyer:
     ios: ''
@@ -18,6 +28,11 @@ shengyiplus:
     ios: ''
     android: ''
 qiyoutong:
+  key_store:
+    path: 'key-store/app-name.jks'
+    password: ''
+    alias: 'app-name'
+    alias_password: ''
   server: ''
   pgyer:
     ios: ''

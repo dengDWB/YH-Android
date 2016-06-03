@@ -2,6 +2,7 @@
 *.lock
 *.y[a]ml
 
+.gradletasknamecache
 .DS_Store
 app/src/main/AndroidManifest.xml
 app/src/main/java/com/intfocus/yh_android/util/PrivateURLs.java
