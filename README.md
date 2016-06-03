@@ -1,12 +1,16 @@
+## 发布
 
+```
+./appkeeper.sh app-name
+```
 
 ## 更新日志
 
 
 * 16/06/03
 
-  * add: gradlew generate apk with command line
-  
+  * add: gradlew generate apk and upload to pgyer within a command line
+
 * 16/06/02
 
   * add: deploy multi apps with the same code
