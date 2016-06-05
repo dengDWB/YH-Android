@@ -8,7 +8,11 @@
 
 case "$1" in
   yonghui|shengyiplus|qiyoutong)
-    bundle exec ruby config/app_keeper.rb "$1"
+    # bundle exec ruby config/app_keeper.rb --app=shengyiplus --gradle --mipmap --manifest --res --java --apk --pgyer
+    bundle exec ruby config/app_keeper.rb --app="$1" --gradle --mipmap --manifest --res --java
+  ;;
+  pgyer)
+     bundle exec ruby config/app_keeper.rb --app="$(cat .current-app)" --apk --pgyer
   ;;
   all)
     echo 'TODO'
