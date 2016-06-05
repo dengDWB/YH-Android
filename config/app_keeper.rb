@@ -30,6 +30,12 @@ require 'active_support/core_ext/hash'
 require 'active_support/core_ext/string'
 require 'active_support/core_ext/numeric'
 
+def exit_when condition, &block
+  return unless condition
+  yield
+  exit
+end
+
 slop_opts = Slop.parse do |o|
   o.string '-a', '--app', 'current app', default: 'yonghui'
   o.bool '-g', '--gradle', 'bundle.gradle', default: false
@@ -56,9 +62,8 @@ bundle_display_hash = {
   qiyoutong: '企邮通'
 }
 bundle_display_names = bundle_display_hash.keys.map(&:to_s)
-unless bundle_display_names.include?(current_app)
+exit_when !bundle_display_names.include?(current_app) do
   puts %(Abort: appname should in #{bundle_display_names}, but #{current_app})
-  exit
 end
 
 current_app_name = bundle_display_hash.fetch(current_app.to_sym)
@@ -157,17 +162,15 @@ end
 if slop_opts[:apk]
   apk_path = 'app/build/outputs/apk/app-release.apk'
   key_store_path = File.join(Dir.pwd, Settings.key_store.path)
-  unless File.exist?(key_store_path)
+  exit_when !File.exist?(key_store_path) do
     puts %(Abort: key store file not exist - #{apk_path})
-    exit
   end
 
   `test -f #{apk_path} && rm -f #{apk_path}`
   `export KEYSTORE=#{key_store_path} KEYSTORE_PASSWORD=#{Settings.key_store.password} KEY_ALIAS=#{Settings.key_store.alias} KEY_PASSWORD=#{Settings.key_store.alias_password} && /bin/bash ./gradlew assembleRelease`
 
-  unless File.exist?(apk_path)
+  exit_when !File.exist?(apk_path) do
     puts %(Abort: failed generate apk - #{apk_path})
-    exit
   end
 
   puts %(- done: generate apk(#{File.size(apk_path).to_s(:human_size)}) - #{apk_path})

@@ -2,12 +2,12 @@
 
 ##############################################################################
 ##
-##  Ruby switch YH-Android apps for UN*X
+##  Script switch YH-Android apps for UN*X
 ##
 ##############################################################################
 
 case "$1" in
-  yonghui|shengyiplus|qiyoutong)
+  yonghui|shengyiplus|qiyoutong|test)
     # bundle exec ruby config/app_keeper.rb --app=shengyiplus --gradle --mipmap --manifest --res --java --apk --pgyer
     bundle exec ruby config/app_keeper.rb --app="$1" --gradle --mipmap --manifest --res --java
   ;;
