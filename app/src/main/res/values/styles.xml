@@ -16,10 +16,12 @@
     </style>
 
     <!-- Application theme. -->
-    <style name="AppTheme" parent="AppBaseTheme">
+    <style name="AppTheme" parent="Base.Theme.AppCompat.Light.DarkActionBar">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
+        <!-- 将 Activity 的 Theme 设置成透明 -->
+        <item name="android:windowIsTranslucent">true</item>
     </style>
 
     <style name="FullscreenTheme" parent="android:Theme.NoTitleBar">
@@ -89,14 +91,51 @@
         <item name="android:layout_marginBottom">10dp</item>
     </style>
 
-    <style name="ActionRightButton">
+    <style name="BannerTitle">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerInParent">true</item>
+    </style>
+
+    <style name="BannerBackButton">
+        <item name="android:layout_width">20dp</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:gravity">fill_vertical</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:src">@drawable/back</item>
+    </style>
+
+    <style name="BannerBackText">
+        <item name="android:text">返回</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:src">@drawable/back</item>
+        <item name="android:gravity">fill_vertical</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_marginLeft">0dp</item>
+        <item name="android:paddingTop">3dp</item>
+    </style>
+
+    <style name="BannerButton">
         <item name="android:layout_width">50dp</item>
         <item name="android:layout_height">fill_parent</item>
-        <item name="android:layout_alignParentRight">true</item>
         <item name="android:layout_centerVertical">true</item>
         <item name="android:scaleType">fitCenter</item>
-        <item name="android:padding">12dp</item>
+    </style>
 
+    <style name="BannerLeftButton" parent="BannerButton">
+        <item name="android:layout_alignParentLeft">true</item>
+        <item name="android:paddingTop">10dp</item>
+    </style>
+
+    <style name="BannerRightButton" parent="BannerButton">
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:padding">12dp</item>
     </style>
 
     <style name="PasswordTextView">

@@ -32,8 +32,8 @@ public class ResetPasswordActivity extends BaseActivity {
         mMyApp.setCurrentActivity(this);
 
 
-        findViewById(R.id.back).setOnClickListener(mOnBackListener);
-        findViewById(R.id.back_text).setOnClickListener(mOnBackListener);
+        findViewById(R.id.banner_back_button).setOnClickListener(mOnBackListener);
+        findViewById(R.id.banner_back_text).setOnClickListener(mOnBackListener);
 
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
         initRefreshWebView();

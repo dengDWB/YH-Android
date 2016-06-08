@@ -46,8 +46,8 @@ public class SettingActivity extends BaseActivity {
         setContentView(R.layout.activity_setting);
         mMyApp.setCurrentActivity(this);
 
-        findViewById(R.id.back).setOnClickListener(mOnBackListener);
-        findViewById(R.id.back_text).setOnClickListener(mOnBackListener);
+        findViewById(R.id.banner_back_button).setOnClickListener(mOnBackListener);
+        findViewById(R.id.banner_back_text).setOnClickListener(mOnBackListener);
 
         mUserID = (TextView) findViewById(R.id.user_id);
         mRoleID = (TextView) findViewById(R.id.role_id);

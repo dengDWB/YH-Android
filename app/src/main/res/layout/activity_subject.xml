@@ -6,45 +6,29 @@
     tools:context="com.intfocus.yh_android.SubjectActivity">
 
     <RelativeLayout
-        android:id="@+id/actionBar"
+        android:id="@+id/action_bar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/actionBar">
 
         <ImageView
-            android:id="@+id/back"
-            android:layout_width="20dp"
-            android:layout_height="fill_parent"
-            android:gravity="fill_vertical"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
-            android:src="@drawable/back" />
+            android:id="@+id/banner_back_button"
+            style="@style/BannerBackButton" />
 
         <TextView
-            android:id="@+id/back_text"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/back"
-            android:text="返回"
-            android:textColor="@color/white"
-            android:gravity="fill_vertical"
-            android:textSize="18sp" />
+            android:id="@+id/banner_back_text"
+            android:layout_toRightOf="@id/banner_back_button"
+            style="@style/BannerBackText" />
 
         <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:id="@+id/banner_title"
             android:text="主题名称"
-            android:textColor="@color/white"
-            android:textSize="20sp" />
+            style="@style/BannerTitle" />
 
         <ImageView
-            android:id="@+id/comment"
-            style="@style/ActionRightButton"
+            android:id="@+id/banner_comment"
+            style="@style/BannerRightButton"
             android:src="@drawable/comment" />
-
 
         <RelativeLayout
             android:id="@+id/colorViewLayout"
@@ -79,7 +63,7 @@
         android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/actionBar" />
+        android:layout_below="@id/action_bar" />
 
 
     <com.joanzapata.pdfview.PDFView
@@ -87,6 +71,6 @@
         android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/actionBar" />
+        android:layout_below="@id/action_bar" />
 
 </RelativeLayout>

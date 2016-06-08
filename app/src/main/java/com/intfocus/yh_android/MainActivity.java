@@ -27,7 +27,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        findViewById(R.id.setting).setOnClickListener(mSettingListener);
+        findViewById(R.id.banner_setting).setOnClickListener(mSettingListener);
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
         initRefreshWebView();
         setPullToRefreshWebView(true);

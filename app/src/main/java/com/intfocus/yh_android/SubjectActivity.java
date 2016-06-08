@@ -52,8 +52,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         setContentView(R.layout.activity_subject);
         mMyApp.setCurrentActivity(this);
 
-        findViewById(R.id.back).setOnClickListener(mOnBackListener);
-        findViewById(R.id.back_text).setOnClickListener(mOnBackListener);
+        findViewById(R.id.banner_back_button).setOnClickListener(mOnBackListener);
+        findViewById(R.id.banner_back_text).setOnClickListener(mOnBackListener);
 
         /*
          * JSON Data
@@ -68,10 +68,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             userNum = "not-set";
         }
 
-        bannerView = (RelativeLayout) findViewById(R.id.actionBar);
-        TextView mTitle = (TextView) findViewById(R.id.title);
+        bannerView = (RelativeLayout) findViewById(R.id.action_bar);
+        TextView mTitle = (TextView) findViewById(R.id.banner_title);
         mPDFView = (PDFView) findViewById(R.id.pdfview);
-        ImageView mComment = (ImageView) findViewById(R.id.comment);
+        ImageView mComment = (ImageView) findViewById(R.id.banner_comment);
         mComment.setOnClickListener(mOnCommentLister);
         mPDFView.setVisibility(View.INVISIBLE);
 

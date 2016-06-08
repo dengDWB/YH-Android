@@ -10,17 +10,18 @@ android {
         targetSdkVersion 22
     }
 
-    signingConfigs {    
-        release {
-            storeFile file(System.getenv("KEYSTORE"))
-            storePassword System.getenv("KEYSTORE_PASSWORD")
-            keyAlias System.getenv("KEY_ALIAS")
-            keyPassword System.getenv("KEY_PASSWORD")
-        }
-    }
+//    signingConfigs {
+//        release {
+//            storeFile file(System.getenv("KEYSTORE"))
+//            storePassword System.getenv("KEYSTORE_PASSWORD")
+//            keyAlias System.getenv("KEY_ALIAS")
+//            keyPassword System.getenv("KEY_PASSWORD")
+//        }
+//    }
+
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            // signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles 'proguard-rules.pro' //getDefaultProguardFile('proguard-android.txt'),
         }
@@ -46,6 +47,7 @@ dependencies {
     compile 'com.pgyersdk:sdk:2.2.2'
     compile 'commons-io:commons-io:+'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    compile 'me.dm7.barcodescanner:zxing:1.8.4'
     compile project(':lib:pull-to-refresh')
     compile project(':android-pdfview')
     compile project(':Pushlib')

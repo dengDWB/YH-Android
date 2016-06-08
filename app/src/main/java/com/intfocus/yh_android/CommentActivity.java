@@ -34,10 +34,10 @@ public class CommentActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
 
-        findViewById(R.id.back).setOnClickListener(mOnBackListener);
-        findViewById(R.id.back_text).setOnClickListener(mOnBackListener);
+        findViewById(R.id.banner_back_button).setOnClickListener(mOnBackListener);
+        findViewById(R.id.banner_back_text).setOnClickListener(mOnBackListener);
 
-        TextView mTitle = (TextView) findViewById(R.id.title);
+        TextView mTitle = (TextView) findViewById(R.id.banner_title);
 
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
         initRefreshWebView();
