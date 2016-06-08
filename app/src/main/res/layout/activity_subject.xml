@@ -28,7 +28,7 @@
         <ImageView
             android:id="@+id/banner_comment"
             style="@style/BannerRightButton"
-            android:src="@drawable/comment" />
+            android:src="@drawable/banner_comment" />
 
         <RelativeLayout
             android:id="@+id/colorViewLayout"

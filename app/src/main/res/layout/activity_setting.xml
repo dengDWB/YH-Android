@@ -13,12 +13,12 @@
         android:background="@color/actionBar">
 
         <ImageView
-            android:id="@+id/banner_back_buttonack"
+            android:id="@+id/banner_back_button"
             style="@style/BannerBackButton" />
 
         <TextView
             android:id="@+id/banner_back_text"
-            android:layout_toRightOf="@id/banner_back_buttonack"
+            android:layout_toRightOf="@id/banner_back_button"
             style="@style/BannerBackText" />
 
         <TextView
