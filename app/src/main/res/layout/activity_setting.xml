@@ -14,12 +14,13 @@
 
         <ImageView
             android:id="@+id/banner_back_button"
-            style="@style/BannerBackButton" />
+            style="@style/BannerBackButton"
+            android:onClick="dismissActivity" />
 
         <TextView
-            android:id="@+id/banner_back_text"
+            style="@style/BannerBackText"
             android:layout_toRightOf="@id/banner_back_button"
-            style="@style/BannerBackText" />
+            android:onClick="dismissActivity" />
 
         <TextView
             android:text="设置"

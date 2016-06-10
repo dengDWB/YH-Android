@@ -31,10 +31,6 @@ public class ResetPasswordActivity extends BaseActivity {
         setContentView(R.layout.activity_reset_password);
         mMyApp.setCurrentActivity(this);
 
-
-        findViewById(R.id.banner_back_button).setOnClickListener(mOnBackListener);
-        findViewById(R.id.banner_back_text).setOnClickListener(mOnBackListener);
-
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
         initRefreshWebView();
         setPullToRefreshWebView(false);
@@ -42,7 +38,6 @@ public class ResetPasswordActivity extends BaseActivity {
         mWebView.requestFocus();
         mWebView.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");
         mWebView.loadUrl(urlStringForLoading);
-
 
         urlString = String.format(URLs.RESET_PASSWORD_PATH, URLs.HOST, currentUIVersion());
         new Thread(mRunnableForDetecting).start();
@@ -53,11 +48,11 @@ public class ResetPasswordActivity extends BaseActivity {
         super.onResume();
     }
 
-    private final View.OnClickListener mOnBackListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            ResetPasswordActivity.this.onBackPressed();
-        }
+    /*
+     * 返回
+     */
+    public void dismissActivity(View v) {
+        ResetPasswordActivity.this.onBackPressed();
     };
 
     private class JavaScriptInterface extends JavaScriptBase  {

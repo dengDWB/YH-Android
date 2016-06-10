@@ -100,8 +100,7 @@ public class BaseActivity extends Activity {
                     urlStringForDetecting = String.format(URLs.API_DEVICE_STATE_PATH, URLs.HOST, user.getInt("user_device_id"));
                     relativeAssetsPath = "../../Shared/assets";
                 }
-            }
-            catch (JSONException e) {
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
@@ -127,11 +126,9 @@ public class BaseActivity extends Activity {
                             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
                             userJSON.put("umeng_device_id", registrationId);
                             FileUtil.writeFile(userConfigPath, userJSON.toString());
-                        }
-                        catch (JSONException e) {
+                        } catch (JSONException e) {
                             e.printStackTrace();
-                        }
-                        catch (IOException e) {
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }

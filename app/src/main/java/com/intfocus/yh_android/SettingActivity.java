@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,8 @@ import com.intfocus.yh_android.util.URLs;
 import com.umeng.message.PushAgent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,9 +48,6 @@ public class SettingActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
         mMyApp.setCurrentActivity(this);
-
-        findViewById(R.id.banner_back_button).setOnClickListener(mOnBackListener);
-        findViewById(R.id.banner_back_text).setOnClickListener(mOnBackListener);
 
         mUserID = (TextView) findViewById(R.id.user_id);
         mRoleID = (TextView) findViewById(R.id.role_id);
@@ -79,12 +79,19 @@ public class SettingActivity extends BaseActivity {
         mUISwitch.setOnCheckedChangeListener(mSwitchUIListener);
         mPygerLink.setOnClickListener(mPgyerLinkListener);
 
+        List<ImageView> colorViews = new ArrayList<>();
+        colorViews.add((ImageView) findViewById(R.id.colorView0));
+        colorViews.add((ImageView) findViewById(R.id.colorView1));
+        colorViews.add((ImageView) findViewById(R.id.colorView2));
+        colorViews.add((ImageView) findViewById(R.id.colorView3));
+        colorViews.add((ImageView) findViewById(R.id.colorView4));
+        initColorView(colorViews);
+
         initializeUI();
     }
     @Override
     public void onResume() {
-        super.onResume();  // Always call the superclass method first
-        // Get the Camera instance as the activity achieves full user focus
+        super.onResume();
 
         mMyApp.setCurrentActivity(this);
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));
@@ -135,11 +142,8 @@ public class SettingActivity extends BaseActivity {
     /*
      * 返回
      */
-    private final View.OnClickListener mOnBackListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            SettingActivity.this.onBackPressed();
-        }
+    public void dismissActivity(View v) {
+        SettingActivity.this.onBackPressed();
     };
 
     /*

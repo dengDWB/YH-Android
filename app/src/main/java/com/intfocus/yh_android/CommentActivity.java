@@ -1,11 +1,11 @@
 package com.intfocus.yh_android;
 
 import android.annotation.SuppressLint;
+import android.webkit.JavascriptInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.webkit.JavascriptInterface;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -34,11 +34,7 @@ public class CommentActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
 
-        findViewById(R.id.banner_back_button).setOnClickListener(mOnBackListener);
-        findViewById(R.id.banner_back_text).setOnClickListener(mOnBackListener);
-
         TextView mTitle = (TextView) findViewById(R.id.banner_title);
-
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
         initRefreshWebView();
         setPullToRefreshWebView(true);
@@ -71,11 +67,11 @@ public class CommentActivity extends BaseActivity {
         super.onResume();
     }
 
-    private final View.OnClickListener mOnBackListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            CommentActivity.this.onBackPressed();
-        }
+    /*
+     * 返回
+     */
+    public void dismissActivity(View v) {
+        CommentActivity.this.onBackPressed();
     };
 
     private class JavaScriptInterface extends JavaScriptBase  {

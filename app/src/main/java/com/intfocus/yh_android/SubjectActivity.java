@@ -52,17 +52,13 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         setContentView(R.layout.activity_subject);
         mMyApp.setCurrentActivity(this);
 
-        findViewById(R.id.banner_back_button).setOnClickListener(mOnBackListener);
-        findViewById(R.id.banner_back_text).setOnClickListener(mOnBackListener);
-
         /*
          * JSON Data
          */
         try {
             groupID = user.getInt("group_id");
             userNum = user.getString("user_num");
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
             groupID = -2;
             userNum = "not-set";
@@ -71,8 +67,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         bannerView = (RelativeLayout) findViewById(R.id.action_bar);
         TextView mTitle = (TextView) findViewById(R.id.banner_title);
         mPDFView = (PDFView) findViewById(R.id.pdfview);
-        ImageView mComment = (ImageView) findViewById(R.id.banner_comment);
-        mComment.setOnClickListener(mOnCommentLister);
         mPDFView.setVisibility(View.INVISIBLE);
 
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
@@ -186,8 +180,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             lp.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
             getWindow().setAttributes(lp);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        }
-        else {
+        } else {
             WindowManager.LayoutParams attr = getWindow().getAttributes();
             attr.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
             getWindow().setAttributes(attr);
@@ -217,8 +210,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                     new Thread(mRunnableForDetecting).start();
                 }
             }).start();
-        }
-        else {
+        } else {
             urlString = link;
             webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
@@ -227,8 +219,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                 public void run() {
                     if (urlString.toLowerCase().endsWith(".pdf")) {
                         new Thread(mRunnableForPDF).start();
-                    }
-                    else {
+                    } else {
                         /*
                          * 外部链接传参: user_num, timestamp
                          */
@@ -257,8 +248,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                         .load();
                 mWebView.setVisibility(View.INVISIBLE);
                 mPDFView.setVisibility(View.VISIBLE);
-            }
-            else {
+            } else {
                 toast("加载PDF失败");
             }
 
@@ -277,34 +267,33 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         }
     };
 
-    private final View.OnClickListener mOnCommentLister = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Intent intent = new Intent(mContext, CommentActivity.class);
-            intent.putExtra("bannerName", bannerName);
-            intent.putExtra("objectID", objectID);
-            intent.putExtra("objectType", objectType);
+    /*
+     * 评论
+     */
+    public void launchCommentActivity(View v) {
+        Intent intent = new Intent(mContext, CommentActivity.class);
+        intent.putExtra("bannerName", bannerName);
+        intent.putExtra("objectID", objectID);
+        intent.putExtra("objectType", objectType);
+        mContext.startActivity(intent);
 
-            mContext.startActivity(intent);
-
-            /*
-             * 用户行为记录, 单独异常处理，不可影响用户体验
-             */
-            try {
-                logParams = new JSONObject();
-                logParams.put("action", "点击/主题页面/评论");
-                new Thread(mRunnableForLogger).start();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        /*
+         * 用户行为记录, 单独异常处理，不可影响用户体验
+         */
+        try {
+            logParams = new JSONObject();
+            logParams.put("action", "点击/主题页面/评论");
+            new Thread(mRunnableForLogger).start();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     };
 
-    private final View.OnClickListener mOnBackListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            SubjectActivity.this.onBackPressed();
-        }
+    /*
+     * 返回
+     */
+    public void dismissActivity(View v) {
+        SubjectActivity.this.onBackPressed();
     };
 
     private class pullToRefreshTask extends AsyncTask<Void, Void, Void> {

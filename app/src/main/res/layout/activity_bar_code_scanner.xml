@@ -23,13 +23,8 @@
 
         <TextView
             android:id="@+id/banner_title"
-            android:text="主题名称"
+            android:text="扫一扫"
             style="@style/BannerTitle" />
-
-        <ImageView
-            style="@style/BannerRightButton"
-            android:src="@drawable/banner_comment"
-            android:onClick="launchCommentActivity" />
 
         <RelativeLayout
             android:id="@+id/colorViewLayout"
@@ -59,19 +54,10 @@
 
     </RelativeLayout>
 
-    <com.handmark.pulltorefresh.library.PullToRefreshWebView
-        android:id="@+id/webview"
-        android:visibility="visible"
+    <FrameLayout
+        android:id="@+id/bar_code_scanner_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/action_bar" />
-
-
-    <com.joanzapata.pdfview.PDFView
-        android:id="@+id/pdfview"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/action_bar" />
+        android:layout_below="@id/action_bar"/>
 
 </RelativeLayout>

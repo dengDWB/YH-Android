@@ -1,8 +1,12 @@
 package com.intfocus.yh_android;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.widget.ImageView;
@@ -17,7 +21,9 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 public class MainActivity extends BaseActivity {
+    private static final int ZBAR_CAMERA_PERMISSION = 1;
     private int objectType;
     private TabView mCurrentTab;
 
@@ -27,7 +33,6 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        findViewById(R.id.banner_setting).setOnClickListener(mSettingListener);
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
         initRefreshWebView();
         setPullToRefreshWebView(true);
@@ -115,25 +120,6 @@ public class MainActivity extends BaseActivity {
         mCurrentTab.setActive(true);
     }
 
-    private final View.OnClickListener mSettingListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Intent intent = new Intent(mContext, SettingActivity.class);
-            mContext.startActivity(intent);
-
-            /*
-             * 用户行为记录, 单独异常处理，不可影响用户体验
-             */
-            try {
-                logParams = new JSONObject();
-                logParams.put("action", "点击/主页面/设置");
-                new Thread(mRunnableForLogger).start();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    };
-
     @SuppressLint("SetJavaScriptEnabled")
     private final View.OnClickListener mTabChangeListener = new View.OnClickListener() {
         @Override
@@ -183,12 +169,52 @@ public class MainActivity extends BaseActivity {
                 logParams.put("action", "点击/主页面/标签栏");
                 logParams.put("obj_type", objectType);
                 new Thread(mRunnableForLogger).start();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     };
+
+    public void launchSettingActivity(View v) {
+        Intent intent = new Intent(mContext, SettingActivity.class);
+        mContext.startActivity(intent);
+
+        /*
+         * 用户行为记录, 单独异常处理，不可影响用户体验
+         */
+        try {
+            logParams = new JSONObject();
+            logParams.put("action", "点击/主页面/设置");
+            new Thread(mRunnableForLogger).start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void launchBarCodeScannerActivity(View v) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA }, ZBAR_CAMERA_PERMISSION);
+        } else {
+            Intent intent = new Intent(mContext, BarCodeScannerActivity.class);
+            mContext.startActivity(intent);
+        }
+    }
+
+    //@Override
+    //public void onRequestPermissionsResult(int requestCode,  String permissions[], int[] grantResults) {
+    //    switch (requestCode) {
+    //        case ZBAR_CAMERA_PERMISSION:
+    //            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+    //
+    //                Intent intent = new Intent(this, BarCodeScannerActivity.class);
+    //                startActivity(intent);
+    //            } else {
+    //                toast("Please grant camera permission to use the QR Scanner");
+    //            }
+    //            return;
+    //    }
+    //}
 
     private class JavaScriptInterface extends JavaScriptBase {
         /*
@@ -222,8 +248,7 @@ public class MainActivity extends BaseActivity {
                 logParams.put("obj_type", objectType);
                 logParams.put("obj_title", bannerName);
                 new Thread(mRunnableForLogger).start();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -241,8 +266,7 @@ public class MainActivity extends BaseActivity {
                 config.put(pageName, tabIndex);
 
                 FileUtil.writeFile(filePath, config.toString());
-            }
-            catch (JSONException | IOException e) {
+            } catch (JSONException | IOException e) {
                 e.printStackTrace();
             }
         }
@@ -279,8 +303,7 @@ public class MainActivity extends BaseActivity {
                 logParams.put("obj_type", objectType);
                 logParams.put("obj_title", String.format("主页面/%s", ex));
                 new Thread(mRunnableForLogger).start();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

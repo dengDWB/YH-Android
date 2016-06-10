@@ -13,25 +13,25 @@
         android:background="@color/actionBar">
 
         <ImageView
-            android:id="@+id/banner_scan"
-            android:layout_alignTop="@+id/imageView"
+            android:layout_alignTop="@+id/banner_logo"
             style="@style/BannerLeftButton"
             android:src="@drawable/banner_scan"
-            android:layout_alignBottom="@+id/colorViewLayout" />
+            android:layout_alignBottom="@+id/colorViewLayout"
+            android:onClick="launchBarCodeScannerActivity" />
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/banner_logo"
             android:src="@drawable/banner_logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true" />
 
         <ImageView
-            android:id="@+id/banner_setting"
             android:src="@drawable/banner_setting"
             style="@style/BannerRightButton"
-            android:layout_alignTop="@+id/imageView"
-            android:layout_alignBottom="@+id/colorViewLayout" />
+            android:layout_alignTop="@+id/banner_logo"
+            android:layout_alignBottom="@+id/colorViewLayout"
+            android:onClick="launchSettingActivity" />
 
         <RelativeLayout
             android:id="@+id/colorViewLayout"
