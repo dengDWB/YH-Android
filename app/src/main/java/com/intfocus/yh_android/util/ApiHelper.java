@@ -125,7 +125,8 @@ public class ApiHelper {
      * 发表评论
      */
     public static void writeComment(int userID, int objectType, int objectID, Map params) throws UnsupportedEncodingException {
-        String urlString = String.format(URLs.API_COMMENT_PATH, URLs.HOST, userID, objectID, objectType);
+        String urlString = String.format(URLs.API_COMMENT_PATH, URLs.HOST, userID, objectID,
+            objectType);
 
         Map<String, String> response = HttpUtil.httpPost(urlString, params);
         Log.i("WriteComment", response.get("code"));
@@ -392,6 +393,65 @@ public class ApiHelper {
             String urlString = String.format(URLs.API_ACTION_LOG_PATH, URLs.HOST);
             HttpUtil.httpPost(urlString, params);
         } catch (JSONException | PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *  消息推送， 设备标识
+     *
+     *  @param deviceUUID  设备ID
+     *
+     *  @return 服务器是否更新成功
+     */
+    public static void pushDeviceToken(Context context, String deviceUUID) {
+        try {
+            String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), URLs.PUSH_CONFIG_FILENAME);
+            JSONObject pushJSON = FileUtil.readConfigFile(userConfigPath);
+
+            String urlString = String.format(URLs.API_PUSH_DEVICE_TOKEN_PATH, URLs.HOST, deviceUUID, pushJSON.getString("device_token"));
+            HttpUtil.httpPost(urlString, new JSONObject());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *  二维码扫描
+     *
+     *  @param userNum    用户编号
+     *  @param codeInfo   条形码信息
+     *  @param codeType   条形码或二维码
+     */
+    public static void barCodeScan(Context mContext, String userNum, String codeInfo, String codeType) {
+        try {
+            JSONObject params = new JSONObject();
+            params.put("code_info", codeInfo);
+            params.put("code_type", codeType);
+
+            String urlString = String.format(URLs.API_BAR_CODE_SCAN_PATH, URLs.HOST, userNum);
+            Map<String, String> response = HttpUtil.httpPost(urlString, params);
+            String responseString = response.get("body");
+
+            if(response.get("code") == null || !response.get("code").equals("200")) {
+                responseString = String.format("{'商品编号': '%s', '编号类型': '%s', '服务器报错': '%s'}", codeInfo, codeType, responseString);
+            }
+            String javascriptPath = FileUtil.sharedPath(mContext) + "/assets/javascripts/bar_code_scan_result.js";
+            String javascriptContent = new StringBuilder()
+                .append("(function(){")
+                .append("  var response = " + responseString + ", array = [], key, value;")
+                .append("  for(key in response) {")
+                .append("    if(key === 'code') continue;")
+                .append("    value = response[key];")
+                .append("    array.push('<tr><td>' + key + '</td><td>' + value + '</td></tr>');")
+                .append("  }")
+                .append("  document.getElementById('result').innerHTML = array.join('');")
+                .append("}).call(this);")
+                .toString();
+            FileUtil.writeFile(javascriptPath, javascriptContent);
+        } catch(JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

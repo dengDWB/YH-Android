@@ -17,45 +17,40 @@ import java.util.Date;
  */
 public class URLs extends PrivateURLs implements Serializable {
 
-
     public final static String API_USER_PATH            = "%s/api/v1/%s/%s/%s/authentication";
-    public final static String API_DATA_DEPRECATED_PATH = "%s/api/v1/group/%s/report/%s/attachment";
     public final static String API_DATA_PATH            = "%s/api/v1/group/%s/template/%s/report/%s/attachment";
     public final static String API_COMMENT_PATH         = "%s/api/v1/user/%d/id/%d/type/%d";
     public final static String API_SCREEN_LOCK_PATH     = "%s/api/v1/user_device/%s/screen_lock";
     public final static String API_DEVICE_STATE_PATH    = "%s/api/v1/user_device/%d/state";
     public final static String API_RESET_PASSWORD_PATH  = "%s/api/v1/update/%s/password";
     public final static String API_ACTION_LOG_PATH      = "%s/api/v1/android/logger";
-    public final static String API_ASSETS_PATH          = "%s/api/v1/download/%s.zip";
 
-    public final static String KPI_DEPRECATED_PATH      = "%s/mobile/%s/role/%s/group/%s/kpi";
-    public final static String KPI_PATH                 = "%s/mobile/%s/group/%s/role/%s/kpi";
-    public final static String MESSAGE_PATH             = "%s/mobile/%s/role/%s/group/%s/user/%s/message";
-    public final static String APPLICATION_PATH         = "%s/mobile/%s/role/%s/app";
-    public final static String ANALYSE_PATH             = "%s/mobile/%s/role/%s/analyse";
-    public final static String COMMENT_PATH             = "%s/mobile/%s/id/%s/type/%s/comment";
-    public final static String RESET_PASSWORD_PATH      = "%s/mobile/%s/update_user_password";
+    public final static String API_PUSH_DEVICE_TOKEN_PATH = "%s/api/v1/device/%s/push_token/%s";
+    public final static String API_BAR_CODE_SCAN_PATH     = "%s/api/v1/user/%s/bar_code_scan";
+    public final static String API_ASSETS_PATH            = "%s/api/v1/download/%s.zip";
 
-    public final static String REPORT_DATA_DEPRECATED_FILENAME = "template_data_group_%s_report_%s.js";
-    public final static String REPORT_DATA_FILENAME            = "group_%s_template_%s_report_%s.js";
+    public final static String KPI_PATH                  = "%s/mobile/%s/group/%s/role/%s/kpi";
+    public final static String MESSAGE_PATH              = "%s/mobile/%s/role/%s/group/%s/user/%s/message";
+    public final static String APPLICATION_PATH          = "%s/mobile/%s/role/%s/app";
+    public final static String ANALYSE_PATH              = "%s/mobile/%s/role/%s/analyse";
+    public final static String COMMENT_PATH              = "%s/mobile/%s/id/%s/type/%s/comment";
+    public final static String RESET_PASSWORD_PATH       = "%s/mobile/%s/update_user_password";
 
-    // public final static String STORAGE_BASE = String.format("%s/com.intfocus.yh_android", Environment.getExternalStorageDirectory().getAbsolutePath());
-    //public final static String TimeStamp       = new SimpleDateFormat("yyyyMMddKKmmss").format(new Date());
+    public final static String REPORT_DATA_FILENAME      = "group_%s_template_%s_report_%s.js";
 
-
-    public final static String USER_CONFIG_FILENAME = "user.plist";
-    public final static String CONFIG_DIRNAME = "Configs";
-    public final static String SETTINGS_CONFIG_FILENAME = "Setting.plist";
-    public final static String BETA_CONFIG_FILENAME = "Beta.plist";
-    public final static String TABINDEX_CONFIG_FILENAME = "page_tab_index.plist";
+    public final static String USER_CONFIG_FILENAME      = "user.plist";
+    public final static String CONFIG_DIRNAME            = "Configs";
+    public final static String SETTINGS_CONFIG_FILENAME  = "setting.plist";
+    public final static String BETA_CONFIG_FILENAME      = "beta.plist";
+    public final static String PUSH_CONFIG_FILENAME      = "push_message.plist";
+    public final static String TABINDEX_CONFIG_FILENAME  = "page_tab_index.plist";
     public final static String GESTURE_PASSWORD_FILENAME = "gesture_password.plist";
-    public final static String HTML_DIRNAME = "HTML";
-    public final static String SHARED_DIRNAME = "Shared";
-    public final static String CACHED_DIRNAME = "Cached";
-
-    public final static String CACHED_HEADER_FILENAME   = "cached_header.plist";
-    public final static String CURRENT_VERSION_FILENAME = "current_version.txt";
-    public final static String PGYER_VERSION_FILENAME   = "pgyer_version.txt";
+    public final static String HTML_DIRNAME              = "HTML";
+    public final static String SHARED_DIRNAME            = "Shared";
+    public final static String CACHED_DIRNAME            = "Cached";
+    public final static String CACHED_HEADER_FILENAME    = "cached_header.plist";
+    public final static String CURRENT_VERSION_FILENAME  = "current_version.txt";
+    public final static String PGYER_VERSION_FILENAME    = "pgyer_version.txt";
 
     public static String storage_base(Context context) {
         //    String path = "";

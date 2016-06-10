@@ -1,11 +1,12 @@
 package com.intfocus.yh_android;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 import me.dm7.barcodescanner.zbar.Result;
@@ -50,23 +51,32 @@ public class BarCodeScannerActivity extends BaseActivity implements ZBarScannerV
 
     @Override
     public void handleResult(Result rawResult) {
-      toast("Contents = " + rawResult.getContents() + ", Format = " + rawResult.getBarcodeFormat().getName());
-
-      /*
-       * Note:
-       * Wait 2 seconds to resume the preview.
-       *
-       * @BUG:
-       * On older devices continuously stopping and resuming camera preview can result in freezing the app.
-       * I don't know why this is the case but I don't have the time to figure out.
-       */
-      Handler handler = new Handler();
-      handler.postDelayed(new Runnable() {
-        @Override
-        public void run() {
-          mScannerView.resumeCameraPreview(BarCodeScannerActivity.this);
-        }
-      }, 2000);
+      Log.i("handleResult",
+          "Contents = " + rawResult.getContents() + ", Format = " + rawResult.getBarcodeFormat()
+              .getName());
+      if (rawResult.getContents().isEmpty()) {
+        /*
+         * Note:
+         * Wait 2 seconds to resume the preview.
+         *
+         * @BUG:
+         * On older devices continuously stopping and resuming camera preview can result in freezing the app.
+         * I don't know why this is the case but I don't have the time to figure out.
+         */
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+              mScannerView.resumeCameraPreview(BarCodeScannerActivity.this);
+            }
+          }, 2000);
+      }
+      else {
+        Intent intent = new Intent(mContext, BarCodeResultActivity.class);
+        intent.putExtra("code_info", rawResult.getContents());
+        intent.putExtra("code_type", rawResult.getBarcodeFormat().getName());
+        mContext.startActivity(intent);
+      }
     }
 
     /*
