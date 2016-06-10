@@ -51,10 +51,11 @@ public class BarCodeScannerActivity extends BaseActivity implements ZBarScannerV
 
     @Override
     public void handleResult(Result rawResult) {
-      Log.i("handleResult",
-          "Contents = " + rawResult.getContents() + ", Format = " + rawResult.getBarcodeFormat()
-              .getName());
-      if (rawResult.getContents().isEmpty()) {
+      toast("Contents = " + rawResult.getContents() + ", Format = " + rawResult.getBarcodeFormat()
+          .getName());
+      Log.i("handleResult", "Contents = " + rawResult.getContents() + ", Format = " + rawResult.getBarcodeFormat()
+          .getName());
+      if (rawResult.getContents() == null || rawResult.getContents().isEmpty()) {
         /*
          * Note:
          * Wait 2 seconds to resume the preview.

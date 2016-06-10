@@ -438,16 +438,17 @@ public class ApiHelper {
             }
             String javascriptPath = FileUtil.sharedPath(mContext) + "/assets/javascripts/bar_code_scan_result.js";
             String javascriptContent = new StringBuilder()
-                .append("(function(){")
-                .append("  var response = " + responseString + ", array = [], key, value;")
-                .append("  for(key in response) {")
-                .append("    if(key === 'code') continue;")
-                .append("    value = response[key];")
-                .append("    array.push('<tr><td>' + key + '</td><td>' + value + '</td></tr>');")
-                .append("  }")
-                .append("  document.getElementById('result').innerHTML = array.join('');")
+                .append("(function() {\n")
+                .append("  var response = " + responseString + ", array = [], key, value;\n")
+                .append("  for(key in response) {\n")
+                .append("    if(key === 'code') continue;\n")
+                .append("    value = response[key];\n")
+                .append("    array.push('<tr><td>' + key + '</td><td>' + value + '</td></tr>');\n")
+                .append("  }\n")
+                .append("  document.getElementById('result').innerHTML = array.join('');\n")
                 .append("}).call(this);")
                 .toString();
+            Log.i("javascriptContent", javascriptContent);
             FileUtil.writeFile(javascriptPath, javascriptContent);
         } catch(JSONException e) {
             e.printStackTrace();
