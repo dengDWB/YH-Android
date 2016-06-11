@@ -114,18 +114,18 @@ public class BaseActivity extends Activity {
         PushAgent mPushAgent = PushAgent.getInstance(mContext);
         //开启推送并设置注册的回调处理
         mPushAgent.enable(new IUmengRegisterCallback() {
-
             @Override
             public void onRegistered(final String registrationId) {
                 new Handler().post(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            //onRegistered方法的参数registrationId即是device_token
-                            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
-                            JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
-                            userJSON.put("umeng_device_id", registrationId);
-                            FileUtil.writeFile(userConfigPath, userJSON.toString());
+                            // onRegistered方法的参数registrationId即是device_token
+                            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.PUSH_CONFIG_FILENAME);
+                            JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
+                            pushJSON.put("push_valid", false);
+                            pushJSON.put("push_device_token", registrationId);
+                            FileUtil.writeFile(pushConfigPath, pushJSON.toString());
                         } catch (JSONException e) {
                             e.printStackTrace();
                         } catch (IOException e) {
@@ -597,6 +597,14 @@ public class BaseActivity extends Activity {
                 File headerFile = new File(headerPath);
                 if (headerFile.exists()) {
                     headerFile.delete();
+                }
+
+                /*
+                 * Remove bar code scan result html
+                 */
+                File barCodeScanReulFile = new File(sharedPath + "/bar_code_scan_result.html");
+                if(barCodeScanReulFile.exists()) {
+                    barCodeScanReulFile.delete();
                 }
 
                 FileUtil.writeFile(versionConfigPath, packageInfo.versionName);

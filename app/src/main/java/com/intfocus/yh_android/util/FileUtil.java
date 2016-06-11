@@ -127,11 +127,13 @@ public class FileUtil {
     /*
      * 读取本地文件内容，并转化为json
      */
-    public static JSONObject readConfigFile(String pathName) {
-        JSONObject jsonObject = null;
+    public static JSONObject readConfigFile(String jsonPath) {
+        JSONObject jsonObject = new JSONObject();
         try {
-            String string = FileUtil.readFile(pathName);
-            jsonObject = new JSONObject(string);
+            if(new File(jsonPath).exists()) {
+                String string = FileUtil.readFile(jsonPath);
+                jsonObject = new JSONObject(string);
+            }
         }
         catch (JSONException e) {
             e.printStackTrace();

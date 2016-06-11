@@ -21,6 +21,7 @@ import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.umeng.message.PushAgent;
+import com.umeng.message.UmengRegistrar;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -229,7 +230,31 @@ public class SettingActivity extends BaseActivity {
                         headerPath = String.format("%s/%s", FileUtil.dirPath(mContext, URLs.HTML_DIRNAME), URLs.CACHED_HEADER_FILENAME);
                         new File(headerPath).delete();
 
+                        /*
+                         * Remove bar code scan result html
+                         */
+                        File barCodeScanReulFile = new File(sharedPath + "/bar_code_scan_result.html");
+                        if(barCodeScanReulFile.exists()) {
+                            barCodeScanReulFile.delete();
+                        }
+
+                        /*
+                         * Umeng Device Token
+                         */
+                        String device_token = UmengRegistrar.getRegistrationId(mContext);
+                        String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.PUSH_CONFIG_FILENAME);
+                        JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
+                        if(!pushJSON.has("push_device_token") || pushJSON.getString("push_device_token").length() != 44 ||
+                            device_token.length() != 44 || !pushJSON.getString("push_device_token").equals(device_token)) {
+                            pushJSON.put("push_valid", false);
+                            pushJSON.put("push_device_token", device_token);
+                            FileUtil.writeFile(pushConfigPath, pushJSON.toString());
+                        }
+
                         ApiHelper.authentication(SettingActivity.this, user.getString("user_num"), user.getString("password"));
+
+                        pushJSON = FileUtil.readConfigFile(pushConfigPath);
+                        mPushState.setText(pushJSON.has("push_valid") && pushJSON.getBoolean("push_valid") ? "开启" : "关闭");
 
                         /*
                          * 检测服务器静态资源是否更新，并下载
@@ -249,6 +274,8 @@ public class SettingActivity extends BaseActivity {
                             }
                         });
                     } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }

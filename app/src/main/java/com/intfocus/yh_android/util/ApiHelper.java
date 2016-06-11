@@ -84,6 +84,9 @@ public class ApiHelper {
 
             Log.i("CurrentUser", userJSON.toString());
             if (response.get("code").equals("200")) {
+                // 第三方消息推送，设备标识
+                ApiHelper.pushDeviceToken(context, userJSON.getString("device_uuid"));
+
                 FileUtil.writeFile(settingsConfigPath, userJSON.toString());
             } else {
                 ret = responseJSON.getString("info");
@@ -404,16 +407,30 @@ public class ApiHelper {
      *
      *  @return 服务器是否更新成功
      */
-    public static void pushDeviceToken(Context context, String deviceUUID) {
+    public static boolean pushDeviceToken(Context context, String deviceUUID) {
         try {
-            String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), URLs.PUSH_CONFIG_FILENAME);
-            JSONObject pushJSON = FileUtil.readConfigFile(userConfigPath);
+            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(context),
+                URLs.PUSH_CONFIG_FILENAME);
+            JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
+
+            if(pushJSON.has("push_valid") && pushJSON.getBoolean("push_valid") && pushJSON.has("push_device_token") && pushJSON
+                .getString("push_device_token").length() == 44) return true;
+            if(pushJSON.has("push_device_token") && pushJSON.getString("push_device_token").length() != 44) return false;
 
             String urlString = String.format(URLs.API_PUSH_DEVICE_TOKEN_PATH, URLs.HOST, deviceUUID, pushJSON.getString("device_token"));
-            HttpUtil.httpPost(urlString, new JSONObject());
+            Map<String, String> response = HttpUtil.httpPost(urlString, new JSONObject());
+            JSONObject responseJSON = new JSONObject(response.get("body"));
+
+            pushJSON.put("push_valid", responseJSON.has("valid") && responseJSON.getBoolean("valid"));
+            FileUtil.writeFile(pushConfigPath, pushJSON.toString());
+
+            return pushJSON.has("push_valid") && pushJSON.getBoolean("push_valid");
         } catch (JSONException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return false;
     }
 
     /**
