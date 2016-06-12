@@ -196,7 +196,6 @@ public class HttpUtil {
      */
     public static Map<String, String> httpPost(String urlString, JSONObject params) {
         Log.i("POST2", urlString);
-
         Map<String, String> retMap = new HashMap<>();
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(3, TimeUnit.SECONDS)
