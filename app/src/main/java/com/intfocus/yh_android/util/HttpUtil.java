@@ -208,6 +208,7 @@ public class HttpUtil {
 
         if (params != null) {
             requestBuilder.post(RequestBody.create(JSON, params.toString()));
+            Log.i("PARAM", params.toString());
         }
         try {
             request = requestBuilder

@@ -18,6 +18,7 @@ import org.json.JSONException;
  * Created by lijunjie on 16/6/10.
  */
 public class BarCodeResultActivity extends BaseActivity {
+  private String htmlPath, codeInfo, codeType, userNum;
 
   @Override
   public void onCreate(Bundle state) {
@@ -39,24 +40,38 @@ public class BarCodeResultActivity extends BaseActivity {
     initColorView(colorViews);
 
 
-    String htmlPath = sharedPath + "/bar_code_scan_result.html";
+    htmlPath = sharedPath + "/bar_code_scan_result.html";
     if(!(new File(htmlPath).exists())) {
       FileUtil.copyAssetFile(mContext, "bar_code_scan_result.html", htmlPath);
     }
 
     try {
       Intent intent = getIntent();
-      String codeInfo = intent.getStringExtra("code_info");
-      String codeType = intent.getStringExtra("code_type");
-      ApiHelper.barCodeScan(mContext, user.getString("user_num"), codeInfo, codeType);
-
-      htmlPath = String.format("file:///%s", htmlPath);
-      mWebView.loadUrl(htmlPath);
+      codeInfo = intent.getStringExtra("code_info");
+      codeType = intent.getStringExtra("code_type");
+      userNum = user.getString("user_num");
     } catch (JSONException e) {
       e.printStackTrace();
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+
+    new Thread(new Runnable() {
+      @Override public void run() {
+        ApiHelper.barCodeScan(mContext, userNum, codeInfo, codeType);
+
+        runOnUiThread(new Runnable() {
+          @Override public void run() {
+            mWebView.loadUrl(String.format("file:///%s", htmlPath));
+          }
+        });
+      }
+    }).start();
   }
 
   /*

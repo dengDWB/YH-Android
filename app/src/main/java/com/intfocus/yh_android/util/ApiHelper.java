@@ -409,15 +409,14 @@ public class ApiHelper {
      */
     public static boolean pushDeviceToken(Context context, String deviceUUID) {
         try {
-            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(context),
-                URLs.PUSH_CONFIG_FILENAME);
+            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(context), URLs.PUSH_CONFIG_FILENAME);
             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
 
             if(pushJSON.has("push_valid") && pushJSON.getBoolean("push_valid") && pushJSON.has("push_device_token") && pushJSON
                 .getString("push_device_token").length() == 44) return true;
             if(pushJSON.has("push_device_token") && pushJSON.getString("push_device_token").length() != 44) return false;
 
-            String urlString = String.format(URLs.API_PUSH_DEVICE_TOKEN_PATH, URLs.HOST, deviceUUID, pushJSON.getString("device_token"));
+            String urlString = String.format(URLs.API_PUSH_DEVICE_TOKEN_PATH, URLs.HOST, deviceUUID, pushJSON.getString("push_device_token"));
             Map<String, String> response = HttpUtil.httpPost(urlString, new JSONObject());
             JSONObject responseJSON = new JSONObject(response.get("body"));
 
