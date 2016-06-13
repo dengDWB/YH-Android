@@ -4,7 +4,6 @@
 
 .gradletasknamecache
 .DS_Store
-app/src/main/AndroidManifest.xml
 app/src/main/java/com/intfocus/yh_android/util/PrivateURLs.java
 
 # Android 的 Module 推荐这么写. gitignore 文件

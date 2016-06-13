@@ -9,5 +9,6 @@ end
 ruby '2.3.0'
 
 gem 'slop', '~>4.3.0'
+gem 'nokogiri', '~>1.6.8'
 gem 'settingslogic', '~>2.0.9'
 gem 'activesupport', '~>4.2.6'

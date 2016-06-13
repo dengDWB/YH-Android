@@ -21,9 +21,9 @@
 #     -v, --version   print the version
 #     -a, --app       current app
 #   
-require 'erb'
 require 'json'
 require 'slop'
+require 'nokogiri'
 require 'settingslogic'
 require 'active_support'
 require 'active_support/core_ext/hash'
@@ -45,6 +45,7 @@ slop_opts = Slop.parse do |o|
   o.bool '-j', '--java', 'PrivateURLs.java', default: false
   o.bool '-f', '--apk', 'whether generate apk', default: false
   o.bool '-p', '--pgyer', 'whether upload to pgyer', default: false
+  o.bool '-b', '--github', 'black private info when commit', default: false
   o.on '-v', '--version', 'print the version' do
     puts Slop::VERSION
     exit
@@ -58,8 +59,8 @@ end
 current_app = slop_opts[:app]
 bundle_display_hash = {
   yonghui: '永辉生意人',
-  shengyiplus: '生意+',
-  qiyoutong: '企邮通'
+  qiyoutong: '企邮通',
+  shengyiplus: '生意+'
 }
 bundle_display_names = bundle_display_hash.keys.map(&:to_s)
 exit_when !bundle_display_names.include?(current_app) do
@@ -109,13 +110,37 @@ end
 
 #
 # reset app/src/main/AndroidManifest.xml
-# 
+#
+android_manifest_path = 'app/src/main/AndroidManifest.xml'
+def xml_sub(content, doc, key, value)
+  meta_data = doc.xpath(%(//meta-data[@android:name='#{key}'])).first
+  meta_data_value = meta_data.attributes['value']
+  content.sub(meta_data_value, value)
+end
+
 if slop_opts[:manifest]
-  android_manifest_erb_path = 'config/AndroidManifest.xml.erb'
-  android_manifest_xml_path = 'app/src/main/AndroidManifest.xml'
+  android_manifest_content = File.read(android_manifest_path)
+  android_manifest_doc = Nokogiri.XML(android_manifest_content)
+  android_manifest_content = xml_sub(android_manifest_content, android_manifest_doc, 'PGYER_APPID', Settings.pgyer.android)
+  android_manifest_content = xml_sub(android_manifest_content, android_manifest_doc, 'UMENG_APPKEY', Settings.umeng.android.app_key)
+  android_manifest_content = xml_sub(android_manifest_content, android_manifest_doc, 'UMENG_MESSAGE_SECRET', Settings.umeng.android.umeng_message_secret)
+
   puts %(- done: umeng/pgyer configuration)
-  File.open(android_manifest_xml_path, 'w:utf-8') do |file|
-    file.puts ERB.new(IO.read(android_manifest_erb_path)).result
+  File.open(android_manifest_path, 'w:utf-8') do |file|
+    file.puts(android_manifest_content)
+  end
+end
+
+if slop_opts[:github]
+  android_manifest_content = File.read(android_manifest_path)
+  android_manifest_doc = Nokogiri.XML(android_manifest_content)
+  android_manifest_content = xml_sub(android_manifest_content, android_manifest_doc, 'PGYER_APPID', 'pgyer-app-id')
+  android_manifest_content = xml_sub(android_manifest_content, android_manifest_doc, 'UMENG_APPKEY', 'umeng-app-key')
+  android_manifest_content = xml_sub(android_manifest_content, android_manifest_doc, 'UMENG_MESSAGE_SECRET', 'umeng-message-secret')
+
+  puts %(- done: umeng/pgyer info black for github)
+  File.open(android_manifest_path, 'w:utf-8') do |file|
+    file.puts(android_manifest_content)
   end
 end
 
@@ -182,5 +207,3 @@ if slop_opts[:pgyer]
   hash = JSON.parse(response).deep_symbolize_keys[:data]
   puts %(- done: upload apk(#{hash[:appFileSize].to_i.to_s(:human_size)}) to #pgyer#\n\t#{hash[:appName]}\n\t#{hash[:appIdentifier]}\n\t#{hash[:appVersion]}(#{hash[:appVersionNo]})\n\t#{hash[:appQRCodeURL]})
 end
-
-

@@ -14,6 +14,9 @@ case "$1" in
   pgyer)
      bundle exec ruby config/app_keeper.rb --app="$(cat .current-app)" --apk --pgyer
   ;;
+  github)
+     bundle exec ruby config/app_keeper.rb --github
+  ;;
   all)
     echo 'TODO'
   ;;
