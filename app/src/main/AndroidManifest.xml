@@ -111,7 +111,5 @@
             android:name="UMENG_CHANNEL"
             android:value="Umeng" >
         </meta-data>
-
     </application>
-
 </manifest>

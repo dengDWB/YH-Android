@@ -20,7 +20,8 @@
 #     -p, --pgyer     whether upload to pgyer
 #     -v, --version   print the version
 #     -a, --app       current app
-#   
+#
+require 'erb'
 require 'json'
 require 'slop'
 require 'nokogiri'
@@ -46,6 +47,7 @@ slop_opts = Slop.parse do |o|
   o.bool '-f', '--apk', 'whether generate apk', default: false
   o.bool '-p', '--pgyer', 'whether upload to pgyer', default: false
   o.bool '-b', '--github', 'black private info when commit', default: false
+  o.bool '-c', '--check', 'info mirror', default: false
   o.on '-v', '--version', 'print the version' do
     puts Slop::VERSION
     exit
@@ -78,7 +80,7 @@ class Settings < Settingslogic
   namespace NAME_SPACE
 end
 
-puts %(\n## modified configuration\n\n)
+puts %(\n## modified configuration\n\n) unless slop_opts[:check]
 #
 # reset app/build.gradle
 #
@@ -142,6 +144,19 @@ if slop_opts[:github]
   File.open(android_manifest_path, 'w:utf-8') do |file|
     file.puts(android_manifest_content)
   end
+end
+
+if slop_opts[:check]
+  def info_when_check(doc, key, expect_value, value_info)
+    value = doc.xpath(%(//meta-data[@android:name='#{key}'])).first.attributes['value']
+    puts %(- #{'**NOT**' if value != expect_value}match: #{value_info})
+  end
+
+  android_manifest_content = File.read(android_manifest_path)
+  android_manifest_doc = Nokogiri.XML(android_manifest_content)
+  info_when_check(android_manifest_doc, 'PGYER_APPID', Settings.pgyer.android, 'pgyer app id')
+  info_when_check(android_manifest_doc, 'UMENG_APPKEY', Settings.umeng.android.app_key, 'umeng app id')
+  info_when_check(android_manifest_doc, 'UMENG_MESSAGE_SECRET', Settings.umeng.android.umeng_message_secret, 'umeng message secret')
 end
 
 #
