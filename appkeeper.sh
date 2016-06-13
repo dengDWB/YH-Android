@@ -17,6 +17,14 @@ case "$1" in
   github)
     bundle exec ruby config/app_keeper.rb --github
   ;;
+  deploy)
+    bash "$0" shengyiplus
+    bash "$0" pgyer
+    bash "$0" qiyoutong
+    bash "$0" pgyer
+    bash "$0" yonghui
+    bash "$0" pgyer
+  ;;
   all)
     echo 'TODO'
   ;;
