@@ -116,7 +116,7 @@ end
 android_manifest_path = 'app/src/main/AndroidManifest.xml'
 def xml_sub(content, doc, key, value)
   meta_data = doc.xpath(%(//meta-data[@android:name='#{key}'])).first
-  meta_data_value = meta_data.attributes['value']
+  meta_data_value = meta_data.attributes['value'].value
   content.sub(meta_data_value, value)
 end
 
@@ -148,7 +148,7 @@ end
 
 if slop_opts[:check]
   def info_when_check(doc, key, expect_value, value_info)
-    value = doc.xpath(%(//meta-data[@android:name='#{key}'])).first.attributes['value']
+    value = doc.xpath(%(//meta-data[@android:name='#{key}'])).first.attributes['value'].value
     puts %(- #{'**NOT**' if value != expect_value}match: #{value_info})
   end
 
