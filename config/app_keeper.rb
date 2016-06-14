@@ -21,7 +21,6 @@
 #     -v, --version   print the version
 #     -a, --app       current app
 #
-require 'erb'
 require 'json'
 require 'slop'
 require 'nokogiri'
@@ -35,6 +34,17 @@ def exit_when condition, &block
   return unless condition
   yield
   exit
+end
+
+def xml_meta_data_sub(content, doc, key, value)
+  meta_data = doc.xpath(%(//meta-data[@android:name='#{key}'])).first
+  meta_data_value = meta_data.attributes['value'].value
+  content.sub(meta_data_value, value)
+end
+
+def xml_string_sub(content, doc, key, value)
+  meta_data_value = doc.xpath(%(//string[@name='#{key}'])).first.text
+  content.sub(meta_data_value, value)
 end
 
 slop_opts = Slop.parse do |o|
@@ -80,7 +90,6 @@ class Settings < Settingslogic
   namespace NAME_SPACE
 end
 
-puts %(\n## modified configuration\n\n) unless slop_opts[:check]
 #
 # reset app/build.gradle
 #
@@ -113,62 +122,69 @@ end
 #
 # reset app/src/main/AndroidManifest.xml
 #
-android_manifest_path = 'app/src/main/AndroidManifest.xml'
-def xml_sub(content, doc, key, value)
-  meta_data = doc.xpath(%(//meta-data[@android:name='#{key}'])).first
-  meta_data_value = meta_data.attributes['value'].value
-  content.sub(meta_data_value, value)
-end
-
+manifest_xml_path = 'app/src/main/AndroidManifest.xml'
 if slop_opts[:manifest]
-  android_manifest_content = File.read(android_manifest_path)
-  android_manifest_doc = Nokogiri.XML(android_manifest_content)
-  android_manifest_content = xml_sub(android_manifest_content, android_manifest_doc, 'PGYER_APPID', Settings.pgyer.android)
-  android_manifest_content = xml_sub(android_manifest_content, android_manifest_doc, 'UMENG_APPKEY', Settings.umeng.android.app_key)
-  android_manifest_content = xml_sub(android_manifest_content, android_manifest_doc, 'UMENG_MESSAGE_SECRET', Settings.umeng.android.umeng_message_secret)
+  manifest_content = File.read(manifest_xml_path)
+  manifest_nokogiri = Nokogiri.XML(manifest_content)
+  manifest_content = xml_meta_data_sub(manifest_content, manifest_nokogiri, 'PGYER_APPID', Settings.pgyer.android)
+  manifest_content = xml_meta_data_sub(manifest_content, manifest_nokogiri, 'UMENG_APPKEY', Settings.umeng.android.app_key)
+  manifest_content = xml_meta_data_sub(manifest_content, manifest_nokogiri, 'UMENG_MESSAGE_SECRET', Settings.umeng.android.umeng_message_secret)
 
   puts %(- done: umeng/pgyer configuration)
-  File.open(android_manifest_path, 'w:utf-8') do |file|
-    file.puts(android_manifest_content)
+  File.open(manifest_xml_path, 'w:utf-8') do |file|
+    file.puts(manifest_content)
   end
 end
 
+#
+# blurred app/src/main/AndroidManifest.xml 
+#
 if slop_opts[:github]
-  android_manifest_content = File.read(android_manifest_path)
-  android_manifest_doc = Nokogiri.XML(android_manifest_content)
-  android_manifest_content = xml_sub(android_manifest_content, android_manifest_doc, 'PGYER_APPID', 'pgyer-app-id')
-  android_manifest_content = xml_sub(android_manifest_content, android_manifest_doc, 'UMENG_APPKEY', 'umeng-app-key')
-  android_manifest_content = xml_sub(android_manifest_content, android_manifest_doc, 'UMENG_MESSAGE_SECRET', 'umeng-message-secret')
+  manifest_content = File.read(manifest_xml_path)
+  manifest_nokogiri = Nokogiri.XML(manifest_content)
+  manifest_content = xml_meta_data_sub(manifest_content, manifest_nokogiri, 'PGYER_APPID', 'pgyer-app-id')
+  manifest_content = xml_meta_data_sub(manifest_content, manifest_nokogiri, 'UMENG_APPKEY', 'umeng-app-key')
+  manifest_content = xml_meta_data_sub(manifest_content, manifest_nokogiri, 'UMENG_MESSAGE_SECRET', 'umeng-message-secret')
 
-  puts %(- done: umeng/pgyer info black for github)
-  File.open(android_manifest_path, 'w:utf-8') do |file|
-    file.puts(android_manifest_content)
+  puts %(- done: umeng/pgyer blurred info)
+  File.open(manifest_xml_path, 'w:utf-8') do |file|
+    file.puts(manifest_content)
   end
 end
 
+#
+# reset res/strings.xml
+#
+strings_xml_path = 'app/src/main/res/values/strings.xml'
+if slop_opts[:res]
+  strings_content = File.read(strings_xml_path)
+  manifest_nokogiri = Nokogiri.XML(strings_content)
+  strings_content = xml_string_sub(strings_content, manifest_nokogiri, 'app_name', current_app_name)
+  strings_content = xml_string_sub(strings_content, manifest_nokogiri, 'title_activity_main', current_app_name)
+
+  puts %(- done: res/strings.xml: #{current_app_name})
+  File.open(strings_xml_path, 'w:utf-8') do |file|
+    file.puts(strings_content)
+  end
+end
+
+#
+# check manifest.xml, res/strings.xml
+#
 if slop_opts[:check]
   def info_when_check(doc, key, expect_value, value_info)
     value = doc.xpath(%(//meta-data[@android:name='#{key}'])).first.attributes['value'].value
     puts %(- #{'**NOT**' if value != expect_value}match: #{value_info})
   end
 
-  android_manifest_content = File.read(android_manifest_path)
-  android_manifest_doc = Nokogiri.XML(android_manifest_content)
-  info_when_check(android_manifest_doc, 'PGYER_APPID', Settings.pgyer.android, 'pgyer app id')
-  info_when_check(android_manifest_doc, 'UMENG_APPKEY', Settings.umeng.android.app_key, 'umeng app id')
-  info_when_check(android_manifest_doc, 'UMENG_MESSAGE_SECRET', Settings.umeng.android.umeng_message_secret, 'umeng message secret')
-end
+  manifest_nokogiri = Nokogiri.XML(File.read(manifest_xml_path))
+  info_when_check(manifest_nokogiri, 'PGYER_APPID', Settings.pgyer.android, 'pgyer app id')
+  info_when_check(manifest_nokogiri, 'UMENG_APPKEY', Settings.umeng.android.app_key, 'umeng app id')
+  info_when_check(manifest_nokogiri, 'UMENG_MESSAGE_SECRET', Settings.umeng.android.umeng_message_secret, 'umeng message secret')
 
-#
-# reset res/strings.xml
-#
-if slop_opts[:res]
-  strings_erb_path = 'config/strings.xml.erb'
-  strings_xml_path = 'app/src/main/res/values/strings.xml'
-  puts %(- done: app name: #{current_app_name})
-  File.open(strings_xml_path, 'w:utf-8') do |file|
-    file.puts ERB.new(IO.read(strings_erb_path)).result
-  end
+  strings_nokogiri = Nokogiri.XML(File.read(strings_xml_path))
+  app_name_value = strings_nokogiri.xpath(%(//string[@name='app_name'])).first.text
+  puts %(- #{'**NOT**' if app_name_value != current_app_name}match: strings.xml app name)
 end
 
 if slop_opts[:java]
