@@ -10,20 +10,24 @@ android {
         targetSdkVersion 22
     }
 
-    signingConfigs {
-        release {
-            storeFile file(System.getenv("KEYSTORE"))
-            storePassword System.getenv("KEYSTORE_PASSWORD")
-            keyAlias System.getenv("KEY_ALIAS")
-            keyPassword System.getenv("KEY_PASSWORD")
+
+    if(System.getenv().containsKey("KEYSTORE"))
+        signingConfigs {
+            release {
+                storeFile file(System.getenv("KEYSTORE"))
+                storePassword System.getenv("KEYSTORE_PASSWORD")
+                keyAlias System.getenv("KEY_ALIAS")
+                keyPassword System.getenv("KEY_PASSWORD")
+            }
         }
-    }
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles 'proguard-rules.pro' //getDefaultProguardFile('proguard-android.txt'),
+
+            if(System.getenv().containsKey("KEYSTORE"))
+                signingConfig signingConfigs.release
         }
     }
 
