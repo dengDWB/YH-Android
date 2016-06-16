@@ -439,25 +439,27 @@ public class ApiHelper {
      *  @param codeInfo   条形码信息
      *  @param codeType   条形码或二维码
      */
-    public static void barCodeScan(Context mContext, String userNum, String codeInfo, String codeType) {
+    public static void barCodeScan(Context mContext, String groupID, String roleID, String userNum, String codeInfo, String codeType) {
         try {
             JSONObject params = new JSONObject();
             params.put("code_info", codeInfo);
             params.put("code_type", codeType);
 
-            String urlString = String.format(URLs.API_BAR_CODE_SCAN_PATH, URLs.HOST, userNum);
+            String urlString = String.format(URLs.API_BARCODE_SCAN_PATH, URLs.HOST, groupID, roleID, userNum);
             Map<String, String> response = HttpUtil.httpPost(urlString, params);
             String responseString = response.get("body");
 
             if(response.get("code") == null || !response.get("code").equals("200")) {
                 responseString = String.format("{'商品编号': '%s', '编号类型': '%s', '服务器报错': '%s'}", codeInfo, codeType, responseString);
             }
-            String javascriptPath = FileUtil.sharedPath(mContext) + "/assets/javascripts/bar_code_scan_result.js";
+            String javascriptPath = FileUtil.sharedPath(mContext) + "/assets/javascripts/barcode_scan_result.js";
             String javascriptContent = new StringBuilder()
                 .append("(function() {\n")
-                .append("  var response = " + responseString + ", array = [], key, value;\n")
-                .append("  for(key in response) {\n")
-                .append("    if(key === 'code') continue;\n")
+                .append("  var response = " + responseString + ",\n")
+                .append("      order_keys = response.order_keys,\n")
+                .append("      array = [], key, value, i;\n")
+                .append("  for(i = 0; i < order_keys.length; i ++) {\n")
+                .append("    key = order_keys[i];\n")
                 .append("    value = response[key];\n")
                 .append("    array.push('<tr><td>' + key + '</td><td>' + value + '</td></tr>');\n")
                 .append("  }\n")

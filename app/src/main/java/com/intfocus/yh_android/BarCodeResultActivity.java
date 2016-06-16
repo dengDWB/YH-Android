@@ -2,7 +2,6 @@ package com.intfocus.yh_android;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -18,7 +17,7 @@ import org.json.JSONException;
  * Created by lijunjie on 16/6/10.
  */
 public class BarCodeResultActivity extends BaseActivity {
-  private String htmlPath, codeInfo, codeType, userNum;
+  private String htmlPath, codeInfo, codeType, groupID, roleID, userNum;
 
   @Override
   public void onCreate(Bundle state) {
@@ -40,15 +39,17 @@ public class BarCodeResultActivity extends BaseActivity {
     initColorView(colorViews);
 
 
-    htmlPath = sharedPath + "/bar_code_scan_result.html";
+    htmlPath = sharedPath + "/barcode_scan_result.html";
     if(!(new File(htmlPath).exists())) {
-      FileUtil.copyAssetFile(mContext, "bar_code_scan_result.html", htmlPath);
+      FileUtil.copyAssetFile(mContext, "barcode_scan_result.html", htmlPath);
     }
 
     try {
       Intent intent = getIntent();
       codeInfo = intent.getStringExtra("code_info");
       codeType = intent.getStringExtra("code_type");
+      groupID = user.getString("group_id");
+      roleID = user.getString("role_id");
       userNum = user.getString("user_num");
     } catch (JSONException e) {
       e.printStackTrace();
@@ -63,7 +64,7 @@ public class BarCodeResultActivity extends BaseActivity {
 
     new Thread(new Runnable() {
       @Override public void run() {
-        ApiHelper.barCodeScan(mContext, userNum, codeInfo, codeType);
+        ApiHelper.barCodeScan(mContext, groupID, roleID, userNum, codeInfo, codeType);
 
         runOnUiThread(new Runnable() {
           @Override public void run() {

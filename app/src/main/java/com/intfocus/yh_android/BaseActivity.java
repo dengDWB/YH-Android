@@ -602,7 +602,7 @@ public class BaseActivity extends Activity {
                 /*
                  * Remove bar code scan result html
                  */
-                File barCodeScanReulFile = new File(sharedPath + "/bar_code_scan_result.html");
+                File barCodeScanReulFile = new File(sharedPath + "/barcode_scan_result.html");
                 if(barCodeScanReulFile.exists()) {
                     barCodeScanReulFile.delete();
                 }
