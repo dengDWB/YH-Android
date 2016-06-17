@@ -231,14 +231,6 @@ public class SettingActivity extends BaseActivity {
                         new File(headerPath).delete();
 
                         /*
-                         * Remove bar code scan result html
-                         */
-                        File barCodeScanReulFile = new File(sharedPath + "/barcode_scan_result.html");
-                        if(barCodeScanReulFile.exists()) {
-                            barCodeScanReulFile.delete();
-                        }
-
-                        /*
                          * Umeng Device Token
                          */
                         String device_token = UmengRegistrar.getRegistrationId(mContext);

@@ -2,14 +2,16 @@ package com.intfocus.yh_android;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.json.JSONException;
 
@@ -17,7 +19,7 @@ import org.json.JSONException;
  * Created by lijunjie on 16/6/10.
  */
 public class BarCodeResultActivity extends BaseActivity {
-  private String htmlPath, codeInfo, codeType, groupID, roleID, userNum;
+  private String htmlContent, htmlPath, codeInfo, codeType, groupID, roleID, userNum;
 
   @Override
   public void onCreate(Bundle state) {
@@ -38,11 +40,8 @@ public class BarCodeResultActivity extends BaseActivity {
     colorViews.add((ImageView) findViewById(R.id.colorView4));
     initColorView(colorViews);
 
-
     htmlPath = sharedPath + "/barcode_scan_result.html";
-    if(!(new File(htmlPath).exists())) {
-      FileUtil.copyAssetFile(mContext, "barcode_scan_result.html", htmlPath);
-    }
+    htmlContent = FileUtil.assetsFileContent(mContext, "barcode_scan_result.html");
 
     try {
       Intent intent = getIntent();
@@ -62,9 +61,15 @@ public class BarCodeResultActivity extends BaseActivity {
   public void onStart() {
     super.onStart();
 
+    String loadingString = String.format("{\"商品编号\": \"%s\",  \"状态\": \"处理中...\", \"order_keys\": [\"商品编号\",  \"状态\"]}", codeInfo);
+    FileUtil.barCodeScanResult(mContext, loadingString);
+    updateHtmlContentTimetamp();
+    mWebView.loadUrl(String.format("file:///%s", htmlPath));
+
     new Thread(new Runnable() {
       @Override public void run() {
         ApiHelper.barCodeScan(mContext, groupID, roleID, userNum, codeInfo, codeType);
+        updateHtmlContentTimetamp();
 
         runOnUiThread(new Runnable() {
           @Override public void run() {
@@ -81,4 +86,14 @@ public class BarCodeResultActivity extends BaseActivity {
   public void dismissActivity(View v) {
     BarCodeResultActivity.this.onBackPressed();
   };
+
+  public void updateHtmlContentTimetamp() {
+    try {
+      String newHtmlContent = htmlContent.replaceAll("TIMESTAMP", String.format("%d", new Date().getTime()));
+      Log.i("HtmlContentTimetamp", newHtmlContent);
+      FileUtil.writeFile(htmlPath, newHtmlContent);
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
+  }
 }

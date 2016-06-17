@@ -160,12 +160,10 @@ public class ApiHelper {
                 htmlContent = htmlContent.replace("/stylesheets/", String.format("%s/stylesheets/", relativeAssetsPath));
                 htmlContent = htmlContent.replace("/images/", String.format("%s/images/", relativeAssetsPath));
                 FileUtil.writeFile(htmlPath, htmlContent);
-            }
-            else {
+            } else {
                 retMap.put("code", statusCode);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             retMap.put("code", "500");
             e.printStackTrace();
         }
@@ -450,27 +448,11 @@ public class ApiHelper {
             String responseString = response.get("body");
 
             if(response.get("code") == null || !response.get("code").equals("200")) {
-                responseString = String.format("{'商品编号': '%s', '编号类型': '%s', '服务器报错': '%s'}", codeInfo, codeType, responseString);
+                responseString = String.format("{\"商品编号\": \"%s\",  \"状态\": \"%s\", \"order_keys\": [\"商品编号\",  \"状态\"]}", codeInfo, responseString);
             }
-            String javascriptPath = FileUtil.sharedPath(mContext) + "/assets/javascripts/barcode_scan_result.js";
-            String javascriptContent = new StringBuilder()
-                .append("(function() {\n")
-                .append("  var response = " + responseString + ",\n")
-                .append("      order_keys = response.order_keys,\n")
-                .append("      array = [], key, value, i;\n")
-                .append("  for(i = 0; i < order_keys.length; i ++) {\n")
-                .append("    key = order_keys[i];\n")
-                .append("    value = response[key];\n")
-                .append("    array.push('<tr><td>' + key + '</td><td>' + value + '</td></tr>');\n")
-                .append("  }\n")
-                .append("  document.getElementById('result').innerHTML = array.join('');\n")
-                .append("}).call(this);")
-                .toString();
-            Log.i("javascriptContent", javascriptContent);
-            FileUtil.writeFile(javascriptPath, javascriptContent);
+
+            FileUtil.barCodeScanResult(mContext, responseString);
         } catch(JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
     }

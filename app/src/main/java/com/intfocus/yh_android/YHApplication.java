@@ -114,19 +114,6 @@ public class YHApplication extends Application {
          *  监测内存泄漏
          */
         refWatcher = LeakCanary.install(this);
-
-        /*
-         * Debug
-         */
-        try {
-            File sharedFolder = new File(sharedPath + "/loading");
-            for(File path:sharedFolder.listFiles()) {
-               Log.i("SharedFolder", path.getAbsolutePath());
-           }
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

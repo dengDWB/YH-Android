@@ -310,8 +310,7 @@ public class BaseActivity extends Activity {
                 try {
                     JSONObject json = new JSONObject(response.get("body"));
                     statusCode = json.getBoolean("device_state") ? 200 : 401;
-                }
-                catch (JSONException e) {
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
@@ -355,7 +354,6 @@ public class BaseActivity extends Activity {
             message.obj = response.get("path");
 
             Log.i("mRunnableWithAPI", String.format("code: %s, path: %s", response.get("code"), response.get("path")));
-
             mHandlerWithAPI.sendMessage(message);
         }
     };
@@ -597,14 +595,6 @@ public class BaseActivity extends Activity {
                 File headerFile = new File(headerPath);
                 if (headerFile.exists()) {
                     headerFile.delete();
-                }
-
-                /*
-                 * Remove bar code scan result html
-                 */
-                File barCodeScanReulFile = new File(sharedPath + "/barcode_scan_result.html");
-                if(barCodeScanReulFile.exists()) {
-                    barCodeScanReulFile.delete();
                 }
 
                 FileUtil.writeFile(versionConfigPath, packageInfo.versionName);
