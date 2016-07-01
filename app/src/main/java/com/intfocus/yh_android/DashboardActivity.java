@@ -22,7 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class MainActivity extends BaseActivity {
+public class DashboardActivity extends BaseActivity {
     private static final int ZBAR_CAMERA_PERMISSION = 1;
     private int objectType;
     private TabView mCurrentTab;
@@ -31,7 +31,10 @@ public class MainActivity extends BaseActivity {
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_dashboard);
+
+        ImageView bannerCodeScan = (ImageView) findViewById(R.id.banner_code_scan);
+        bannerCodeScan.setVisibility(URLs.kDashboardDisplayScanCode ? View.VISIBLE : View.INVISIBLE);
 
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
         initRefreshWebView();
@@ -107,12 +110,17 @@ public class MainActivity extends BaseActivity {
     @JavascriptInterface
     private void initTab() {
         TabView mTabKPI = (TabView) findViewById(R.id.tab_kpi);
-        TabView mTabAnalysis = (TabView) findViewById(R.id.tab_analysis);
+        TabView mTabAnalyse = (TabView) findViewById(R.id.tab_analyse);
         TabView mTabAPP = (TabView) findViewById(R.id.tab_app);
         TabView mTabMessage = (TabView) findViewById(R.id.tab_message);
 
+        mTabKPI.setVisibility(URLs.kDashboardTabBarDisplayKPI ? View.VISIBLE : View.GONE);
+        mTabAnalyse.setVisibility(URLs.kDashboardTabBarDisplayAnalyse ? View.VISIBLE : View.GONE);
+        mTabAPP.setVisibility(URLs.kDashboardTabBarDisplayApp ? View.VISIBLE : View.GONE);
+        mTabMessage.setVisibility(URLs.kDashboardTabBarDisplayMessage ? View.VISIBLE : View.GONE);
+
         mTabKPI.setOnClickListener(mTabChangeListener);
-        mTabAnalysis.setOnClickListener(mTabChangeListener);
+        mTabAnalyse.setOnClickListener(mTabChangeListener);
         mTabAPP.setOnClickListener(mTabChangeListener);
         mTabMessage.setOnClickListener(mTabChangeListener);
 
@@ -138,7 +146,7 @@ public class MainActivity extends BaseActivity {
                         objectType = 1;
                         urlString = String.format(URLs.KPI_PATH, URLs.HOST, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
                         break;
-                    case R.id.tab_analysis:
+                    case R.id.tab_analyse:
                         objectType = 2;
                         urlString = String.format(URLs.ANALYSE_PATH, URLs.HOST, currentUIVersion, user.getString("role_id"));
                         break;
@@ -229,7 +237,7 @@ public class MainActivity extends BaseActivity {
                     String message = String.format("%s\n%s\n%d", bannerName, link, objectID);
                     longLog("JSClick", message);
 
-                    Intent intent = new Intent(MainActivity.this, SubjectActivity.class);
+                    Intent intent = new Intent(DashboardActivity.this, SubjectActivity.class);
                     intent.putExtra("bannerName", bannerName);
                     intent.putExtra("link", link);
                     intent.putExtra("objectID", objectID);

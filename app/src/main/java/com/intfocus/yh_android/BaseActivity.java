@@ -365,7 +365,9 @@ public class BaseActivity extends Activity {
                 case 304:
                     String localHtmlPath = String.format("file:///%s", (String) message.obj);
                     Log.i("localHtmlPath", localHtmlPath);
-                    mWebView.loadUrl(localHtmlPath);
+                    if(mWebView != null && localHtmlPath != null) {
+                        mWebView.loadUrl(localHtmlPath);
+                    }
                     break;
                 case 400:
                 case 408:

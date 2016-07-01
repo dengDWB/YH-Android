@@ -27,6 +27,7 @@
             style="@style/BannerTitle" />
 
         <ImageView
+            android:id="@+id/banner_comment"
             style="@style/BannerRightButton"
             android:src="@drawable/banner_comment"
             android:onClick="launchCommentActivity" />

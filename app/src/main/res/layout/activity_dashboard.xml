@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.intfocus.yh_android.MainActivity">
+    tools:context=".DashboardActivity">
 
     <RelativeLayout
         android:id="@+id/action_bar"
@@ -13,6 +13,7 @@
         android:background="@color/actionBar">
 
         <ImageView
+            android:id="@+id/banner_code_scan"
             android:layout_alignTop="@+id/banner_logo"
             style="@style/BannerLeftButton"
             android:src="@drawable/banner_scan"
@@ -81,7 +82,7 @@
             app:text="仪表盘" />
 
         <com.intfocus.yh_android.TabView
-            android:id="@+id/tab_analysis"
+            android:id="@+id/tab_analyse"
             style="@style/ToolBarTab"
             app:active_src="@drawable/tab_analysis_s"
             app:src="@drawable/tab_analysis"

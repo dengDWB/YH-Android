@@ -117,6 +117,8 @@ if slop_opts[:mipmap]
   `cp -f config/Assets/loading-#{current_app}.zip app/src/main/assets/loading.zip`
   puts %(- done: banner_logo)
   `cp -f config/Assets/banner-logo-#{current_app}.png app/src/main/res/drawable/banner_logo.png`
+  puts %(- done: banner_setting)
+  `cp -f config/Assets/banner-setting-#{current_app}.png app/src/main/res/drawable/banner_setting.png`
 end
 
 #
@@ -207,6 +209,13 @@ if slop_opts[:java]
       public class PrivateURLs {
         public final static String HOST = "#{Settings.server}";
         public final static String HOST1 = "http://10.0.3.2:4567";
+
+        public final static boolean kDashboardTabBarDisplayKPI = #{Settings.display_status.kpi == 1 ? 'true' : 'false'};
+        public final static boolean kDashboardTabBarDisplayAnalyse = #{Settings.display_status.analyse == 1 ? 'true' : 'false'};
+        public final static boolean kDashboardTabBarDisplayApp = #{Settings.display_status.app == 1 ? 'true' : 'false'};
+        public final static boolean kDashboardTabBarDisplayMessage = #{Settings.display_status.message == 1 ? 'true' : 'false'};
+        public final static boolean kDashboardDisplayScanCode = #{Settings.display_status.scan_code == 1 ? 'true' : 'false'};
+        public final static boolean kSubjectDisplayComment = #{Settings.display_status.comment == 1 ? 'true' : 'false'};
       }
       EOF
   end

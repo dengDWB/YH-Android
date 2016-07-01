@@ -28,7 +28,7 @@ public class LoginActivity extends BaseActivity {
         Intent intent = getIntent();
         if (intent.hasExtra("from_activity") && intent.getStringExtra("from_activity").equals("ConfirmPassCodeActivity")) {
             Log.i("getIndent", intent.getStringExtra("from_activity"));
-            intent = new Intent(LoginActivity.this, MainActivity.class);
+            intent = new Intent(LoginActivity.this, DashboardActivity.class);
             intent.putExtra("from_activity", intent.getStringExtra("from_activity"));
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             LoginActivity.this.startActivity(intent);
@@ -126,7 +126,7 @@ public class LoginActivity extends BaseActivity {
                 }
 
                 // 跳转至主界面
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 LoginActivity.this.startActivity(intent);
 

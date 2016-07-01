@@ -64,6 +64,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             userNum = "not-set";
         }
 
+        ImageView bannerComment = (ImageView) findViewById(R.id.banner_comment);
+        bannerComment.setVisibility(URLs.kSubjectDisplayComment ? View.VISIBLE : View.INVISIBLE);
+
         bannerView = (RelativeLayout) findViewById(R.id.action_bar);
         TextView mTitle = (TextView) findViewById(R.id.banner_title);
         mPDFView = (PDFView) findViewById(R.id.pdfview);

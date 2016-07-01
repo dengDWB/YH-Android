@@ -54,7 +54,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.intfocus.yh_android.MainActivity"
+            android:name="com.intfocus.yh_android.DashboardActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
