@@ -245,8 +245,8 @@ public class SettingActivity extends BaseActivity {
 
                         ApiHelper.authentication(SettingActivity.this, user.getString("user_num"), user.getString("password"));
 
-                        pushJSON = FileUtil.readConfigFile(pushConfigPath);
-                        mPushState.setText(pushJSON.has("push_valid") && pushJSON.getBoolean("push_valid") ? "开启" : "关闭");
+                        // pushJSON = FileUtil.readConfigFile(pushConfigPath);
+                        // mPushState.setText(pushJSON.has("push_valid") && pushJSON.getBoolean("push_valid") ? "开启" : "关闭");
 
                         /*
                          * 检测服务器静态资源是否更新，并下载

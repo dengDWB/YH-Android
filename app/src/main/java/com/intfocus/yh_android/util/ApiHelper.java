@@ -29,7 +29,8 @@ public class ApiHelper {
      * params: {device: {name, platform, os, os_version, uuid}}
      */
     public static String authentication(Context context, String username, String password) {
-        String ret = "success", urlString = String.format(URLs.API_USER_PATH, URLs.HOST, "android", username, password);
+        String ret = "success", urlString = String.format(URLs.API_USER_PATH, URLs.HOST, "android",
+            username, password);
         try {
             JSONObject device = new JSONObject();
             device.put("name", android.os.Build.MODEL);
@@ -103,7 +104,8 @@ public class ApiHelper {
      */
     public static void reportData(Context context, String groupID, String templateID, String reportID) {
         String assetsPath = FileUtil.sharedPath(context);
-        String urlString = String.format(URLs.API_DATA_PATH, URLs.HOST, groupID, templateID, reportID);
+        String urlString = String.format(URLs.API_DATA_PATH, URLs.HOST, groupID, templateID,
+            reportID);
 
         String fileName = String.format(URLs.REPORT_DATA_FILENAME, groupID, templateID, reportID);
         String filePath = String.format("%s/assets/javascripts/%s", assetsPath, fileName);
@@ -414,14 +416,19 @@ public class ApiHelper {
                 .getString("push_device_token").length() == 44) return true;
             if(pushJSON.has("push_device_token") && pushJSON.getString("push_device_token").length() != 44) return false;
 
-            String urlString = String.format(URLs.API_PUSH_DEVICE_TOKEN_PATH, URLs.HOST, deviceUUID, pushJSON.getString("push_device_token"));
-            Map<String, String> response = HttpUtil.httpPost(urlString, new JSONObject());
-            JSONObject responseJSON = new JSONObject(response.get("body"));
+            if(pushJSON.has("push_device_token")) {
+                String urlString = String.format(URLs.API_PUSH_DEVICE_TOKEN_PATH, URLs.HOST, deviceUUID, pushJSON.getString("push_device_token"));
+                Map<String, String> response = HttpUtil.httpPost(urlString, new JSONObject());
+                JSONObject responseJSON = new JSONObject(response.get("body"));
 
-            pushJSON.put("push_valid", responseJSON.has("valid") && responseJSON.getBoolean("valid"));
-            FileUtil.writeFile(pushConfigPath, pushJSON.toString());
+                pushJSON.put("push_valid",
+                    responseJSON.has("valid") && responseJSON.getBoolean("valid"));
+                FileUtil.writeFile(pushConfigPath, pushJSON.toString());
 
-            return pushJSON.has("push_valid") && pushJSON.getBoolean("push_valid");
+                return pushJSON.has("push_valid") && pushJSON.getBoolean("push_valid");
+            } else {
+                return false;
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (IOException e) {

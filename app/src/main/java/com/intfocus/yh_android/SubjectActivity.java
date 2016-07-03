@@ -159,6 +159,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             e.printStackTrace();
         }
 
+
         Message message = mHandlerWithAPI.obtainMessage();
         message.what = 200;
         message.obj = outputPath;

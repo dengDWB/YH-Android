@@ -16,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.text.TextUtils;
@@ -48,6 +49,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -301,10 +303,14 @@ public class BaseActivity extends Activity {
      * WebView display UI
      * ********************
      */
+    protected final HandlerForDetecting mHandlerForDetecting = new HandlerForDetecting(BaseActivity.this);
+    protected final HandlerWithAPI mHandlerWithAPI = new HandlerWithAPI(BaseActivity.this);
+
     protected final Runnable mRunnableForDetecting = new Runnable() {
         @Override
         public void run() {
-            Map<String, String> response = HttpUtil.httpGet(urlStringForDetecting, new HashMap<String, String>());
+            Map<String, String> response = HttpUtil.httpGet(urlStringForDetecting,
+                new HashMap<String, String>());
             int statusCode = Integer.parseInt(response.get("code"));
             if (statusCode == 200 && !urlStringForDetecting.equals(URLs.HOST)) {
                 try {
@@ -315,14 +321,93 @@ public class BaseActivity extends Activity {
                 }
             }
 
+            mHandlerForDetecting.setVariables(mWebView, urlString, sharedPath, assetsPath, relativeAssetsPath);
             Message message = mHandlerForDetecting.obtainMessage();
             message.what = statusCode;
             mHandlerForDetecting.sendMessage(message);
         }
     };
 
-    private final Handler mHandlerForDetecting = new Handler() {
+    /**
+     * Instances of static inner classes do not hold an implicit
+     * reference to their outer class.
+     */
+    public static class HandlerForDetecting extends Handler {
+        private final WeakReference<BaseActivity> weakActivity;
+        private WebView mWebView;
+        private String mSharedPath;
+        private String mUrlString;
+        private String mAssetsPath;
+        private String mRelativeAssetsPath;
+
+        public HandlerForDetecting(BaseActivity activity) {
+            weakActivity = new WeakReference<BaseActivity>(activity);
+        }
+
+        public void setVariables(WebView webView, String urlString, String sharedPath, String assetsPath, String relativeAssetsPath) {
+            mWebView = webView;
+            mUrlString = urlString;
+            mSharedPath = sharedPath;
+            mUrlString = urlString;
+            mAssetsPath = assetsPath;
+            mRelativeAssetsPath = relativeAssetsPath;
+        }
+
+        protected String loadingPath(String htmlName) {
+            return String.format("file:///%s/loading/%s.html", mSharedPath, htmlName);
+        }
+
+        private void showWebViewForWithoutNetwork() {
+            String urlStringForLoading = loadingPath("400");
+            mWebView.loadUrl(urlStringForLoading);
+        }
+
+        private void showDialogForDeviceForbided() {
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(weakActivity.get());
+            alertDialog.setTitle("温馨提示");
+            alertDialog.setMessage("您被禁止在该设备使用本应用");
+
+            alertDialog.setNegativeButton(
+                "知道了",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // TODO， 界面跳转登录
+                        dialog.dismiss();
+                    }
+                }
+            );
+            alertDialog.show();
+        }
+
+        private final Runnable mRunnableWithAPI = new Runnable() {
+            @Override
+            public void run() {
+                Log.i("httpGetWithHeader",
+                    String.format("url: %s, assets: %s, relativeAssets: %s", mUrlString,
+                        mAssetsPath, mRelativeAssetsPath));
+                Map<String, String> response = ApiHelper.httpGetWithHeader(mUrlString, mAssetsPath, mRelativeAssetsPath);
+
+                Looper.prepare();
+                HandlerWithAPI mHandlerWithAPI = new HandlerWithAPI(weakActivity.get());
+                mHandlerWithAPI.setVariables(mWebView, mSharedPath);
+                Message message = mHandlerWithAPI.obtainMessage();
+                message.what = Integer.parseInt(response.get("code"));
+                message.obj = response.get("path");
+
+                Log.i("mRunnableWithAPI", String.format("code: %s, path: %s", response.get("code"), response.get("path")));
+                mHandlerWithAPI.sendMessage(message);
+                Looper.loop();
+            }
+        };
+
+        @Override
         public void handleMessage(Message message) {
+            BaseActivity activity = weakActivity.get();
+            if (activity == null) {
+                return;
+            }
+
             switch (message.what) {
                 case 200:
                 case 304:
@@ -336,37 +421,55 @@ public class BaseActivity extends Activity {
                     showDialogForDeviceForbided();
                     break;
                 default:
-                    Log.i("UnkownCode", urlStringForDetecting);
                     Log.i("UnkownCode", String.format("%d", message.what));
                     break;
             }
         }
-    };
 
-    private final Runnable mRunnableWithAPI = new Runnable() {
-        @Override
-        public void run() {
-            Log.i("httpGetWithHeader", String.format("url: %s, assets: %s, relativeAssets: %s", urlString, assetsPath, relativeAssetsPath));
-            Map<String, String> response = ApiHelper.httpGetWithHeader(urlString, assetsPath, relativeAssetsPath);
+    }
 
-            Message message = mHandlerWithAPI.obtainMessage();
-            message.what = Integer.parseInt(response.get("code"));
-            message.obj = response.get("path");
+    public static class HandlerWithAPI extends Handler {
+        private final WeakReference<BaseActivity> weakActivity;
+        private WebView mWebView;
+        private String mSharedPath;
 
-            Log.i("mRunnableWithAPI", String.format("code: %s, path: %s", response.get("code"), response.get("path")));
-            mHandlerWithAPI.sendMessage(message);
+        public HandlerWithAPI(BaseActivity activity) {
+            weakActivity = new WeakReference<BaseActivity>(activity);
         }
-    };
 
-    protected final Handler mHandlerWithAPI = new Handler() {
+        public void setVariables(WebView webView, String sharedPath) {
+            mWebView = webView;
+            mSharedPath = sharedPath;
+        }
+
+        protected String loadingPath(String htmlName) {
+            return String.format("file:///%s/loading/%s.html", mSharedPath, htmlName);
+        }
+
+        private void showWebViewForWithoutNetwork() {
+            String urlStringForLoading = loadingPath("400");
+            mWebView.loadUrl(urlStringForLoading);
+        }
+
+        @Override
         public void handleMessage(Message message) {
+            BaseActivity activity = weakActivity.get();
+            if (activity == null) {
+                return;
+            }
+
             switch (message.what) {
                 case 200:
                 case 304:
-                    String localHtmlPath = String.format("file:///%s", (String) message.obj);
+                    final String localHtmlPath = String.format("file:///%s", (String) message.obj);
                     Log.i("localHtmlPath", localHtmlPath);
-                    if(mWebView != null && localHtmlPath != null) {
-                        mWebView.loadUrl(localHtmlPath);
+                    if(mWebView != null) {
+                        weakActivity.get().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mWebView.loadUrl(localHtmlPath);
+                            }
+                        });
                     }
                     break;
                 case 400:
@@ -375,11 +478,13 @@ public class BaseActivity extends Activity {
                     break;
                 default:
                     String msg = String.format("访问服务器失败（%d)", message.what);
-                    toast(msg);
+                    Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
                     break;
             }
         }
-    };
+
+    }
+
 
     final Runnable  mRunnableForLogger = new Runnable() {
         @Override
