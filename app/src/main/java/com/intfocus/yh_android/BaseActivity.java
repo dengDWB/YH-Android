@@ -122,6 +122,10 @@ public class BaseActivity extends Activity {
                     @Override
                     public void run() {
                         try {
+                            if(mContext == null) {
+                                Log.i("PushAgent", "mContext is null");
+                                return;
+                            }
                             // onRegistered方法的参数registrationId即是device_token
                             String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.PUSH_CONFIG_FILENAME);
                             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
@@ -454,7 +458,7 @@ public class BaseActivity extends Activity {
         @Override
         public void handleMessage(Message message) {
             BaseActivity activity = weakActivity.get();
-            if (activity == null) {
+            if (activity == null || mWebView == null) {
                 return;
             }
 
@@ -463,14 +467,12 @@ public class BaseActivity extends Activity {
                 case 304:
                     final String localHtmlPath = String.format("file:///%s", (String) message.obj);
                     Log.i("localHtmlPath", localHtmlPath);
-                    if(mWebView != null) {
-                        weakActivity.get().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mWebView.loadUrl(localHtmlPath);
-                            }
-                        });
-                    }
+                    weakActivity.get().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mWebView.loadUrl(localHtmlPath);
+                        }
+                    });
                     break;
                 case 400:
                 case 408:
@@ -738,13 +740,6 @@ public class BaseActivity extends Activity {
             if (!isShouldUpdateAssets) return false;
 
             Log.i("checkAssetUpdated", String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName), userJSON.getString(keyName)));
-            // instantiate it within the onCreate method
-            //mProgressDialog = new ProgressDialog(mContext);
-            //mProgressDialog.setMessage(String.format("更新%s库", assetName));
-            //mProgressDialog.setIndeterminate(true);
-            //mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            //mProgressDialog.setCancelable(true);
-
             // execute this when the downloader must be fired
             final DownloadAssetsTask downloadTask = new DownloadAssetsTask(mContext, shouldReloadUIThread, assetName, isInAssets);
             downloadTask.execute(String.format(URLs.API_ASSETS_PATH, URLs.HOST, assetName), assetZipPath);
@@ -761,8 +756,6 @@ public class BaseActivity extends Activity {
         Toast.makeText(mContext, info, Toast.LENGTH_SHORT).show();
     }
 
-    // usually, subclasses of AsyncTask are declared inside the activity class.
-    // that way, you can easily modify the UI thread from here
     class DownloadAssetsTask extends AsyncTask<String, Integer, String> {
         private final Context context;
         private PowerManager.WakeLock mWakeLock;
@@ -790,15 +783,12 @@ public class BaseActivity extends Activity {
                 // expect HTTP 200 OK, so we don't mistakenly save error report
                 // instead of the file
                 if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                    return "Server returned HTTP " + connection.getResponseCode()
-                            + " " + connection.getResponseMessage();
+                    return "Server returned HTTP " + connection.getResponseCode() + " " + connection.getResponseMessage();
                 }
 
                 // this will be useful to display download percentage
                 // might be -1: server did not report the length
                 int fileLength = connection.getContentLength();
-
-                // download the file
                 input = connection.getInputStream();
                 output = new FileOutputStream(params[1]);
 
@@ -818,6 +808,7 @@ public class BaseActivity extends Activity {
                     output.write(data, 0, count);
                 }
             } catch (Exception e) {
+                Log.i("Exception", e.toString());
                 return e.toString();
             } finally {
                 try {
@@ -843,25 +834,19 @@ public class BaseActivity extends Activity {
             mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                     getClass().getName());
             mWakeLock.acquire();
-            //mProgressDialog.show();
         }
 
         @Override
         protected void onProgressUpdate(Integer... progress) {
             super.onProgressUpdate(progress);
-            // if we get here, length is known, now set indeterminate to false
-            //mProgressDialog.setIndeterminate(false);
-            //mProgressDialog.setMax(100);
-            //mProgressDialog.setProgress(progress[0]);
         }
 
         @Override
         protected void onPostExecute(String result) {
             mWakeLock.release();
-            //mProgressDialog.dismiss();
 
             if (result != null) {
-                Toast.makeText(context, "静态资源更新失败", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, String.format("静态资源更新失败(%s)", result), Toast.LENGTH_LONG).show();
             } else {
                 FileUtil.checkAssets(mContext, assetFilename, isInAssets);
                 if (isReloadUIThread) {
