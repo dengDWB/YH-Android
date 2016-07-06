@@ -51,7 +51,7 @@ public class LoginActivity extends BaseActivity {
         }
 
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
-        initRefreshWebView();
+        initWebView();
         setPullToRefreshWebView(false);
 
         mWebView.requestFocus();

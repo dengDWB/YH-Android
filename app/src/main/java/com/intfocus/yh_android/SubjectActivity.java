@@ -73,7 +73,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         mPDFView.setVisibility(View.INVISIBLE);
 
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
-        initRefreshWebView();
+        initWebView();
 
         mWebView.requestFocus();
         pullToRefreshWebView.setVisibility(View.VISIBLE);

@@ -32,7 +32,7 @@ public class ResetPasswordActivity extends BaseActivity {
         mMyApp.setCurrentActivity(this);
 
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
-        initRefreshWebView();
+        initWebView();
         setPullToRefreshWebView(false);
 
         mWebView.requestFocus();

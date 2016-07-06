@@ -164,7 +164,7 @@ public class SettingActivity extends BaseActivity {
 
             Intent intent = new Intent();
             intent.setClass(SettingActivity.this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//它可以关掉所要到的界面中间的activity
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
 
             /*

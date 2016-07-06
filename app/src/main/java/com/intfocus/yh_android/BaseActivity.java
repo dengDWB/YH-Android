@@ -176,12 +176,7 @@ public class BaseActivity extends Activity {
         return String.format("file:///%s/loading/%s.html", sharedPath, htmlName);
     }
 
-    /*
-     * ********************
-     * WebView Setting
-     * ********************
-     */
-    android.webkit.WebView initRefreshWebView() {
+    android.webkit.WebView initWebView() {
         pullToRefreshWebView.setMode(PullToRefreshBase.Mode.PULL_FROM_START);
 
         mWebView = pullToRefreshWebView.getRefreshableView();
@@ -254,12 +249,10 @@ public class BaseActivity extends Activity {
         pullToRefreshWebView.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener<android.webkit.WebView>() {
             @Override
             public void onRefresh(PullToRefreshBase<android.webkit.WebView> refreshView) {
-                // 模拟加载任务
                 new pullToRefreshTask().execute();
 
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String label = simpleDateFormat.format(System.currentTimeMillis());
-                // 显示最后更新的时间
                 refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
             }
         });
@@ -302,11 +295,6 @@ public class BaseActivity extends Activity {
         }
     }
 
-    /*
-     * ********************
-     * WebView display UI
-     * ********************
-     */
     protected final HandlerForDetecting mHandlerForDetecting = new HandlerForDetecting(BaseActivity.this);
     protected final HandlerWithAPI mHandlerWithAPI = new HandlerWithAPI(BaseActivity.this);
 
@@ -333,11 +321,113 @@ public class BaseActivity extends Activity {
     };
 
     /**
-     * Instances of static inner classes do not hold an implicit
-     * reference to their outer class.
+     * Instances of static inner classes do not hold an implicit reference to their outer class.
      */
+    public static class innerHandler extends Handler {
+        private final WeakReference<BaseActivity> weakActivity;
+        private Context mContext;
+        private WebView mWebView;
+        private String mSharedPath;
+        private String mUrlString;
+        private String mAssetsPath;
+        private String mRelativeAssetsPath;
+
+        public innerHandler(BaseActivity activity) {
+            weakActivity = new WeakReference<BaseActivity>(activity);
+            mContext = weakActivity.get();
+        }
+
+        public void setAPIVariables(WebView webView, String sharedPath) {
+            mWebView = webView;
+            mSharedPath = sharedPath;
+        }
+
+        public void setDetectingVariables(WebView webView, String urlString, String sharedPath, String assetsPath, String relativeAssetsPath) {
+            mWebView = webView;
+            mUrlString = urlString;
+            mSharedPath = sharedPath;
+            mUrlString = urlString;
+            mAssetsPath = assetsPath;
+            mRelativeAssetsPath = relativeAssetsPath;
+        }
+
+        protected String loadingPath(String htmlName) {
+            return String.format("file:///%s/loading/%s.html", mSharedPath, htmlName);
+        }
+
+        private void showWebViewForWithoutNetwork() {
+            String urlStringForLoading = loadingPath("400");
+            mWebView.loadUrl(urlStringForLoading);
+        }
+
+        private void showDialogForDeviceForbided() {
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(weakActivity.get());
+            alertDialog.setTitle("温馨提示");
+            alertDialog.setMessage("您被禁止在该设备使用本应用");
+
+            alertDialog.setNegativeButton(
+                "知道了",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            JSONObject configJSON = new JSONObject();
+                            configJSON.put("is_login", false);
+
+                            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
+                            JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
+
+                            userJSON = ApiHelper.merge(userJSON, configJSON);
+                            FileUtil.writeFile(userConfigPath, userJSON.toString());
+
+                            String settingsConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
+                            FileUtil.writeFile(settingsConfigPath, userJSON.toString());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        Intent intent = new Intent();
+                        intent.setClass(mContext, LoginActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        mContext.startActivity(intent);
+
+                        dialog.dismiss();
+                    }
+                }
+            );
+            alertDialog.show();
+        }
+
+        private final Runnable mRunnableWithAPI = new Runnable() {
+            @Override
+            public void run() {
+                Log.i("httpGetWithHeader", String.format("url: %s, assets: %s, relativeAssets: %s", mUrlString, mAssetsPath, mRelativeAssetsPath));
+                Map<String, String> response = ApiHelper.httpGetWithHeader(mUrlString, mAssetsPath, mRelativeAssetsPath);
+
+                Looper.prepare();
+                HandlerWithAPI mHandlerWithAPI = new HandlerWithAPI(weakActivity.get());
+                mHandlerWithAPI.setVariables(mWebView, mSharedPath);
+                Message message = mHandlerWithAPI.obtainMessage();
+                message.what = Integer.parseInt(response.get("code"));
+                message.obj = response.get("path");
+
+                Log.i("mRunnableWithAPI", String.format("code: %s, path: %s", response.get("code"), response.get("path")));
+                mHandlerWithAPI.sendMessage(message);
+                Looper.loop();
+            }
+        };
+
+        @Override
+        public void handleMessage(Message message) {
+            if (mContext == null)  return;
+        }
+
+    }
     public static class HandlerForDetecting extends Handler {
         private final WeakReference<BaseActivity> weakActivity;
+        private Context mContext;
         private WebView mWebView;
         private String mSharedPath;
         private String mUrlString;
@@ -346,6 +436,7 @@ public class BaseActivity extends Activity {
 
         public HandlerForDetecting(BaseActivity activity) {
             weakActivity = new WeakReference<BaseActivity>(activity);
+            mContext = weakActivity.get();
         }
 
         public void setVariables(WebView webView, String urlString, String sharedPath, String assetsPath, String relativeAssetsPath) {
@@ -376,7 +467,29 @@ public class BaseActivity extends Activity {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // TODO， 界面跳转登录
+                        try {
+                            JSONObject configJSON = new JSONObject();
+                            configJSON.put("is_login", false);
+
+                                String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
+                                JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
+
+                                userJSON = ApiHelper.merge(userJSON, configJSON);
+                                FileUtil.writeFile(userConfigPath, userJSON.toString());
+
+                                String settingsConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
+                                FileUtil.writeFile(settingsConfigPath, userJSON.toString());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        Intent intent = new Intent();
+                        intent.setClass(mContext, LoginActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        mContext.startActivity(intent);
+
                         dialog.dismiss();
                     }
                 }
@@ -387,9 +500,7 @@ public class BaseActivity extends Activity {
         private final Runnable mRunnableWithAPI = new Runnable() {
             @Override
             public void run() {
-                Log.i("httpGetWithHeader",
-                    String.format("url: %s, assets: %s, relativeAssets: %s", mUrlString,
-                        mAssetsPath, mRelativeAssetsPath));
+                Log.i("httpGetWithHeader", String.format("url: %s, assets: %s, relativeAssets: %s", mUrlString, mAssetsPath, mRelativeAssetsPath));
                 Map<String, String> response = ApiHelper.httpGetWithHeader(mUrlString, mAssetsPath, mRelativeAssetsPath);
 
                 Looper.prepare();
@@ -408,12 +519,11 @@ public class BaseActivity extends Activity {
         @Override
         public void handleMessage(Message message) {
             BaseActivity activity = weakActivity.get();
-            if (activity == null) {
-                return;
-            }
+            if (activity == null)  return;
 
             switch (message.what) {
                 case 200:
+                case 201:
                 case 304:
                     new Thread(mRunnableWithAPI).start();
                     break;
@@ -484,22 +594,18 @@ public class BaseActivity extends Activity {
                     break;
             }
         }
-
     }
-
 
     final Runnable  mRunnableForLogger = new Runnable() {
         @Override
         public void run() {
             try {
-                if (!logParams.getString("action").equals("登录") && !logParams.getString("action").equals("解屏")) {
+                if (!logParams.getString("action").contains("登录") && !logParams.getString("action").equals("解屏")) {
                     return;
                 }
 
                 ApiHelper.actionLog(mContext, logParams);
-                System.out.println("logParams: " + logParams.get("action").toString());
-            }
-            catch (JSONException e) {
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
@@ -555,8 +661,7 @@ public class BaseActivity extends Activity {
 
     void modifiedUserConfig(JSONObject configJSON) {
         try {
-            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext),
-                URLs.USER_CONFIG_FILENAME);
+            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
             userJSON = ApiHelper.merge(userJSON, configJSON);

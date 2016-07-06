@@ -37,7 +37,7 @@ public class DashboardActivity extends BaseActivity {
         bannerCodeScan.setVisibility(URLs.kDashboardDisplayScanCode ? View.VISIBLE : View.INVISIBLE);
 
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
-        initRefreshWebView();
+        initWebView();
         setPullToRefreshWebView(true);
 
         mWebView.requestFocus();
