@@ -111,7 +111,7 @@ public class SettingActivity extends BaseActivity {
             mAppName.setText(getApplicationName(SettingActivity.this));
 
             mDeviceID.setText(TextUtils.split(android.os.Build.MODEL, " - ")[0]);
-            mApiDomain.setText(URLs.HOST.replace("http://", "").replace("https://", ""));
+            mApiDomain.setText(URLs.kBaseUrl.replace("http://", "").replace("https://", ""));
 
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             String versionInfo = String.format("%s(%d)", packageInfo.versionName, packageInfo.versionCode);

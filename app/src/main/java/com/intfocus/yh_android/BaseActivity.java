@@ -88,7 +88,7 @@ public class BaseActivity extends Activity {
         mContext = BaseActivity.this;
         sharedPath = FileUtil.sharedPath(mContext);
         assetsPath = sharedPath;
-        urlStringForDetecting = URLs.HOST;
+        urlStringForDetecting = URLs.kBaseUrl;
         relativeAssetsPath = "assets";
         urlStringForLoading = loadingPath("loading");
 
@@ -99,7 +99,7 @@ public class BaseActivity extends Activity {
                 if (user.has("is_login") && user.getBoolean("is_login")) {
                     userID = user.getInt("user_id");
                     assetsPath = FileUtil.dirPath(mContext, URLs.HTML_DIRNAME);
-                    urlStringForDetecting = String.format(URLs.API_DEVICE_STATE_PATH, URLs.HOST, user.getInt("user_device_id"));
+                    urlStringForDetecting = String.format(URLs.API_DEVICE_STATE_PATH, URLs.kBaseUrl, user.getInt("user_device_id"));
                     relativeAssetsPath = "../../Shared/assets";
                 }
             } catch (JSONException e) {
@@ -304,7 +304,7 @@ public class BaseActivity extends Activity {
             Map<String, String> response = HttpUtil.httpGet(urlStringForDetecting,
                 new HashMap<String, String>());
             int statusCode = Integer.parseInt(response.get("code"));
-            if (statusCode == 200 && !urlStringForDetecting.equals(URLs.HOST)) {
+            if (statusCode == 200 && !urlStringForDetecting.equals(URLs.kBaseUrl)) {
                 try {
                     JSONObject json = new JSONObject(response.get("body"));
                     statusCode = json.getBoolean("device_state") ? 200 : 401;
@@ -323,108 +323,6 @@ public class BaseActivity extends Activity {
     /**
      * Instances of static inner classes do not hold an implicit reference to their outer class.
      */
-    public static class innerHandler extends Handler {
-        private final WeakReference<BaseActivity> weakActivity;
-        private Context mContext;
-        private WebView mWebView;
-        private String mSharedPath;
-        private String mUrlString;
-        private String mAssetsPath;
-        private String mRelativeAssetsPath;
-
-        public innerHandler(BaseActivity activity) {
-            weakActivity = new WeakReference<BaseActivity>(activity);
-            mContext = weakActivity.get();
-        }
-
-        public void setAPIVariables(WebView webView, String sharedPath) {
-            mWebView = webView;
-            mSharedPath = sharedPath;
-        }
-
-        public void setDetectingVariables(WebView webView, String urlString, String sharedPath, String assetsPath, String relativeAssetsPath) {
-            mWebView = webView;
-            mUrlString = urlString;
-            mSharedPath = sharedPath;
-            mUrlString = urlString;
-            mAssetsPath = assetsPath;
-            mRelativeAssetsPath = relativeAssetsPath;
-        }
-
-        protected String loadingPath(String htmlName) {
-            return String.format("file:///%s/loading/%s.html", mSharedPath, htmlName);
-        }
-
-        private void showWebViewForWithoutNetwork() {
-            String urlStringForLoading = loadingPath("400");
-            mWebView.loadUrl(urlStringForLoading);
-        }
-
-        private void showDialogForDeviceForbided() {
-            AlertDialog.Builder alertDialog = new AlertDialog.Builder(weakActivity.get());
-            alertDialog.setTitle("温馨提示");
-            alertDialog.setMessage("您被禁止在该设备使用本应用");
-
-            alertDialog.setNegativeButton(
-                "知道了",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        try {
-                            JSONObject configJSON = new JSONObject();
-                            configJSON.put("is_login", false);
-
-                            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
-                            JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
-
-                            userJSON = ApiHelper.merge(userJSON, configJSON);
-                            FileUtil.writeFile(userConfigPath, userJSON.toString());
-
-                            String settingsConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
-                            FileUtil.writeFile(settingsConfigPath, userJSON.toString());
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                        Intent intent = new Intent();
-                        intent.setClass(mContext, LoginActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        mContext.startActivity(intent);
-
-                        dialog.dismiss();
-                    }
-                }
-            );
-            alertDialog.show();
-        }
-
-        private final Runnable mRunnableWithAPI = new Runnable() {
-            @Override
-            public void run() {
-                Log.i("httpGetWithHeader", String.format("url: %s, assets: %s, relativeAssets: %s", mUrlString, mAssetsPath, mRelativeAssetsPath));
-                Map<String, String> response = ApiHelper.httpGetWithHeader(mUrlString, mAssetsPath, mRelativeAssetsPath);
-
-                Looper.prepare();
-                HandlerWithAPI mHandlerWithAPI = new HandlerWithAPI(weakActivity.get());
-                mHandlerWithAPI.setVariables(mWebView, mSharedPath);
-                Message message = mHandlerWithAPI.obtainMessage();
-                message.what = Integer.parseInt(response.get("code"));
-                message.obj = response.get("path");
-
-                Log.i("mRunnableWithAPI", String.format("code: %s, path: %s", response.get("code"), response.get("path")));
-                mHandlerWithAPI.sendMessage(message);
-                Looper.loop();
-            }
-        };
-
-        @Override
-        public void handleMessage(Message message) {
-            if (mContext == null)  return;
-        }
-
-    }
     public static class HandlerForDetecting extends Handler {
         private final WeakReference<BaseActivity> weakActivity;
         private Context mContext;
@@ -600,7 +498,8 @@ public class BaseActivity extends Activity {
         @Override
         public void run() {
             try {
-                if (!logParams.getString("action").contains("登录") && !logParams.getString("action").equals("解屏")) {
+                if (!logParams.getString("action").contains("登录") &&
+                    !logParams.getString("action").equals("解屏")) {
                     return;
                 }
 
@@ -610,29 +509,6 @@ public class BaseActivity extends Activity {
             }
         }
     };
-
-    private void showWebViewForWithoutNetwork() {
-        urlStringForLoading = loadingPath("400");
-        mWebView.loadUrl(urlStringForLoading);
-    }
-
-    private void showDialogForDeviceForbided() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(BaseActivity.this);
-        alertDialog.setTitle("温馨提示");
-        alertDialog.setMessage("您被禁止在该设备使用本应用");
-
-        alertDialog.setNegativeButton(
-                "知道了",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        new Thread(mRunnableForDetecting).start();
-                        dialog.dismiss();
-                    }
-                }
-        );
-        alertDialog.show();
-    }
 
     void initColorView(List<ImageView> colorViews) {
         String[] colors = {"#ffffff", "#ffcd0a", "#fd9053", "#dd0929", "#016a43", "#9d203c", "#093db5", "#6a3906", "#192162", "#000000"};
@@ -691,7 +567,19 @@ public class BaseActivity extends Activity {
 
     /*
      * 检测版本更新
-     * {"code":0,"message":"","data":{"lastBuild":"10","downloadURL":"","versionCode":"15","versionName":"0.1.5","appUrl":"http:\/\/www.pgyer.com\/yh-a","build":"10","releaseNote":"\u66f4\u65b0\u5230\u7248\u672c: 0.1.5(build10)"}}
+        {
+          "code": 0,
+          "message": "",
+          "data": {
+            "lastBuild": "10",
+            "downloadURL": "",
+            "versionCode": "15",
+            "versionName": "0.1.5",
+            "appUrl": "http://www.pgyer.com/yh-a",
+            "build": "10",
+            "releaseNote": "更新到版本: 0.1.5(build10)"
+          }
+        }
      */
     final View.OnClickListener mCheckUpgradeListener = new View.OnClickListener() {
         @Override
@@ -847,7 +735,7 @@ public class BaseActivity extends Activity {
             Log.i("checkAssetUpdated", String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName), userJSON.getString(keyName)));
             // execute this when the downloader must be fired
             final DownloadAssetsTask downloadTask = new DownloadAssetsTask(mContext, shouldReloadUIThread, assetName, isInAssets);
-            downloadTask.execute(String.format(URLs.API_ASSETS_PATH, URLs.HOST, assetName), assetZipPath);
+            downloadTask.execute(String.format(URLs.API_ASSETS_PATH, URLs.kBaseUrl, assetName), assetZipPath);
 
             return true;
         } catch (JSONException e) {

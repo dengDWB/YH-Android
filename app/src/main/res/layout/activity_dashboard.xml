@@ -7,21 +7,21 @@
     tools:context=".DashboardActivity">
 
     <RelativeLayout
-        android:id="@+id/action_bar"
+        android:id="@+id/actionBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/actionBar">
 
         <ImageView
-            android:id="@+id/banner_code_scan"
-            android:layout_alignTop="@+id/banner_logo"
+            android:id="@+id/bannerCodeScan"
+            android:layout_alignTop="@+id/bannerLogo"
             style="@style/BannerLeftButton"
             android:src="@drawable/banner_scan"
             android:layout_alignBottom="@+id/colorViewLayout"
             android:onClick="launchBarCodeScannerActivity" />
 
         <ImageView
-            android:id="@+id/banner_logo"
+            android:id="@+id/bannerLogo"
             android:src="@drawable/banner_logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -30,7 +30,7 @@
         <ImageView
             android:src="@drawable/banner_setting"
             style="@style/BannerRightButton"
-            android:layout_alignTop="@+id/banner_logo"
+            android:layout_alignTop="@+id/bannerLogo"
             android:layout_alignBottom="@+id/colorViewLayout"
             android:onClick="launchSettingActivity" />
 
@@ -75,28 +75,28 @@
         android:orientation="horizontal">
 
         <com.intfocus.yh_android.TabView
-            android:id="@+id/tab_kpi"
+            android:id="@+id/tabKPI"
             style="@style/ToolBarTab"
             app:active_src="@drawable/tab_kpi_s"
             app:src="@drawable/tab_kpi"
             app:text="仪表盘" />
 
         <com.intfocus.yh_android.TabView
-            android:id="@+id/tab_analyse"
+            android:id="@+id/tabAnalyse"
             style="@style/ToolBarTab"
             app:active_src="@drawable/tab_analysis_s"
             app:src="@drawable/tab_analysis"
             app:text="分析" />
 
         <com.intfocus.yh_android.TabView
-            android:id="@+id/tab_app"
+            android:id="@+id/tabApp"
             style="@style/ToolBarTab"
             app:active_src="@drawable/tab_app_s"
             app:src="@drawable/tab_app"
             app:text="应用" />
 
         <com.intfocus.yh_android.TabView
-            android:id="@+id/tab_message"
+            android:id="@+id/tabMessage"
             style="@style/ToolBarTab"
             app:active_src="@drawable/tab_message_s"
             app:src="@drawable/tab_message"
@@ -106,11 +106,11 @@
 
 
     <com.handmark.pulltorefresh.library.PullToRefreshWebView
-        android:id="@+id/webview"
+        android:id="@+id/browser"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/toolBar"
-        android:layout_below="@id/action_bar" />
+        android:layout_below="@id/actionBar" />
 
     <View
         android:layout_width="match_parent"

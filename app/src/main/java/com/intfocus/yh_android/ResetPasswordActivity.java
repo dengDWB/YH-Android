@@ -31,7 +31,7 @@ public class ResetPasswordActivity extends BaseActivity {
         setContentView(R.layout.activity_reset_password);
         mMyApp.setCurrentActivity(this);
 
-        pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
+        pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
         initWebView();
         setPullToRefreshWebView(false);
 
@@ -39,7 +39,7 @@ public class ResetPasswordActivity extends BaseActivity {
         mWebView.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");
         mWebView.loadUrl(urlStringForLoading);
 
-        urlString = String.format(URLs.RESET_PASSWORD_PATH, URLs.HOST, currentUIVersion());
+        urlString = String.format(URLs.RESET_PASSWORD_PATH, URLs.kBaseUrl, currentUIVersion());
         new Thread(mRunnableForDetecting).start();
     }
 

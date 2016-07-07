@@ -22,10 +22,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.telephony.TelephonyManager;
 
 public class HttpUtil {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -256,7 +252,7 @@ public class HttpUtil {
     public static String UrlToFileName(String urlString) {
         String path = "default";
         try {
-            urlString = urlString.replace(URLs.HOST, "");
+            urlString = urlString.replace(URLs.kBaseUrl, "");
             URI uri = new URI(urlString);
             path = uri.getPath().replace("/", "_");
         } catch (Exception e) {

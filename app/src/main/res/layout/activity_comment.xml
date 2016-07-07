@@ -6,24 +6,24 @@
     tools:context=".CommentActivity">
 
     <RelativeLayout
-        android:id="@+id/action_bar"
+        android:id="@+id/actionBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/actionBar">
 
         <ImageView
-            android:id="@+id/banner_back_button"
+            android:id="@+id/bannerBack"
             style="@style/BannerBackButton"
             android:onClick="dismissActivity" />
 
         <TextView
-            android:id="@+id/banner_back_text"
-            android:layout_toRightOf="@id/banner_back_button"
+            android:id="@+id/bannerBackText"
+            android:layout_toRightOf="@id/bannerBack"
             style="@style/BannerBackText"
             android:onClick="dismissActivity" />
 
         <TextView
-            android:id="@+id/banner_title"
+            android:id="@+id/bannerTitle"
             android:text="对象"
             style="@style/BannerTitle" />
 
@@ -57,9 +57,9 @@
     </RelativeLayout>
 
     <com.handmark.pulltorefresh.library.PullToRefreshWebView
-        android:id="@+id/webview"
+        android:id="@+id/browser"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/action_bar" />
+        android:layout_below="@id/actionBar" />
 
 </RelativeLayout>

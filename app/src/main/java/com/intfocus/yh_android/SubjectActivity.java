@@ -64,15 +64,17 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             userNum = "not-set";
         }
 
-        ImageView bannerComment = (ImageView) findViewById(R.id.banner_comment);
-        bannerComment.setVisibility(URLs.kSubjectDisplayComment ? View.VISIBLE : View.INVISIBLE);
+        ImageView bannerComment = (ImageView) findViewById(R.id.bannerComment);
+        bannerComment.setVisibility(URLs.kSubjectDisplayComment ? View.VISIBLE : View.GONE);
+        ImageView bannerShare = (ImageView) findViewById(R.id.bannerShare);
+        bannerShare.setVisibility(URLs.kSubjectDisplayShare ? View.VISIBLE : View.INVISIBLE);
 
-        bannerView = (RelativeLayout) findViewById(R.id.action_bar);
-        TextView mTitle = (TextView) findViewById(R.id.banner_title);
+        bannerView = (RelativeLayout) findViewById(R.id.actionBar);
+        TextView mTitle = (TextView) findViewById(R.id.bannerTitle);
         mPDFView = (PDFView) findViewById(R.id.pdfview);
         mPDFView.setVisibility(View.INVISIBLE);
 
-        pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
+        pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
         initWebView();
 
         mWebView.requestFocus();
@@ -159,7 +161,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             e.printStackTrace();
         }
 
-
         Message message = mHandlerWithAPI.obtainMessage();
         message.what = 200;
         message.obj = outputPath;
@@ -203,7 +204,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             templateID = TextUtils.split(link, "/")[6];
             reportID = TextUtils.split(link, "/")[8];
             String urlPath = format(link.replace("%@", "%d"), groupID);
-            urlString = String.format("%s%s", URLs.HOST, urlPath);
+            urlString = String.format("%s%s", URLs.kBaseUrl, urlPath);
             webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
             new Thread(new Runnable() {
@@ -272,9 +273,16 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     };
 
     /*
+     * 分享截图至微信
+     */
+    public void actionShare2Weixin(View v) {
+        Log.i("actionShare2Weixin", "pending");
+    }
+
+    /*
      * 评论
      */
-    public void launchCommentActivity(View v) {
+    public void actionLaunchCommentActivity(View v) {
         Intent intent = new Intent(mContext, CommentActivity.class);
         intent.putExtra("bannerName", bannerName);
         intent.putExtra("objectID", objectID);
@@ -314,7 +322,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                     urlKey = urlString.contains("?") ? TextUtils.split(urlString, "?")[0] : urlString;
                     ApiHelper.clearResponseHeader(urlKey, assetsPath);
                 }
-                urlKey = String.format(URLs.API_DATA_PATH, URLs.HOST, groupID, templateID, reportID);
+                urlKey = String.format(URLs.API_DATA_PATH, URLs.kBaseUrl, groupID, templateID, reportID);
                 ApiHelper.clearResponseHeader(urlKey, FileUtil.sharedPath(mContext));
 
                 ApiHelper.reportData(mContext, String.format("%d", groupID), templateID, reportID);

@@ -29,7 +29,7 @@ public class ApiHelper {
      * params: {device: {name, platform, os, os_version, uuid}}
      */
     public static String authentication(Context context, String username, String password) {
-        String ret = "success", urlString = String.format(URLs.API_USER_PATH, URLs.HOST, "android",
+        String ret = "success", urlString = String.format(URLs.API_USER_PATH, URLs.kBaseUrl, "android",
             username, password);
         try {
             JSONObject device = new JSONObject();
@@ -104,7 +104,7 @@ public class ApiHelper {
      */
     public static void reportData(Context context, String groupID, String templateID, String reportID) {
         String assetsPath = FileUtil.sharedPath(context);
-        String urlString = String.format(URLs.API_DATA_PATH, URLs.HOST, groupID, templateID,
+        String urlString = String.format(URLs.API_DATA_PATH, URLs.kBaseUrl, groupID, templateID,
             reportID);
 
         String fileName = String.format(URLs.REPORT_DATA_FILENAME, groupID, templateID, reportID);
@@ -130,7 +130,7 @@ public class ApiHelper {
      * 发表评论
      */
     public static void writeComment(int userID, int objectType, int objectID, Map params) throws UnsupportedEncodingException {
-        String urlString = String.format(URLs.API_COMMENT_PATH, URLs.HOST, userID, objectID,
+        String urlString = String.format(URLs.API_COMMENT_PATH, URLs.kBaseUrl, userID, objectID,
             objectType);
 
         Map<String, String> response = HttpUtil.httpPost(urlString, params);
@@ -177,7 +177,7 @@ public class ApiHelper {
         Map<String, String> retMap = new HashMap<>();
 
         try {
-            String urlString = String.format(URLs.API_RESET_PASSWORD_PATH, URLs.HOST, userID);
+            String urlString = String.format(URLs.API_RESET_PASSWORD_PATH, URLs.kBaseUrl, userID);
 
             Map<String, String> params = new HashMap<>();
             params.put("password", newPassword);
@@ -357,7 +357,7 @@ public class ApiHelper {
      * @param state 是否启用锁屏
      */
     public static void screenLock(String deviceID, String password, boolean state) {
-        String urlString = String.format(URLs.API_SCREEN_LOCK_PATH, URLs.HOST, deviceID);
+        String urlString = String.format(URLs.API_SCREEN_LOCK_PATH, URLs.kBaseUrl, deviceID);
 
         Map<String, String> params = new HashMap<>();
         params.put("screen_lock_state", "1");
@@ -393,7 +393,7 @@ public class ApiHelper {
             userParams.put("user_pass", userJSON.getString("password"));
             params.put("user", userParams);
 
-            String urlString = String.format(URLs.API_ACTION_LOG_PATH, URLs.HOST);
+            String urlString = String.format(URLs.API_ACTION_LOG_PATH, URLs.kBaseUrl);
             HttpUtil.httpPost(urlString, params);
         } catch (JSONException | PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -417,7 +417,7 @@ public class ApiHelper {
             if(pushJSON.has("push_device_token") && pushJSON.getString("push_device_token").length() != 44) return false;
 
             if(pushJSON.has("push_device_token")) {
-                String urlString = String.format(URLs.API_PUSH_DEVICE_TOKEN_PATH, URLs.HOST, deviceUUID, pushJSON.getString("push_device_token"));
+                String urlString = String.format(URLs.API_PUSH_DEVICE_TOKEN_PATH, URLs.kBaseUrl, deviceUUID, pushJSON.getString("push_device_token"));
                 Map<String, String> response = HttpUtil.httpPost(urlString, new JSONObject());
                 JSONObject responseJSON = new JSONObject(response.get("body"));
 
@@ -450,7 +450,7 @@ public class ApiHelper {
             params.put("code_info", codeInfo);
             params.put("code_type", codeType);
 
-            String urlString = String.format(URLs.API_BARCODE_SCAN_PATH, URLs.HOST, groupID, roleID, userNum);
+            String urlString = String.format(URLs.API_BARCODE_SCAN_PATH, URLs.kBaseUrl, groupID, roleID, userNum);
             Map<String, String> response = HttpUtil.httpPost(urlString, params);
             String responseString = response.get("body");
 

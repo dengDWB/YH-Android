@@ -26,7 +26,7 @@ public class BarCodeResultActivity extends BaseActivity {
     super.onCreate(state);
     setContentView(R.layout.activity_bar_code_result);
 
-    mWebView = (WebView) findViewById(R.id.webview);
+    mWebView = (WebView) findViewById(R.id.browser);
     WebSettings webSettings = mWebView.getSettings();
     webSettings.setJavaScriptEnabled(true);
     webSettings.setDefaultTextEncodingName("utf-8");

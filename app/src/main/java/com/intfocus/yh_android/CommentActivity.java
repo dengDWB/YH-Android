@@ -34,8 +34,8 @@ public class CommentActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
 
-        TextView mTitle = (TextView) findViewById(R.id.banner_title);
-        pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
+        TextView mTitle = (TextView) findViewById(R.id.bannerTitle);
+        pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
         initWebView();
         setPullToRefreshWebView(true);
 
@@ -49,7 +49,7 @@ public class CommentActivity extends BaseActivity {
         objectType = intent.getIntExtra("objectType", -1);
 
         mTitle.setText(bannerName);
-        urlString = String.format(URLs.COMMENT_PATH, URLs.HOST, currentUIVersion(), objectID, objectType);
+        urlString = String.format(URLs.COMMENT_PATH, URLs.kBaseUrl, currentUIVersion(), objectID, objectType);
 
         new Thread(mRunnableForDetecting).start();
 

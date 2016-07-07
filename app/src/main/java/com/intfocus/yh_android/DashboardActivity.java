@@ -33,10 +33,10 @@ public class DashboardActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        ImageView bannerCodeScan = (ImageView) findViewById(R.id.banner_code_scan);
+        ImageView bannerCodeScan = (ImageView) findViewById(R.id.bannerCodeScan);
         bannerCodeScan.setVisibility(URLs.kDashboardDisplayScanCode ? View.VISIBLE : View.INVISIBLE);
 
-        pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
+        pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
         initWebView();
         setPullToRefreshWebView(true);
 
@@ -46,7 +46,7 @@ public class DashboardActivity extends BaseActivity {
 
         try {
             objectType = 1;
-            urlString = String.format(URLs.KPI_PATH, URLs.HOST, currentUIVersion(), user.getString("group_id"), user.getString("role_id"));
+            urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion(), user.getString("group_id"), user.getString("role_id"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -109,10 +109,10 @@ public class DashboardActivity extends BaseActivity {
     @SuppressLint("SetJavaScriptEnabled")
     @JavascriptInterface
     private void initTab() {
-        TabView mTabKPI = (TabView) findViewById(R.id.tab_kpi);
-        TabView mTabAnalyse = (TabView) findViewById(R.id.tab_analyse);
-        TabView mTabAPP = (TabView) findViewById(R.id.tab_app);
-        TabView mTabMessage = (TabView) findViewById(R.id.tab_message);
+        TabView mTabKPI = (TabView) findViewById(R.id.tabKPI);
+        TabView mTabAnalyse = (TabView) findViewById(R.id.tabAnalyse);
+        TabView mTabAPP = (TabView) findViewById(R.id.tabApp);
+        TabView mTabMessage = (TabView) findViewById(R.id.tabMessage);
 
         mTabKPI.setVisibility(URLs.kDashboardTabBarDisplayKPI ? View.VISIBLE : View.GONE);
         mTabAnalyse.setVisibility(URLs.kDashboardTabBarDisplayAnalyse ? View.VISIBLE : View.GONE);
@@ -142,25 +142,25 @@ public class DashboardActivity extends BaseActivity {
             String currentUIVersion = currentUIVersion();
             try {
                 switch (v.getId()) {
-                    case R.id.tab_kpi:
+                    case R.id.tabKPI:
                         objectType = 1;
-                        urlString = String.format(URLs.KPI_PATH, URLs.HOST, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
+                        urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
                         break;
-                    case R.id.tab_analyse:
+                    case R.id.tabAnalyse:
                         objectType = 2;
-                        urlString = String.format(URLs.ANALYSE_PATH, URLs.HOST, currentUIVersion, user.getString("role_id"));
+                        urlString = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
                         break;
-                    case R.id.tab_app:
+                    case R.id.tabApp:
                         objectType = 3;
-                        urlString = String.format(URLs.APPLICATION_PATH, URLs.HOST, currentUIVersion, user.getString("role_id"));
+                        urlString = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
                         break;
-                    case R.id.tab_message:
+                    case R.id.tabMessage:
                         objectType = 5;
-                        urlString = String.format(URLs.MESSAGE_PATH, URLs.HOST, currentUIVersion, user.getString("role_id"), user.getString("group_id"), user.getString("user_id"));
+                        urlString = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"), user.getString("group_id"), user.getString("user_id"));
                         break;
                     default:
                         objectType = 1;
-                        urlString = String.format(URLs.KPI_PATH, URLs.HOST, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
+                        urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
                         break;
                 }
 

@@ -60,7 +60,7 @@ public class InitPassCodeActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_input_pass_code);
+        setContentView(R.layout.activity_input_passcode);
 
         mContext = InitPassCodeActivity.this;
         stringBuilder = new StringBuilder();

@@ -6,23 +6,23 @@
     tools:context="com.intfocus.yh_android.SubjectActivity">
 
     <RelativeLayout
-        android:id="@+id/action_bar"
+        android:id="@+id/actionBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/actionBar">
 
         <ImageView
-            android:id="@+id/banner_back_button"
+            android:id="@+id/bannerBack"
             style="@style/BannerBackButton"
             android:onClick="dismissActivity" />
 
         <TextView
             style="@style/BannerBackText"
-            android:layout_toRightOf="@id/banner_back_button"
+            android:layout_toRightOf="@id/bannerBack"
             android:onClick="dismissActivity" />
 
         <TextView
-            android:id="@+id/banner_title"
+            android:id="@+id/bannerTitle"
             android:text="商品信息"
             style="@style/BannerTitle" />
 
@@ -55,9 +55,9 @@
     </RelativeLayout>
 
     <android.webkit.WebView
-        android:id="@+id/webview"
+        android:id="@+id/browser"
         android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/action_bar" />
+        android:layout_below="@id/actionBar" />
 </RelativeLayout>

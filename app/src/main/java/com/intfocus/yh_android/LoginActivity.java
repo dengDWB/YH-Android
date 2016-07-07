@@ -50,7 +50,7 @@ public class LoginActivity extends BaseActivity {
             checkPgyerVersionUpgrade(false);
         }
 
-        pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.webview);
+        pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
         initWebView();
         setPullToRefreshWebView(false);
 
