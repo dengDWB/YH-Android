@@ -28,7 +28,6 @@ import java.io.IOException;
  * Created by lijunjie on 16/1/15.
  */
 public class YHApplication extends Application {
-
     private Context mContext;
     private RefWatcher refWatcher;
 
@@ -42,7 +41,6 @@ public class YHApplication extends Application {
         public void onReceive(Context context, Intent intent) {
             if(!intent.getAction().equals(Intent.ACTION_SCREEN_ON)) return;
             Log.i("BroadcastReceiver", "Screen On");
-
 
             String currentActivityName = null;
             Activity currentActivity = ((YHApplication)context.getApplicationContext()).getCurrentActivity();

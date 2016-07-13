@@ -10,7 +10,6 @@ android {
         targetSdkVersion 22
     }
 
-
     if(System.getenv().containsKey("KEYSTORE"))
         signingConfigs {
             release {
@@ -52,11 +51,10 @@ dependencies {
     compile 'commons-io:commons-io:+'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'me.dm7.barcodescanner:zbar:1.8.4'
-    compile project(':lib:pull-to-refresh')
+    compile project(':pull-to-refresh')
     compile project(':android-pdfview')
-    compile project(':Pushlib')
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-
+    compile project(':umeng-push')
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.3'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.3'
+    compile fileTree(dir: 'libs', include: ['*.jar'])
 }
