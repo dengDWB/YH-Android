@@ -163,7 +163,6 @@ public class YHApplication extends Application {
         }
     }
 
-
     private Activity mCurrentActivity = null;
     public Activity getCurrentActivity(){
         return mCurrentActivity;

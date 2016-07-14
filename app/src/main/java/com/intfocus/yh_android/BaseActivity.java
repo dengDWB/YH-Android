@@ -111,8 +111,8 @@ public class BaseActivity extends Activity {
         refWatcher.watch(this);
 
          /*
-         * 友盟消息推送
-         */
+          * 友盟消息推送
+          */
         PushAgent mPushAgent = PushAgent.getInstance(mContext);
         //开启推送并设置注册的回调处理
         mPushAgent.enable(new IUmengRegisterCallback() {
@@ -257,7 +257,6 @@ public class BaseActivity extends Activity {
             }
         });
     }
-
 
     private class pullToRefreshTask extends AsyncTask<Void, Void, Void> {
         @Override

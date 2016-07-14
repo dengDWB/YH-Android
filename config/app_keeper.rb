@@ -217,6 +217,7 @@ if slop_opts[:java]
         public final static String kWXAppId      = "#{Settings.umeng_weixin.android.app_id}";
         public final static String kWXAppSecret  = "#{Settings.umeng_weixin.android.app_secret}";
 
+        public final static boolean kDashboardTabBarDisplay        = #{Settings.display_status.tab_bar == 1 ? 'true' : 'false'};
         public final static boolean kDashboardTabBarDisplayKPI     = #{Settings.display_status.kpi == 1 ? 'true' : 'false'};
         public final static boolean kDashboardTabBarDisplayAnalyse = #{Settings.display_status.analyse == 1 ? 'true' : 'false'};
         public final static boolean kDashboardTabBarDisplayApp     = #{Settings.display_status.app == 1 ? 'true' : 'false'};

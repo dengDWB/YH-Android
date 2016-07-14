@@ -114,10 +114,14 @@ public class DashboardActivity extends BaseActivity {
         TabView mTabAPP = (TabView) findViewById(R.id.tabApp);
         TabView mTabMessage = (TabView) findViewById(R.id.tabMessage);
 
-        mTabKPI.setVisibility(URLs.kDashboardTabBarDisplayKPI ? View.VISIBLE : View.GONE);
-        mTabAnalyse.setVisibility(URLs.kDashboardTabBarDisplayAnalyse ? View.VISIBLE : View.GONE);
-        mTabAPP.setVisibility(URLs.kDashboardTabBarDisplayApp ? View.VISIBLE : View.GONE);
-        mTabMessage.setVisibility(URLs.kDashboardTabBarDisplayMessage ? View.VISIBLE : View.GONE);
+        if(URLs.kDashboardTabBarDisplay) {
+            mTabKPI.setVisibility(URLs.kDashboardTabBarDisplayKPI ? View.VISIBLE : View.GONE);
+            mTabAnalyse.setVisibility( URLs.kDashboardTabBarDisplayAnalyse ? View.VISIBLE : View.GONE);
+            mTabAPP.setVisibility(URLs.kDashboardTabBarDisplayApp ? View.VISIBLE : View.GONE);
+            mTabMessage.setVisibility(URLs.kDashboardTabBarDisplayMessage ? View.VISIBLE : View.GONE);
+        } else {
+           findViewById(R.id.toolBar).setVisibility(View.GONE);
+        }
 
         mTabKPI.setOnClickListener(mTabChangeListener);
         mTabAnalyse.setOnClickListener(mTabChangeListener);
