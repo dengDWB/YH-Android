@@ -13,6 +13,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.apache.commons.io.FileUtils;
@@ -423,4 +426,83 @@ public class FileUtil {
             e.printStackTrace();
         }
     }
+
+    /**
+     *  内部报表是否支持筛选功能
+     *
+     *  @param groupID    群组ID
+     *  @param templateID 模板ID
+     *  @param reportID   报表ID
+     *
+     *  @return 是否支持筛选功能
+     */
+    public static boolean reportIsSupportSearch(Context context, String groupID, String templateID, String reportID) {
+        ArrayList<String> items = reportSearchItems(context, groupID, templateID, reportID);
+        return (items.size() > 0);
+    }
+
+    /**
+     *  内部报表 JavaScript 文件路径
+     *
+     *  @param groupID    群组ID
+     *  @param templateID 模板ID
+     *  @param reportID   报表ID
+     *
+     *  @return 文件路径
+     */
+    public static String reportJavaScriptDataPath(Context context, String groupID, String templateID, String reportID) {
+        String assetsPath = FileUtil.sharedPath(context);
+        String fileName = String.format(URLs.REPORT_DATA_FILENAME, groupID, templateID, reportID);
+        return String.format("%s/assets/javascripts/%s", assetsPath, fileName);
+    }
+
+    /**
+     *  内部报表具有筛选功能时，选项列表
+     *
+     *  @param groupID    群组ID
+     *  @param templateID 模板ID
+     *  @param reportID   报表ID
+     *
+     *  @return 选项列表
+     */
+    public static ArrayList<String> reportSearchItems(Context context, String groupID, String templateID, String reportID) {
+        ArrayList<String> searchItems = new ArrayList<String>();
+        String searchItemsPath = String.format("%s.search_items", FileUtil.reportJavaScriptDataPath(context, groupID, templateID, reportID));
+        if(new File(searchItemsPath).exists()) {
+            String itemsString = FileUtil.readFile(searchItemsPath);
+            StringTokenizer items = new StringTokenizer(itemsString, "::");
+            while (items.hasMoreTokens()) {
+                searchItems.add(items.nextToken());
+            }
+        }
+
+        return searchItems;
+    }
+
+
+    /**
+     *  内部报表具有筛选功能时，用户选择的选项，默认第一个选项
+     *
+     *  @param groupID    群组ID
+     *  @param templateID 模板ID
+     *  @param reportID   报表ID
+     *
+     *  @return 用户选择的选项，默认第一个选项
+     */
+    public static String reportSelectedItem(Context context, String groupID, String templateID, String reportID) {
+        String selectedItem = "";
+        String selectedItemPath = String.format("%s.selected_item", FileUtil.reportJavaScriptDataPath(context, groupID, templateID, reportID));
+        if(new File(selectedItemPath).exists()) {
+            selectedItem = FileUtil.readFile(selectedItemPath);
+        }
+
+        return selectedItem.trim();
+    }
+    //json.put("size", searchItems.size());
+    //for(int i = 0, len = searchItems.size(); i < len; i ++) {
+    //    json.put(String.format("item%d", i), searchItems.get(i).toString());
+    //}
+    //
+    //FileUtil.writeFile(searchItemsPath, json.toString());
+
 }

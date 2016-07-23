@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
+import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 import java.io.File;
 import java.io.IOException;
@@ -239,7 +240,7 @@ public class DashboardActivity extends BaseActivity {
                 @Override
                 public void run() {
                     String message = String.format("%s\n%s\n%d", bannerName, link, objectID);
-                    longLog("JSClick", message);
+                    LogUtil.d("JSClick", message);
 
                     Intent intent = new Intent(DashboardActivity.this, SubjectActivity.class);
                     intent.putExtra("bannerName", bannerName);

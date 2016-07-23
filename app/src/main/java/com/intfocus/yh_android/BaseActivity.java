@@ -20,7 +20,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -36,6 +35,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.HttpUtil;
+import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.TypedObject;
 import com.intfocus.yh_android.util.URLs;
 import com.pgyersdk.javabean.AppBean;
@@ -123,7 +123,7 @@ public class BaseActivity extends Activity {
                     public void run() {
                         try {
                             if(mContext == null) {
-                                Log.i("PushAgent", "mContext is null");
+                                LogUtil.d("PushAgent", "mContext is null");
                                 return;
                             }
                             // onRegistered方法的参数registrationId即是device_token
@@ -198,18 +198,20 @@ public class BaseActivity extends Activity {
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
 
-                Log.i("onPageStarted", String.format("%s - %s", URLs.timestamp(), url));
+                LogUtil.d("onPageStarted", String.format("%s - %s", URLs.timestamp(), url));
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
 
-                Log.i("onPageFinished", String.format("%s - %s", URLs.timestamp(), url));
+                LogUtil.d("onPageFinished", String.format("%s - %s", URLs.timestamp(), url));
             }
 
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                Log.i("onReceivedError", String.format("errorCode: %d, description: %s, url: %s", errorCode, description, failingUrl));
+                LogUtil.d("onReceivedError",
+                    String.format("errorCode: %d, description: %s, url: %s", errorCode, description,
+                        failingUrl));
             }
         });
 
@@ -397,7 +399,7 @@ public class BaseActivity extends Activity {
         private final Runnable mRunnableWithAPI = new Runnable() {
             @Override
             public void run() {
-                Log.i("httpGetWithHeader", String.format("url: %s, assets: %s, relativeAssets: %s", mUrlString, mAssetsPath, mRelativeAssetsPath));
+                LogUtil.d("httpGetWithHeader", String.format("url: %s, assets: %s, relativeAssets: %s", mUrlString, mAssetsPath, mRelativeAssetsPath));
                 Map<String, String> response = ApiHelper.httpGetWithHeader(mUrlString, mAssetsPath, mRelativeAssetsPath);
 
                 Looper.prepare();
@@ -407,7 +409,8 @@ public class BaseActivity extends Activity {
                 message.what = Integer.parseInt(response.get("code"));
                 message.obj = response.get("path");
 
-                Log.i("mRunnableWithAPI", String.format("code: %s, path: %s", response.get("code"), response.get("path")));
+                LogUtil.d("mRunnableWithAPI",
+                    String.format("code: %s, path: %s", response.get("code"), response.get("path")));
                 mHandlerWithAPI.sendMessage(message);
                 Looper.loop();
             }
@@ -432,7 +435,7 @@ public class BaseActivity extends Activity {
                     showDialogForDeviceForbided();
                     break;
                 default:
-                    Log.i("UnkownCode", String.format("%d", message.what));
+                    LogUtil.d("UnkownCode", String.format("%d", message.what));
                     break;
             }
         }
@@ -473,7 +476,7 @@ public class BaseActivity extends Activity {
                 case 200:
                 case 304:
                     final String localHtmlPath = String.format("file:///%s", (String) message.obj);
-                    Log.i("localHtmlPath", localHtmlPath);
+                    LogUtil.d("localHtmlPath", localHtmlPath);
                     weakActivity.get().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -523,16 +526,6 @@ public class BaseActivity extends Activity {
             colorViews.get(i).setBackgroundColor(Color.parseColor(colors[colorIndex]));
         }
     }
-
-    void longLog(String Tag, String str) {
-        if (str.length() > 200) {
-            Log.i(Tag, str.substring(0, 200));
-            longLog(Tag, str.substring(200));
-        } else {
-            Log.i(Tag, str);
-        }
-    }
-
 
     void modifiedUserConfig(JSONObject configJSON) {
         try {
@@ -607,7 +600,7 @@ public class BaseActivity extends Activity {
         UpdateManagerListener updateManagerListener = new UpdateManagerListener() {
             @Override
             public void onUpdateAvailable(final String result) {
-                Log.i("checkPgyerUpgrade", result);
+                LogUtil.d("checkPgyerUpgrade", result);
                 String message = "", versionCode = "-1", versionName = "-1";
                 try {
                     JSONObject response = new JSONObject(result);
@@ -687,7 +680,9 @@ public class BaseActivity extends Activity {
             }
 
             if (isUpgrade) {
-                Log.i("VersionUpgrade", String.format("%s => %s remove %s/%s", localVersion, packageInfo.versionName, assetsPath, URLs.CACHED_HEADER_FILENAME));
+                LogUtil.d("VersionUpgrade",
+                    String.format("%s => %s remove %s/%s", localVersion, packageInfo.versionName,
+                        assetsPath, URLs.CACHED_HEADER_FILENAME));
 
                 /*
                  * 用户报表数据js文件存放在公共区域
@@ -731,7 +726,9 @@ public class BaseActivity extends Activity {
 
             if (!isShouldUpdateAssets) return false;
 
-            Log.i("checkAssetUpdated", String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName), userJSON.getString(keyName)));
+            LogUtil.d("checkAssetUpdated",
+                String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName),
+                    userJSON.getString(keyName)));
             // execute this when the downloader must be fired
             final DownloadAssetsTask downloadTask = new DownloadAssetsTask(mContext, shouldReloadUIThread, assetName, isInAssets);
             downloadTask.execute(String.format(URLs.API_ASSETS_PATH, URLs.kBaseUrl, assetName), assetZipPath);
@@ -800,7 +797,7 @@ public class BaseActivity extends Activity {
                     output.write(data, 0, count);
                 }
             } catch (Exception e) {
-                Log.i("Exception", e.toString());
+                LogUtil.d("Exception", e.toString());
                 return e.toString();
             } finally {
                 try {

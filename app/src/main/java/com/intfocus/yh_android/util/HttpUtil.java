@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +33,7 @@ public class HttpUtil {
      */
     //@throws UnsupportedEncodingException
     public static Map<String, String> httpGet(String urlString, Map<String, String> headers) {
-        Log.i("GET", urlString);
+        LogUtil.d("GET", urlString);
         Map<String, String> retMap = new HashMap<>();
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(3, TimeUnit.SECONDS)
@@ -64,15 +63,16 @@ public class HttpUtil {
             }
             retMap.put("code", String.format("%d", response.code()));
             retMap.put("body", response.body().string());
+            LogUtil.d("BODY", retMap.get("body").toString());
 
             if(isJSON) {
-                Log.i("code", retMap.get("code"));
-                Log.i("responseBody", retMap.get("body"));
+                LogUtil.d("code", retMap.get("code"));
+                LogUtil.d("responseBody", retMap.get("body"));
             }
         } catch (UnknownHostException e) {
             // 400: Unable to resolve host "yonghui.idata.mobi": No address associated with hostname
             if(e != null && e.getMessage() != null) {
-                Log.i("UnknownHostException2", e.getMessage());
+                LogUtil.d("UnknownHostException2", e.getMessage());
             }
             retMap.put("code", "400");
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
@@ -83,7 +83,7 @@ public class HttpUtil {
 
             if(e != null && e.getMessage() != null) {
                 String errorMessage = e.getMessage().toLowerCase();
-                Log.i("Exception", errorMessage);
+                LogUtil.d("Exception", errorMessage);
                 if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
                     retMap.put("code", "400");
                     retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
@@ -102,7 +102,7 @@ public class HttpUtil {
     //@throws UnsupportedEncodingException
     //@throws JSONException
     public static Map<String, String> httpPost(String urlString, Map params){
-        Log.i("POST", urlString);
+        LogUtil.d("POST", urlString);
         Map<String, String> retMap = new HashMap<>();
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(3, TimeUnit.SECONDS)
@@ -152,17 +152,18 @@ public class HttpUtil {
             int headerSize = responseHeaders.size();
             for (int i = 0; i < headerSize; i++) {
                 retMap.put(responseHeaders.name(i), responseHeaders.value(i));
-                Log.i("HEADER", String.format("Key : %s, Value: %s", responseHeaders.name(i), responseHeaders.value(i)));
+                LogUtil.d("HEADER", String.format("Key : %s, Value: %s", responseHeaders.name(i),
+                    responseHeaders.value(i)));
             }
 
             retMap.put("code", String.format("%d", response.code()));
             retMap.put("body", response.body().string());
 
-            Log.i("code", retMap.get("code"));
-            Log.i("responseBody", retMap.get("body"));
+            LogUtil.d("code", retMap.get("code"));
+            LogUtil.d("responseBody", retMap.get("body"));
         } catch (UnknownHostException e) {
             if(e != null && e.getMessage() != null) {
-                Log.i("UnknownHostException", e.getMessage());
+                LogUtil.d("UnknownHostException", e.getMessage());
             }
             retMap.put("code", "400");
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
@@ -173,7 +174,7 @@ public class HttpUtil {
 
             if(e != null && e.getMessage() != null) {
                 String errorMessage = e.getMessage().toLowerCase();
-                Log.i("Exception", errorMessage);
+                LogUtil.d("Exception", errorMessage);
                 if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
                     retMap.put("code", "400");
                     retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
@@ -191,7 +192,7 @@ public class HttpUtil {
      * ִ执行一个HTTP POST请求，返回请求响应的HTML
      */
     public static Map<String, String> httpPost(String urlString, JSONObject params) {
-        Log.i("POST2", urlString);
+        LogUtil.d("POST2", urlString);
         Map<String, String> retMap = new HashMap<>();
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(3, TimeUnit.SECONDS)
@@ -204,7 +205,7 @@ public class HttpUtil {
 
         if (params != null) {
             requestBuilder.post(RequestBody.create(JSON, params.toString()));
-            Log.i("PARAM", params.toString());
+            LogUtil.d("PARAM", params.toString());
         }
         try {
             request = requestBuilder
@@ -217,16 +218,17 @@ public class HttpUtil {
             Headers responseHeaders = response.headers();
             for (int i = 0, headerSize = responseHeaders.size(); i < headerSize; i++) {
                 retMap.put(responseHeaders.name(i), responseHeaders.value(i));
-                Log.i("HEADER", String.format("Key : %s, Value: %s", responseHeaders.name(i), responseHeaders.value(i)));
+                LogUtil.d("HEADER", String.format("Key : %s, Value: %s", responseHeaders.name(i),
+                    responseHeaders.value(i)));
             }
             retMap.put("code", String.format("%d", response.code()));
             retMap.put("body", response.body().string());
 
-            Log.i("code", retMap.get("code"));
-            Log.i("responseBody", retMap.get("body"));
+            LogUtil.d("code", retMap.get("code"));
+            LogUtil.d("responseBody", retMap.get("body"));
         } catch (UnknownHostException e) {
             if(e != null && e.getMessage() != null) {
-                Log.i("UnknownHostException2", e.getMessage());
+                LogUtil.d("UnknownHostException2", e.getMessage());
             }
             retMap.put("code", "400");
             retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
@@ -236,7 +238,7 @@ public class HttpUtil {
 
             if(e != null && e.getMessage() != null) {
                 String errorMessage = e.getMessage().toLowerCase();
-                Log.i("Exception2", errorMessage);
+                LogUtil.d("Exception2", errorMessage);
                 if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
                     retMap.put("code", "400");
                     retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
@@ -271,7 +273,7 @@ public class HttpUtil {
     }
 
     private static void dealWithException(String errorMessage, Map<String, String> retMap) {
-        Log.i("DDEBUG", errorMessage);
+        LogUtil.d("DDEBUG", errorMessage);
         errorMessage = errorMessage.toLowerCase();
         if (errorMessage.contains("timed out") || errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
             retMap.put("code", "408");

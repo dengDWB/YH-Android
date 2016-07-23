@@ -67,7 +67,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         ImageView bannerComment = (ImageView) findViewById(R.id.bannerComment);
         bannerComment.setVisibility(URLs.kSubjectDisplayComment ? View.VISIBLE : View.GONE);
         ImageView bannerShare = (ImageView) findViewById(R.id.bannerShare);
-        bannerShare.setVisibility(URLs.kSubjectDisplayShare ? View.VISIBLE : View.INVISIBLE);
+        bannerShare.setVisibility(URLs.kSubjectDisplayShare ? View.VISIBLE : View.GONE);
+        ImageView bannerSearch = (ImageView) findViewById(R.id.bannerSearch);
+        bannerSearch.setVisibility(View.GONE);
 
         bannerView = (RelativeLayout) findViewById(R.id.actionBar);
         TextView mTitle = (TextView) findViewById(R.id.bannerTitle);
@@ -106,9 +108,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         objectID = intent.getIntExtra("objectID", -1);
         objectType = intent.getIntExtra("objectType", -1);
         isInnerLink = !(link.startsWith("http://") || link.startsWith("https://"));
-
         mTitle.setText(bannerName);
-        checkInterfaceOrientation(this.getResources().getConfiguration());
 
         List<ImageView> colorViews = new ArrayList<>();
         colorViews.add((ImageView) findViewById(R.id.colorView0));
@@ -120,10 +120,32 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     }
 
     protected void onResume() {
+        checkInterfaceOrientation(this.getResources().getConfiguration());
+
         mMyApp.setCurrentActivity(this);
         super.onResume();
     }
 
+    protected void displayBannerTitleAndSearchIcon() {
+        runOnUiThread(new Runnable() {
+            @Override public void run() {
+                ImageView bannerSearch = (ImageView) findViewById(R.id.bannerSearch);
+                bannerSearch.setVisibility(View.VISIBLE);
+
+                String selectedItem = FileUtil.reportSelectedItem(mContext, String.format("%d", groupID), templateID, reportID);
+                if (selectedItem == null || selectedItem.length() == 0) {
+                    ArrayList<String> items = FileUtil.reportSearchItems(mContext, String.format("%d", groupID), templateID, reportID);
+                    if (items.size() > 0) {
+                        selectedItem = items.get(0);
+                    } else {
+                        selectedItem = String.format("%s(NONE)", bannerName);
+                    }
+                }
+                TextView mTitle = (TextView) findViewById(R.id.bannerTitle);
+                mTitle.setText(selectedItem);
+            }
+        });
+    }
     /**
      * PDFView OnPageChangeListener CallBack
      *
@@ -192,10 +214,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         }
 
-        dealWithURL();
+        loadHtml();
     }
 
-    private void dealWithURL() {
+    private void loadHtml() {
         WebSettings webSettings = mWebView.getSettings();
         if (isInnerLink) {
             // format: /mobile/v1/group/:group_id/template/:template_id/report/:report_id
@@ -206,6 +228,11 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             String urlPath = format(link.replace("%@", "%d"), groupID);
             urlString = String.format("%s%s", URLs.kBaseUrl, urlPath);
             webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+
+            boolean isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
+            if(isSupportSearch) {
+                displayBannerTitleAndSearchIcon();;
+            }
 
             new Thread(new Runnable() {
                 @Override
@@ -271,6 +298,18 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             mHandlerForPDF.sendMessage(message);
         }
     };
+
+    /*
+     * 内部报表具有筛选功能时，调用筛选项界面
+     */
+    public void actionLaunchReportSelectorActivity(View v) {
+        Intent intent = new Intent(mContext, ReportSelectorAcitity.class);
+        intent.putExtra("bannerName", bannerName);
+        intent.putExtra("groupID", groupID);
+        intent.putExtra("reportID", reportID);
+        intent.putExtra("templateID", templateID);
+        mContext.startActivity(intent);
+    }
 
     /*
      * 分享截图至微信
@@ -340,7 +379,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                     e.printStackTrace();
                 }
             }
-            dealWithURL();
+            loadHtml();
 
             return null;
         }
@@ -412,6 +451,30 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        @JavascriptInterface
+        public void reportSearchItems(final String arrayString) {
+            try {
+                String searchItemsPath = String.format("%s.search_items", FileUtil.reportJavaScriptDataPath(mContext, String.format("%d", groupID), templateID, reportID));
+                if(!new File(searchItemsPath).exists()) {
+                    FileUtil.writeFile(searchItemsPath, arrayString);
+
+                    displayBannerTitleAndSearchIcon();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @JavascriptInterface
+        public String reportSelectedItem() {
+            String item = null;
+            String selectedItemPath = String.format("%s.selected_item", FileUtil.reportJavaScriptDataPath(mContext, String.format("%d", groupID), templateID, reportID));
+            if(new File(selectedItemPath).exists()) {
+                item = FileUtil.readFile(selectedItemPath);
+            }
+            return item;
         }
     }
 }

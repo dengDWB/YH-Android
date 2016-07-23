@@ -29,7 +29,8 @@ public class ApiHelper {
      * params: {device: {name, platform, os, os_version, uuid}}
      */
     public static String authentication(Context context, String username, String password) {
-        String ret = "success", urlString = String.format(URLs.API_USER_PATH, URLs.kBaseUrl, "android",
+        String ret = "success", urlString = String.format(URLs.API_USER_PATH, URLs.kBaseUrl,
+            "android",
             username, password);
         try {
             JSONObject device = new JSONObject();
@@ -103,13 +104,10 @@ public class ApiHelper {
      *  获取报表网页数据
      */
     public static void reportData(Context context, String groupID, String templateID, String reportID) {
+        String urlString = String.format(URLs.API_DATA_PATH, URLs.kBaseUrl, groupID, templateID, reportID);
+        String javascriptPath = FileUtil.reportJavaScriptDataPath(context, groupID, templateID, reportID);
+
         String assetsPath = FileUtil.sharedPath(context);
-        String urlString = String.format(URLs.API_DATA_PATH, URLs.kBaseUrl, groupID, templateID,
-            reportID);
-
-        String fileName = String.format(URLs.REPORT_DATA_FILENAME, groupID, templateID, reportID);
-        String filePath = String.format("%s/assets/javascripts/%s", assetsPath, fileName);
-
         Map<String, String> headers = ApiHelper.checkResponseHeader(urlString, assetsPath);
         Map<String, String> response = HttpUtil.httpGet(urlString, headers);
 
@@ -117,7 +115,13 @@ public class ApiHelper {
             try {
                 ApiHelper.storeResponseHeader(urlString, assetsPath, response);
 
-                FileUtil.writeFile(filePath, response.get("body"));
+                FileUtil.writeFile(javascriptPath, response.get("body"));
+
+                String searchItemsPath = String.format("%s.search_items", javascriptPath);
+                File searchItemsFile = new File(searchItemsPath);
+                if(searchItemsFile.exists()) {
+                    searchItemsFile.delete();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
