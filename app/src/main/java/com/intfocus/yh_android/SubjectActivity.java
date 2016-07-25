@@ -36,7 +36,7 @@ import org.json.JSONObject;
 import static java.lang.String.format;
 
 public class SubjectActivity extends BaseActivity implements OnPageChangeListener, OnLoadCompleteListener, OnErrorOccurredListener {
-    private Boolean isInnerLink;
+    private Boolean isInnerLink, isSupportSearch;
     private String templateID, reportID;
     private PDFView mPDFView;
     private File pdfFile;
@@ -229,7 +229,15 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             urlString = String.format("%s%s", URLs.kBaseUrl, urlPath);
             webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
-            boolean isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
+            /**
+             * 内部报表具有筛选功能时
+             *   - 如果用户已选择，则 banner 显示该选项名称
+             *   - 未设置时，默认显示筛选项列表中第一个
+             *
+             *  初次加载时，判断筛选功能的条件还未生效
+             *  此处仅在第二次及以后才会生效
+             */
+            isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
             if(isSupportSearch) {
                 displayBannerTitleAndSearchIcon();;
             }
@@ -460,7 +468,14 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                 if(!new File(searchItemsPath).exists()) {
                     FileUtil.writeFile(searchItemsPath, arrayString);
 
-                    displayBannerTitleAndSearchIcon();
+                    /**
+                     *  判断筛选的条件: arrayString 数组不为空
+                     *  报表第一次加载时，此处为判断筛选功能的关键点
+                     */
+                    isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
+                    if(isSupportSearch) {
+                        displayBannerTitleAndSearchIcon();
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
