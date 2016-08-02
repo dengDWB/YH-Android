@@ -14,9 +14,9 @@
 
         <ImageView
             android:id="@+id/bannerCodeScan"
-            android:layout_alignTop="@+id/bannerLogo"
             style="@style/BannerLeftButton"
             android:src="@drawable/banner_scan"
+            android:layout_marginTop="2dp"
             android:layout_alignBottom="@+id/colorViewLayout"
             android:onClick="launchBarCodeScannerActivity" />
 
@@ -25,12 +25,14 @@
             android:src="@drawable/banner_logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
             android:layout_centerInParent="true" />
 
         <ImageView
             android:src="@drawable/banner_setting"
             style="@style/BannerRightButton"
-            android:layout_alignTop="@+id/bannerLogo"
+            android:layout_marginTop="0dp"
             android:layout_alignBottom="@+id/colorViewLayout"
             android:onClick="launchSettingActivity" />
 

@@ -529,7 +529,8 @@ public class BaseActivity extends Activity {
 
     void modifiedUserConfig(JSONObject configJSON) {
         try {
-            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
+            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext),
+                URLs.USER_CONFIG_FILENAME);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
             userJSON = ApiHelper.merge(userJSON, configJSON);
@@ -593,6 +594,7 @@ public class BaseActivity extends Activity {
 
     /*
      * 托管在蒲公英平台，对比版本号检测是否版本更新
+     * 对比 build 值，只准正向安装提示
      * 奇数: 测试版本，仅提示
      * 偶数: 正式版本，点击安装更新
      */
@@ -601,8 +603,19 @@ public class BaseActivity extends Activity {
             @Override
             public void onUpdateAvailable(final String result) {
                 LogUtil.d("checkPgyerUpgrade", result);
-                String message = "", versionCode = "-1", versionName = "-1";
+                String message = "", versionCode = "-1", versionName = "-1", currentVersionCode = "0";
+                String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.PGYER_VERSION_FILENAME);
                 try {
+                    if(new File(pgyerVersionPath).exists()) {
+                        JSONObject currentVersion = FileUtil.readConfigFile(pgyerVersionPath);
+                        message = currentVersion.getString("message");
+
+                        if (message.isEmpty()) {
+                            JSONObject responseData = currentVersion.getJSONObject("data");
+                            currentVersionCode = responseData.getString("versionCode");
+                        }
+                    }
+
                     JSONObject response = new JSONObject(result);
                     message = response.getString("message");
                     if (message.isEmpty()) {
@@ -611,7 +624,6 @@ public class BaseActivity extends Activity {
                         versionCode = responseData.getString("versionCode");
                         versionName = responseData.getString("versionName");
 
-                        String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.PGYER_VERSION_FILENAME);
                         FileUtil.writeFile(pgyerVersionPath, result);
                     }
                 } catch (JSONException e) {
@@ -621,8 +633,16 @@ public class BaseActivity extends Activity {
                     e.printStackTrace();
                 }
 
+                int iCode = Integer.parseInt(versionCode);
+                int iCurrentCode = Integer.parseInt(currentVersionCode);
+
+                // 对比 build 值，只准正向安装提示
+                if(iCode <= iCurrentCode) {
+                    return;
+                }
+
                 // 偶数时为正式版本
-                if (Integer.parseInt(versionCode) % 2 == 1) {
+                if (iCode % 2 == 1) {
                     if(isShowToast) {
                         toast(String.format("有发布测试版本%s(%s)", versionName, versionCode));
                     }

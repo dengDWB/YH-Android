@@ -133,6 +133,13 @@ public class DashboardActivity extends BaseActivity {
         mCurrentTab.setActive(true);
     }
 
+    /*
+     * OBJ_TYPE_KPI = 1
+     * OBJ_TYPE_ANALYSE = 2
+     * OBJ_TYPE_APP = 3
+     * OBJ_TYPE_REPORT = 4
+     * OBJ_TYPE_MESSAGE = 5
+     */
     @SuppressLint("SetJavaScriptEnabled")
     private final View.OnClickListener mTabChangeListener = new View.OnClickListener() {
         @Override
