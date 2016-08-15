@@ -130,13 +130,12 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         runOnUiThread(new Runnable() {
             @Override public void run() {
                 ImageView bannerSearch = (ImageView) findViewById(R.id.bannerSearch);
-                bannerSearch.setVisibility(View.VISIBLE);
-
-                if(!URLs.kSubjectDisplayComment && !URLs.kSubjectDisplayShare) {
-                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(50, RelativeLayout.LayoutParams.MATCH_PARENT);
+                if (!URLs.kSubjectDisplayComment && !URLs.kSubjectDisplayShare) {
+                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(dip2px(50), RelativeLayout.LayoutParams.MATCH_PARENT);
                     params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
                     bannerSearch.setLayoutParams(params);
                 }
+                bannerSearch.setVisibility(View.VISIBLE);
 
                 String selectedItem = FileUtil.reportSelectedItem(mContext, String.format("%d", groupID), templateID, reportID);
                 if (selectedItem == null || selectedItem.length() == 0) {
@@ -502,5 +501,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             }
             return item;
         }
+    }
+
+    public int dip2px( float dpValue) {
+        final float scale = mContext.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
     }
 }
