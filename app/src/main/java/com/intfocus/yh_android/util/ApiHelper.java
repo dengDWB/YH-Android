@@ -444,22 +444,26 @@ public class ApiHelper {
     /**
      *  二维码扫描
      *
+     *  @param groupID    群组ID
+     *  @param roleID     角色ID
      *  @param userNum    用户编号
+     *  @param storeID    门店ID
      *  @param codeInfo   条形码信息
      *  @param codeType   条形码或二维码
      */
-    public static void barCodeScan(Context mContext, String groupID, String roleID, String userNum, String codeInfo, String codeType) {
+    public static void barCodeScan(Context mContext, String groupID, String roleID, String userNum, String storeID, String codeInfo, String codeType) {
         try {
             JSONObject params = new JSONObject();
             params.put("code_info", codeInfo);
             params.put("code_type", codeType);
 
-            String urlString = String.format(URLs.API_BARCODE_SCAN_PATH, URLs.kBaseUrl, groupID, roleID, userNum);
-            Map<String, String> response = HttpUtil.httpPost(urlString, params);
-            String responseString = response.get("body");
+            String urlString = String.format(URLs.API_BARCODE_SCAN_PATH, URLs.kBaseUrl, groupID, roleID, userNum, storeID, codeInfo, codeType);
+            Map<String, String> response = HttpUtil.httpGet(urlString, new HashMap());
+            // Map<String, String> response = HttpUtil.httpPost(urlString, params);
 
-            if(response.get("code") == null || !response.get("code").equals("200")) {
-                responseString = String.format("{\"商品编号\": \"%s\",  \"状态\": \"%s\", \"order_keys\": [\"商品编号\",  \"状态\"]}", codeInfo, responseString);
+            String responseString = response.get("body");
+            if (!response.get("code").equals("200") && !response.get("code").equals("201")) {
+                responseString = "{\"chart\": \"[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]\", \"tabs\": [{ title: \"提示\", table: { length: 1, \"1\": [\"获取数据失败...\"]}}]}";
             }
 
             FileUtil.barCodeScanResult(mContext, responseString);

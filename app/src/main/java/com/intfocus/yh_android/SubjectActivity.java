@@ -132,6 +132,12 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                 ImageView bannerSearch = (ImageView) findViewById(R.id.bannerSearch);
                 bannerSearch.setVisibility(View.VISIBLE);
 
+                if(!URLs.kSubjectDisplayComment && !URLs.kSubjectDisplayShare) {
+                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(50, RelativeLayout.LayoutParams.MATCH_PARENT);
+                    params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+                    bannerSearch.setLayoutParams(params);
+                }
+
                 String selectedItem = FileUtil.reportSelectedItem(mContext, String.format("%d", groupID), templateID, reportID);
                 if (selectedItem == null || selectedItem.length() == 0) {
                     ArrayList<String> items = FileUtil.reportSearchItems(mContext, String.format("%d", groupID), templateID, reportID);
@@ -214,7 +220,11 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         }
 
-        loadHtml();
+        mWebView.post(new Runnable() {
+            @Override public void run() {
+                loadHtml();
+            }
+        });
     }
 
     private void loadHtml() {
@@ -387,6 +397,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                     e.printStackTrace();
                 }
             }
+
             loadHtml();
 
             return null;

@@ -406,20 +406,13 @@ public class FileUtil {
      */
     public static void barCodeScanResult(Context mContext, String responseString) {
         try {
-            String javascriptPath = FileUtil.sharedPath(mContext) + "/assets/javascripts/barcode_scan_result.js";
+            String javascriptPath = FileUtil.sharedPath(mContext) + "/BarCodeScan/assets/javascripts/bar_code_data.js";
             String javascriptContent = new StringBuilder()
-                .append("(function() {\n")
-                .append("  var response = " + responseString + ",\n")
-                .append("      order_keys = response.order_keys,\n")
-                .append("      array = [], key, value, i;\n")
-                .append("  for(i = 0; i < order_keys.length; i ++) {\n")
-                .append("    key = order_keys[i];\n")
-                .append("    value = response[key];\n")
-                .append("    array.push('<tr><td>' + key + '</td><td>' + value + '</td></tr>');\n")
-                .append("  }\n")
-                .append("  document.getElementById('result').innerHTML = array.join('');\n")
+                .append("(function() {")
+                .append("  window.BarCodeData = " + responseString)
                 .append("}).call(this);")
                 .toString();
+
             Log.i("javascriptContent", javascriptContent);
             FileUtil.writeFile(javascriptPath, javascriptContent);
         } catch(IOException e) {

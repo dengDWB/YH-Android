@@ -14,12 +14,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by lijunjie on 16/6/10.
  */
 public class BarCodeResultActivity extends BaseActivity {
-  private String htmlContent, htmlPath, codeInfo, codeType, groupID, roleID, userNum;
+  private String htmlContent, htmlPath, cachedPath;
+  private String codeInfo, codeType, groupID, roleID, userNum;
+  private String storeID;
 
   @Override
   public void onCreate(Bundle state) {
@@ -40,8 +43,10 @@ public class BarCodeResultActivity extends BaseActivity {
     colorViews.add((ImageView) findViewById(R.id.colorView4));
     initColorView(colorViews);
 
-    htmlPath = sharedPath + "/barcode_scan_result.html";
-    htmlContent = FileUtil.assetsFileContent(mContext, "barcode_scan_result.html");
+    String htmlOriginPath = sharedPath + "/BarCodeScan/scan_bar_code.html";
+    htmlContent = FileUtil.readFile(htmlOriginPath);
+    cachedPath = FileUtil.dirPath(mContext, "Cached", "barcode.json");
+    htmlPath = String.format("%s.tmp", htmlOriginPath);
 
     try {
       Intent intent = getIntent();
@@ -50,6 +55,27 @@ public class BarCodeResultActivity extends BaseActivity {
       groupID = user.getString("group_id");
       roleID = user.getString("role_id");
       userNum = user.getString("user_num");
+
+      /*
+       * 初始化默认选中门店（第一家）
+       */
+      JSONObject cachedJSON = FileUtil.readConfigFile(cachedPath);
+      if((!cachedJSON.has("store") || !cachedJSON.getJSONObject("store").has("id")) &&
+          user.has("store_ids") && user.getJSONArray("store_ids").length() > 0) {
+        cachedJSON.put("store", user.getJSONArray("store_ids").get(0));
+        FileUtil.writeFile(cachedPath, cachedJSON.toString());
+      }
+
+      /*
+       * 商品条形码写入缓存
+       */
+      JSONObject cachedCodeJSON = new JSONObject();
+      cachedCodeJSON.put("code_info", codeInfo);
+      cachedCodeJSON.put("code_type", codeType);
+      cachedJSON.put("barcode", cachedCodeJSON);
+      FileUtil.writeFile(cachedPath, cachedJSON.toString());
+
+      storeID = cachedJSON.getJSONObject("store").getString("id");
     } catch (JSONException e) {
       e.printStackTrace();
     } catch (Exception e) {
@@ -58,17 +84,17 @@ public class BarCodeResultActivity extends BaseActivity {
   }
 
   @Override
-  public void onStart() {
-    super.onStart();
+  public void onResume() {
+    super.onResume();
 
-    String loadingString = String.format("{\"商品编号\": \"%s\",  \"状态\": \"处理中...\", \"order_keys\": [\"商品编号\",  \"状态\"]}", codeInfo);
+    String loadingString = "{\"chart\": \"[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]\", \"tabs\": [{ title: \"提示\", table: { length: 1, \"1\": [\"加载中...\"]}}]}";
     FileUtil.barCodeScanResult(mContext, loadingString);
     updateHtmlContentTimetamp();
     mWebView.loadUrl(String.format("file:///%s", htmlPath));
 
     new Thread(new Runnable() {
       @Override public void run() {
-        ApiHelper.barCodeScan(mContext, groupID, roleID, userNum, codeInfo, codeType);
+        ApiHelper.barCodeScan(mContext, groupID, roleID, userNum, storeID, codeInfo, codeType);
         updateHtmlContentTimetamp();
 
         runOnUiThread(new Runnable() {
@@ -95,5 +121,10 @@ public class BarCodeResultActivity extends BaseActivity {
     } catch(IOException e) {
       e.printStackTrace();
     }
+  }
+
+  public void actionLaunchStoreSelectorActivity(View v) throws InterruptedException {
+    Intent intent = new Intent(mContext, StoreSelectorActivity.class);
+    mContext.startActivity(intent);
   }
 }

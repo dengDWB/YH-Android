@@ -26,7 +26,7 @@ public class URLs extends PrivateURLs implements Serializable {
     public final static String API_ACTION_LOG_PATH      = "%s/api/v1/android/logger";
 
     public final static String API_PUSH_DEVICE_TOKEN_PATH = "%s/api/v1/device/%s/push_token/%s";
-    public final static String API_BARCODE_SCAN_PATH      = "%s/api/v1/group/%s/role/%s/user/%s/barcode_scan";
+    public final static String API_BARCODE_SCAN_PATH      = "%s/api/v1/group/%s/role/%s/user/%s/store/%s/barcode_scan?code_info=%s&code_type=%s";
     public final static String API_ASSETS_PATH            = "%s/api/v1/download/%s.zip";
 
     public final static String KPI_PATH                  = "%s/mobile/%s/group/%s/role/%s/kpi";

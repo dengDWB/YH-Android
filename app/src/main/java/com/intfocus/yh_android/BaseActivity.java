@@ -352,8 +352,12 @@ public class BaseActivity extends Activity {
         }
 
         private void showWebViewForWithoutNetwork() {
-            String urlStringForLoading = loadingPath("400");
-            mWebView.loadUrl(urlStringForLoading);
+            mWebView.post(new Runnable() {
+                @Override public void run() {
+                    String urlStringForLoading = loadingPath("400");
+                    mWebView.loadUrl(urlStringForLoading);
+                }
+            });
         }
 
         private void showDialogForDeviceForbided() {
@@ -461,8 +465,12 @@ public class BaseActivity extends Activity {
         }
 
         private void showWebViewForWithoutNetwork() {
-            String urlStringForLoading = loadingPath("400");
-            mWebView.loadUrl(urlStringForLoading);
+            mWebView.post(new Runnable() {
+                @Override public void run() {
+                    String urlStringForLoading = loadingPath("400");
+                    mWebView.loadUrl(urlStringForLoading);
+                }
+            });
         }
 
         @Override
@@ -762,7 +770,12 @@ public class BaseActivity extends Activity {
     }
 
     protected void toast(String info) {
-        Toast.makeText(mContext, info, Toast.LENGTH_SHORT).show();
+        try {
+            Toast.makeText(mContext, info, Toast.LENGTH_SHORT).show();
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     class DownloadAssetsTask extends AsyncTask<String, Integer, String> {

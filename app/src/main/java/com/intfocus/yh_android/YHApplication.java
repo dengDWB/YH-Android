@@ -45,8 +45,13 @@ public class YHApplication extends Application {
             String currentActivityName = null;
             Activity currentActivity = ((YHApplication)context.getApplicationContext()).getCurrentActivity();
             if(currentActivity != null) {
-                currentActivityName = currentActivity.getClass().getSimpleName();
-                Log.i("currentActivityName", currentActivityName.trim().equals("ConfirmPassCodeActivity") ? "YES" : "NO");
+                try {
+                    currentActivityName = currentActivity.getClass().getSimpleName();
+                    Log.i("currentActivityName", currentActivityName.trim().equals("ConfirmPassCodeActivity") ? "YES" : "NO");
+                }
+                catch(NoSuchMethodError e) {
+                    e.printStackTrace();;
+                }
             }
             Log.i("currentActivityName", "[" + currentActivityName + "]");
             if ((currentActivityName != null && !currentActivityName.trim().equals("ConfirmPassCodeActivity")) && // 当前活动的Activity非解锁界面
@@ -101,6 +106,7 @@ public class YHApplication extends Application {
         FileUtil.checkAssets(mContext, "images", true);
         FileUtil.checkAssets(mContext, "stylesheets", true);
         FileUtil.checkAssets(mContext, "javascripts", true);
+        FileUtil.checkAssets(mContext, "BarCodeScan", false);
 
         /*
          *  手机待机再激活时发送开屏广播

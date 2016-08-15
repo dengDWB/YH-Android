@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.intfocus.yh_android.SubjectActivity">
+    tools:context=".CommentActivity">
 
     <RelativeLayout
         android:id="@+id/actionBar"
@@ -17,26 +17,16 @@
             android:onClick="dismissActivity" />
 
         <TextView
-            style="@style/BannerBackText"
+            android:id="@+id/bannerBackText"
             android:layout_toRightOf="@id/bannerBack"
+            style="@style/BannerBackText"
             android:onClick="dismissActivity" />
 
         <TextView
             android:id="@+id/bannerTitle"
-            android:text="商品信息"
+            android:text="筛选列表"
             style="@style/BannerTitle" />
 
-        <ImageView
-            android:id="@+id/bannerSearch"
-            android:src="@drawable/banner_search"
-            style="@style/BannerButton"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:paddingTop="16dp"
-            android:layout_marginLeft="-10dp"
-            android:layout_alignBottom="@+id/colorViewLayout"
-            android:layout_alignParentRight="true"
-            android:onClick="actionLaunchStoreSelectorActivity" />
 
         <RelativeLayout
             android:id="@+id/colorViewLayout"
@@ -66,10 +56,16 @@
 
     </RelativeLayout>
 
-    <android.webkit.WebView
-        android:id="@+id/browser"
-        android:visibility="visible"
+    <RelativeLayout
+        android:layout_below="@+id/actionBar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/actionBar" />
+        android:layout_height="match_parent">
+        <ListView
+            android:id="@+id/listStores"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+        </ListView>
+    </RelativeLayout>
+
+
 </RelativeLayout>
