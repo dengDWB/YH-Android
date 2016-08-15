@@ -101,6 +101,7 @@ public class YHApplication extends Application {
         FileUtil.checkAssets(mContext, "images", true);
         FileUtil.checkAssets(mContext, "stylesheets", true);
         FileUtil.checkAssets(mContext, "javascripts", true);
+        FileUtil.checkAssets(mContext, "BarCodeScan", false);
 
         /*
          *  手机待机再激活时发送开屏广播

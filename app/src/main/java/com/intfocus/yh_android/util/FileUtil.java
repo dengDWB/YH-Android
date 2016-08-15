@@ -148,7 +148,14 @@ public class FileUtil {
      */
     public static void writeFile(String pathName, String content) throws IOException {
         File file = new File(pathName);
-        if (file.exists()) { file.delete(); }
+        Log.i("barcode",pathName);
+        if (file.exists()) {
+            Log.i("barcode","文件存在");
+            file.delete();
+        }
+        else {
+            Log.i("barcode","文件不存在");
+        }
 
         file.createNewFile();
         FileOutputStream out = new FileOutputStream(file, true);
@@ -406,18 +413,11 @@ public class FileUtil {
      */
     public static void barCodeScanResult(Context mContext, String responseString) {
         try {
-            String javascriptPath = FileUtil.sharedPath(mContext) + "/assets/javascripts/barcode_scan_result.js";
+            String javascriptPath = FileUtil.sharedPath(mContext) + "/BarCodeScan/assets/javascripts/bar_code_data.js";
+            Log.i("barcode",javascriptPath);
             String javascriptContent = new StringBuilder()
                 .append("(function() {\n")
-                .append("  var response = " + responseString + ",\n")
-                .append("      order_keys = response.order_keys,\n")
-                .append("      array = [], key, value, i;\n")
-                .append("  for(i = 0; i < order_keys.length; i ++) {\n")
-                .append("    key = order_keys[i];\n")
-                .append("    value = response[key];\n")
-                .append("    array.push('<tr><td>' + key + '</td><td>' + value + '</td></tr>');\n")
-                .append("  }\n")
-                .append("  document.getElementById('result').innerHTML = array.join('');\n")
+                .append("  window.BarCodeData = " + responseString + "\n")
                 .append("}).call(this);")
                 .toString();
             Log.i("javascriptContent", javascriptContent);
@@ -478,7 +478,6 @@ public class FileUtil {
 
         return searchItems;
     }
-
 
     /**
      *  内部报表具有筛选功能时，用户选择的选项，默认第一个选项

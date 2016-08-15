@@ -239,7 +239,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
              */
             isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
             if(isSupportSearch) {
-                displayBannerTitleAndSearchIcon();;
+                displayBannerTitleAndSearchIcon();
             }
 
             new Thread(new Runnable() {

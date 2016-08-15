@@ -95,6 +95,10 @@
             android:name="com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
+        <activity
+            android:name="com.intfocus.yh_android.StoreSelectorActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
 
         <!-- 蒲公英 必选-->
         <meta-data
