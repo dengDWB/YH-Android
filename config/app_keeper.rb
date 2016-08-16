@@ -43,8 +43,15 @@ def xml_meta_data_sub(content, doc, key, value)
 end
 
 def xml_string_sub(content, doc, key, value)
-  meta_data_value = doc.xpath(%(//string[@name='#{key}'])).first.text
-  content.sub(meta_data_value, value)
+  meta_datas = doc.xpath(%(//string[@name='#{key}']))
+  if meta_datas && meta_datas.first
+    meta_data_value = meta_datas.first.text
+    content = content.sub(meta_data_value, value)
+  else
+    puts %(#{key} not found; #{value})
+  end
+
+  content
 end
 
 slop_opts = Slop.parse do |o|
@@ -116,9 +123,7 @@ if slop_opts[:mipmap]
   puts %(- done: loading zip)
   `cp -f config/Assets/loading-#{current_app}.zip app/src/main/assets/loading.zip`
   puts %(- done: banner_logo)
-  `cp -f config/Assets/banner-logo-#{current_app}.png app/src/main/res/drawable/banner_logo.png`
-  puts %(- done: banner_setting)
-  `cp -f config/Assets/banner-setting-#{current_app}.png app/src/main/res/drawable/banner_setting.png`
+  `cp -f config/Assets/drawable-#{current_app}/*.png app/src/main/res/drawable/`
 end
 
 #
@@ -163,6 +168,7 @@ if slop_opts[:res]
   manifest_nokogiri = Nokogiri.XML(strings_content)
   strings_content = xml_string_sub(strings_content, manifest_nokogiri, 'app_name', current_app_name)
   strings_content = xml_string_sub(strings_content, manifest_nokogiri, 'title_activity_main', current_app_name)
+  strings_content = xml_string_sub(strings_content, manifest_nokogiri, 'login_slogan_text', Settings.slogan_text)
 
   puts %(- done: res/strings.xml: #{current_app_name})
   File.open(strings_xml_path, 'w:utf-8') do |file|

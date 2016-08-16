@@ -22,4 +22,16 @@
     <string name="eight">8</string>
     <string name="nine">9</string>
     <string name="period">.</string>
+    <string name="login_submit">登录</string>
+    <string name="login_password_placeholder">请输入密码</string>
+    <string name="login_username_placeholder">请输入账号</string>
+    <string name="login_slogan_text">融合共享，成于至善</string>
+    <string name="text_dashboard">仪表盘</string>
+    <string name="text_analysis">分析</string>
+    <string name="text_app">应用</string>
+    <string name="text_message">消息</string>
+    <string name="text_scan">扫一扫</string>
+    <string name="text_help_feedback">帮助与反馈</string>
+    <string name="text_user_info">用户信息</string>
+    <string name="text_add_friend">添加朋友</string>
 </resources>

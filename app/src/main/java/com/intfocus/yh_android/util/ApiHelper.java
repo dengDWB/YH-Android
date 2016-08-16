@@ -29,9 +29,7 @@ public class ApiHelper {
      * params: {device: {name, platform, os, os_version, uuid}}
      */
     public static String authentication(Context context, String username, String password) {
-        String ret = "success", urlString = String.format(URLs.API_USER_PATH, URLs.kBaseUrl,
-            "android",
-            username, password);
+        String responseState = "success", urlString = String.format(URLs.API_USER_PATH, URLs.kBaseUrl, "android", username, password);
         try {
             JSONObject device = new JSONObject();
             device.put("name", android.os.Build.MODEL);
@@ -91,13 +89,13 @@ public class ApiHelper {
 
                 FileUtil.writeFile(settingsConfigPath, userJSON.toString());
             } else {
-                ret = responseJSON.getString("info");
+                responseState = responseJSON.getString("info");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            ret = e.getMessage();
+            responseState = e.getMessage();
         }
-        return ret;
+        return responseState;
     }
 
     /*

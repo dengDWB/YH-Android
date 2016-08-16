@@ -5,16 +5,17 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.WindowManager;
-import android.webkit.JavascriptInterface;
-import com.handmark.pulltorefresh.library.PullToRefreshWebView;
+import android.view.View;
+import android.widget.EditText;
 import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.URLs;
-import org.json.JSONObject;
 
 public class LoginActivity extends BaseActivity {
+    private EditText usernameEditText, passwordEditText;
+    private String usernameString, passwordString;
+
     @Override
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,17 +51,8 @@ public class LoginActivity extends BaseActivity {
             checkPgyerVersionUpgrade(false);
         }
 
-        pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
-        initWebView();
-        setPullToRefreshWebView(false);
-
-        mWebView.requestFocus();
-        mWebView.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");
-
-        /*
-         * 登录界面
-         */
-        mWebView.loadUrl(loadingPath("login"));
+        usernameEditText = (EditText) findViewById(R.id.etUsername);
+        passwordEditText = (EditText) findViewById(R.id.etPassword);
 
         /*
          * 检测登录界面，版本是否升级
@@ -70,7 +62,9 @@ public class LoginActivity extends BaseActivity {
 
     protected void onResume() {
         mMyApp.setCurrentActivity(this);
-        if(mProgressDialog != null)  mProgressDialog.dismiss();
+        if(mProgressDialog != null)  {
+            mProgressDialog.dismiss();
+        }
 
         super.onResume();
     }
@@ -82,14 +76,11 @@ public class LoginActivity extends BaseActivity {
         super.onDestroy();
     }
 
-    private class JavaScriptInterface extends JavaScriptBase {
-        /*
-         * JS 接口，暴露给JS的方法使用@JavascriptInterface装饰
-         */
-        @JavascriptInterface
-        public void login(final String username, final String password) {
-
-            if (username.isEmpty() || password.isEmpty()) {
+    public void actionSubmit(View v) {
+        try {
+            usernameString = usernameEditText.getText().toString();
+            passwordString = passwordEditText.getText().toString();
+            if (usernameString.isEmpty() || passwordString.isEmpty()) {
                 toast("请输入用户名与密码");
                 return;
             }
@@ -97,61 +88,47 @@ public class LoginActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
                     mProgressDialog = ProgressDialog.show(LoginActivity.this, "稍等", "验证用户信息...");
                 }
             });
 
-            try {
-                String info = ApiHelper.authentication(mContext, username, URLs.MD5(password));
-                if (info.compareTo("success") > 0) {
-                    if(mProgressDialog != null)  mProgressDialog.dismiss();
-                    toast(info);
-                    return;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    final String info = ApiHelper.authentication(mContext, usernameString, URLs.MD5(passwordString));
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (info.compareTo("success") > 0 || info.compareTo("success") < 0) {
+                                if (mProgressDialog != null) {
+                                    mProgressDialog.dismiss();
+                                }
+                                toast(info);
+                                return;
+                            }
+
+                            // 检测用户空间，版本是否升级
+                            assetsPath = FileUtil.dirPath(mContext, URLs.HTML_DIRNAME);
+                            checkVersionUpgrade(assetsPath);
+
+                            // 跳转至主界面
+                            Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            LoginActivity.this.startActivity(intent);
+
+                            if (mProgressDialog != null) {
+                                mProgressDialog.dismiss();
+                            }
+
+                            finish();
+                        }
+                    });
                 }
-
-                // 检测用户空间，版本是否升级
-                assetsPath = FileUtil.dirPath(mContext, URLs.HTML_DIRNAME);
-                checkVersionUpgrade(assetsPath);
-
-                /*
-                 * 用户行为记录, 单独异常处理，不可影响用户体验
-                 */
-                try {
-                    logParams = new JSONObject();
-                    logParams.put("action", "登录");
-                    new Thread(mRunnableForLogger).start();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // 跳转至主界面
-                Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                LoginActivity.this.startActivity(intent);
-
-                if(mProgressDialog != null)  mProgressDialog.dismiss();
-                finish();
-            } catch (Exception e) {
-                e.printStackTrace();
-                if(mProgressDialog != null)  mProgressDialog.dismiss();
-                toast(e.getLocalizedMessage());
-            }
-        }
-
-        @JavascriptInterface
-        public void jsException(final String ex) {
-            /*
-             * 用户行为记录, 单独异常处理，不可影响用户体验
-             */
-            try {
-                logParams = new JSONObject();
-                logParams.put("action", "JS异常");
-                logParams.put("obj_title", String.format("登录页面/%s", ex));
-                new Thread(mRunnableForLogger).start();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            }).start();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (mProgressDialog != null) mProgressDialog.dismiss();
+            toast(e.getLocalizedMessage());
         }
     }
 }
