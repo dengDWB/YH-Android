@@ -55,7 +55,7 @@ def xml_string_sub(content, doc, key, value)
 end
 
 slop_opts = Slop.parse do |o|
-  o.string '-a', '--app', 'current app', default: 'yonghui'
+  o.string '-a', '--app', 'current app'
   o.bool '-g', '--gradle', 'bundle.gradle', default: false
   o.bool '-m', '--mipmap', 'update mipmap', default: false
   o.bool '-x', '--manifest', 'AndroidManifest.xml', default: false
@@ -75,7 +75,7 @@ slop_opts = Slop.parse do |o|
   end
 end
 
-current_app = slop_opts[:app]
+current_app = slop_opts[:app] || `cat .current-app`.strip
 bundle_display_hash = {
   yonghui: '永辉生意人',
   yonghuitest: '永辉应用(测试)',
