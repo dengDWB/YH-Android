@@ -2,7 +2,10 @@ package com.intfocus.yh_android;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -41,8 +44,7 @@ import org.json.JSONObject;
 
 public class DashboardActivity extends BaseActivity {
 	private static final int ZBAR_CAMERA_PERMISSION = 1;
-	private int objectType;
-	private int displayDpi;
+	private int objectType,kpiCount,analyseCount,appCount,messageCount;
 	private TabView mCurrentTab;
 	private BadgeView bvKpi;
 	private BadgeView bvAnalyse;
@@ -51,10 +53,13 @@ public class DashboardActivity extends BaseActivity {
 	private BadgeView bvBannerSetting;
 	private PopupWindow popupWindow;
 	private View popupView;
+	private NotifitionBroadcastReceiver notifitionBroadcastReceiver;
 	private JSONObject notifition = new JSONObject();
 
 	private String notifitionGetUrl = "http://iamjay.name/api/notifications/liurl/list";
 	private String notifitionPostUrl = "http://iamjay.name/api/notifications/liurl/read/%s";
+
+	public static final String ACTION_UPDATENOTIFITION = "action.updateNotifition";
 
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
@@ -73,11 +78,6 @@ public class DashboardActivity extends BaseActivity {
 		mWebView.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");
 		mWebView.loadUrl(urlStringForLoading);
 
-		//获取当前设备屏幕密度
-		DisplayMetrics dm = getResources().getDisplayMetrics();
-		displayDpi = dm.densityDpi;
-		Log.i("display","屏幕密度为：" + displayDpi);
-
 		try {
 			objectType = 1;
 			urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion(), user.getString("group_id"), user.getString("role_id"));
@@ -86,7 +86,6 @@ public class DashboardActivity extends BaseActivity {
 		}
 
 		initTab();
-		new initNotifition().execute();
 
 		List<ImageView> colorViews = new ArrayList<>();
 		colorViews.add((ImageView) findViewById(R.id.colorView0));
@@ -122,6 +121,16 @@ public class DashboardActivity extends BaseActivity {
 			mWebView.clearCache(true);
 		}
 
+		//动态注册广播
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(ACTION_UPDATENOTIFITION);
+		notifitionBroadcastReceiver = new NotifitionBroadcastReceiver();
+		registerReceiver(notifitionBroadcastReceiver, filter);
+
+		//打开服务
+		Intent startService = new Intent(this,NotifitionService.class);
+		startService(startService);
+
         /*
 		 * 检测服务器静态资源是否更新，并下载
          */
@@ -138,6 +147,7 @@ public class DashboardActivity extends BaseActivity {
 		mContext = null;
 		mWebView = null;
 		user = null;
+		unregisterReceiver(notifitionBroadcastReceiver);
 		super.onDestroy();
 	}
 
@@ -175,47 +185,31 @@ public class DashboardActivity extends BaseActivity {
 	}
 
 	/*
-	 * 读取服务器通知信息,若有通知，添加小红点
+	 * 定义广播接收器（内部类）
 	 */
-	private class initNotifition extends AsyncTask<Void, Void, Map<String, String>> {
-		@Override
-		protected Map<String, String> doInBackground(Void... voids) {
-			Map<String, String> response = HttpUtil.httpGet(notifitionGetUrl,
-					new HashMap<String, String>());
-			Log.i("notifition",response.get("body").toString());
-			return response;
-		}
+	private class NotifitionBroadcastReceiver extends BroadcastReceiver {
 
 		@Override
-		protected void onPostExecute(Map<String, String> response) {
-			super.onPostExecute(response);
+		public void onReceive(Context context, Intent intent) {
+			kpiCount = intent.getExtras().getInt("kpi");
+			analyseCount = intent.getExtras().getInt("analyse");
+			appCount = intent.getExtras().getInt("app");
+			messageCount = intent.getExtras().getInt("message");
 
-			int statusCode = Integer.parseInt(response.get("code"));
-			if (statusCode == 200) {
-				try {
-					notifition = new JSONObject(response.get("body").toString());
-
-					if (notifition.getInt("tab_kpi") > 0) {
-						setBadgeView(bvKpi);
-					}
-					if (notifition.getInt("tab_analyse") > 0) {
-						setBadgeView(bvAnalyse);
-					}
-					if (notifition.getInt("tab_app") > 0) {
-						setBadgeView(bvApp);
-					}
-					if (notifition.getInt("tab_message") > 0) {
-						setBadgeView(bvMessage);
-					}
-					if (notifition.getInt("setting") > 0) {
-						setBadgeView(bvBannerSetting);
-					}
-				} catch (JSONException e) {
-					Log.i("notifition", "notifition is wrong");
-					e.printStackTrace();
-				}
+			if (kpiCount > 0) {
+				setBadgeView(bvKpi);
+			}
+			if (analyseCount > 0) {
+				setBadgeView(bvAnalyse);
+			}
+			if (appCount > 0) {
+				setBadgeView(bvApp);
+			}
+			if (messageCount > 0) {
+				setBadgeView(bvMessage);
 			}
 		}
+
 	}
 
 	/*
