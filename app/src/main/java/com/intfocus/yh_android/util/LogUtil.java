@@ -24,6 +24,6 @@ public class LogUtil {
    * Log.d(tag, str)
    */
   public static void d(String tag, String str) {
-     // LogUtil.d(tag, str, 0);
+     LogUtil.d(tag, str, 0);
   }
 }

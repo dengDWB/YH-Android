@@ -7,7 +7,7 @@
 ##############################################################################
 
 case "$1" in
-  yonghui|shengyiplus|qiyoutong|test)
+  yonghui|shengyiplus|qiyoutong|yonghuitest|test)
     # bundle exec ruby config/app_keeper.rb --app=shengyiplus --gradle --mipmap --manifest --res --java --apk --pgyer
     bundle exec ruby config/app_keeper.rb --app="$1" --gradle --mipmap --manifest --res --java
   ;;

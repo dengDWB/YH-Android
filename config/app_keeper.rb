@@ -78,6 +78,7 @@ end
 current_app = slop_opts[:app]
 bundle_display_hash = {
   yonghui: '永辉生意人',
+  yonghuitest: '永辉应用(测试)',
   qiyoutong: '企邮通',
   shengyiplus: '生意+'
 }

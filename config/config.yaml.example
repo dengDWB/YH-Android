@@ -37,6 +37,42 @@ yonghui:
     android:
       app_id: '-'
       app_secret: '-'
+yonghuitest:
+  slogan: '融合共享，成于至善'
+  application_id: 'com.intfocus.-'
+  display_status:
+    tab_bar: 1
+    kpi: 1
+    analyse: 1
+    app: 1
+    message: 1
+    comment: 1
+    share: 1
+  key_store:
+    path: 'key-store/yh-test.jks'
+    password: '-'
+    alias: '-'
+    alias_password: '-'
+  server: 'http://yonghui.idata.mobi'
+  pgyer:
+    ios: '-'
+    android: '-'
+    <<: *pgyer
+  umeng: 
+    ios: 
+      app_key: '-'
+      app_master_secret: '-'
+    android: 
+      app_key: '-'
+      umeng_message_secret: '-'
+      app_master_secret: '-'
+  umeng_weixin:
+    ios:
+      app_id: '-'
+      app_secret: '-'
+    android:
+      app_id: '-'
+      app_secret: '-'
 shengyiplus:
   slogan: '融合共享，成于至善'
   application_id: 'com.intfocus.-'
