@@ -31,7 +31,7 @@
     <string name="text_app">应用</string>
     <string name="text_message">消息</string>
     <string name="text_scan">扫一扫</string>
-    <string name="text_help_feedback">帮助与反馈</string>
-    <string name="text_user_info">用户信息</string>
-    <string name="text_add_friend">添加朋友</string>
+    <string name="text_search">搜索</string>
+    <string name="text_user_info">个人信息</string>
+    <string name="text_voice">语音播报</string>
 </resources>

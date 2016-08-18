@@ -4,17 +4,23 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
+import com.readystatesoftware.viewbadger.BadgeView;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,11 +28,15 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
-public class DashboardActivity extends BaseActivity {
+public class DashboardActivity extends BaseActivity implements View.OnClickListener {
     private static final int ZBAR_CAMERA_PERMISSION = 1;
     private int objectType;
+    private ImageView imgSetting;
     private TabView mCurrentTab;
+    private PopupWindow popupWindow;
+    private BadgeView bvUser, bvVoice;
+    private BadgeView bvKpi,bvAnalyse,bvApp,bvMessage,bvSetting;
+    private LinearLayout linearUserInfo,linearScan,linearVoice,linearSearch;
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -34,17 +44,9 @@ public class DashboardActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        ImageView bannerCodeScan = (ImageView) findViewById(R.id.bannerCodeScan);
-        bannerCodeScan.setVisibility(URLs.kDashboardDisplayScanCode ? View.VISIBLE : View.INVISIBLE);
-
-        pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
-        initWebView();
-        setPullToRefreshWebView(true);
-
-        mWebView.requestFocus();
-        mWebView.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");
-        mWebView.loadUrl(urlStringForLoading);
-
+        /*
+         * 默认标签栏选中【仪表盘】
+         */
         try {
             objectType = 1;
             urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion(), user.getString("group_id"), user.getString("role_id"));
@@ -52,41 +54,19 @@ public class DashboardActivity extends BaseActivity {
             e.printStackTrace();
         }
 
+        imgSetting = (ImageView) findViewById(R.id.btnSetting);
+        bvSetting = new BadgeView(DashboardActivity.this, imgSetting);
+        bvSetting.setId(7);
+
+        loadWebView();
         initTab();
+        initUserIDColorView();
+        initPopupView();
 
-        List<ImageView> colorViews = new ArrayList<>();
-        colorViews.add((ImageView) findViewById(R.id.colorView0));
-        colorViews.add((ImageView) findViewById(R.id.colorView1));
-        colorViews.add((ImageView) findViewById(R.id.colorView2));
-        colorViews.add((ImageView) findViewById(R.id.colorView3));
-        colorViews.add((ImageView) findViewById(R.id.colorView4));
-        initColorView(colorViews);
-
-        Intent intent = getIntent();
-        if (intent.hasExtra("from_activity")) {
-            checkVersionUpgrade(assetsPath);
-            checkPgyerVersionUpgrade(false);
-
-            new Thread(new Runnable() {
-                @Override
-                public synchronized void run() {
-                    try {
-                        String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
-                        JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
-
-                        String info = ApiHelper.authentication(mContext, userJSON.getString("user_num"), userJSON.getString("password"));
-                        if (!info.isEmpty() && info.contains("用户") || info.contains("密码")) {
-                            userJSON.put("is_login", false);
-                            FileUtil.writeFile(userConfigPath, userJSON.toString());
-                        }
-                    } catch (JSONException | IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-        } else {
-            mWebView.clearCache(true);
-        }
+        /*
+         * 通过解屏进入界面后，进行用户验证
+         */
+        checkWhetherFromScreenLockActivity();
 
         /*
          * 检测服务器静态资源是否更新，并下载
@@ -100,11 +80,141 @@ public class DashboardActivity extends BaseActivity {
         super.onResume();
     }
 
+    @Override
+    protected void onStop() {
+        popupWindow.dismiss();
+        super.onStop();
+    }
+
     protected void onDestroy() {
         mContext = null;
         mWebView = null;
         user = null;
+        popupWindow.dismiss();
         super.onDestroy();
+    }
+
+    /*
+     * 配置 mWebView
+     */
+    public void loadWebView() {
+        pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
+        initWebView();
+        setPullToRefreshWebView(true);
+
+        mWebView.requestFocus();
+        mWebView.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");
+        mWebView.loadUrl(urlStringForLoading);
+    }
+
+    /*
+     * 通过解屏进入界面后，进行用户验证
+     */
+    public void checkWhetherFromScreenLockActivity() {
+        Intent intent = getIntent();
+        if (intent.hasExtra("from_activity")) {
+            checkVersionUpgrade(assetsPath);
+            checkPgyerVersionUpgrade(false);
+
+            new Thread(new Runnable() {
+                @Override
+                public synchronized void run() {
+                    try {
+                        String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
+                        JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
+
+                        String info = ApiHelper.authentication(mContext, userJSON.getString("user_num"), userJSON.getString("password"));
+                        if (!info.isEmpty() && (info.contains("用户") || info.contains("密码"))) {
+                            userJSON.put("is_login", false);
+                            FileUtil.writeFile(userConfigPath, userJSON.toString());
+                        }
+                    } catch (JSONException | IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        } else {
+            mWebView.clearCache(true);
+        }
+    }
+
+    /*
+     * 用户编号
+     */
+    public void initUserIDColorView() {
+        List<ImageView> colorViews = new ArrayList<>();
+        colorViews.add((ImageView) findViewById(R.id.colorView0));
+        colorViews.add((ImageView) findViewById(R.id.colorView1));
+        colorViews.add((ImageView) findViewById(R.id.colorView2));
+        colorViews.add((ImageView) findViewById(R.id.colorView3));
+        colorViews.add((ImageView) findViewById(R.id.colorView4));
+        initColorView(colorViews);
+    }
+
+    /*
+     * 标题栏设置按钮下拉菜单样式
+     */
+    public void initPopupView() {
+        View contentView = LayoutInflater.from(this).inflate(R.layout.activity_dashboard_dialog,null);
+
+        linearUserInfo = (LinearLayout) contentView.findViewById(R.id.linearUserInfo);
+        linearScan = (LinearLayout) contentView.findViewById(R.id.linearScan);
+        linearSearch = (LinearLayout) contentView.findViewById(R.id.linearSearch);
+        linearVoice = (LinearLayout) contentView.findViewById(R.id.linearVoice);
+
+        bvUser = new BadgeView(DashboardActivity.this, linearUserInfo);
+        bvVoice = new BadgeView(DashboardActivity.this, linearVoice);
+
+        setRedDot(bvUser,false);
+        setRedDot(bvVoice,false);
+
+        linearUserInfo.setOnClickListener(this);
+        linearScan.setOnClickListener(this);
+        linearSearch.setOnClickListener(this);
+        linearVoice.setOnClickListener(this);
+
+        popupWindow = new PopupWindow(this);
+
+        popupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setContentView(contentView);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
+        popupWindow.setOutsideTouchable(false);
+        popupWindow.setFocusable(true);
+    }
+
+    /*
+     * 标题栏设置按钮下拉菜单点击响应事件
+     */
+    @Override
+    public void onClick(View v) {
+        popupWindow.dismiss();
+
+        switch (v.getId()) {
+            case R.id.linearUserInfo:
+                Intent settingIntent = new Intent(mContext, SettingActivity.class);
+                mContext.startActivity(settingIntent);
+                break;
+
+            case R.id.linearScan:
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA }, ZBAR_CAMERA_PERMISSION);
+                }
+                else {
+                    Intent barCodeScannerIntent = new Intent(mContext, BarCodeScannerActivity.class);
+                    mContext.startActivity(barCodeScannerIntent);
+                }
+                break;
+
+            case R.id.linearSearch:
+                toast("【搜索】功能开发中，敬请期待");
+                break;
+
+            case R.id.linearVoice:
+                toast("【语音播报】功能开发中，敬请期待");
+                break;
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -134,6 +244,8 @@ public class DashboardActivity extends BaseActivity {
     }
 
     /*
+     * 标签栏点击响应事件
+     *
      * OBJ_TYPE_KPI = 1
      * OBJ_TYPE_ANALYSE = 2
      * OBJ_TYPE_APP = 3
@@ -195,9 +307,14 @@ public class DashboardActivity extends BaseActivity {
         }
     };
 
+    /*
+     * 标题栏点击设置按钮显示下拉菜单
+     */
     public void launchSettingActivity(View v) {
-        Intent intent = new Intent(mContext, SettingActivity.class);
-        mContext.startActivity(intent);
+        popupWindow.showAsDropDown(imgSetting, dip2px(this, -87), dip2px(this, 10));
+
+        // Intent intent = new Intent(mContext, SettingActivity.class);
+        // mContext.startActivity(intent);
 
         /*
          * 用户行为记录, 单独异常处理，不可影响用户体验
@@ -211,31 +328,9 @@ public class DashboardActivity extends BaseActivity {
         }
     }
 
-    public void launchBarCodeScannerActivity(View v) {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA }, ZBAR_CAMERA_PERMISSION);
-        } else {
-            Intent intent = new Intent(mContext, BarCodeScannerActivity.class);
-            mContext.startActivity(intent);
-        }
-    }
-
-    //@Override
-    //public void onRequestPermissionsResult(int requestCode,  String permissions[], int[] grantResults) {
-    //    switch (requestCode) {
-    //        case ZBAR_CAMERA_PERMISSION:
-    //            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-    //
-    //                Intent intent = new Intent(this, BarCodeScannerActivity.class);
-    //                startActivity(intent);
-    //            } else {
-    //                toast("Please grant camera permission to use the QR Scanner");
-    //            }
-    //            return;
-    //    }
-    //}
-
+    /*
+     * javascript & native 交互
+     */
     private class JavaScriptInterface extends JavaScriptBase {
         /*
          * JS 接口，暴露给JS的方法使用@JavascriptInterface装饰
@@ -327,5 +422,16 @@ public class DashboardActivity extends BaseActivity {
                 e.printStackTrace();
             }
         }
+    }
+    public void setRedDot(BadgeView badgeView, boolean flag) {
+        badgeView.setBadgePosition(BadgeView.POSITION_TOP_RIGHT);
+        badgeView.setWidth(dip2px(this, 7));
+        badgeView.setHeight(dip2px(this, 7));
+        //是否为最右上角
+        if(flag){
+            badgeView.setBadgeMargin(0, 0);
+        }
+
+        badgeView.show();
     }
 }

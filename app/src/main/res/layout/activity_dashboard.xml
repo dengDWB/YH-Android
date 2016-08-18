@@ -13,14 +13,6 @@
         android:background="@color/actionBar">
 
         <ImageView
-            android:id="@+id/bannerCodeScan"
-            style="@style/BannerLeftButton"
-            android:src="@drawable/banner_scan"
-            android:layout_marginTop="2dp"
-            android:layout_alignBottom="@+id/colorViewLayout"
-            android:onClick="launchBarCodeScannerActivity" />
-
-        <ImageView
             android:id="@+id/bannerLogo"
             android:src="@drawable/banner_logo"
             android:layout_width="wrap_content"
@@ -30,6 +22,7 @@
             android:layout_centerInParent="true" />
 
         <ImageView
+            android:id="@+id/btnSetting"
             android:src="@drawable/banner_setting"
             style="@style/BannerRightButton"
             android:layout_marginTop="0dp"

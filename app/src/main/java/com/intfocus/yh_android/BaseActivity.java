@@ -248,18 +248,24 @@ public class BaseActivity extends Activity {
         }
 
         // 刷新监听事件
-        pullToRefreshWebView.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener<android.webkit.WebView>() {
-            @Override
-            public void onRefresh(PullToRefreshBase<android.webkit.WebView> refreshView) {
-                new pullToRefreshTask().execute();
+        pullToRefreshWebView.setOnRefreshListener(
+            new PullToRefreshBase.OnRefreshListener<android.webkit.WebView>() {
+                @Override
+                public void onRefresh(PullToRefreshBase<android.webkit.WebView> refreshView) {
+                    new pullToRefreshTask().execute();
 
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String label = simpleDateFormat.format(System.currentTimeMillis());
-                refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
-            }
-        });
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String label = simpleDateFormat.format(System.currentTimeMillis());
+                    refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+                }
+            });
     }
 
+
+    public static int dip2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
     private class pullToRefreshTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
