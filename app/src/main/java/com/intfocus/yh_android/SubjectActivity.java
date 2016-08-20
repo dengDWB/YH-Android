@@ -65,9 +65,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         }
 
         ImageView bannerComment = (ImageView) findViewById(R.id.bannerComment);
-        bannerComment.setVisibility(URLs.kSubjectDisplayComment ? View.VISIBLE : View.GONE);
+        bannerComment.setVisibility(URLs.kSubjectComment ? View.VISIBLE : View.GONE);
         ImageView bannerShare = (ImageView) findViewById(R.id.bannerShare);
-        bannerShare.setVisibility(URLs.kSubjectDisplayShare ? View.VISIBLE : View.GONE);
+        bannerShare.setVisibility(URLs.kSubjectShare ? View.VISIBLE : View.GONE);
         ImageView bannerSearch = (ImageView) findViewById(R.id.bannerSearch);
         bannerSearch.setVisibility(View.GONE);
 
@@ -130,7 +130,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         runOnUiThread(new Runnable() {
             @Override public void run() {
                 ImageView bannerSearch = (ImageView) findViewById(R.id.bannerSearch);
-                if (!URLs.kSubjectDisplayComment && !URLs.kSubjectDisplayShare) {
+                if (!URLs.kSubjectComment && !URLs.kSubjectShare) {
                     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(dip2px(50), RelativeLayout.LayoutParams.MATCH_PARENT);
                     params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
                     bannerSearch.setLayoutParams(params);

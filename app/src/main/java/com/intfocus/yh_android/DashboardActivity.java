@@ -61,7 +61,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         loadWebView();
         initTab();
         initUserIDColorView();
-        initPopupView();
+        initDropMenu();
 
         /*
          * 通过解屏进入界面后，进行用户验证
@@ -154,33 +154,65 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
     /*
      * 标题栏设置按钮下拉菜单样式
      */
-    public void initPopupView() {
-        View contentView = LayoutInflater.from(this).inflate(R.layout.activity_dashboard_dialog,null);
+    public void initDropMenu() {
+        View contentView = LayoutInflater.from(this).inflate(R.layout.activity_dashboard_dialog, null);
 
-        linearUserInfo = (LinearLayout) contentView.findViewById(R.id.linearUserInfo);
         linearScan = (LinearLayout) contentView.findViewById(R.id.linearScan);
         linearSearch = (LinearLayout) contentView.findViewById(R.id.linearSearch);
         linearVoice = (LinearLayout) contentView.findViewById(R.id.linearVoice);
-
-        bvUser = new BadgeView(DashboardActivity.this, linearUserInfo);
-        bvVoice = new BadgeView(DashboardActivity.this, linearVoice);
-
-        setRedDot(bvUser,false);
-        setRedDot(bvVoice,false);
-
-        linearUserInfo.setOnClickListener(this);
-        linearScan.setOnClickListener(this);
-        linearSearch.setOnClickListener(this);
-        linearVoice.setOnClickListener(this);
+        linearUserInfo = (LinearLayout) contentView.findViewById(R.id.linearUserInfo);
 
         popupWindow = new PopupWindow(this);
-
         popupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
         popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         popupWindow.setContentView(contentView);
         popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
         popupWindow.setOutsideTouchable(false);
         popupWindow.setFocusable(true);
+
+        /*
+         * 根据配置动态设置显示下拉菜单选项
+         */
+        View viewSeparator;
+        if(!URLs.kDropMenuScan) {
+            viewSeparator = contentView.findViewById(R.id.linearScanSeparator);
+            viewSeparator.setVisibility(URLs.kDropMenuScan ? View.VISIBLE : View.GONE);
+
+            linearScan.setVisibility(URLs.kDropMenuScan ? View.VISIBLE : View.GONE);
+        } else {
+            linearScan.setOnClickListener(this);
+        }
+
+        if(!URLs.kDropMenuVoice) {
+            viewSeparator = contentView.findViewById(R.id.linearVoiceSeparator);
+            viewSeparator.setVisibility(URLs.kDropMenuVoice ? View.VISIBLE : View.GONE);
+
+            linearVoice.setVisibility(URLs.kDropMenuVoice ? View.VISIBLE : View.GONE);
+        } else {
+            linearVoice.setOnClickListener(this);
+
+            // bvVoice = new BadgeView(DashboardActivity.this, linearVoice);
+            // setRedDot(bvVoice, false);
+        }
+
+        if(!URLs.kDropMenuSearch) {
+            viewSeparator = contentView.findViewById(R.id.linearSearchSeparator);
+            viewSeparator.setVisibility(URLs.kDropMenuSearch ? View.VISIBLE : View.GONE);
+
+            linearSearch.setVisibility(URLs.kDropMenuSearch ? View.VISIBLE : View.GONE);
+        } else {
+            linearSearch.setOnClickListener(this);
+        }
+
+        if(!URLs.kDropMenuUserInfo) {
+            linearUserInfo.setVisibility(URLs.kDropMenuUserInfo ? View.VISIBLE : View.GONE);
+            linearUserInfo.setOnClickListener(this);
+        } else {
+            linearUserInfo.setOnClickListener(this);
+
+            // bvUser = new BadgeView(DashboardActivity.this, linearUserInfo);
+            // setRedDot(bvUser, false);
+        }
     }
 
     /*
@@ -225,11 +257,11 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         TabView mTabAPP = (TabView) findViewById(R.id.tabApp);
         TabView mTabMessage = (TabView) findViewById(R.id.tabMessage);
 
-        if(URLs.kDashboardTabBarDisplay) {
-            mTabKPI.setVisibility(URLs.kDashboardTabBarDisplayKPI ? View.VISIBLE : View.GONE);
-            mTabAnalyse.setVisibility( URLs.kDashboardTabBarDisplayAnalyse ? View.VISIBLE : View.GONE);
-            mTabAPP.setVisibility(URLs.kDashboardTabBarDisplayApp ? View.VISIBLE : View.GONE);
-            mTabMessage.setVisibility(URLs.kDashboardTabBarDisplayMessage ? View.VISIBLE : View.GONE);
+        if(URLs.kTabBar) {
+            mTabKPI.setVisibility(URLs.kTabBarKPI ? View.VISIBLE : View.GONE);
+            mTabAnalyse.setVisibility( URLs.kTabBarAnalyse ? View.VISIBLE : View.GONE);
+            mTabAPP.setVisibility(URLs.kTabBarApp ? View.VISIBLE : View.GONE);
+            mTabMessage.setVisibility(URLs.kTabBarMessage ? View.VISIBLE : View.GONE);
         } else {
            findViewById(R.id.toolBar).setVisibility(View.GONE);
         }
@@ -256,7 +288,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
     private final View.OnClickListener mTabChangeListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (v == mCurrentTab) return;
+            if (v == mCurrentTab) {
+                return;
+            }
 
             mCurrentTab.setActive(false);
             mCurrentTab = (TabView) v;
@@ -423,6 +457,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             }
         }
     }
+
     public void setRedDot(BadgeView badgeView, boolean flag) {
         badgeView.setBadgePosition(BadgeView.POSITION_TOP_RIGHT);
         badgeView.setWidth(dip2px(this, 7));
