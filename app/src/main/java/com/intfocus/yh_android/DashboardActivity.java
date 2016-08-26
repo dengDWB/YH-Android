@@ -2,12 +2,16 @@ package com.intfocus.yh_android;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,14 +33,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class DashboardActivity extends BaseActivity implements View.OnClickListener {
+    public static final String ACTION_UPDATENOTIFITION = "action.updateNotifition";
     private static final int ZBAR_CAMERA_PERMISSION = 1;
-    private int objectType;
-    private ImageView imgSetting;
     private TabView mCurrentTab;
     private PopupWindow popupWindow;
     private BadgeView bvUser, bvVoice;
-    private BadgeView bvKpi,bvAnalyse,bvApp,bvMessage,bvSetting;
     private LinearLayout linearUserInfo,linearScan,linearVoice,linearSearch;
+    private ArrayList<String> urlStrings;
+    JSONObject notifition;
+    private BadgeView bvKpi, bvAnalyse, bvApp, bvMessage, bvBannerSetting;
+    private int objectType, kpiNotifition, analyseNotifition, appNotifition, messageNotifition;
+    private NotifitionBroadcastReceiver notifitionBroadcastReceiver;
+
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -44,24 +52,12 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        /*
-         * 默认标签栏选中【仪表盘】
-         */
-        try {
-            objectType = 1;
-            urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion(), user.getString("group_id"), user.getString("role_id"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        initUrlStrings();
 
-        imgSetting = (ImageView) findViewById(R.id.btnSetting);
-        bvSetting = new BadgeView(DashboardActivity.this, imgSetting);
-        bvSetting.setId(7);
-
-        loadWebView();
         initTab();
         initUserIDColorView();
         initDropMenu();
+        loadWebView();
 
         /*
          * 通过解屏进入界面后，进行用户验证
@@ -72,6 +68,13 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
          * 检测服务器静态资源是否更新，并下载
          */
         checkAssetsUpdated(true);
+
+        /*
+         * 动态注册广播用于接收通知
+         */
+        initLocalNotifications();
+        initNotifictionService();
+
         new Thread(mRunnableForDetecting).start();
     }
 
@@ -91,7 +94,105 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         mWebView = null;
         user = null;
         popupWindow.dismiss();
+        unregisterReceiver(notifitionBroadcastReceiver);
         super.onDestroy();
+    }
+
+    /*
+     * 动态注册广播用于接收通知
+     */
+    private void initNotifictionService() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_UPDATENOTIFITION);
+        notifitionBroadcastReceiver = new NotifitionBroadcastReceiver();
+        registerReceiver(notifitionBroadcastReceiver, filter);
+        /*
+         * 打开通知服务,用于发送通知
+         */
+        Intent startService = new Intent(this, LocalNotificationService.class);
+        startService(startService);
+    }
+
+    /*
+     * 定义广播接收器（内部类），接收到后调用是否显示通知的判断逻辑
+     */
+    private class NotifitionBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // receiveNotifition();
+            Log.i("Timer", URLs.timestamp());
+        }
+    }
+
+    /*
+     * 通知显示判断逻辑，在 Activity 显示和接收到广播时都会调用
+     */
+    private void receiveNotifition() {
+        try {
+            String noticePath = FileUtil.dirPath(mContext, "Cached", "local_notification.json");
+            notifition = FileUtil.readConfigFile(noticePath);
+            kpiNotifition = notifition.getInt("tab_kpi");
+            analyseNotifition = notifition.getInt("tab_analyse");
+            appNotifition = notifition.getInt("tab_app");
+            messageNotifition = notifition.getInt("tab_message");
+
+            if (kpiNotifition > 0 && objectType != 1) {
+                setBadgeView("tab", bvKpi);
+            }
+            if (analyseNotifition > 0 && objectType != 2) {
+                setBadgeView("tab", bvAnalyse);
+            }
+            if (appNotifition > 0 && objectType != 3) {
+                setBadgeView("tab" ,bvApp);
+            }
+            if (messageNotifition > 0 && objectType != 5) {
+                setBadgeView("tab", bvMessage);
+            }
+            if (notifition.getInt("setting_pgyer") == 1 || notifition.getInt("setting_password") == 1) {
+                setBadgeView("setting", bvBannerSetting);
+            }
+            else {
+                bvBannerSetting.setVisibility(View.GONE);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*
+	   * 设置应用内通知小红点参数
+	   */
+    public void setBadgeView(String type, BadgeView badgeView) {
+        //根据不同屏幕显示密度设置小红点大小
+        if (displayDpi < 320) {
+            badgeView.setWidth(10);
+            badgeView.setHeight(10);
+        } else if (displayDpi >= 320 && displayDpi < 480) {
+            badgeView.setWidth(20);
+            badgeView.setHeight(20);
+        } else if (displayDpi >= 480) {
+            badgeView.setWidth(25);
+            badgeView.setHeight(25);
+        }
+
+        //badgeView.setText(badgerCount);  //暂不需要计数
+        badgeView.setBadgePosition(BadgeView.POSITION_TOP_RIGHT);
+        if (type.equals("setting")) {
+            badgeView.setBadgeMargin(20, 15);
+        }
+        else if (type.equals("tab")) {
+            badgeView.setBadgeMargin(45, 0);
+        }
+        else if (type.equals("upgrade")){
+            badgeView.setBadgeMargin(165, 0);
+        }
+        else if (type.equals("changePWD")){
+            badgeView.setBadgeMargin(250, 0);
+        }
+        else {
+            badgeView.setBadgeMargin(45, 0);
+        }
+        badgeView.show();
     }
 
     /*
@@ -190,9 +291,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             linearVoice.setVisibility(URLs.kDropMenuVoice ? View.VISIBLE : View.GONE);
         } else {
             linearVoice.setOnClickListener(this);
-
-            // bvVoice = new BadgeView(DashboardActivity.this, linearVoice);
-            // setRedDot(bvVoice, false);
         }
 
         if(!URLs.kDropMenuSearch) {
@@ -256,6 +354,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         TabView mTabAnalyse = (TabView) findViewById(R.id.tabAnalyse);
         TabView mTabAPP = (TabView) findViewById(R.id.tabApp);
         TabView mTabMessage = (TabView) findViewById(R.id.tabMessage);
+        ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 
         if(URLs.kTabBar) {
             mTabKPI.setVisibility(URLs.kTabBarKPI ? View.VISIBLE : View.GONE);
@@ -273,6 +372,12 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
         mCurrentTab = mTabKPI;
         mCurrentTab.setActive(true);
+
+        bvKpi = new BadgeView(this, mTabKPI);
+        bvAnalyse = new BadgeView(this, mTabAnalyse);
+        bvApp = new BadgeView(this, mTabAPP);
+        bvMessage = new BadgeView(this, mTabMessage);
+        bvBannerSetting = new BadgeView(this, mBannerSetting);
     }
 
     /*
@@ -345,7 +450,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
      * 标题栏点击设置按钮显示下拉菜单
      */
     public void launchSettingActivity(View v) {
-        popupWindow.showAsDropDown(imgSetting, dip2px(this, -87), dip2px(this, 10));
+        ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
+        popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -87), dip2px(this, 10));
 
         // Intent intent = new Intent(mContext, SettingActivity.class);
         // mContext.startActivity(intent);
@@ -468,5 +574,63 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         }
 
         badgeView.show();
+    }
+
+    private void initUrlStrings() {
+        urlStrings = new ArrayList<String>();
+
+        String currentUIVersion = currentUIVersion();
+        String tmpString;
+        try {
+            tmpString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
+            urlStrings.add(tmpString);
+            tmpString = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
+            urlStrings.add(tmpString);
+            tmpString = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
+            urlStrings.add(tmpString);
+            tmpString = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"), user.getString("group_id"), user.getString("user_id"));
+            urlStrings.add(tmpString);
+            tmpString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
+            urlStrings.add(tmpString);
+        } catch(JSONException e) {
+            e.printStackTrace();
+        }
+
+        /*
+         * 默认标签栏选中【仪表盘】
+         */
+        objectType = 1;
+        urlString = urlStrings.get(0);
+    }
+    /**
+     *  初始化本地通知
+     */
+    private void initLocalNotifications() {
+        try {
+            String noticePath = FileUtil.dirPath(mContext, "Cached", "local_notification.json");
+            if((new File(noticePath)).exists()) {
+                return;
+            }
+
+            JSONObject noticeJSON = new JSONObject();
+            noticeJSON.put("app", -1);
+            noticeJSON.put("tab_kpi", -1);
+            noticeJSON.put("tab_kpi_last", -1);
+            noticeJSON.put("tab_analyse", -1);
+            noticeJSON.put("tab_analyse_last", -1);
+            noticeJSON.put("tab_app", "-1");
+            noticeJSON.put("tab_app_last", -1);
+            noticeJSON.put("tab_message", -1);
+            noticeJSON.put("tab_message_last", -1);
+            noticeJSON.put("setting", -1);
+            noticeJSON.put("setting_pgyer", -1);
+            noticeJSON.put("setting_password", -1);
+
+            FileUtil.writeFile(noticePath, noticeJSON.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

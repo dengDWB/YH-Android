@@ -22,7 +22,7 @@
             android:layout_centerInParent="true" />
 
         <ImageView
-            android:id="@+id/btnSetting"
+            android:id="@+id/bannerSetting"
             android:src="@drawable/banner_setting"
             style="@style/BannerRightButton"
             android:layout_marginTop="0dp"

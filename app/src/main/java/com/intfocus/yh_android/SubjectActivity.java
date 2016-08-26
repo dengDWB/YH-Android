@@ -300,7 +300,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             } else {
                 toast("加载PDF失败");
             }
-
         }
     };
 
@@ -397,15 +396,14 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                 }
             }
 
-            loadHtml();
-
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            // Call onRefreshComplete when the list has been refreshed. 如果没有下面的函数那么刷新将不会停
+
+            loadHtml();
             pullToRefreshWebView.onRefreshComplete();
         }
     }

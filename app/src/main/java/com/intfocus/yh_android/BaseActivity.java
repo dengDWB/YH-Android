@@ -20,6 +20,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -78,11 +79,16 @@ public class BaseActivity extends Activity {
     String urlStringForLoading;
     JSONObject logParams = new JSONObject();
     Context mContext;
+    int displayDpi; //屏幕密度
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //获取当前设备屏幕密度
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        displayDpi = dm.densityDpi;
 
         mMyApp = (YHApplication)this.getApplicationContext();
         mContext = BaseActivity.this;
@@ -380,14 +386,14 @@ public class BaseActivity extends Activity {
                             JSONObject configJSON = new JSONObject();
                             configJSON.put("is_login", false);
 
-                                String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
-                                JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
+                            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
+                            JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
-                                userJSON = ApiHelper.merge(userJSON, configJSON);
-                                FileUtil.writeFile(userConfigPath, userJSON.toString());
+                            userJSON = ApiHelper.merge(userJSON, configJSON);
+                            FileUtil.writeFile(userConfigPath, userJSON.toString());
 
-                                String settingsConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
-                                FileUtil.writeFile(settingsConfigPath, userJSON.toString());
+                            String settingsConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
+                            FileUtil.writeFile(settingsConfigPath, userJSON.toString());
                         } catch (JSONException e) {
                             e.printStackTrace();
                         } catch (IOException e) {
@@ -514,8 +520,11 @@ public class BaseActivity extends Activity {
         @Override
         public void run() {
             try {
-                if (!logParams.getString("action").contains("登录") &&
-                    !logParams.getString("action").equals("解屏")) {
+                String action = logParams.getString("action");
+                if(action == null) {
+                    return;
+                }
+                if (!action.contains("登录") && !action.equals("解屏") && !action.equals("点击/主页面/浏览器")) {
                     return;
                 }
 
