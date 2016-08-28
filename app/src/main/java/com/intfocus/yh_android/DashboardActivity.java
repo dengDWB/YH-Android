@@ -485,6 +485,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
                     LogUtil.d("JSClick", message);
 
                     Intent intent = new Intent(DashboardActivity.this, SubjectActivity.class);
+                    intent.setFlags(intent.FLAG_ACTIVITY_SINGLE_TOP);
                     intent.putExtra("bannerName", bannerName);
                     intent.putExtra("link", link);
                     intent.putExtra("objectID", objectID);
