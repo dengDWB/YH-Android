@@ -63,7 +63,7 @@ public class LocalNotificationService extends Service {
     pgyerJSON = FileUtil.readConfigFile(pgyerVersionPath);
     notifition = FileUtil.readConfigFile(notifitionPath);
     try {
-      String currentUIVersion = currentUIVersion();
+      String currentUIVersion = URLs.currentUIVersion(mContext);
       kpiUrl = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
       analyseUrl = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
       appUrl = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
@@ -73,23 +73,6 @@ public class LocalNotificationService extends Service {
     }
     notifitionTask();
     return super.onStartCommand(intent, flags, startId);
-  }
-
-  /*
-   * UI 版本
-   */
-  final String currentUIVersion() {
-    try {
-      String betaConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.BETA_CONFIG_FILENAME);
-      JSONObject betaJSON = new JSONObject();
-      if (new File(betaConfigPath).exists()) {
-        betaJSON = FileUtil.readConfigFile(betaConfigPath);
-      }
-      return betaJSON.has("new_ui") && betaJSON.getBoolean("new_ui") ? "v2" : "v1";
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return "v1";
   }
 
   /*

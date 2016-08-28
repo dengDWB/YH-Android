@@ -1,12 +1,15 @@
 package com.intfocus.yh_android.util;
 
 import android.content.Context;
+import java.io.File;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * api链接，宏
@@ -66,6 +69,22 @@ public class URLs extends PrivateURLs implements Serializable {
         return (new SimpleDateFormat("yyyyMMddKKmmss")).format(new Date());
     }
 
+    /*
+     * UI 版本
+     */
+    public static String currentUIVersion(Context mContext) {
+        try {
+            String betaConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.BETA_CONFIG_FILENAME);
+            JSONObject betaJSON = new JSONObject();
+            if (new File(betaConfigPath).exists()) {
+                betaJSON = FileUtil.readConfigFile(betaConfigPath);
+            }
+            return betaJSON.has("new_ui") && betaJSON.getBoolean("new_ui") ? "v2" : "v1";
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return "v1";
+    }
     /**
      * 对URL进行格式处理
      *

@@ -566,21 +566,6 @@ public class BaseActivity extends Activity {
         }
     }
 
-    final String currentUIVersion() {
-        try {
-            String betaConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.BETA_CONFIG_FILENAME);
-            JSONObject betaJSON = new JSONObject();
-            if(new File(betaConfigPath).exists()) {
-                betaJSON = FileUtil.readConfigFile(betaConfigPath);
-            }
-            return betaJSON.has("new_ui") && betaJSON.getBoolean("new_ui") ? "v2" : "v1";
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return "v1";
-    }
-
-
     /*
      * 检测版本更新
         {

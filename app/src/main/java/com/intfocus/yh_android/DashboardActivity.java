@@ -402,7 +402,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             mCurrentTab.setActive(true);
 
             mWebView.loadUrl(loadingPath("loading"));
-            String currentUIVersion = currentUIVersion();
+            String currentUIVersion = URLs.currentUIVersion(mContext);
             try {
                 switch (v.getId()) {
                     case R.id.tabKPI:
@@ -548,7 +548,14 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         }
 
         @JavascriptInterface
+        public void setDashboardDataCount(final String tabType, final int dataCount) {
+           Log.i("setDashboardDataCount", String.format("type: %s, count: %d", tabType, dataCount));
+        }
+
+        @JavascriptInterface
         public void jsException(final String ex) {
+            Log.i("jsException", ex);
+
             /*
              * 用户行为记录, 单独异常处理，不可影响用户体验
              */
@@ -579,7 +586,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
     private void initUrlStrings() {
         urlStrings = new ArrayList<String>();
 
-        String currentUIVersion = currentUIVersion();
+        String currentUIVersion = URLs.currentUIVersion(mContext);
         String tmpString;
         try {
             tmpString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
