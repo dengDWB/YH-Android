@@ -88,7 +88,7 @@ public class LocalNotificationService extends Service {
         sendBroadcast(sendIntent);
       }
     };
-    timer.schedule(timerTask, 0, 1 * 10 * 1000);//间隔 15 分钟
+    timer.schedule(timerTask, 0, 15 * 60 * 1000);//间隔 15 分钟
   }
 
   /*

@@ -177,7 +177,7 @@ public class SettingActivity extends BaseActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            
+
             finish();
         }
     };
