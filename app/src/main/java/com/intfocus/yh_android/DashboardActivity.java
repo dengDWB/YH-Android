@@ -2,8 +2,10 @@ package com.intfocus.yh_android;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -63,6 +65,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
          * 通过解屏进入界面后，进行用户验证
          */
         checkWhetherFromScreenLockActivity();
+
+        checkUserModifiedInitPassword();
 
         /*
          * 检测服务器静态资源是否更新，并下载
@@ -236,6 +240,28 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             }).start();
         } else {
             mWebView.clearCache(true);
+        }
+    }
+
+    public void checkUserModifiedInitPassword() {
+        try {
+            if(!user.getString("password").equals(URLs.MD5("123456"))) {
+                return;
+            }
+
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(DashboardActivity.this);
+            alertDialog.setTitle("温馨提示");
+            alertDialog.setMessage("初始化密码未修改，安全起见，请在\n【设置】-【个人信息】-【修改密码】页面修改密码");
+
+            alertDialog.setNegativeButton("知道了", new DialogInterface.OnClickListener() {
+                    @Override public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }
+            );
+            alertDialog.show();
+        } catch(JSONException e) {
+            e.printStackTrace();
         }
     }
 
