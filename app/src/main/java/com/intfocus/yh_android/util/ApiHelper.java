@@ -29,9 +29,7 @@ public class ApiHelper {
      * params: {device: {name, platform, os, os_version, uuid}}
      */
     public static String authentication(Context context, String username, String password) {
-        String ret = "success", urlString = String.format(URLs.API_USER_PATH, URLs.kBaseUrl,
-            "android",
-            username, password);
+        String responseState = "success", urlString = String.format(URLs.API_USER_PATH, URLs.kBaseUrl, "android", username, password);
         try {
             JSONObject device = new JSONObject();
             device.put("name", android.os.Build.MODEL);
@@ -91,13 +89,13 @@ public class ApiHelper {
 
                 FileUtil.writeFile(settingsConfigPath, userJSON.toString());
             } else {
-                ret = responseJSON.getString("info");
+                responseState = responseJSON.getString("info");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            ret = e.getMessage();
+            responseState = e.getMessage();
         }
-        return ret;
+        return responseState;
     }
 
     /*
@@ -444,7 +442,10 @@ public class ApiHelper {
     /**
      *  二维码扫描
      *
+     *  @param groupID    群组ID
+     *  @param roleID     角色ID
      *  @param userNum    用户编号
+     *  @param storeID    门店ID
      *  @param codeInfo   条形码信息
      *  @param codeType   条形码或二维码
      */
@@ -454,17 +455,14 @@ public class ApiHelper {
             params.put("code_info", codeInfo);
             params.put("code_type", codeType);
 
-            String assetsPath = FileUtil.sharedPath(mContext);
-            String urlString = String.format(URLs.API_BARCODE_SCAN_PATH, URLs.kBaseUrl, groupID, roleID, userNum,storeID,codeInfo,codeType);
-            Log.i("barscan",urlString);
-            Map<String, String> headers = ApiHelper.checkResponseHeader(urlString, assetsPath);
-            Map<String, String> response = HttpUtil.httpGet(urlString, headers);
-            String responseString = response.get("body");
-            Log.i("barscan",responseString);
+            String urlString = String.format(URLs.API_BARCODE_SCAN_PATH, URLs.kBaseUrl, groupID, roleID, userNum, storeID, codeInfo, codeType);
+            Map<String, String> response = HttpUtil.httpGet(urlString, new HashMap());
+            // Map<String, String> response = HttpUtil.httpPost(urlString, params);
 
-//            if(response.get("code") == null || !response.get("code").equals("200")) {
-//                responseString = String.format("{\"商品编号\": \"%s\",  \"状态\": \"%s\", \"order_keys\": [\"商品编号\",  \"状态\"]}", codeInfo, responseString);
-//            }
+            String responseString = response.get("body");
+            if (!response.get("code").equals("200") && !response.get("code").equals("201")) {
+                responseString = "{\"chart\": \"[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]\", \"tabs\": [{ title: \"提示\", table: { length: 1, \"1\": [\"获取数据失败...\"]}}]}";
+            }
 
             FileUtil.barCodeScanResult(mContext, responseString);
         } catch(JSONException e) {

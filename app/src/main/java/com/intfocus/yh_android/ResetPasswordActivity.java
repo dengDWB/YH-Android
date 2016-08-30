@@ -39,7 +39,7 @@ public class ResetPasswordActivity extends BaseActivity {
         mWebView.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");
         mWebView.loadUrl(urlStringForLoading);
 
-        urlString = String.format(URLs.RESET_PASSWORD_PATH, URLs.kBaseUrl, currentUIVersion());
+        urlString = String.format(URLs.RESET_PASSWORD_PATH, URLs.kBaseUrl, URLs.currentUIVersion(mContext));
         new Thread(mRunnableForDetecting).start();
     }
 

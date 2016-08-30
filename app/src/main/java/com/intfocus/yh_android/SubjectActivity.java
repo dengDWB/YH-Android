@@ -1,14 +1,24 @@
 package com.intfocus.yh_android;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Picture;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
+import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
@@ -16,6 +26,13 @@ import android.webkit.WebSettings;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.ddmlib.AdbCommandRejectedException;
+import com.android.ddmlib.AndroidDebugBridge;
+import com.android.ddmlib.IDevice;
+import com.android.ddmlib.RawImage;
+import com.android.ddmlib.TimeoutException;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
@@ -25,8 +42,16 @@ import com.joanzapata.pdfview.PDFView;
 import com.joanzapata.pdfview.listener.OnErrorOccurredListener;
 import com.joanzapata.pdfview.listener.OnLoadCompleteListener;
 import com.joanzapata.pdfview.listener.OnPageChangeListener;
+import com.umeng.socialize.ShareAction;
+import com.umeng.socialize.UMShareAPI;
+import com.umeng.socialize.UMShareListener;
+import com.umeng.socialize.bean.SHARE_MEDIA;
+import com.umeng.socialize.media.UMImage;
+
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,9 +90,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         }
 
         ImageView bannerComment = (ImageView) findViewById(R.id.bannerComment);
-        bannerComment.setVisibility(URLs.kSubjectDisplayComment ? View.VISIBLE : View.GONE);
+        bannerComment.setVisibility(URLs.kSubjectComment ? View.VISIBLE : View.GONE);
         ImageView bannerShare = (ImageView) findViewById(R.id.bannerShare);
-        bannerShare.setVisibility(URLs.kSubjectDisplayShare ? View.VISIBLE : View.GONE);
+        bannerShare.setVisibility(URLs.kSubjectShare ? View.VISIBLE : View.GONE);
         ImageView bannerSearch = (ImageView) findViewById(R.id.bannerSearch);
         bannerSearch.setVisibility(View.GONE);
 
@@ -130,6 +155,11 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         runOnUiThread(new Runnable() {
             @Override public void run() {
                 ImageView bannerSearch = (ImageView) findViewById(R.id.bannerSearch);
+                if (!URLs.kSubjectComment && !URLs.kSubjectShare) {
+                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(dip2px(50), RelativeLayout.LayoutParams.MATCH_PARENT);
+                    params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+                    bannerSearch.setLayoutParams(params);
+                }
                 bannerSearch.setVisibility(View.VISIBLE);
 
                 String selectedItem = FileUtil.reportSelectedItem(mContext, String.format("%d", groupID), templateID, reportID);
@@ -214,7 +244,11 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         }
 
-        loadHtml();
+        mWebView.post(new Runnable() {
+            @Override public void run() {
+                loadHtml();
+            }
+        });
     }
 
     private void loadHtml() {
@@ -239,7 +273,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
              */
             isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
             if(isSupportSearch) {
-                displayBannerTitleAndSearchIcon();
+                displayBannerTitleAndSearchIcon();;
             }
 
             new Thread(new Runnable() {
@@ -291,7 +325,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             } else {
                 toast("加载PDF失败");
             }
-
         }
     };
 
@@ -323,7 +356,57 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
      * 分享截图至微信
      */
     public void actionShare2Weixin(View v) {
-        Log.i("actionShare2Weixin", "pending");
+        String filePath = FileUtil.basePath(mContext) + "/" + "Cached" + "/" + "timestmap.png";
+
+        mWebView.setDrawingCacheEnabled(true);
+        mWebView.buildDrawingCache();
+        Bitmap imgBmp = Bitmap.createBitmap(mWebView.getWidth(), mWebView.getHeight(), Bitmap.Config.ARGB_8888);
+        mWebView.destroyDrawingCache();
+        Canvas c = new Canvas(imgBmp);
+        mWebView.draw(c);
+        FileUtil.saveSnapShot(imgBmp,mContext);
+
+        File file = new File(filePath);
+        if (file.exists()) {
+            UMImage image = new UMImage(SubjectActivity.this, file);
+
+            new ShareAction(this)
+                    .withTitle("分享截图")
+                    .setPlatform(SHARE_MEDIA.WEIXIN)
+                    .setDisplayList(SHARE_MEDIA.WEIXIN)
+                    .setCallback(umShareListener)
+                    .withMedia(image)
+                    .open();
+        }
+        else {
+            Toast.makeText(SubjectActivity.this,"截图失败啦", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private UMShareListener umShareListener  = new UMShareListener() {
+        @Override
+        public void onResult(SHARE_MEDIA platform) {
+            Log.d("plat","platform"+platform);
+        }
+
+        @Override
+        public void onError(SHARE_MEDIA platform, Throwable t) {
+            Toast.makeText(SubjectActivity.this,platform + " 分享失败啦", Toast.LENGTH_SHORT).show();
+            if(t!=null){
+                Log.d("throw","throw:"+t.getMessage());
+            }
+        }
+
+        @Override
+        public void onCancel(SHARE_MEDIA platform) {
+            Toast.makeText(SubjectActivity.this,platform + " 分享取消了", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        UMShareAPI.get( this ).onActivityResult( requestCode, resultCode, data);
     }
 
     /*
@@ -387,7 +470,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                     e.printStackTrace();
                 }
             }
-            loadHtml();
 
             return null;
         }
@@ -395,7 +477,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            // Call onRefreshComplete when the list has been refreshed. 如果没有下面的函数那么刷新将不会停
+
+            loadHtml();
             pullToRefreshWebView.onRefreshComplete();
         }
     }
@@ -491,5 +574,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             }
             return item;
         }
+    }
+
+    public int dip2px( float dpValue) {
+        final float scale = mContext.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
     }
 }
