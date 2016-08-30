@@ -1,6 +1,7 @@
 package com.intfocus.yh_android.util;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.Log;
 import java.io.BufferedReader;
@@ -498,4 +499,29 @@ public class FileUtil {
     //
     //FileUtil.writeFile(searchItemsPath, json.toString());
 
+    /*
+	 * 保存截屏文件
+	 *
+	 */
+    public static void saveSnapShot(Bitmap bmp, Context mContext) {
+        // 文件保存的路径
+        String filePath = FileUtil.basePath(mContext) + "/" + "Cached" + "/" + "timestmap.png";
+
+        // 如果有目标文件，删除它
+        File file = new File(filePath);
+        if (file.exists()) {
+            file.delete();
+        }
+        // 声明输出流
+        FileOutputStream outStream = null;
+
+        try {
+            // 获得输出流，写入文件
+            outStream = new FileOutputStream(file);
+            bmp.compress(Bitmap.CompressFormat.PNG, 90, outStream);
+            outStream.close();
+        } catch (IOException e) {
+            Log.e("snapshot", e.toString());
+        }
+    }
 }

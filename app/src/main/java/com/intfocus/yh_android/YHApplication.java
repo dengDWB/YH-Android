@@ -18,6 +18,7 @@ import com.intfocus.yh_android.util.URLs;
 import com.pgyersdk.crash.PgyCrashManager;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
+import com.umeng.socialize.PlatformConfig;
 
 import org.OpenUDID.OpenUDID_manager;
 
@@ -71,6 +72,11 @@ public class YHApplication extends Application {
 
         mContext = YHApplication.this;
         String sharedPath = FileUtil.sharedPath(mContext), basePath = FileUtil.basePath(mContext);
+
+        /*
+         * 微信平台验证
+         */
+        PlatformConfig.setWeixin("wxcff211a335b17088", "af964fd476b59bf54682bb15f23a0569");
 
         /*
          *  蒲公英平台，收集闪退日志

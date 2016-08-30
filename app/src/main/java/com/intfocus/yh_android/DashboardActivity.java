@@ -2,9 +2,9 @@ package com.intfocus.yh_android;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -65,8 +65,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
          * 通过解屏进入界面后，进行用户验证
          */
         checkWhetherFromScreenLockActivity();
-
-        checkUserModifiedInitPassword();
 
         /*
          * 检测服务器静态资源是否更新，并下载

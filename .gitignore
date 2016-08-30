@@ -1,4 +1,4 @@
-META-INF/
+﻿META-INF/
 .current-app
 *.lock
 *.y[a]ml
@@ -9,6 +9,7 @@ app/src/main/java/com/intfocus/yh_android/util/PrivateURLs.java
 
 # Android 的 Module 推荐这么写. gitignore 文件
 /build
+app/build
 *.iml
 
 # Built application files
