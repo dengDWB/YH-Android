@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CommentActivity">
+
+    <RelativeLayout
+        android:id="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/actionBar">
+
+        <ImageView
+            android:id="@+id/bannerBack"
+            style="@style/BannerBackButton"
+            android:onClick="dismissActivity" />
+
+        <TextView
+            android:id="@+id/bannerBackText"
+            android:layout_toRightOf="@id/bannerBack"
+            style="@style/BannerBackText"
+            android:onClick="dismissActivity" />
+
+        <TextView
+            android:id="@+id/bannerTitle"
+            android:text="筛选列表"
+            style="@style/BannerTitle" />
+
+
+        <RelativeLayout
+            android:id="@+id/colorViewLayout"
+            android:layout_width="35dp"
+            android:layout_height="5dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="6dp">
+
+            <ImageView
+                android:id="@+id/colorView0"
+                style="@style/ColorViewStyle0" />
+            <ImageView
+                android:id="@+id/colorView1"
+                style="@style/ColorViewStyle1" />
+            <ImageView
+                android:id="@+id/colorView2"
+                style="@style/ColorViewStyle2" />
+            <ImageView
+                android:id="@+id/colorView3"
+                style="@style/ColorViewStyle3" />
+            <ImageView
+                android:id="@+id/colorView4"
+                style="@style/ColorViewStyle4" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_below="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ListView
+            android:id="@+id/listStores"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+        </ListView>
+    </RelativeLayout>
+
+
+</RelativeLayout>

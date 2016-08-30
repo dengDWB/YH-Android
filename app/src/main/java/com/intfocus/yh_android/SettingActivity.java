@@ -70,7 +70,7 @@ public class SettingActivity extends BaseActivity {
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));
         mCheckAssets.setOnClickListener(mCheckAssetsListener);
         mUISwitch = (Switch) findViewById(R.id.ui_switch);
-        mUISwitch.setChecked(currentUIVersion().equals("v2"));
+        mUISwitch.setChecked(URLs.currentUIVersion(mContext).equals("v2"));
 
         mChangeLock.setOnClickListener(mChangeLockListener);
         mChangePWD.setOnClickListener(mChangePWDListener);
@@ -164,7 +164,7 @@ public class SettingActivity extends BaseActivity {
 
             Intent intent = new Intent();
             intent.setClass(SettingActivity.this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
 
             /*
@@ -177,6 +177,8 @@ public class SettingActivity extends BaseActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            finish();
         }
     };
 

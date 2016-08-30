@@ -20,6 +20,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -78,11 +79,16 @@ public class BaseActivity extends Activity {
     String urlStringForLoading;
     JSONObject logParams = new JSONObject();
     Context mContext;
+    int displayDpi; //屏幕密度
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //获取当前设备屏幕密度
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        displayDpi = dm.densityDpi;
 
         mMyApp = (YHApplication)this.getApplicationContext();
         mContext = BaseActivity.this;
@@ -248,18 +254,24 @@ public class BaseActivity extends Activity {
         }
 
         // 刷新监听事件
-        pullToRefreshWebView.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener<android.webkit.WebView>() {
-            @Override
-            public void onRefresh(PullToRefreshBase<android.webkit.WebView> refreshView) {
-                new pullToRefreshTask().execute();
+        pullToRefreshWebView.setOnRefreshListener(
+            new PullToRefreshBase.OnRefreshListener<android.webkit.WebView>() {
+                @Override
+                public void onRefresh(PullToRefreshBase<android.webkit.WebView> refreshView) {
+                    new pullToRefreshTask().execute();
 
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String label = simpleDateFormat.format(System.currentTimeMillis());
-                refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
-            }
-        });
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String label = simpleDateFormat.format(System.currentTimeMillis());
+                    refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+                }
+            });
     }
 
+
+    public static int dip2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
     private class pullToRefreshTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
@@ -352,8 +364,12 @@ public class BaseActivity extends Activity {
         }
 
         private void showWebViewForWithoutNetwork() {
-            String urlStringForLoading = loadingPath("400");
-            mWebView.loadUrl(urlStringForLoading);
+            mWebView.post(new Runnable() {
+                @Override public void run() {
+                    String urlStringForLoading = loadingPath("400");
+                    mWebView.loadUrl(urlStringForLoading);
+                }
+            });
         }
 
         private void showDialogForDeviceForbided() {
@@ -370,14 +386,14 @@ public class BaseActivity extends Activity {
                             JSONObject configJSON = new JSONObject();
                             configJSON.put("is_login", false);
 
-                                String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
-                                JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
+                            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
+                            JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
-                                userJSON = ApiHelper.merge(userJSON, configJSON);
-                                FileUtil.writeFile(userConfigPath, userJSON.toString());
+                            userJSON = ApiHelper.merge(userJSON, configJSON);
+                            FileUtil.writeFile(userConfigPath, userJSON.toString());
 
-                                String settingsConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
-                                FileUtil.writeFile(settingsConfigPath, userJSON.toString());
+                            String settingsConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
+                            FileUtil.writeFile(settingsConfigPath, userJSON.toString());
                         } catch (JSONException e) {
                             e.printStackTrace();
                         } catch (IOException e) {
@@ -461,8 +477,12 @@ public class BaseActivity extends Activity {
         }
 
         private void showWebViewForWithoutNetwork() {
-            String urlStringForLoading = loadingPath("400");
-            mWebView.loadUrl(urlStringForLoading);
+            mWebView.post(new Runnable() {
+                @Override public void run() {
+                    String urlStringForLoading = loadingPath("400");
+                    mWebView.loadUrl(urlStringForLoading);
+                }
+            });
         }
 
         @Override
@@ -500,8 +520,11 @@ public class BaseActivity extends Activity {
         @Override
         public void run() {
             try {
-                if (!logParams.getString("action").contains("登录") &&
-                    !logParams.getString("action").equals("解屏")) {
+                String action = logParams.getString("action");
+                if(action == null) {
+                    return;
+                }
+                if (!action.contains("登录") && !action.equals("解屏") && !action.equals("点击/主页面/浏览器")) {
                     return;
                 }
 
@@ -542,21 +565,6 @@ public class BaseActivity extends Activity {
             e.printStackTrace();
         }
     }
-
-    final String currentUIVersion() {
-        try {
-            String betaConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.BETA_CONFIG_FILENAME);
-            JSONObject betaJSON = new JSONObject();
-            if(new File(betaConfigPath).exists()) {
-                betaJSON = FileUtil.readConfigFile(betaConfigPath);
-            }
-            return betaJSON.has("new_ui") && betaJSON.getBoolean("new_ui") ? "v2" : "v1";
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return "v1";
-    }
-
 
     /*
      * 检测版本更新
@@ -762,7 +770,12 @@ public class BaseActivity extends Activity {
     }
 
     protected void toast(String info) {
-        Toast.makeText(mContext, info, Toast.LENGTH_SHORT).show();
+        try {
+            Toast.makeText(mContext, info, Toast.LENGTH_SHORT).show();
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     class DownloadAssetsTask extends AsyncTask<String, Integer, String> {

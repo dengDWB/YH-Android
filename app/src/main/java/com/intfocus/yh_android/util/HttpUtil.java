@@ -63,7 +63,7 @@ public class HttpUtil {
             }
             retMap.put("code", String.format("%d", response.code()));
             retMap.put("body", response.body().string());
-            LogUtil.d("BODY2", retMap.get("body").toString());
+            LogUtil.d("BODY", retMap.get("body").toString());
 
             if(isJSON) {
                 LogUtil.d("code", retMap.get("code"));

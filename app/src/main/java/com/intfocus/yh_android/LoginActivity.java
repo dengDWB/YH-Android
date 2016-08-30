@@ -2,148 +2,133 @@ package com.intfocus.yh_android;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.URLs;
 
 public class LoginActivity extends BaseActivity {
-	private TextView textSolgan;
-	private EditText textUser;
-	private EditText textPassWord;
-	private Button btnLogin;
-	private ProgressDialog mProgressDialog;
+    private EditText usernameEditText, passwordEditText;
+    private String usernameString, passwordString;
 
-	private String userName;
-	private String passWord;
-	Context mContext = this;
-
-	@Override
-	@SuppressLint("SetJavaScriptEnabled")
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_login);
+    @Override
+    @SuppressLint("SetJavaScriptEnabled")
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
 
         /*
-		 *  如果是从触屏界面过来，则直接进入主界面
+         *  如果是从触屏界面过来，则直接进入主界面
          *  不是的话，相当于直接启动应用，则检测是否有设置锁屏
          */
-		Intent intent = getIntent();
-		if (intent.hasExtra("from_activity") && intent.getStringExtra("from_activity").equals("ConfirmPassCodeActivity")) {
-			Log.i("getIndent", intent.getStringExtra("from_activity"));
-			intent = new Intent(LoginActivity.this, DashboardActivity.class);
-			intent.putExtra("from_activity", intent.getStringExtra("from_activity"));
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			LoginActivity.this.startActivity(intent);
+        Intent intent = getIntent();
+        if (intent.hasExtra("from_activity") && intent.getStringExtra("from_activity").equals("ConfirmPassCodeActivity")) {
+            Log.i("getIndent", intent.getStringExtra("from_activity"));
+            intent = new Intent(LoginActivity.this, DashboardActivity.class);
+            intent.putExtra("from_activity", intent.getStringExtra("from_activity"));
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            LoginActivity.this.startActivity(intent);
 
-			finish();
-		}
-		else if(FileUtil.checkIsLocked(mContext)){
-			intent = new Intent(this, ConfirmPassCodeActivity.class);
-			intent.putExtra("is_from_login", true);
-			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			this.startActivity(intent);
+            finish();
+        } else if (FileUtil.checkIsLocked(mContext)) {
+            intent = new Intent(this, ConfirmPassCodeActivity.class);
+            intent.putExtra("is_from_login", true);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            this.startActivity(intent);
 
-			finish();
-		}
-		else {
-			Log.i("info","暂无动作");
-		}
+            finish();
+        } else {
+            /*
+             *  检测版本更新
+             *    1. 与锁屏界面互斥；取消解屏时，返回登录界面，则不再检测版本更新；
+             *    2. 原因：如果解屏成功，直接进入MainActivity,会在BaseActivity#finishLoginActivityWhenInMainAcitivty中结束LoginActivity,若此时有AlertDialog，会报错误:Activity has leaked window com.android.internal.policy.impl.PhoneWindow$DecorView@44f72ff0 that was originally added here
+             */
+            checkPgyerVersionUpgrade(false);
+        }
 
-		init();
-	}
-
-	private void init() {
-		textSolgan = (TextView) findViewById(R.id.text_slogan);
-		textUser = (EditText) findViewById(R.id.edit_user);
-		textPassWord = (EditText) findViewById(R.id.edit_password);
-		btnLogin = (Button) findViewById(R.id.btn_login);
+        usernameEditText = (EditText) findViewById(R.id.etUsername);
+        passwordEditText = (EditText) findViewById(R.id.etPassword);
 
         /*
-         * 设置Solgan文本内容，设置字体为“冬青黑体简体中文 W3”
-         * 字体存放路径为"/assets/fonts/dqhtw3.otf"
+         * 检测登录界面，版本是否升级
          */
-		textSolgan.setText("融合共享，成于至善");
-		Typeface customFont = Typeface.createFromAsset(this.getAssets(), "fonts/dqhtW3.otf");
-		textSolgan.setTypeface(customFont);
+        checkVersionUpgrade(assetsPath);
+    }
 
-		btnLogin.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				userName = textUser.getText().toString();
-				passWord = textPassWord.getText().toString();
+    protected void onResume() {
+        mMyApp.setCurrentActivity(this);
+        if(mProgressDialog != null)  {
+            mProgressDialog.dismiss();
+        }
 
-				if (userName.isEmpty() || passWord.isEmpty()) {
-					Toast.makeText(LoginActivity.this, "请输入用户名或密码", Toast.LENGTH_SHORT).show();
-					return;
-				}
+        super.onResume();
+    }
 
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-						mProgressDialog = ProgressDialog.show(LoginActivity.this, "稍等", "验证用户信息...");
-						return;
-					}
-				});
+    protected void onDestroy() {
+        mContext = null;
+        mWebView = null;
+        user = null;
+        super.onDestroy();
+    }
 
-				try {
-					Thread thread = new Thread(new Runnable() {
-						@Override
-						public void run() {
-							String info = ApiHelper.authentication(mContext, userName, URLs.MD5(passWord));
-							Log.i("info", info);
-							if (info.compareTo("success") > 0) {
-								if (mProgressDialog != null) mProgressDialog.dismiss();
-								Toast.makeText(LoginActivity.this, info, Toast.LENGTH_SHORT).show();
-								return;
-							}
+    public void actionSubmit(View v) {
+        try {
+            usernameString = usernameEditText.getText().toString();
+            passwordString = passwordEditText.getText().toString();
+            if (usernameString.isEmpty() || passwordString.isEmpty()) {
+                toast("请输入用户名与密码");
+                return;
+            }
 
-							Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-							startActivity(intent);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mProgressDialog = ProgressDialog.show(LoginActivity.this, "稍等", "验证用户信息...");
+                }
+            });
 
-							if (mProgressDialog != null) {
-								mProgressDialog.dismiss();
-							}
-							finish();
-						}
-					});
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    final String info = ApiHelper.authentication(mContext, usernameString, URLs.MD5(passwordString));
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (info.compareTo("success") > 0 || info.compareTo("success") < 0) {
+                                if (mProgressDialog != null) {
+                                    mProgressDialog.dismiss();
+                                }
+                                toast(info);
+                                return;
+                            }
 
-					thread.start();
-				} catch (Exception e) {
-					e.printStackTrace();
-					if (mProgressDialog != null) {
-						mProgressDialog.dismiss();
-					}
-					Toast.makeText(LoginActivity.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-				}
-			}
-		});
-	}
+                            // 检测用户空间，版本是否升级
+                            assetsPath = FileUtil.dirPath(mContext, URLs.HTML_DIRNAME);
+                            checkVersionUpgrade(assetsPath);
 
-	protected void onResume() {
-		mMyApp.setCurrentActivity(this);
-		if (mProgressDialog != null) mProgressDialog.dismiss();
-		super.onResume();
-	}
+                            // 跳转至主界面
+                            Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            LoginActivity.this.startActivity(intent);
 
-	protected void onDestroy() {
-		mContext = null;
-		mWebView = null;
-		user = null;
-		super.onDestroy();
-	}
+                            if (mProgressDialog != null) {
+                                mProgressDialog.dismiss();
+                            }
+
+                            finish();
+                        }
+                    });
+                }
+            }).start();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (mProgressDialog != null) mProgressDialog.dismiss();
+            toast(e.getLocalizedMessage());
+        }
+    }
 }

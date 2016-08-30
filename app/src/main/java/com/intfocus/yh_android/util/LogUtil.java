@@ -16,7 +16,7 @@ public class LogUtil {
     Log.d(tag, str.substring(0, str.length() > maxLength ? maxLength : str.length()));
     if(str.length() > maxLength && limit < 4) {
       str = str.substring(maxLength, str.length());
-//      LogUtil.d(tag, str, limit);
+      LogUtil.d(tag, str, limit);
     }
   }
 

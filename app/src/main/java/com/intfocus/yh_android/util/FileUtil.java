@@ -1,6 +1,7 @@
 package com.intfocus.yh_android.util;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.Log;
 import java.io.BufferedReader;
@@ -148,14 +149,7 @@ public class FileUtil {
      */
     public static void writeFile(String pathName, String content) throws IOException {
         File file = new File(pathName);
-        Log.i("barcode",pathName);
-        if (file.exists()) {
-            Log.i("barcode","文件存在");
-            file.delete();
-        }
-        else {
-            Log.i("barcode","文件不存在");
-        }
+        if (file.exists()) { file.delete(); }
 
         file.createNewFile();
         FileOutputStream out = new FileOutputStream(file, true);
@@ -414,12 +408,12 @@ public class FileUtil {
     public static void barCodeScanResult(Context mContext, String responseString) {
         try {
             String javascriptPath = FileUtil.sharedPath(mContext) + "/BarCodeScan/assets/javascripts/bar_code_data.js";
-            Log.i("barcode",javascriptPath);
             String javascriptContent = new StringBuilder()
-                .append("(function() {\n")
-                .append("  window.BarCodeData = " + responseString + "\n")
+                .append("(function() {")
+                .append("  window.BarCodeData = " + responseString)
                 .append("}).call(this);")
                 .toString();
+
             Log.i("javascriptContent", javascriptContent);
             FileUtil.writeFile(javascriptPath, javascriptContent);
         } catch(IOException e) {
@@ -479,6 +473,7 @@ public class FileUtil {
         return searchItems;
     }
 
+
     /**
      *  内部报表具有筛选功能时，用户选择的选项，默认第一个选项
      *
@@ -504,4 +499,29 @@ public class FileUtil {
     //
     //FileUtil.writeFile(searchItemsPath, json.toString());
 
+    /*
+	 * 保存截屏文件
+	 *
+	 */
+    public static void saveSnapShot(Bitmap bmp, Context mContext) {
+        // 文件保存的路径
+        String filePath = FileUtil.basePath(mContext) + "/" + "Cached" + "/" + "timestmap.png";
+
+        // 如果有目标文件，删除它
+        File file = new File(filePath);
+        if (file.exists()) {
+            file.delete();
+        }
+        // 声明输出流
+        FileOutputStream outStream = null;
+
+        try {
+            // 获得输出流，写入文件
+            outStream = new FileOutputStream(file);
+            bmp.compress(Bitmap.CompressFormat.PNG, 90, outStream);
+            outStream.close();
+        } catch (IOException e) {
+            Log.e("snapshot", e.toString());
+        }
+    }
 }
