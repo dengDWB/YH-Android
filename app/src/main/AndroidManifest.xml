@@ -2,15 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.intfocus.yh_android"
-<<<<<<< HEAD
-    android:versionCode="132"
-    android:versionName="1.2.70"
-    android:hardwareAccelerated="true">
-=======
     android:versionCode="138"
     android:versionName="1.2.76"
     android:hardwareAccelerated="false">
->>>>>>> 4cbc9b852ff04ad8a478c68820961b004c3f6900
 
     <uses-permission android:name="android.permission.CAMERA" /> <!-- 扫描条形码或二维码 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />

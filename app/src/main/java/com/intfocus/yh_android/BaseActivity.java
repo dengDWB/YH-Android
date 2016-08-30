@@ -265,15 +265,6 @@ public class BaseActivity extends Activity {
                     refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
                 }
             });
-<<<<<<< HEAD
-=======
-    }
-
-
-    public static int dip2px(Context context, float dpValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
->>>>>>> 4cbc9b852ff04ad8a478c68820961b004c3f6900
     }
 
 
@@ -281,6 +272,7 @@ public class BaseActivity extends Activity {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
     }
+
     private class pullToRefreshTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {

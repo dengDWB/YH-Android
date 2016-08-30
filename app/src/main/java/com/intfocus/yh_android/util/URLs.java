@@ -79,19 +79,12 @@ public class URLs extends PrivateURLs implements Serializable {
             if (new File(betaConfigPath).exists()) {
                 betaJSON = FileUtil.readConfigFile(betaConfigPath);
             }
-<<<<<<< HEAD
-            return betaJSON.has("new_ui") && betaJSON.getBoolean("new_ui") ? "v2" : "v1";
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return "v1";
-=======
+
             return betaJSON.has("old_ui") && betaJSON.getBoolean("old_ui") ? "v1" : "v2";
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return "v2";
->>>>>>> 4cbc9b852ff04ad8a478c68820961b004c3f6900
     }
     /**
      * 对URL进行格式处理
