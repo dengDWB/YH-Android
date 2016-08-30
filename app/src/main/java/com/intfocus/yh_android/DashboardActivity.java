@@ -2,8 +2,15 @@ package com.intfocus.yh_android;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+<<<<<<< HEAD
 import android.content.BroadcastReceiver;
 import android.content.Context;
+=======
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+>>>>>>> 4cbc9b852ff04ad8a478c68820961b004c3f6900
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -64,6 +71,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
          */
         checkWhetherFromScreenLockActivity();
 
+<<<<<<< HEAD
         /*
          * 检测服务器静态资源是否更新，并下载
          */
@@ -78,6 +86,24 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         new Thread(mRunnableForDetecting).start();
     }
 
+=======
+        checkUserModifiedInitPassword();
+
+        /*
+         * 检测服务器静态资源是否更新，并下载
+         */
+        checkAssetsUpdated(true);
+
+        /*
+         * 动态注册广播用于接收通知
+         */
+        initLocalNotifications();
+        initNotifictionService();
+
+        new Thread(mRunnableForDetecting).start();
+    }
+
+>>>>>>> 4cbc9b852ff04ad8a478c68820961b004c3f6900
     protected void onResume() {
         mMyApp.setCurrentActivity(this);
         super.onResume();
@@ -194,6 +220,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         }
         badgeView.show();
     }
+<<<<<<< HEAD
 
     /*
      * 配置 mWebView
@@ -203,6 +230,17 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         initWebView();
         setPullToRefreshWebView(true);
 
+=======
+
+    /*
+     * 配置 mWebView
+     */
+    public void loadWebView() {
+        pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
+        initWebView();
+        setPullToRefreshWebView(true);
+
+>>>>>>> 4cbc9b852ff04ad8a478c68820961b004c3f6900
         mWebView.requestFocus();
         mWebView.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");
         mWebView.loadUrl(urlStringForLoading);
@@ -239,6 +277,31 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
+<<<<<<< HEAD
+=======
+    public void checkUserModifiedInitPassword() {
+        try {
+            if(!user.getString("password").equals(URLs.MD5("123456"))) {
+                return;
+            }
+
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(DashboardActivity.this);
+            alertDialog.setTitle("温馨提示");
+            alertDialog.setMessage("初始化密码未修改，安全起见，请在\n【设置】-【个人信息】-【修改密码】页面修改密码");
+
+            alertDialog.setNegativeButton("知道了", new DialogInterface.OnClickListener() {
+                    @Override public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }
+            );
+            alertDialog.show();
+        } catch(JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+>>>>>>> 4cbc9b852ff04ad8a478c68820961b004c3f6900
     /*
      * 用户编号
      */

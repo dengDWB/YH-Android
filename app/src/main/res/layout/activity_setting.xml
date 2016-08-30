@@ -266,13 +266,13 @@
 
             <TextView
                 style="@style/SettingTitle"
-                android:text="测试功能" />
+                android:text="配色主题" />
 
             <RelativeLayout style="@style/SettingGroup">
 
                 <TextView
                     style="@style/SettingKey"
-                    android:text="新版UI" />
+                    android:text="旧版UI" />
 
                 <Switch
                     android:id="@+id/ui_switch"

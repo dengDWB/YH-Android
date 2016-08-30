@@ -46,8 +46,13 @@
             android:textColorHint="#FFFFFF"
             android:textColor="#FFFFFF"
             android:gravity="center"
+<<<<<<< HEAD
             android:text="80666444"
             android:paddingRight="45dp"
+=======
+            android:paddingRight="45dp"
+            android:textCursorDrawable="@null"
+>>>>>>> 4cbc9b852ff04ad8a478c68820961b004c3f6900
             android:inputType="textVisiblePassword"
             android:textSize="20sp"
             android:singleLine="true"
@@ -82,7 +87,11 @@
             android:layout_height="wrap_content"
             android:hint="@string/login_password_placeholder"
             android:inputType="textPassword"
+<<<<<<< HEAD
             android:text="123456"
+=======
+            android:textCursorDrawable="@null"
+>>>>>>> 4cbc9b852ff04ad8a478c68820961b004c3f6900
             android:gravity="center"
             android:paddingRight="45dp"
             android:textColorHint="#FFFFFF"
