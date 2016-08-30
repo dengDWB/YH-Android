@@ -1,4 +1,4 @@
-﻿META-INF/
+﻿META*/
 .current-app
 *.lock
 *.y[a]ml
@@ -31,6 +31,7 @@ gen/
 # Gradle files
 .gradle/
 build/
+libs/*/build
 
 # Local configuration file (sdk path, etc)
 local.properties
