@@ -30,6 +30,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import com.handmark.pulltorefresh.library.ILoadingLayout;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
@@ -45,6 +46,10 @@ import com.pgyersdk.update.UpdateManagerListener;
 import com.squareup.leakcanary.RefWatcher;
 import com.umeng.message.IUmengRegisterCallback;
 import com.umeng.message.PushAgent;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -57,8 +62,6 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by lijunjie on 16/1/14.
@@ -739,6 +742,7 @@ public class BaseActivity extends Activity {
         checkAssetUpdated(shouldReloadUIThread, "images", true);
         checkAssetUpdated(shouldReloadUIThread, "stylesheets", true);
         checkAssetUpdated(shouldReloadUIThread, "javascripts", true);
+        checkAssetUpdated(shouldReloadUIThread, "advertisement", false);
     }
 
     private boolean checkAssetUpdated(boolean shouldReloadUIThread, String assetName, boolean isInAssets) {
