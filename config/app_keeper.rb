@@ -214,6 +214,8 @@ if slop_opts[:java]
       package com.intfocus.yh_android.util;
 
       public class PrivateURLs {
+        public final static String kThemeColor   = "#31809f";
+        public final static String kInitPassword = "123456";
         public final static String kBaseUrl      = "#{Settings.server}";
         public final static String kBaseUrl1     = "http://10.0.3.2:4567";
 

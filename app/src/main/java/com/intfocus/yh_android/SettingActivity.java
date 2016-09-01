@@ -361,9 +361,7 @@ public class SettingActivity extends BaseActivity {
     final View.OnClickListener mPgyerLinkListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            String pgyerUrl = "https://www.pgyer.com/yh-a";
-            Intent browserIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(
-                pgyerUrl));
+            Intent browserIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(URLs.kPgyerUrl));
             startActivity(browserIntent);
         }
     };
@@ -380,13 +378,13 @@ public class SettingActivity extends BaseActivity {
         try {
             JSONObject notificationJSON = FileUtil.readConfigFile(notificationPath);
             // 每次进入设置页面都判断密码是否修改以及是否需要更新
-            int passwordCount = user.getString("password").equals(URLs.MD5("123456")) ? 1 : -1;
+            int passwordCount = user.getString("password").equals(URLs.MD5(URLs.kInitPassword)) ? 1 : -1;
             notificationJSON.put("setting_password", passwordCount);
 
             if (passwordCount == 1) {
-                mWarnPWD.setTextColor(getResources().getColor(R.color.orange));
+                mWarnPWD.setTextColor(Color.parseColor("#808080"));
                 mWarnPWD.setTextSize(16);
-                mWarnPWD.setText("请修改初始密码           ");
+                mWarnPWD.setText("请修改初始密码");
                 mChangePWD.setText("   修改登录密码");
                 setBadgeView("setting_password", bvChangePWD);
             } else {

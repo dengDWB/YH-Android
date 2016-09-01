@@ -247,13 +247,13 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
      */
     public void checkUserModifiedInitPassword() {
         try {
-            if(!user.getString("password").equals(URLs.MD5("123456"))) {
+            if(!user.getString("password").equals(URLs.MD5(URLs.kInitPassword))) {
                 return;
             }
 
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(DashboardActivity.this);
             alertDialog.setTitle("温馨提示");
-            alertDialog.setMessage("初始化密码未修改，安全起见，请在\n【设置】-【个人信息】-【修改密码】页面修改密码");
+            alertDialog.setMessage("安全起见，请在【设置】-【个人信息】-【修改登录密码】页面修改初始密码");
 
             alertDialog.setNegativeButton("知道了", new DialogInterface.OnClickListener() {
                     @Override public void onClick(DialogInterface dialog, int which) {
@@ -366,11 +366,11 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
                 break;
 
             case R.id.linearSearch:
-                toast("【搜索】功能开发中，敬请期待");
+                toast("功能开发中，敬请期待");
                 break;
 
             case R.id.linearVoice:
-                toast("【语音播报】功能开发中，敬请期待");
+                toast("功能开发中，敬请期待");
                 break;
         }
     }
