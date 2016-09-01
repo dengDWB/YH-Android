@@ -25,21 +25,18 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.readystatesoftware.viewbadger.BadgeView;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class DashboardActivity extends BaseActivity implements View.OnClickListener {
     public static final String ACTION_UPDATENOTIFITION = "action.updateNotifition";
@@ -69,11 +66,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         initUserIDColorView();
         initDropMenu();
         loadWebView();
-
-        if (mCurrentTab == mTabKPI) {
-            browserAd.setVisibility(View.VISIBLE);
-            browserAd.loadUrl(String.format("file:///%s/%s.html", FileUtil.sharedPath(this) + "/advertisement", "index_android"));
-        }
+        displayAdOrNot(true);
 
         /*
          * 通过解屏进入界面后，进行用户验证
@@ -115,6 +108,19 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
     }
 
     /*
+     * 仪表盘界面可以显示广告
+     */
+    private void displayAdOrNot(boolean isShouldLoadHtml) {
+        String adIndexPath = FileUtil.sharedPath(this) + "/advertisement/index_android.html";
+        if(isShouldLoadHtml) {
+            browserAd.loadUrl(String.format("file:///%s", adIndexPath));
+        }
+
+        boolean isShouldDisplayAd = mCurrentTab == mTabKPI && new File(adIndexPath).exists();
+        browserAd.setVisibility(isShouldDisplayAd ? View.VISIBLE : View.GONE);
+    }
+
+    /*
      * 动态注册广播用于接收通知
      */
     private void initNotifictionService() {
@@ -135,8 +141,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
     private class NotifitionBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // receiveNotifition();
-            Log.i("Timer", URLs.timestamp());
+            receiveNotifition();
         }
     }
 
@@ -381,8 +386,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                     != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA }, ZBAR_CAMERA_PERMISSION);
-                }
-                else {
+                } else {
                     Intent barCodeScannerIntent = new Intent(mContext, BarCodeScannerActivity.class);
                     mContext.startActivity(barCodeScannerIntent);
                 }
@@ -455,18 +459,13 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             mWebView.loadUrl(loadingPath("loading"));
             String currentUIVersion = URLs.currentUIVersion(mContext);
 
-            if (mCurrentTab == mTabKPI) {
-                browserAd.setVisibility(View.VISIBLE);
-            } else {
-                browserAd.setVisibility(View.GONE);
-            }
+            displayAdOrNot(false);
 
             try {
                 switch (v.getId()) {
                     case R.id.tabKPI:
                         objectType = 1;
                         urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
-                        browserAd.loadUrl(String.format("file:///%s/%s.html", FileUtil.sharedPath(mContext) + "/advertisement", "index_android"));
                         break;
                     case R.id.tabAnalyse:
                         objectType = 2;

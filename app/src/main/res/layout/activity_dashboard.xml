@@ -112,6 +112,7 @@
             android:layout_height="100dp"
             android:scrollbars="none"
             android:visibility="gone"/>
+
         <com.handmark.pulltorefresh.library.PullToRefreshWebView
             android:id="@+id/browser"
             android:layout_width="match_parent"
