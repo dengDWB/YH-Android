@@ -2,14 +2,15 @@ package com.intfocus.yh_android;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -18,21 +19,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.readystatesoftware.viewbadger.BadgeView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class DashboardActivity extends BaseActivity implements View.OnClickListener {
     public static final String ACTION_UPDATENOTIFITION = "action.updateNotifition";
@@ -46,6 +53,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
     private BadgeView bvKpi, bvAnalyse, bvApp, bvMessage, bvBannerSetting;
     private int objectType, kpiNotifition, analyseNotifition, appNotifition, messageNotifition;
     private NotifitionBroadcastReceiver notifitionBroadcastReceiver;
+    private TabView mTabKPI, mTabAnalyse, mTabAPP, mTabMessage;
+    private WebView browserAd;
 
 
     @Override
@@ -60,6 +69,11 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         initUserIDColorView();
         initDropMenu();
         loadWebView();
+
+        if (mCurrentTab == mTabKPI) {
+            browserAd.setVisibility(View.VISIBLE);
+            browserAd.loadUrl(String.format("file:///%s/%s.html", FileUtil.sharedPath(this) + "/advertisement", "index_android"));
+        }
 
         /*
          * 通过解屏进入界面后，进行用户验证
@@ -208,6 +222,19 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         mWebView.requestFocus();
         mWebView.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");
         mWebView.loadUrl(urlStringForLoading);
+
+        browserAd = (WebView) findViewById(R.id.browserAd);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dip2px(this, 100));
+        browserAd.setLayoutParams(layoutParams);
+        browserAd.getSettings().setJavaScriptEnabled(true);
+        browserAd.getSettings().setDefaultTextEncodingName("utf-8");
+        browserAd.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");
+        browserAd.setWebViewClient(new WebViewClient());
+        browserAd.setWebChromeClient(new WebChromeClient() {
+        });
+        browserAd.getSettings().setUseWideViewPort(true);
+        browserAd.getSettings().setLoadWithOverviewMode(true);
+
     }
 
     /*
@@ -374,10 +401,10 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
     @SuppressLint("SetJavaScriptEnabled")
     @JavascriptInterface
     private void initTab() {
-        TabView mTabKPI = (TabView) findViewById(R.id.tabKPI);
-        TabView mTabAnalyse = (TabView) findViewById(R.id.tabAnalyse);
-        TabView mTabAPP = (TabView) findViewById(R.id.tabApp);
-        TabView mTabMessage = (TabView) findViewById(R.id.tabMessage);
+        mTabKPI = (TabView) findViewById(R.id.tabKPI);
+        mTabAnalyse = (TabView) findViewById(R.id.tabAnalyse);
+        mTabAPP = (TabView) findViewById(R.id.tabApp);
+        mTabMessage = (TabView) findViewById(R.id.tabMessage);
         ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 
         if(URLs.kTabBar) {
@@ -427,11 +454,19 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
             mWebView.loadUrl(loadingPath("loading"));
             String currentUIVersion = URLs.currentUIVersion(mContext);
+
+            if (mCurrentTab == mTabKPI) {
+                browserAd.setVisibility(View.VISIBLE);
+            } else {
+                browserAd.setVisibility(View.GONE);
+            }
+
             try {
                 switch (v.getId()) {
                     case R.id.tabKPI:
                         objectType = 1;
                         urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
+                        browserAd.loadUrl(String.format("file:///%s/%s.html", FileUtil.sharedPath(mContext) + "/advertisement", "index_android"));
                         break;
                     case R.id.tabAnalyse:
                         objectType = 2;
@@ -534,6 +569,51 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         }
 
         @JavascriptInterface
+        public void adLink(final String openType, final String openLink) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        switch (openType) {
+                            case "browser":
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                Uri content_url = Uri.parse(openLink);
+                                intent.setData(content_url);
+                                startActivity(intent);
+                                break;
+                            case "tab_kpi":
+                                break;
+                            case "tab_analyse":
+                                jumpTab(mTabMessage);
+                                urlString = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, URLs.currentUIVersion(mContext), user.getString("role_id"));
+                                new Thread(mRunnableForDetecting).start();
+                                break;
+                            case "tab_app":
+                                jumpTab(mTabAPP);
+                                urlString = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, URLs.currentUIVersion(mContext), user.getString("role_id"));
+                                new Thread(mRunnableForDetecting).start();
+                                break;
+                            case "tab_message":
+                                jumpTab(mTabMessage);
+                                urlString = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, URLs.currentUIVersion(mContext), user.getString("role_id"), user.getString("group_id"), user.getString("user_id"));
+                                new Thread(mRunnableForDetecting).start();
+                                break;
+                            case "report":
+                                Intent subjectIntent = new Intent(DashboardActivity.this, SubjectActivity.class);
+                                subjectIntent.putExtra("link", openLink);
+                                subjectIntent.putExtra("bannerName", openType);
+                                startActivity(subjectIntent);
+                                break;
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+        }
+
+        @JavascriptInterface
         public void storeTabIndex(final String pageName, final int tabIndex) {
             try {
                 String filePath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.TABINDEX_CONFIG_FILENAME);
@@ -594,6 +674,13 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
                 e.printStackTrace();
             }
         }
+    }
+
+    public void jumpTab(TabView tabView) {
+        browserAd.setVisibility(View.GONE);
+        mCurrentTab.setActive(false);
+        mCurrentTab = tabView;
+        mCurrentTab.setActive(true);
     }
 
     public void setRedDot(BadgeView badgeView, boolean flag) {
