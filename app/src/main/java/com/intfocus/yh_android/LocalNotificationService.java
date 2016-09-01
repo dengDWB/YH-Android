@@ -48,7 +48,7 @@ public class LocalNotificationService extends Service {
     super.onCreate();
     mContext = this;
 
-    notifitionPath = FileUtil.dirPath(mContext, "Cached", "local_notification.json");
+    notifitionPath = FileUtil.dirPath(mContext, "Cached", URLs.LOCAL_NOTIFICATION_FILENAME);
     userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
     pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.PGYER_VERSION_FILENAME);
 

@@ -20,6 +20,7 @@ import com.intfocus.yh_android.screen_lock.InitPassCodeActivity;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.URLs;
+import com.readystatesoftware.viewbadger.BadgeView;
 import com.umeng.message.PushAgent;
 import com.umeng.message.UmengRegistrar;
 import java.io.File;
@@ -43,6 +44,11 @@ public class SettingActivity extends BaseActivity {
     private Switch mUISwitch;
     private String screenLockInfo;
     private TextView mPygerLink;
+    private TextView mChangePWD;
+    private TextView mCheckUpgrade;
+    private TextView mWarnPWD;
+    private BadgeView bvCheckUpgrade;
+    private BadgeView bvChangePWD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +59,9 @@ public class SettingActivity extends BaseActivity {
         mUserID = (TextView) findViewById(R.id.user_id);
         mRoleID = (TextView) findViewById(R.id.role_id);
         mGroupID = (TextView) findViewById(R.id.group_id);
-        TextView mChangePWD = (TextView) findViewById(R.id.change_pwd);
-        TextView mCheckUpgrade = (TextView) findViewById(R.id.check_upgrade);
+        mChangePWD = (TextView) findViewById(R.id.change_pwd);
+        mWarnPWD = (TextView) findViewById(R.id.warn_pwd);
+        mCheckUpgrade = (TextView) findViewById(R.id.check_upgrade);
         mPygerLink = (TextView) findViewById(R.id.pgyer_link);
         mAppName = (TextView) findViewById(R.id.app_name);
         mAppVersion = (TextView) findViewById(R.id.app_version);
@@ -70,8 +77,10 @@ public class SettingActivity extends BaseActivity {
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));
         mCheckAssets.setOnClickListener(mCheckAssetsListener);
         mUISwitch = (Switch) findViewById(R.id.ui_switch);
-
         mUISwitch.setChecked(URLs.currentUIVersion(mContext).equals("v1"));
+
+        bvCheckUpgrade = new BadgeView(this, mCheckUpgrade);
+        bvChangePWD = new BadgeView(this, mChangePWD);
 
         mChangeLock.setOnClickListener(mChangeLockListener);
         mChangePWD.setOnClickListener(mChangePWDListener);
@@ -90,6 +99,7 @@ public class SettingActivity extends BaseActivity {
         initColorView(colorViews);
 
         initializeUI();
+        setSettingViewControlBadges();
     }
     @Override
     public void onResume() {
@@ -357,4 +367,43 @@ public class SettingActivity extends BaseActivity {
             startActivity(browserIntent);
         }
     };
+
+    /**
+     * 设置界面，需要显示通知样式的控件，检测是否需要通知
+     */
+    private void setSettingViewControlBadges() {
+        String notificationPath = FileUtil.dirPath(mContext, "Cached", URLs.LOCAL_NOTIFICATION_FILENAME);
+        if(!(new File(notificationPath)).exists()) {
+            return;
+        }
+
+        try {
+            JSONObject notificationJSON = FileUtil.readConfigFile(notificationPath);
+            // 每次进入设置页面都判断密码是否修改以及是否需要更新
+            int passwordCount = user.getString("password").equals(URLs.MD5("123456")) ? 1 : -1;
+            notificationJSON.put("setting_password", passwordCount);
+
+            if (passwordCount == 1) {
+                mWarnPWD.setTextColor(getResources().getColor(R.color.orange));
+                mWarnPWD.setTextSize(16);
+                mWarnPWD.setText("请修改初始密码           ");
+                mChangePWD.setText("   修改登录密码");
+                setBadgeView("setting_password", bvChangePWD);
+            } else {
+                mWarnPWD.setVisibility(View.GONE);
+                mChangePWD.setText("修改登录密码");
+                bvChangePWD.setVisibility(View.GONE);
+            }
+
+            if (notificationJSON.getInt("setting_pgyer") == 1) {
+                mCheckUpgrade.setText("   检测更新");
+                setBadgeView("setting_pgyer", bvCheckUpgrade);
+            }
+
+            FileUtil.writeFile(notificationPath, notificationJSON.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 }

@@ -110,12 +110,18 @@
                     android:text="群组ID" />
             </RelativeLayout>
 
-            <RelativeLayout style="@style/SettingGroup">
+            <RelativeLayout style="@style/SettingGroup"
+                android:layout_width="wrap_content">
 
                 <TextView
                     android:id="@+id/change_pwd"
                     style="@style/SettingButton"
+                    android:gravity="center_vertical"
                     android:text="修改登陆密码" />
+
+                <TextView
+                    android:id="@+id/warn_pwd"
+                    style="@style/SettingValue"/>
             </RelativeLayout>
 
             <View style="@style/Divider" />
