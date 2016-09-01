@@ -76,7 +76,7 @@ public class YHApplication extends Application {
         /*
          * 微信平台验证
          */
-        PlatformConfig.setWeixin("wxcff211a335b17088", "af964fd476b59bf54682bb15f23a0569");
+        PlatformConfig.setWeixin(URLs.kWXAppId, URLs.kWXAppId);
 
         /*
          *  蒲公英平台，收集闪退日志
