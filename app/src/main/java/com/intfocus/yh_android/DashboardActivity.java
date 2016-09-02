@@ -62,9 +62,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
         initUrlStrings();
 
+        initDropMenu();
         initTab();
         initUserIDColorView();
-        initDropMenu();
         loadWebView();
         displayAdOrNot(true);
 
@@ -92,7 +92,10 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
     protected void onResume() {
         mMyApp.setCurrentActivity(this);
-
+        /*
+         * 启动 Activity 时也需要判断小红点是否显示
+         */
+        receiveNotification();
         super.onResume();
     }
 
@@ -177,9 +180,11 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             }
             if (notificationJSON.getInt("setting_pgyer") == 1 || notificationJSON.getInt("setting_password") == 1) {
                 setBadgeView("setting", bvBannerSetting);
+                setBadgeView("user",bvUser);
             }
             else {
                 bvBannerSetting.setVisibility(View.GONE);
+                bvUser.setVisibility(View.GONE);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -372,6 +377,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             case R.id.linearVoice:
                 toast("功能开发中，敬请期待");
                 break;
+            default:
+                break;
         }
     }
 
@@ -407,6 +414,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         bvApp = new BadgeView(this, mTabAPP);
         bvMessage = new BadgeView(this, mTabMessage);
         bvBannerSetting = new BadgeView(this, mBannerSetting);
+        bvUser = new BadgeView(this,linearUserInfo);
     }
 
     /*
