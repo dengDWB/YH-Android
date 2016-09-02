@@ -4,15 +4,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,6 +57,13 @@ public class SettingActivity extends BaseActivity {
     private TextView mWarnPWD;
     private BadgeView bvCheckUpgrade;
     private BadgeView bvChangePWD;
+    private IconImageView mIconImageView;
+    private PopupWindow popupWindow;
+
+    /* 请求识别码 */
+    private static final int CODE_GALLERY_REQUEST = 0xa0;
+    private static final int CODE_CAMERA_REQUEST = 0xa1;
+    private static final int CODE_RESULT_REQUEST = 0xa2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +88,8 @@ public class SettingActivity extends BaseActivity {
         TextView mCheckAssets = (TextView) findViewById(R.id.check_assets);
         Button mLogout = (Button) findViewById(R.id.logout);
         mLockSwitch = (Switch) findViewById(R.id.lock_switch);
+        mIconImageView =(IconImageView) findViewById(R.id.img_icon);
+
         screenLockInfo = "取消锁屏成功";
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));
         mCheckAssets.setOnClickListener(mCheckAssetsListener);
@@ -89,15 +106,9 @@ public class SettingActivity extends BaseActivity {
         mLockSwitch.setOnCheckedChangeListener(mSwitchLockListener);
         mUISwitch.setOnCheckedChangeListener(mSwitchUIListener);
         mPygerLink.setOnClickListener(mPgyerLinkListener);
+        mIconImageView.setOnClickListener(mIconImageViewListener);
 
-        List<ImageView> colorViews = new ArrayList<>();
-        colorViews.add((ImageView) findViewById(R.id.colorView0));
-        colorViews.add((ImageView) findViewById(R.id.colorView1));
-        colorViews.add((ImageView) findViewById(R.id.colorView2));
-        colorViews.add((ImageView) findViewById(R.id.colorView3));
-        colorViews.add((ImageView) findViewById(R.id.colorView4));
-        initColorView(colorViews);
-
+        initIconMenu();
         initializeUI();
         setSettingViewControlBadges();
     }
@@ -149,6 +160,142 @@ public class SettingActivity extends BaseActivity {
     private static String getApplicationName(Context context) {
         int stringId = context.getApplicationInfo().labelRes;
         return context.getString(stringId);
+    }
+
+    private final View.OnClickListener mIconImageViewListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            popupWindow.showAtLocation(mIconImageView, Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
+        }
+    };
+
+    public void initIconMenu() {
+        final View iconMenuView = LayoutInflater.from(this).inflate(R.layout.activity_icon_dialog, null);
+
+        Button btnTakePhoto =(Button) iconMenuView.findViewById(R.id.btn_icon_takephoto);
+        Button btnGetPhoto  =(Button) iconMenuView.findViewById(R.id.btn_icon_getphoto);
+        Button btnCancel =(Button) iconMenuView.findViewById(R.id.btn_icon_cancel);
+
+        popupWindow = new PopupWindow(this);
+        popupWindow.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
+        popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setContentView(iconMenuView);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
+        popupWindow.setOutsideTouchable(false);
+        popupWindow.setFocusable(true);
+
+        btnTakePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                choseHeadImageFromCameraCapture();
+            }
+        });
+
+        btnGetPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                choseHeadImageFromGallery();
+            }
+        });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+            }
+        });
+    }
+
+    private void choseHeadImageFromGallery() {
+        Intent intentFromGallery = new Intent();
+        // 设置文件类型
+        intentFromGallery.setType("image/*");
+        intentFromGallery.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intentFromGallery,CODE_GALLERY_REQUEST);
+    }
+
+    // 启动手机相机拍摄照片作为头像
+    private void choseHeadImageFromCameraCapture() {
+        Intent intentFromCapture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        // 判断存储卡是否可用，存储照片文件
+        if (hasSdcard()) {
+            intentFromCapture.putExtra(MediaStore.EXTRA_OUTPUT, Uri.
+                    fromFile(new File(Environment.getExternalStorageDirectory(), "icon.jpg")));
+        }
+
+        startActivityForResult(intentFromCapture,CODE_CAMERA_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,Intent intent) {
+        // 用户没有进行有效的设置操作，返回
+        if (resultCode == RESULT_CANCELED) {
+            Toast.makeText(getApplication(), "取消", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        switch (requestCode) {
+            case CODE_GALLERY_REQUEST:
+                cropPhoto(intent.getData());
+                break;
+            case CODE_CAMERA_REQUEST:
+                if (hasSdcard()) {
+                    File tempFile = new File(Environment.getExternalStorageDirectory(),"icon.jpg");
+                    cropPhoto(Uri.fromFile(tempFile));
+                } else {
+                    Toast.makeText(getApplication(), "没有SDCard!", Toast.LENGTH_LONG).show();
+                }
+                break;
+            case CODE_RESULT_REQUEST:
+                if (intent != null) {
+                    setImageToHeadView(intent);
+                }
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, intent);
+    }
+
+    /*
+     * 调用系统的裁剪
+     */
+    public void cropPhoto(Uri uri) {
+        Intent intent = new Intent("com.android.camera.action.CROP");
+        intent.setDataAndType(uri, "image/*");
+        intent.putExtra("crop", "true");
+        // aspectX aspectY 是宽高的比例
+        intent.putExtra("aspectX", 1);
+        intent.putExtra("aspectY", 1);
+        // outputX outputY 是裁剪图片宽高
+        intent.putExtra("outputX", 150);
+        intent.putExtra("outputY", 150);
+        intent.putExtra("return-data", true);
+        startActivityForResult(intent, CODE_RESULT_REQUEST);
+    }
+
+    /*
+     * 提取保存裁剪之后的图片数据，并设置头像部分的View
+     */
+    private void setImageToHeadView(Intent intent) {
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            Bitmap photo = extras.getParcelable("data");
+            popupWindow.dismiss();
+            mIconImageView.setImageBitmap(photo);
+        }
+    }
+
+    /*
+     * 检查设备是否存在SDCard的工具方法
+     */
+    public static boolean hasSdcard() {
+        String state = Environment.getExternalStorageState();
+        if (state.equals(Environment.MEDIA_MOUNTED)) {
+            // 有存储的SDCard
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /*
