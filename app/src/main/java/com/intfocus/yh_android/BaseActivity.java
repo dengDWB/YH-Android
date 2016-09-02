@@ -891,11 +891,11 @@ public class BaseActivity extends Activity {
         //根据不同屏幕显示密度设置小红点大小
         if (displayDpi < 320) {
             badgeView.setWidth(9);
-            badgeView.setHeight(10);
+            badgeView.setHeight(9);
         }
         else if (displayDpi >= 320 && displayDpi < 480) {
             badgeView.setWidth(19);
-            badgeView.setHeight(20);
+            badgeView.setHeight(19);
         }
         else if (displayDpi >= 480) {
             badgeView.setWidth(25);

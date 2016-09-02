@@ -377,7 +377,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             case R.id.linearVoice:
                 toast("功能开发中，敬请期待");
                 break;
-
             default:
                 break;
         }
