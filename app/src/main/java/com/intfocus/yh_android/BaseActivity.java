@@ -43,6 +43,7 @@ import com.intfocus.yh_android.util.URLs;
 import com.pgyersdk.javabean.AppBean;
 import com.pgyersdk.update.PgyUpdateManager;
 import com.pgyersdk.update.UpdateManagerListener;
+import com.readystatesoftware.viewbadger.BadgeView;
 import com.squareup.leakcanary.RefWatcher;
 import com.umeng.message.IUmengRegisterCallback;
 import com.umeng.message.PushAgent;
@@ -881,6 +882,44 @@ public class BaseActivity extends Activity {
                 }
             }
         }
+    }
+
+    /*
+	   * 设置应用内通知小红点参数
+	   */
+    public void setBadgeView(String type, BadgeView badgeView) {
+        //根据不同屏幕显示密度设置小红点大小
+        if (displayDpi < 320) {
+            badgeView.setWidth(10);
+            badgeView.setHeight(10);
+        }
+        else if (displayDpi >= 320 && displayDpi < 480) {
+            badgeView.setWidth(20);
+            badgeView.setHeight(20);
+        }
+        else if (displayDpi >= 480) {
+            badgeView.setWidth(25);
+            badgeView.setHeight(25);
+        }
+
+        //badgeView.setText(badgerCount);  //暂不需要计数
+        badgeView.setBadgePosition(BadgeView.POSITION_TOP_RIGHT);
+        if (type.equals("setting")) {
+            badgeView.setBadgeMargin(20, 15);
+        }
+        else if (type.equals("tab")) {
+            badgeView.setBadgeMargin(45, 0);
+        }
+        else if (type.equals("setting_pgyer")){
+            badgeView.setBadgeMargin(165, 0);
+        }
+        else if (type.equals("setting_password")){
+            badgeView.setBadgeMargin(250, 0);
+        }
+        else {
+            badgeView.setBadgeMargin(45, 0);
+        }
+        badgeView.show();
     }
 
     class JavaScriptBase {

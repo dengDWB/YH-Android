@@ -76,7 +76,7 @@ public class YHApplication extends Application {
         /*
          * 微信平台验证
          */
-        PlatformConfig.setWeixin("wxcff211a335b17088", "af964fd476b59bf54682bb15f23a0569");
+        PlatformConfig.setWeixin(URLs.kWXAppId, URLs.kWXAppId);
 
         /*
          *  蒲公英平台，收集闪退日志
@@ -119,7 +119,6 @@ public class YHApplication extends Application {
          *  手机待机再激活时发送开屏广播
          */
         registerReceiver(broadcastScreenOnAndOff, new IntentFilter(Intent.ACTION_SCREEN_ON));
-        // registerReceiver(broadcastScreenOnAndOff, new IntentFilter(Intent.ACTION_SCREEN_OFF));
 
         /*
          *  监测内存泄漏

@@ -25,21 +25,18 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.readystatesoftware.viewbadger.BadgeView;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class DashboardActivity extends BaseActivity implements View.OnClickListener {
     public static final String ACTION_UPDATENOTIFITION = "action.updateNotifition";
@@ -49,10 +46,10 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
     private BadgeView bvUser, bvVoice;
     private LinearLayout linearUserInfo,linearScan,linearVoice,linearSearch;
     private ArrayList<String> urlStrings;
-    JSONObject notifition;
+    private JSONObject notificationJSON;
     private BadgeView bvKpi, bvAnalyse, bvApp, bvMessage, bvBannerSetting;
     private int objectType, kpiNotifition, analyseNotifition, appNotifition, messageNotifition;
-    private NotifitionBroadcastReceiver notifitionBroadcastReceiver;
+    private NotificationBroadcastReceiver notificationBroadcastReceiver;
     private TabView mTabKPI, mTabAnalyse, mTabAPP, mTabMessage;
     private WebView browserAd;
 
@@ -69,11 +66,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         initUserIDColorView();
         initDropMenu();
         loadWebView();
-
-        if (mCurrentTab == mTabKPI) {
-            browserAd.setVisibility(View.VISIBLE);
-            browserAd.loadUrl(String.format("file:///%s/%s.html", FileUtil.sharedPath(this) + "/advertisement", "index_android"));
-        }
+        displayAdOrNot(true);
 
         /*
          * 通过解屏进入界面后，进行用户验证
@@ -89,19 +82,24 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
          * 动态注册广播用于接收通知
          */
         initLocalNotifications();
-        initNotifictionService();
+        initNotificationService();
 
         new Thread(mRunnableForDetecting).start();
+
+
+        checkUserModifiedInitPassword();
     }
 
     protected void onResume() {
         mMyApp.setCurrentActivity(this);
+
         super.onResume();
     }
 
     @Override
     protected void onStop() {
         popupWindow.dismiss();
+
         super.onStop();
     }
 
@@ -110,18 +108,32 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         mWebView = null;
         user = null;
         popupWindow.dismiss();
-        unregisterReceiver(notifitionBroadcastReceiver);
+        unregisterReceiver(notificationBroadcastReceiver);
+
         super.onDestroy();
+    }
+
+    /*
+     * 仪表盘界面可以显示广告
+     */
+    private void displayAdOrNot(boolean isShouldLoadHtml) {
+        String adIndexPath = FileUtil.sharedPath(this) + "/advertisement/index_android.html";
+        if(isShouldLoadHtml) {
+            browserAd.loadUrl(String.format("file:///%s", adIndexPath));
+        }
+
+        boolean isShouldDisplayAd = mCurrentTab == mTabKPI && new File(adIndexPath).exists();
+        browserAd.setVisibility(isShouldDisplayAd ? View.VISIBLE : View.GONE);
     }
 
     /*
      * 动态注册广播用于接收通知
      */
-    private void initNotifictionService() {
+    private void initNotificationService() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_UPDATENOTIFITION);
-        notifitionBroadcastReceiver = new NotifitionBroadcastReceiver();
-        registerReceiver(notifitionBroadcastReceiver, filter);
+        notificationBroadcastReceiver = new NotificationBroadcastReceiver();
+        registerReceiver(notificationBroadcastReceiver, filter);
         /*
          * 打开通知服务,用于发送通知
          */
@@ -132,25 +144,24 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
     /*
      * 定义广播接收器（内部类），接收到后调用是否显示通知的判断逻辑
      */
-    private class NotifitionBroadcastReceiver extends BroadcastReceiver {
+    private class NotificationBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // receiveNotifition();
-            Log.i("Timer", URLs.timestamp());
+            receiveNotification();
         }
     }
 
     /*
      * 通知显示判断逻辑，在 Activity 显示和接收到广播时都会调用
      */
-    private void receiveNotifition() {
+    private void receiveNotification() {
         try {
-            String noticePath = FileUtil.dirPath(mContext, "Cached", "local_notification.json");
-            notifition = FileUtil.readConfigFile(noticePath);
-            kpiNotifition = notifition.getInt("tab_kpi");
-            analyseNotifition = notifition.getInt("tab_analyse");
-            appNotifition = notifition.getInt("tab_app");
-            messageNotifition = notifition.getInt("tab_message");
+            String noticePath = FileUtil.dirPath(mContext, "Cached", URLs.LOCAL_NOTIFICATION_FILENAME);
+            notificationJSON = FileUtil.readConfigFile(noticePath);
+            kpiNotifition = notificationJSON.getInt("tab_kpi");
+            analyseNotifition = notificationJSON.getInt("tab_analyse");
+            appNotifition = notificationJSON.getInt("tab_app");
+            messageNotifition = notificationJSON.getInt("tab_message");
 
             if (kpiNotifition > 0 && objectType != 1) {
                 setBadgeView("tab", bvKpi);
@@ -164,7 +175,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             if (messageNotifition > 0 && objectType != 5) {
                 setBadgeView("tab", bvMessage);
             }
-            if (notifition.getInt("setting_pgyer") == 1 || notifition.getInt("setting_password") == 1) {
+            if (notificationJSON.getInt("setting_pgyer") == 1 || notificationJSON.getInt("setting_password") == 1) {
                 setBadgeView("setting", bvBannerSetting);
             }
             else {
@@ -173,42 +184,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    /*
-	   * 设置应用内通知小红点参数
-	   */
-    public void setBadgeView(String type, BadgeView badgeView) {
-        //根据不同屏幕显示密度设置小红点大小
-        if (displayDpi < 320) {
-            badgeView.setWidth(10);
-            badgeView.setHeight(10);
-        } else if (displayDpi >= 320 && displayDpi < 480) {
-            badgeView.setWidth(20);
-            badgeView.setHeight(20);
-        } else if (displayDpi >= 480) {
-            badgeView.setWidth(25);
-            badgeView.setHeight(25);
-        }
-
-        //badgeView.setText(badgerCount);  //暂不需要计数
-        badgeView.setBadgePosition(BadgeView.POSITION_TOP_RIGHT);
-        if (type.equals("setting")) {
-            badgeView.setBadgeMargin(20, 15);
-        }
-        else if (type.equals("tab")) {
-            badgeView.setBadgeMargin(45, 0);
-        }
-        else if (type.equals("upgrade")){
-            badgeView.setBadgeMargin(165, 0);
-        }
-        else if (type.equals("changePWD")){
-            badgeView.setBadgeMargin(250, 0);
-        }
-        else {
-            badgeView.setBadgeMargin(45, 0);
-        }
-        badgeView.show();
     }
 
     /*
@@ -234,7 +209,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         });
         browserAd.getSettings().setUseWideViewPort(true);
         browserAd.getSettings().setLoadWithOverviewMode(true);
-
     }
 
     /*
@@ -268,15 +242,18 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
+    /*
+     * 用户编号
+     */
     public void checkUserModifiedInitPassword() {
         try {
-            if(!user.getString("password").equals(URLs.MD5("123456"))) {
+            if(!user.getString("password").equals(URLs.MD5(URLs.kInitPassword))) {
                 return;
             }
 
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(DashboardActivity.this);
             alertDialog.setTitle("温馨提示");
-            alertDialog.setMessage("初始化密码未修改，安全起见，请在\n【设置】-【个人信息】-【修改密码】页面修改密码");
+            alertDialog.setMessage("安全起见，请在【设置】-【个人信息】-【修改登录密码】页面修改初始密码");
 
             alertDialog.setNegativeButton("知道了", new DialogInterface.OnClickListener() {
                     @Override public void onClick(DialogInterface dialog, int which) {
@@ -331,7 +308,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             viewSeparator.setVisibility(URLs.kDropMenuScan ? View.VISIBLE : View.GONE);
 
             linearScan.setVisibility(URLs.kDropMenuScan ? View.VISIBLE : View.GONE);
-        } else {
+        }
+        else {
             linearScan.setOnClickListener(this);
         }
 
@@ -340,7 +318,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             viewSeparator.setVisibility(URLs.kDropMenuVoice ? View.VISIBLE : View.GONE);
 
             linearVoice.setVisibility(URLs.kDropMenuVoice ? View.VISIBLE : View.GONE);
-        } else {
+        }
+        else {
             linearVoice.setOnClickListener(this);
         }
 
@@ -349,18 +328,17 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             viewSeparator.setVisibility(URLs.kDropMenuSearch ? View.VISIBLE : View.GONE);
 
             linearSearch.setVisibility(URLs.kDropMenuSearch ? View.VISIBLE : View.GONE);
-        } else {
+        }
+        else {
             linearSearch.setOnClickListener(this);
         }
 
         if(!URLs.kDropMenuUserInfo) {
             linearUserInfo.setVisibility(URLs.kDropMenuUserInfo ? View.VISIBLE : View.GONE);
             linearUserInfo.setOnClickListener(this);
-        } else {
+        }
+        else {
             linearUserInfo.setOnClickListener(this);
-
-            // bvUser = new BadgeView(DashboardActivity.this, linearUserInfo);
-            // setRedDot(bvUser, false);
         }
     }
 
@@ -381,19 +359,18 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                     != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA }, ZBAR_CAMERA_PERMISSION);
-                }
-                else {
+                } else {
                     Intent barCodeScannerIntent = new Intent(mContext, BarCodeScannerActivity.class);
                     mContext.startActivity(barCodeScannerIntent);
                 }
                 break;
 
             case R.id.linearSearch:
-                toast("【搜索】功能开发中，敬请期待");
+                toast("功能开发中，敬请期待");
                 break;
 
             case R.id.linearVoice:
-                toast("【语音播报】功能开发中，敬请期待");
+                toast("功能开发中，敬请期待");
                 break;
         }
     }
@@ -412,7 +389,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             mTabAnalyse.setVisibility( URLs.kTabBarAnalyse ? View.VISIBLE : View.GONE);
             mTabAPP.setVisibility(URLs.kTabBarApp ? View.VISIBLE : View.GONE);
             mTabMessage.setVisibility(URLs.kTabBarMessage ? View.VISIBLE : View.GONE);
-        } else {
+        }
+        else {
            findViewById(R.id.toolBar).setVisibility(View.GONE);
         }
 
@@ -455,36 +433,49 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             mWebView.loadUrl(loadingPath("loading"));
             String currentUIVersion = URLs.currentUIVersion(mContext);
 
-            if (mCurrentTab == mTabKPI) {
-                browserAd.setVisibility(View.VISIBLE);
-            } else {
-                browserAd.setVisibility(View.GONE);
-            }
+            displayAdOrNot(false);
 
             try {
                 switch (v.getId()) {
                     case R.id.tabKPI:
                         objectType = 1;
                         urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
-                        browserAd.loadUrl(String.format("file:///%s/%s.html", FileUtil.sharedPath(mContext) + "/advertisement", "index_android"));
+
+                        bvKpi.setVisibility(View.GONE);
+                        notificationJSON.put("tab_kpi", 0);
                         break;
                     case R.id.tabAnalyse:
                         objectType = 2;
                         urlString = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
+
+                        bvAnalyse.setVisibility(View.GONE);
+                        notificationJSON.put("tab_analyse", 0);
                         break;
                     case R.id.tabApp:
                         objectType = 3;
                         urlString = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
+
+                        bvApp.setVisibility(View.GONE);
+                        notificationJSON.put("tab_app", 0);
                         break;
                     case R.id.tabMessage:
                         objectType = 5;
                         urlString = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"), user.getString("group_id"), user.getString("user_id"));
+
+                        bvMessage.setVisibility(View.GONE);
+                        notificationJSON.put("tab_message", 0);
                         break;
                     default:
                         objectType = 1;
                         urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
+
+                        bvKpi.setVisibility(View.GONE);
+                        notificationJSON.put("tab_kpi", 0);
                         break;
                 }
+
+                String notificationPath = FileUtil.dirPath(mContext, "Cached", URLs.LOCAL_NOTIFICATION_FILENAME);
+                FileUtil.writeFile(notificationPath, notificationJSON.toString());
 
                 new Thread(mRunnableForDetecting).start();
             } catch (Exception e) {
@@ -511,9 +502,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
     public void launchSettingActivity(View v) {
         ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
         popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -87), dip2px(this, 10));
-
-        // Intent intent = new Intent(mContext, SettingActivity.class);
-        // mContext.startActivity(intent);
 
         /*
          * 用户行为记录, 单独异常处理，不可影响用户体验
@@ -726,7 +714,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
      */
     private void initLocalNotifications() {
         try {
-            String noticePath = FileUtil.dirPath(mContext, "Cached", "local_notification.json");
+            String noticePath = FileUtil.dirPath(mContext, "Cached", URLs.LOCAL_NOTIFICATION_FILENAME);
             if((new File(noticePath)).exists()) {
                 return;
             }

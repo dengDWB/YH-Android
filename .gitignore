@@ -32,6 +32,10 @@ gen/
 .gradle/
 build/
 libs/*/build
+libs/umeng-push/build
+libs/pull-to-refresh/build
+libs/android-pdfview/build
+libs/*/*.iml
 
 # Local configuration file (sdk path, etc)
 local.properties
