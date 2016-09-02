@@ -1,4 +1,4 @@
-﻿META-INF/
+﻿META*/
 .current-app
 *.lock
 *.y[a]ml
@@ -31,6 +31,11 @@ gen/
 # Gradle files
 .gradle/
 build/
+libs/*/build
+libs/umeng-push/build
+libs/pull-to-refresh/build
+libs/android-pdfview/build
+libs/*/*.iml
 
 # Local configuration file (sdk path, etc)
 local.properties

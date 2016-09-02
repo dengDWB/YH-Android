@@ -214,6 +214,8 @@ if slop_opts[:java]
       package com.intfocus.yh_android.util;
 
       public class PrivateURLs {
+        public final static String kThemeColor   = "#31809f";
+        public final static String kInitPassword = "123456";
         public final static String kBaseUrl      = "#{Settings.server}";
         public final static String kBaseUrl1     = "http://10.0.3.2:4567";
 
@@ -265,6 +267,11 @@ end
 if slop_opts[:pgyer]
   response = `curl --silent -F "file=@#{apk_path}" -F "uKey=#{Settings.pgyer.user_key}" -F "_api_key=#{Settings.pgyer.api_key}" http://www.pgyer.com/apiv1/app/upload`
 
-  hash = JSON.parse(response).deep_symbolize_keys[:data]
-  puts %(- done: upload apk(#{hash[:appFileSize].to_i.to_s(:human_size)}) to #pgyer#\n\t#{hash[:appName]}\n\t#{hash[:appIdentifier]}\n\t#{hash[:appVersion]}(#{hash[:appVersionNo]})\n\t#{hash[:appQRCodeURL]})
+  begin
+    hash = JSON.parse(response).deep_symbolize_keys[:data]
+    puts %(- done: upload apk(#{hash[:appFileSize].to_i.to_s(:human_size)}) to #pgyer#\n\t#{hash[:appName]}\n\t#{hash[:appIdentifier]}\n\t#{hash[:appVersion]}(#{hash[:appVersionNo]})\n\t#{hash[:appQRCodeURL]})
+  rescue => e
+    puts response.inspect
+    puts e.message
+  end
 end

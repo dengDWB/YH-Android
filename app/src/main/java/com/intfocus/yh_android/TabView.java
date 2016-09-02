@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.intfocus.yh_android.util.URLs;
 
 /**
  * Created by wiky on 1/10/16.
@@ -51,8 +52,7 @@ public class TabView extends LinearLayout {
         mTextView = new TextView(context);
         mTextView.setText(mText);
         mTextView.setGravity(Gravity.CENTER_HORIZONTAL);
-        layoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.topMargin = 6;
         addView(mTextView, layoutParams);
 
@@ -62,7 +62,7 @@ public class TabView extends LinearLayout {
     private void update() {
         if (mActive) {
             mImageView.setImageDrawable(mActiveDrawable);
-            mTextView.setTextColor(Color.parseColor("#53a93f"));
+            mTextView.setTextColor(Color.parseColor(URLs.kThemeColor));
         } else {
             mImageView.setImageDrawable(mDrawable);
             mTextView.setTextColor(Color.BLACK);

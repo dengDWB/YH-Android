@@ -30,6 +30,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import com.handmark.pulltorefresh.library.ILoadingLayout;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
@@ -42,9 +43,14 @@ import com.intfocus.yh_android.util.URLs;
 import com.pgyersdk.javabean.AppBean;
 import com.pgyersdk.update.PgyUpdateManager;
 import com.pgyersdk.update.UpdateManagerListener;
+import com.readystatesoftware.viewbadger.BadgeView;
 import com.squareup.leakcanary.RefWatcher;
 import com.umeng.message.IUmengRegisterCallback;
 import com.umeng.message.PushAgent;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -57,8 +63,6 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by lijunjie on 16/1/14.
@@ -272,6 +276,7 @@ public class BaseActivity extends Activity {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
     }
+
     private class pullToRefreshTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
@@ -738,6 +743,7 @@ public class BaseActivity extends Activity {
         checkAssetUpdated(shouldReloadUIThread, "images", true);
         checkAssetUpdated(shouldReloadUIThread, "stylesheets", true);
         checkAssetUpdated(shouldReloadUIThread, "javascripts", true);
+        checkAssetUpdated(shouldReloadUIThread, "advertisement", false);
     }
 
     private boolean checkAssetUpdated(boolean shouldReloadUIThread, String assetName, boolean isInAssets) {
@@ -876,6 +882,49 @@ public class BaseActivity extends Activity {
                 }
             }
         }
+    }
+
+    /*
+	   * 设置应用内通知小红点参数
+	   */
+    public void setBadgeView(String type, BadgeView badgeView) {
+        //根据不同屏幕显示密度设置小红点大小
+        if (displayDpi < 320) {
+            badgeView.setWidth(9);
+            badgeView.setHeight(10);
+        }
+        else if (displayDpi >= 320 && displayDpi < 480) {
+            badgeView.setWidth(19);
+            badgeView.setHeight(20);
+        }
+        else if (displayDpi >= 480) {
+            badgeView.setWidth(25);
+            badgeView.setHeight(25);
+        }
+
+        //badgeView.setText(badgerCount);  //暂不需要计数
+        badgeView.setBadgePosition(BadgeView.POSITION_TOP_RIGHT);
+        switch (type) {
+            case "setting":
+                badgeView.setBadgeMargin(20, 15);
+                break;
+            case "tab":
+                badgeView.setBadgeMargin(45, 0);
+                break;
+            case "setting_pgyer":
+                badgeView.setBadgeMargin(165, 0);
+                break;
+            case "setting_password":
+                badgeView.setBadgeMargin(250, 0);
+                break;
+            case "user":
+                badgeView.setBadgeMargin(0, 5);
+                break;
+            default:
+                badgeView.setBadgeMargin(45, 0);
+                break;
+        }
+        badgeView.show();
     }
 
     class JavaScriptBase {

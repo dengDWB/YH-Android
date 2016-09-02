@@ -41,19 +41,20 @@ public class URLs extends PrivateURLs implements Serializable {
 
     public final static String REPORT_DATA_FILENAME      = "group_%s_template_%s_report_%s.js";
 
-    public final static String USER_CONFIG_FILENAME      = "user.plist";
+    public final static String USER_CONFIG_FILENAME      = "user.json";
     public final static String CONFIG_DIRNAME            = "Configs";
-    public final static String SETTINGS_CONFIG_FILENAME  = "setting.plist";
-    public final static String BETA_CONFIG_FILENAME      = "beta.plist";
-    public final static String PUSH_CONFIG_FILENAME      = "push_message.plist";
-    public final static String TABINDEX_CONFIG_FILENAME  = "page_tab_index.plist";
-    public final static String GESTURE_PASSWORD_FILENAME = "gesture_password.plist";
+    public final static String SETTINGS_CONFIG_FILENAME  = "setting.json";
+    public final static String BETA_CONFIG_FILENAME      = "beta.json";
+    public final static String PUSH_CONFIG_FILENAME      = "push_message.json";
+    public final static String TABINDEX_CONFIG_FILENAME  = "page_tab_index.json";
+    public final static String GESTURE_PASSWORD_FILENAME = "gesture_password.json";
     public final static String HTML_DIRNAME              = "HTML";
     public final static String SHARED_DIRNAME            = "Shared";
     public final static String CACHED_DIRNAME            = "Cached";
-    public final static String CACHED_HEADER_FILENAME    = "cached_header.plist";
+    public final static String CACHED_HEADER_FILENAME    = "cached_header.json";
     public final static String CURRENT_VERSION_FILENAME  = "current_version.txt";
     public final static String PGYER_VERSION_FILENAME    = "pgyer_version.txt";
+    public final static String LOCAL_NOTIFICATION_FILENAME = "local_notification.json";
 
     public static String storage_base(Context context) {
         //    String path = "";
@@ -79,11 +80,12 @@ public class URLs extends PrivateURLs implements Serializable {
             if (new File(betaConfigPath).exists()) {
                 betaJSON = FileUtil.readConfigFile(betaConfigPath);
             }
-            return betaJSON.has("new_ui") && betaJSON.getBoolean("new_ui") ? "v2" : "v1";
+
+            return betaJSON.has("old_ui") && betaJSON.getBoolean("old_ui") ? "v1" : "v2";
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return "v1";
+        return "v2";
     }
     /**
      * 对URL进行格式处理
