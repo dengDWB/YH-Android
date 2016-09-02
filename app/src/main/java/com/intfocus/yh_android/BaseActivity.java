@@ -890,12 +890,12 @@ public class BaseActivity extends Activity {
     public void setBadgeView(String type, BadgeView badgeView) {
         //根据不同屏幕显示密度设置小红点大小
         if (displayDpi < 320) {
-            badgeView.setWidth(10);
-            badgeView.setHeight(10);
+            badgeView.setWidth(9);
+            badgeView.setHeight(9);
         }
         else if (displayDpi >= 320 && displayDpi < 480) {
-            badgeView.setWidth(20);
-            badgeView.setHeight(20);
+            badgeView.setWidth(19);
+            badgeView.setHeight(19);
         }
         else if (displayDpi >= 480) {
             badgeView.setWidth(25);
@@ -904,20 +904,25 @@ public class BaseActivity extends Activity {
 
         //badgeView.setText(badgerCount);  //暂不需要计数
         badgeView.setBadgePosition(BadgeView.POSITION_TOP_RIGHT);
-        if (type.equals("setting")) {
-            badgeView.setBadgeMargin(20, 15);
-        }
-        else if (type.equals("tab")) {
-            badgeView.setBadgeMargin(45, 0);
-        }
-        else if (type.equals("setting_pgyer")){
-            badgeView.setBadgeMargin(165, 0);
-        }
-        else if (type.equals("setting_password")){
-            badgeView.setBadgeMargin(250, 0);
-        }
-        else {
-            badgeView.setBadgeMargin(45, 0);
+        switch (type) {
+            case "setting":
+                badgeView.setBadgeMargin(20, 15);
+                break;
+            case "tab":
+                badgeView.setBadgeMargin(45, 0);
+                break;
+            case "setting_pgyer":
+                badgeView.setBadgeMargin(165, 0);
+                break;
+            case "setting_password":
+                badgeView.setBadgeMargin(250, 0);
+                break;
+            case "user":
+                badgeView.setBadgeMargin(0, 5);
+                break;
+            default:
+                badgeView.setBadgeMargin(45, 0);
+                break;
         }
         badgeView.show();
     }
