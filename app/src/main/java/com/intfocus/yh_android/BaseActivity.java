@@ -912,10 +912,8 @@ public class BaseActivity extends Activity {
                 badgeView.setBadgeMargin(45, 0);
                 break;
             case "setting_pgyer":
-                badgeView.setBadgeMargin(165, 0);
-                break;
             case "setting_password":
-                badgeView.setBadgeMargin(250, 0);
+                badgeView.setBadgePosition(BadgeView.POSITION_TOP_LEFT);
                 break;
             case "user":
                 badgeView.setBadgeMargin(0, 5);

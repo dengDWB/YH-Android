@@ -159,7 +159,7 @@ public class SettingActivity extends BaseActivity {
                 pgyerInfo = String.format("%s(%s)", responseData.getString("versionName"), responseData.getString("versionCode"));
                 betaLink = pgyerInfo.equals(versionInfo) ? "" : pgyerInfo;
             }
-            mPygerLink.setText(betaLink.isEmpty() ? "已是最新版本" : String.format("有发布测试版本%s", pgyerInfo));
+            mPygerLink.setText(betaLink.isEmpty() ? "已是最新版本" : String.format("有发布版本%s", pgyerInfo));
             mPygerLink.setTextColor(Color.parseColor(betaLink.isEmpty() ? "#808080" : "#0000ff"));
         } catch (NameNotFoundException e) {
             e.printStackTrace();
