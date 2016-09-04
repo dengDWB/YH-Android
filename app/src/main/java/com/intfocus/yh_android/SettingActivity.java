@@ -61,6 +61,7 @@ public class SettingActivity extends BaseActivity {
     private IconImageView mIconImageView;
     private PopupWindow popupWindow;
     private String iconPath;
+    private ImageView imgUser;
 
     /* 请求识别码 */
     private static final int CODE_GALLERY_REQUEST = 0xa0;
@@ -91,6 +92,7 @@ public class SettingActivity extends BaseActivity {
         Button mLogout = (Button) findViewById(R.id.logout);
         mLockSwitch = (Switch) findViewById(R.id.lock_switch);
         mIconImageView =(IconImageView) findViewById(R.id.img_icon);
+        imgUser =(ImageView) findViewById(R.id.img_bg_user);
 
         screenLockInfo = "取消锁屏成功";
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));
@@ -137,6 +139,8 @@ public class SettingActivity extends BaseActivity {
             mDeviceID.setText(TextUtils.split(android.os.Build.MODEL, " - ")[0]);
             mApiDomain.setText(URLs.kBaseUrl.replace("http://", "").replace("https://", ""));
 
+            imgUser.setImageResource(R.drawable.bg_user);
+            imgUser.setAlpha(0.5f);
             iconPath = FileUtil.dirPath(mContext,URLs.CONFIG_DIRNAME,"icon.jpg");
             if (new File(iconPath).exists()) {
                 Bitmap bitmap = BitmapFactory.decodeFile(iconPath);
