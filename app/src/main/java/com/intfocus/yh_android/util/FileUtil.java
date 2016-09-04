@@ -503,10 +503,7 @@ public class FileUtil {
 	 * 保存截屏文件
 	 *
 	 */
-    public static void saveSnapShot(Bitmap bmp, Context mContext) {
-        // 文件保存的路径
-        String filePath = FileUtil.basePath(mContext) + "/" + "Cached" + "/" + "timestmap.png";
-
+    public static void saveImage(String filePath,Bitmap bmp) {
         // 如果有目标文件，删除它
         File file = new File(filePath);
         if (file.exists()) {
