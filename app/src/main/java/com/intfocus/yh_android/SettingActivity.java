@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -59,6 +60,7 @@ public class SettingActivity extends BaseActivity {
     private BadgeView bvChangePWD;
     private IconImageView mIconImageView;
     private PopupWindow popupWindow;
+    private String iconPath;
 
     /* 请求识别码 */
     private static final int CODE_GALLERY_REQUEST = 0xa0;
@@ -135,6 +137,15 @@ public class SettingActivity extends BaseActivity {
             mDeviceID.setText(TextUtils.split(android.os.Build.MODEL, " - ")[0]);
             mApiDomain.setText(URLs.kBaseUrl.replace("http://", "").replace("https://", ""));
 
+            iconPath = FileUtil.dirPath(mContext,URLs.CONFIG_DIRNAME,"icon.jpg");
+            if (new File(iconPath).exists()) {
+                Bitmap bitmap = BitmapFactory.decodeFile(iconPath);
+                mIconImageView.setImageBitmap(bitmap);
+            }
+            else {
+                mIconImageView.setImageResource(R.drawable.login_bg_logo);
+            }
+
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             String versionInfo = String.format("%s(%d)", packageInfo.versionName, packageInfo.versionCode);
             mAppVersion.setText(versionInfo);
@@ -187,14 +198,14 @@ public class SettingActivity extends BaseActivity {
         btnTakePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                choseHeadImageFromCameraCapture();
+                getCameraCapture();
             }
         });
 
         btnGetPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                choseHeadImageFromGallery();
+                getGallery();
             }
         });
 
@@ -206,22 +217,28 @@ public class SettingActivity extends BaseActivity {
         });
     }
 
-    private void choseHeadImageFromGallery() {
+    /*
+     * 获取相册图片
+     */
+    private void getGallery() {
         Intent intentFromGallery = new Intent();
-        // 设置文件类型
         intentFromGallery.setType("image/*");
         intentFromGallery.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intentFromGallery,CODE_GALLERY_REQUEST);
     }
 
-    // 启动手机相机拍摄照片作为头像
-    private void choseHeadImageFromCameraCapture() {
+    /*
+     * 启动拍照并获取图片
+     */
+    private void getCameraCapture() {
         Intent intentFromCapture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-        // 判断存储卡是否可用，存储照片文件
+        /*
+         * 需要调用裁剪图片功能，无法读取内部存储，故使用 SD 卡先存储图片
+         */
         if (hasSdcard()) {
             intentFromCapture.putExtra(MediaStore.EXTRA_OUTPUT, Uri.
-                    fromFile(new File(Environment.getExternalStorageDirectory(), "icon.jpg")));
+                    fromFile(new File(Environment.getExternalStorageDirectory(),"icon.jpg")));
         }
 
         startActivityForResult(intentFromCapture,CODE_CAMERA_REQUEST);
@@ -229,7 +246,7 @@ public class SettingActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode,Intent intent) {
-        // 用户没有进行有效的设置操作，返回
+        // 用户没有选择图片，返回
         if (resultCode == RESULT_CANCELED) {
             Toast.makeText(getApplication(), "取消", Toast.LENGTH_LONG).show();
             return;
@@ -240,14 +257,10 @@ public class SettingActivity extends BaseActivity {
                 cropPhoto(intent.getData());
                 break;
             case CODE_CAMERA_REQUEST:
-                if (hasSdcard()) {
                     File tempFile = new File(Environment.getExternalStorageDirectory(),"icon.jpg");
                     cropPhoto(Uri.fromFile(tempFile));
-                } else {
-                    Toast.makeText(getApplication(), "没有SDCard!", Toast.LENGTH_LONG).show();
-                }
                 break;
-            case CODE_RESULT_REQUEST:
+            default:
                 if (intent != null) {
                     setImageToHeadView(intent);
                 }
@@ -279,9 +292,10 @@ public class SettingActivity extends BaseActivity {
     private void setImageToHeadView(Intent intent) {
         Bundle extras = intent.getExtras();
         if (extras != null) {
-            Bitmap photo = extras.getParcelable("data");
+            Bitmap userIcon = extras.getParcelable("data");
             popupWindow.dismiss();
-            mIconImageView.setImageBitmap(photo);
+            FileUtil.saveImage(iconPath,userIcon);
+            mIconImageView.setImageBitmap(userIcon);
         }
     }
 
@@ -291,7 +305,6 @@ public class SettingActivity extends BaseActivity {
     public static boolean hasSdcard() {
         String state = Environment.getExternalStorageState();
         if (state.equals(Environment.MEDIA_MOUNTED)) {
-            // 有存储的SDCard
             return true;
         } else {
             return false;

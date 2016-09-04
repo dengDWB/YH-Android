@@ -364,7 +364,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         mWebView.destroyDrawingCache();
         Canvas c = new Canvas(imgBmp);
         mWebView.draw(c);
-        FileUtil.saveSnapShot(imgBmp,mContext);
+        FileUtil.saveImage(filePath,imgBmp);
 
         File file = new File(filePath);
         if (file.exists()) {
