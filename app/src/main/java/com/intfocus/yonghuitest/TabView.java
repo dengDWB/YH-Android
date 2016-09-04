@@ -1,4 +1,4 @@
-package com.intfocus.yh_android;
+package com.intfocus.yonghuitest;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.intfocus.yh_android.util.URLs;
+import com.intfocus.yonghuitest.util.URLs;
 
 /**
  * Created by wiky on 1/10/16.

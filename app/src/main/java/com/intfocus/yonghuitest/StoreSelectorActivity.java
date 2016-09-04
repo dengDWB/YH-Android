@@ -1,4 +1,4 @@
-package com.intfocus.yh_android;
+package com.intfocus.yonghuitest;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -14,8 +14,8 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import com.intfocus.yh_android.util.FileUtil;
-import com.intfocus.yh_android.util.LogUtil;
+import com.intfocus.yonghuitest.util.FileUtil;
+import com.intfocus.yonghuitest.util.LogUtil;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;

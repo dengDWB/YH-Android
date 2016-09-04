@@ -3,7 +3,7 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             tools:context="com.intfocus.yh_android.SettingActivity">
+             tools:context="com.intfocus.yonghuitest.SettingActivity">
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -20,7 +20,7 @@
                 android:layout_height="200dp"
                 android:background="@drawable/bg_user">
 
-                <com.intfocus.yh_android.IconImageView
+                <com.intfocus.yonghuitest.IconImageView
                     android:id="@+id/img_icon"
                     android:layout_width="80dp"
                     android:layout_height="80dp"

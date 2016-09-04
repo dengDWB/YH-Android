@@ -1,4 +1,4 @@
-package com.intfocus.yh_android.wxapi;
+package com.intfocus.yonghuitest.wxapi;
 
 
 import com.umeng.socialize.weixin.view.WXCallbackActivity;

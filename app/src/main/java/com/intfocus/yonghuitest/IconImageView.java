@@ -1,4 +1,4 @@
-package com.intfocus.yh_android;
+package com.intfocus.yonghuitest;
 
 import android.content.Context;
 import android.graphics.Bitmap;

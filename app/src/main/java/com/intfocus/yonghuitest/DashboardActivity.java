@@ -1,4 +1,4 @@
-package com.intfocus.yh_android;
+package com.intfocus.yonghuitest;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -26,10 +26,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
-import com.intfocus.yh_android.util.ApiHelper;
-import com.intfocus.yh_android.util.FileUtil;
-import com.intfocus.yh_android.util.LogUtil;
-import com.intfocus.yh_android.util.URLs;
+import com.intfocus.yonghuitest.util.ApiHelper;
+import com.intfocus.yonghuitest.util.FileUtil;
+import com.intfocus.yonghuitest.util.LogUtil;
+import com.intfocus.yonghuitest.util.URLs;
 import com.readystatesoftware.viewbadger.BadgeView;
 import java.io.File;
 import java.io.IOException;

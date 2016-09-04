@@ -1,4 +1,4 @@
-package com.intfocus.yh_android;
+package com.intfocus.yonghuitest;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,8 +7,8 @@ import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageView;
-import com.intfocus.yh_android.util.ApiHelper;
-import com.intfocus.yh_android.util.FileUtil;
+import com.intfocus.yonghuitest.util.ApiHelper;
+import com.intfocus.yonghuitest.util.FileUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;

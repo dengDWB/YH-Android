@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.intfocus.yh_android"
+    package="com.intfocus.yonghuitest"
     android:versionCode="144"
     android:versionName="1.2.84"
     android:hardwareAccelerated="false">
@@ -22,9 +22,17 @@
     <!-- 可选-->
     <uses-permission android:name="android.permission.READ_LOGS" /> <!-- 获取logcat日志 -->
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.SET_DEBUG_APP" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+
     <application
         tools:replace="android:icon,android:theme"
-        android:name="com.intfocus.yh_android.YHApplication"
+        android:name="com.intfocus.yonghuitest.YHApplication"
         android:allowBackup="true"
         android:icon="@mipmap/launcher"
         android:label="@string/app_name"
@@ -45,7 +53,7 @@
             android:enabled="false" />
         -->
         <activity
-            android:name="com.intfocus.yh_android.LoginActivity"
+            android:name="com.intfocus.yonghuitest.LoginActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/FullscreenTheme" >
@@ -56,48 +64,48 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.intfocus.yh_android.DashboardActivity"
+            android:name="com.intfocus.yonghuitest.DashboardActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yh_android.SettingActivity"
+            android:name="com.intfocus.yonghuitest.SettingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yh_android.SubjectActivity"
+            android:name="com.intfocus.yonghuitest.SubjectActivity"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yh_android.ReportSelectorAcitity"
+            android:name="com.intfocus.yonghuitest.ReportSelectorAcitity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yh_android.CommentActivity"
+            android:name="com.intfocus.yonghuitest.CommentActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yh_android.ResetPasswordActivity"
+            android:name="com.intfocus.yonghuitest.ResetPasswordActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yh_android.BarCodeScannerActivity"
+            android:name="com.intfocus.yonghuitest.BarCodeScannerActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yh_android.BarCodeResultActivity"
+            android:name="com.intfocus.yonghuitest.BarCodeResultActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yh_android.StoreSelectorActivity"
+            android:name="com.intfocus.yonghuitest.StoreSelectorActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yh_android.screen_lock.InitPassCodeActivity"
+            android:name="com.intfocus.yonghuitest.screen_lock.InitPassCodeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity"
+            android:name="com.intfocus.yonghuitest.screen_lock.ConfirmPassCodeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
@@ -105,7 +113,7 @@
             android:theme="@style/Theme.UMDefault"
             android:excludeFromRecents="true"/>
         <activity
-            android:name="com.intfocus.yh_android.wxapi.WXEntryActivity"
+            android:name="com.intfocus.yonghuitest.wxapi.WXEntryActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:screenOrientation="portrait"
@@ -113,11 +121,11 @@
 
 
         <!-- Services -->
-        <service android:name=".LocalNotificationService"></service>
+        <service android:name="com.intfocus.yonghuitest.LocalNotificationService"></service>
 
 
         <!-- Services -->
-        <service android:name=".LocalNotificationService"></service>
+        <service android:name="com.intfocus.yonghuitest.LocalNotificationService"></service>
 
         <!-- 蒲公英 必选-->
         <meta-data

@@ -1,4 +1,4 @@
-package com.intfocus.yh_android;
+package com.intfocus.yonghuitest;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
@@ -7,10 +7,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
-import com.intfocus.yh_android.util.ApiHelper;
-import com.intfocus.yh_android.util.FileUtil;
-import com.intfocus.yh_android.util.URLs;
+
+import com.intfocus.yonghuitest.screen_lock.ConfirmPassCodeActivity;
+import com.intfocus.yonghuitest.util.ApiHelper;
+import com.intfocus.yonghuitest.util.FileUtil;
+import com.intfocus.yonghuitest.util.URLs;
 
 public class LoginActivity extends BaseActivity {
     private EditText usernameEditText, passwordEditText;

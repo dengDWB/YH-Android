@@ -1,4 +1,4 @@
-package com.intfocus.yh_android;
+package com.intfocus.yonghuitest;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -12,9 +12,9 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
 
-import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
-import com.intfocus.yh_android.util.FileUtil;
-import com.intfocus.yh_android.util.URLs;
+import com.intfocus.yonghuitest.screen_lock.ConfirmPassCodeActivity;
+import com.intfocus.yonghuitest.util.FileUtil;
+import com.intfocus.yonghuitest.util.URLs;
 import com.pgyersdk.crash.PgyCrashManager;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;

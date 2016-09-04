@@ -1,4 +1,4 @@
-package com.intfocus.yh_android;
+package com.intfocus.yonghuitest;
 
 import android.app.Service;
 import android.content.Context;
@@ -7,9 +7,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.util.Log;
-import com.intfocus.yh_android.util.FileUtil;
-import com.intfocus.yh_android.util.HttpUtil;
-import com.intfocus.yh_android.util.URLs;
+import com.intfocus.yonghuitest.util.FileUtil;
+import com.intfocus.yonghuitest.util.HttpUtil;
+import com.intfocus.yonghuitest.util.URLs;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;

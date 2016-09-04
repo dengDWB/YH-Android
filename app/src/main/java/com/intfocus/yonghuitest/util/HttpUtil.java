@@ -1,4 +1,4 @@
-package com.intfocus.yh_android.util;
+package com.intfocus.yonghuitest.util;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

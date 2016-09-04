@@ -1,4 +1,4 @@
-package com.intfocus.yh_android;
+package com.intfocus.yonghuitest;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -11,8 +11,8 @@ import android.webkit.JavascriptInterface;
 import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
-import com.intfocus.yh_android.util.ApiHelper;
-import com.intfocus.yh_android.util.URLs;
+import com.intfocus.yonghuitest.util.ApiHelper;
+import com.intfocus.yonghuitest.util.URLs;
 
 import org.json.JSONException;
 import org.json.JSONObject;

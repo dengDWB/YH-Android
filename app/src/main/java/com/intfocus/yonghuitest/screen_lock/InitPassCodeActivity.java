@@ -1,4 +1,4 @@
-package com.intfocus.yh_android.screen_lock;
+package com.intfocus.yonghuitest.screen_lock;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,11 +16,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.intfocus.yh_android.R;
-import com.intfocus.yh_android.YHApplication;
-import com.intfocus.yh_android.util.ApiHelper;
-import com.intfocus.yh_android.util.FileUtil;
-import com.intfocus.yh_android.util.URLs;
+import com.intfocus.yonghuitest.R;
+import com.intfocus.yonghuitest.YHApplication;
+import com.intfocus.yonghuitest.util.ApiHelper;
+import com.intfocus.yonghuitest.util.FileUtil;
+import com.intfocus.yonghuitest.util.URLs;
 
 import org.json.JSONException;
 import org.json.JSONObject;
