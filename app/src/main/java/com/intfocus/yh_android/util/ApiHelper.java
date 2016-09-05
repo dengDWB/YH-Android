@@ -353,10 +353,10 @@ public class ApiHelper {
 
     /**
      * 上传锁屏信息
+     * @param state 是否启用锁屏
      *
      * @param deviceID 设备标识
      * @param password 锁屏密码
-     * @param state 是否启用锁屏
      */
     public static void screenLock(String deviceID, String password, boolean state) {
         String urlString = String.format(URLs.API_SCREEN_LOCK_PATH, URLs.kBaseUrl, deviceID);
@@ -431,9 +431,7 @@ public class ApiHelper {
             } else {
                 return false;
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (JSONException | IOException e) {
             e.printStackTrace();
         }
         return false;

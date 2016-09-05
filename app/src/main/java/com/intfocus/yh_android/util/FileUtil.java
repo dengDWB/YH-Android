@@ -15,7 +15,6 @@ import java.io.InputStreamReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -201,10 +200,10 @@ public class FileUtil {
     /*
      * algorithm can be "MD5", "SHA-1", "SHA-256"
      */
-    private static String hashFile(File file, String algorithm) {
+    private static String hashFile(File file) {
         try {
             FileInputStream inputStream = new FileInputStream(file);
-            MessageDigest digest = MessageDigest.getInstance(algorithm);
+            MessageDigest digest = MessageDigest.getInstance("MD5");
 
             byte[] bytesBuffer = new byte[1024];
             int bytesRead;
@@ -222,7 +221,7 @@ public class FileUtil {
     }
 
     public static String MD5(File file) {
-        return hashFile(file, "MD5");
+        return hashFile(file);
     }
 
     private static String MD5(InputStream inputStream) {
@@ -377,8 +376,6 @@ public class FileUtil {
 
     /**
      * 读取 assets 文件内容
-     * @param  filename
-     * @return
      */
     public static String assetsFileContent(Context mContext, String assetName) {
         String content = "";

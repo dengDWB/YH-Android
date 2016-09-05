@@ -53,7 +53,7 @@ public class ResetPasswordActivity extends BaseActivity {
      */
     public void dismissActivity(View v) {
         ResetPasswordActivity.this.onBackPressed();
-    };
+    }
 
     private class JavaScriptInterface extends JavaScriptBase  {
         /*

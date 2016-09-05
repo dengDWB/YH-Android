@@ -111,7 +111,7 @@ public class BarCodeResultActivity extends BaseActivity {
    */
   public void dismissActivity(View v) {
     BarCodeResultActivity.this.onBackPressed();
-  };
+  }
 
   public void updateHtmlContentTimetamp() {
     try {

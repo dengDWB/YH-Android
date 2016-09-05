@@ -51,7 +51,7 @@ public class YHApplication extends Application {
                     Log.i("currentActivityName", currentActivityName.trim().equals("ConfirmPassCodeActivity") ? "YES" : "NO");
                 }
                 catch(NoSuchMethodError e) {
-                    e.printStackTrace();;
+                    e.printStackTrace();
                 }
             }
             Log.i("currentActivityName", "[" + currentActivityName + "]");

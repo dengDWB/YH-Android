@@ -51,13 +51,13 @@ public class IconImageView extends ImageView {
 
 	/*
 	 * 获取圆形图片
-	 */
-	private Bitmap getCircleBitmap(Bitmap bitmap, int pixels) {
-		Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
-				bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-		Canvas canvas = new Canvas(output);
+		*/
+		private Bitmap getCircleBitmap(Bitmap bitmap, int pixels) {
+			Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+					bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+			Canvas canvas = new Canvas(output);
 
-		final int color = 0xff424242;
+			final int color = 0xff424242;
 
 		final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
 		paint.setAntiAlias(true);

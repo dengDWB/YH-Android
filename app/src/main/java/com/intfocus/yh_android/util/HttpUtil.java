@@ -63,7 +63,7 @@ public class HttpUtil {
             }
             retMap.put("code", String.format("%d", response.code()));
             retMap.put("body", response.body().string());
-            LogUtil.d("BODY", retMap.get("body").toString());
+            LogUtil.d("BODY", retMap.get("body"));
 
             if(isJSON) {
                 LogUtil.d("code", retMap.get("code"));
@@ -310,7 +310,6 @@ public class HttpUtil {
     /**
      * Check if there is any connectivity to a Wifi network
      * @param context
-     * @param type
      * @return
      */
     public static boolean isConnectedWifi(Context context){
@@ -321,7 +320,6 @@ public class HttpUtil {
     /**
      * Check if there is any connectivity to a mobile network
      * @param context
-     * @param type
      * @return
      */
     public static boolean isConnectedMobile(Context context){
