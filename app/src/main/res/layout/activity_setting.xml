@@ -10,24 +10,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <FrameLayout
-            android:id="@+id/user_info"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp">
-
-            <ImageView
-                android:id="@+id/img_bg_user"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"/>
+            android:layout_height="wrap_content">
 
             <RelativeLayout
+                android:id="@+id/user_info"
                 android:layout_width="match_parent"
-                android:layout_height="200dp">
+                android:layout_height="180dp"
+                android:background="@drawable/bg_user">
 
                 <com.intfocus.yh_android.IconImageView
                     android:id="@+id/img_icon"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:layout_centerInParent="true"/>
 
                 <TextView
@@ -66,209 +62,210 @@
                         android:layout_toRightOf="@id/commas"
                         android:textColor="@color/white"/>
                 </LinearLayout>
-            </RelativeLayout>
-        </FrameLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/user_info"
-            android:layout_marginBottom="20dp"
-            android:orientation="vertical"
-            android:paddingBottom="18dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:paddingTop="18dp">
-
-            <TextView
-                style="@style/SettingTitle"
-                android:text="应用信息"/>
-
-            <RelativeLayout style="@style/SettingGroup">
-
-                <TextView
-                    style="@style/SettingKey"
-                    android:text="名称"/>
-
-                <TextView
-                    android:id="@+id/app_name"
-                    style="@style/SettingValue"
-                    android:text="应用名称"/>
             </RelativeLayout>
 
-            <RelativeLayout style="@style/SettingGroup">
-
-                <TextView
-                    style="@style/SettingKey"
-                    android:text="版本号"/>
-
-                <TextView
-                    android:id="@+id/app_version"
-                    style="@style/SettingValue"
-                    android:text="v1.0"/>
-            </RelativeLayout>
-
-            <RelativeLayout style="@style/SettingGroup">
-
-                <TextView
-                    style="@style/SettingKey"
-                    android:text="设备型号"/>
-
-                <TextView
-                    android:id="@+id/device_id"
-                    style="@style/SettingValue"
-                    android:text="设备型号"/>
-            </RelativeLayout>
-
-            <RelativeLayout style="@style/SettingGroup">
-
-                <TextView
-                    style="@style/SettingKey"
-                    android:text="消息推送"/>
-
-                <TextView
-                    android:id="@+id/push_state"
-                    style="@style/SettingValue"
-                    android:layout_marginTop="5dp"
-                    android:text="状态"
-                    android:textSize="12dp"/>
-            </RelativeLayout>
-
-            <RelativeLayout style="@style/SettingGroup">
-
-                <TextView
-                    style="@style/SettingKey"
-                    android:text="数据接口"/>
-
-                <TextView
-                    android:id="@+id/api_domain"
-                    style="@style/SettingValue"
-                    android:layout_marginTop="5dp"
-                    android:text="域名"
-                    android:textSize="12dp"/>
-            </RelativeLayout>
-
-            <RelativeLayout style="@style/SettingGroup">
-
-                <TextView
-                    style="@style/SettingKey"
-                    android:text="应用标识"/>
-
-                <TextView
-                    android:id="@+id/app_identifier"
-                    style="@style/SettingValue"
-                    android:layout_marginTop="5dp"
-                    android:text="标识"
-                    android:textSize="12dp"/>
-            </RelativeLayout>
-
-            <RelativeLayout style="@style/SettingGroup">
-
-                <TextView
-                    android:id="@+id/check_assets"
-                    style="@style/SettingButton"
-                    android:text="校正"/>
-
-                <TextView
-                    style="@style/SettingValue"
-                    android:layout_marginTop="3dp"
-                    android:text="若界面显示异常，请校正"
-                    android:textColor="@color/gray"
-                    android:textSize="12dp"/>
-            </RelativeLayout>
-
-
-            <RelativeLayout style="@style/SettingGroup">
-
-                <TextView
-                    android:id="@+id/check_upgrade"
-                    style="@style/SettingButton"
-                    android:text="检测更新"/>
-
-                <TextView
-                    android:id="@+id/pgyer_link"
-                    style="@style/SettingValue"
-                    android:layout_marginTop="3dp"
-                    android:text="有测试版本发布（1.2.33）"
-                    android:textColor="#0000ff"
-                    android:textSize="12dp"/>
-            </RelativeLayout>
-
-            <View style="@style/Divider"/>
-
-            <TextView
-                style="@style/SettingTitle"
-                android:text="安全策略"/>
-
-            <RelativeLayout style="@style/SettingGroup">
-
-                <TextView
-                    style="@style/SettingKey"
-                    android:text="启用锁屏"/>
-
-                <Switch
-                    android:id="@+id/lock_switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"/>
-            </RelativeLayout>
-
-
-            <RelativeLayout style="@style/SettingGroup">
-
-                <TextView
-                    android:id="@+id/change_lock"
-                    style="@style/SettingButton"
-                    android:text="修改锁屏密码"
-                    android:visibility="gone"/>
-            </RelativeLayout>
-
-            <RelativeLayout
-                style="@style/SettingGroup"
-                android:layout_width="wrap_content">
-
-                <TextView
-                    android:id="@+id/change_pwd"
-                    style="@style/SettingButton"
-                    android:gravity="center_vertical"
-                    android:text="修改登陆密码"/>
-
-                <TextView
-                    android:id="@+id/warn_pwd"
-                    style="@style/SettingValue"/>
-            </RelativeLayout>
-
-            <View style="@style/Divider"/>
-
-            <TextView
-                style="@style/SettingTitle"
-                android:text="配色主题"/>
-
-            <RelativeLayout style="@style/SettingGroup">
-
-                <TextView
-                    style="@style/SettingKey"
-                    android:text="旧版UI"/>
-
-                <Switch
-                    android:id="@+id/ui_switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"/>
-            </RelativeLayout>
-
-            <View style="@style/Divider"/>
-
-            <Button
-                android:id="@+id/logout"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/logout_background"
-                android:text="退出登录"
-                android:textColor="@color/white"/>
-        </LinearLayout>
+                android:layout_below="@id/user_info"
+                android:layout_marginBottom="20dp"
+                android:orientation="vertical"
+                android:paddingBottom="18dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="18dp">
+
+                <TextView
+                    style="@style/SettingTitle"
+                    android:text="应用信息"/>
+
+                <RelativeLayout style="@style/SettingGroup">
+
+                    <TextView
+                        style="@style/SettingKey"
+                        android:text="名称"/>
+
+                    <TextView
+                        android:id="@+id/app_name"
+                        style="@style/SettingValue"
+                        android:text="应用名称"/>
+                </RelativeLayout>
+
+                <RelativeLayout style="@style/SettingGroup">
+
+                    <TextView
+                        style="@style/SettingKey"
+                        android:text="版本号"/>
+
+                    <TextView
+                        android:id="@+id/app_version"
+                        style="@style/SettingValue"
+                        android:text="v1.0"/>
+                </RelativeLayout>
+
+                <RelativeLayout style="@style/SettingGroup">
+
+                    <TextView
+                        style="@style/SettingKey"
+                        android:text="设备型号"/>
+
+                    <TextView
+                        android:id="@+id/device_id"
+                        style="@style/SettingValue"
+                        android:text="设备型号"/>
+                </RelativeLayout>
+
+                <RelativeLayout style="@style/SettingGroup">
+
+                    <TextView
+                        style="@style/SettingKey"
+                        android:text="消息推送"/>
+
+                    <TextView
+                        android:id="@+id/push_state"
+                        style="@style/SettingValue"
+                        android:layout_marginTop="5dp"
+                        android:text="状态"
+                        android:textSize="12dp"/>
+                </RelativeLayout>
+
+                <RelativeLayout style="@style/SettingGroup">
+
+                    <TextView
+                        style="@style/SettingKey"
+                        android:text="数据接口"/>
+
+                    <TextView
+                        android:id="@+id/api_domain"
+                        style="@style/SettingValue"
+                        android:layout_marginTop="5dp"
+                        android:text="域名"
+                        android:textSize="12dp"/>
+                </RelativeLayout>
+
+                <RelativeLayout style="@style/SettingGroup">
+
+                    <TextView
+                        style="@style/SettingKey"
+                        android:text="应用标识"/>
+
+                    <TextView
+                        android:id="@+id/app_identifier"
+                        style="@style/SettingValue"
+                        android:layout_marginTop="5dp"
+                        android:text="标识"
+                        android:textSize="12dp"/>
+                </RelativeLayout>
+
+                <RelativeLayout style="@style/SettingGroup">
+
+                    <TextView
+                        android:id="@+id/check_assets"
+                        style="@style/SettingButton"
+                        android:text="校正"/>
+
+                    <TextView
+                        style="@style/SettingValue"
+                        android:layout_marginTop="3dp"
+                        android:text="若界面显示异常，请校正"
+                        android:textColor="@color/gray"
+                        android:textSize="12dp"/>
+                </RelativeLayout>
+
+
+                <RelativeLayout style="@style/SettingGroup">
+
+                    <TextView
+                        android:id="@+id/check_upgrade"
+                        style="@style/SettingButton"
+                        android:text="检测更新"/>
+
+                    <TextView
+                        android:id="@+id/pgyer_link"
+                        style="@style/SettingValue"
+                        android:layout_marginTop="3dp"
+                        android:text="有测试版本发布（1.2.33）"
+                        android:textColor="#0000ff"
+                        android:textSize="12dp"/>
+                </RelativeLayout>
+
+                <View style="@style/Divider"/>
+
+                <TextView
+                    style="@style/SettingTitle"
+                    android:text="安全策略"/>
+
+                <RelativeLayout style="@style/SettingGroup">
+
+                    <TextView
+                        style="@style/SettingKey"
+                        android:text="启用锁屏"/>
+
+                    <Switch
+                        android:id="@+id/lock_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"/>
+                </RelativeLayout>
+
+
+                <RelativeLayout style="@style/SettingGroup">
+
+                    <TextView
+                        android:id="@+id/change_lock"
+                        style="@style/SettingButton"
+                        android:text="修改锁屏密码"
+                        android:visibility="gone"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    style="@style/SettingGroup"
+                    android:layout_width="wrap_content">
+
+                    <TextView
+                        android:id="@+id/change_pwd"
+                        style="@style/SettingButton"
+                        android:gravity="center_vertical"
+                        android:text="修改登陆密码"/>
+
+                    <TextView
+                        android:id="@+id/warn_pwd"
+                        style="@style/SettingValue"/>
+                </RelativeLayout>
+
+                <View style="@style/Divider"/>
+
+                <TextView
+                    style="@style/SettingTitle"
+                    android:text="配色主题"/>
+
+                <RelativeLayout style="@style/SettingGroup">
+
+                    <TextView
+                        style="@style/SettingKey"
+                        android:text="旧版UI"/>
+
+                    <Switch
+                        android:id="@+id/ui_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"/>
+                </RelativeLayout>
+
+                <View style="@style/Divider"/>
+
+                <Button
+                    android:id="@+id/logout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/logout_background"
+                    android:text="退出登录"
+                    android:textColor="@color/white"/>
+            </LinearLayout>
+        </RelativeLayout>
     </ScrollView>
 
     <RelativeLayout

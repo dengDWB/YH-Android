@@ -4,7 +4,7 @@
     package="com.intfocus.yh_android"
     android:versionCode="144"
     android:versionName="1.2.84"
-    android:hardwareAccelerated="false">
+    android:hardwareAccelerated="true">
 
     <uses-permission android:name="android.permission.CAMERA" /> <!-- 扫描条形码或二维码 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
