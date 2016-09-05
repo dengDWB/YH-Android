@@ -54,7 +54,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
     private TabView mTabKPI, mTabAnalyse, mTabAPP, mTabMessage;
     private WebView browserAd;
 
-
     @Override
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +66,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         initTab();
         initUserIDColorView();
         loadWebView();
-        displayAdOrNot(true);
+        // displayAdOrNot(true);
 
         /*
          * 通过解屏进入界面后，进行用户验证
@@ -225,6 +224,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         browserAd.setLayoutParams(layoutParams);
         browserAd.getSettings().setJavaScriptEnabled(true);
         browserAd.getSettings().setDefaultTextEncodingName("utf-8");
+        browserAd.requestFocus();
         browserAd.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");
         browserAd.setWebViewClient(new WebViewClient());
         browserAd.setWebChromeClient(new WebChromeClient() {
@@ -458,7 +458,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             mWebView.loadUrl(loadingPath("loading"));
             String currentUIVersion = URLs.currentUIVersion(mContext);
 
-            displayAdOrNot(false);
+            // displayAdOrNot(false);
 
             try {
                 switch (v.getId()) {
@@ -557,7 +557,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
                     LogUtil.d("JSClick", message);
 
                     Intent intent = new Intent(DashboardActivity.this, SubjectActivity.class);
-                    intent.setFlags(intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     intent.putExtra("bannerName", bannerName);
                     intent.putExtra("link", link);
                     intent.putExtra("objectID", objectID);
@@ -582,11 +582,11 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         }
 
         @JavascriptInterface
-        public void adLink(final String openType, final String openLink) {
+        public void adLink(final String openType, final String openLink, final String ObjeckID, final String objectType
+                                ,final String objectTitle) {
             runOnUiThread(new Runnable() {
                 @Override
-                public void run() {
-                    try {
+                    public void run() {
                         switch (openType) {
                             case "browser":
                                 Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -597,19 +597,13 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
                             case "tab_kpi":
                                 break;
                             case "tab_analyse":
-                                jumpTab(mTabMessage);
-                                urlString = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, URLs.currentUIVersion(mContext), user.getString("role_id"));
-                                new Thread(mRunnableForDetecting).start();
+                                mTabAnalyse.performClick();
                                 break;
                             case "tab_app":
-                                jumpTab(mTabAPP);
-                                urlString = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, URLs.currentUIVersion(mContext), user.getString("role_id"));
-                                new Thread(mRunnableForDetecting).start();
+                                mTabAPP.performClick();
                                 break;
                             case "tab_message":
-                                jumpTab(mTabMessage);
-                                urlString = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, URLs.currentUIVersion(mContext), user.getString("role_id"), user.getString("group_id"), user.getString("user_id"));
-                                new Thread(mRunnableForDetecting).start();
+                                mTabMessage.performClick();
                                 break;
                             case "report":
                                 Intent subjectIntent = new Intent(DashboardActivity.this, SubjectActivity.class);
@@ -618,10 +612,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
                                 startActivity(subjectIntent);
                                 break;
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
                 }
             });
         }
@@ -687,25 +677,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
                 e.printStackTrace();
             }
         }
-    }
-
-    public void jumpTab(TabView tabView) {
-        browserAd.setVisibility(View.GONE);
-        mCurrentTab.setActive(false);
-        mCurrentTab = tabView;
-        mCurrentTab.setActive(true);
-    }
-
-    public void setRedDot(BadgeView badgeView, boolean flag) {
-        badgeView.setBadgePosition(BadgeView.POSITION_TOP_RIGHT);
-        badgeView.setWidth(dip2px(this, 7));
-        badgeView.setHeight(dip2px(this, 7));
-        //是否为最右上角
-        if(flag){
-            badgeView.setBadgeMargin(0, 0);
-        }
-
-        badgeView.show();
     }
 
     private void initUrlStrings() {
