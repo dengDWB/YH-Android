@@ -237,7 +237,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             lp.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
             getWindow().setAttributes(lp);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        } else {
+        }
+        else {
             WindowManager.LayoutParams attr = getWindow().getAttributes();
             attr.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
             getWindow().setAttributes(attr);
