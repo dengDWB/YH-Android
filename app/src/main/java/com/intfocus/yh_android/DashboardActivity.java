@@ -34,6 +34,7 @@ import com.readystatesoftware.viewbadger.BadgeView;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -120,9 +121,25 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
      * 仪表盘界面可以显示广告
      */
     private void displayAdOrNot(boolean isShouldLoadHtml) {
-        String adIndexPath = FileUtil.sharedPath(this) + "/advertisement/index_android.html";
+        String adIndexBasePath = FileUtil.sharedPath(this) + "/advertisement/index_android";
+        String adIndexPath = adIndexBasePath + ".html";
+        String adIndexWithTimestampPath = adIndexBasePath + ".timestamp.html";
+        if(new File(adIndexPath).exists()) {
+            String htmlContent = FileUtil.readFile(adIndexPath);
+            htmlContent = htmlContent.replaceAll("TIMESTAMP", String.format("%d", new Date().getTime()));
+
+            try {
+                FileUtil.writeFile(adIndexWithTimestampPath, htmlContent);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            isShouldLoadHtml = false;
+        }
+
         if(isShouldLoadHtml) {
-            browserAd.loadUrl(String.format("file:///%s", adIndexPath));
+            browserAd.loadUrl(String.format("file:///%s", adIndexWithTimestampPath));
         }
 
         boolean isShouldDisplayAd = mCurrentTab == mTabKPI && new File(adIndexPath).exists();
