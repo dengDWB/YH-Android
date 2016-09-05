@@ -1,24 +1,16 @@
 package com.intfocus.yh_android;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Picture;
-import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
-import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
@@ -28,11 +20,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.ddmlib.AdbCommandRejectedException;
-import com.android.ddmlib.AndroidDebugBridge;
-import com.android.ddmlib.IDevice;
-import com.android.ddmlib.RawImage;
-import com.android.ddmlib.TimeoutException;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
@@ -50,8 +37,6 @@ import com.umeng.socialize.media.UMImage;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -274,7 +259,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
              */
             isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
             if(isSupportSearch) {
-                displayBannerTitleAndSearchIcon();;
+                displayBannerTitleAndSearchIcon();
             }
 
             new Thread(new Runnable() {
@@ -430,14 +415,14 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         } catch (Exception e) {
             e.printStackTrace();
         }
-    };
+    }
 
     /*
      * 返回
      */
     public void dismissActivity(View v) {
         SubjectActivity.this.onBackPressed();
-    };
+    }
 
     private class pullToRefreshTask extends AsyncTask<Void, Void, Void> {
         @Override

@@ -72,7 +72,7 @@ public class CommentActivity extends BaseActivity {
      */
     public void dismissActivity(View v) {
         CommentActivity.this.onBackPressed();
-    };
+    }
 
     private class JavaScriptInterface extends JavaScriptBase  {
         /*
