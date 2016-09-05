@@ -107,10 +107,8 @@ public class LocalNotificationService extends Service {
       String[] typeString = {"kpi", "analyse", "app", "message"};
       int[] typeCount = {kpiCount, analyseCount, appCount, messageCount};
       for (int i = 0; i < typeString.length; i++) {
-        if (notifition.getInt("tab_" + typeString[i] + "_last") > 0 && notifition.getInt("tab_" + typeString[i] + "_last") != typeCount[i]) {
           notifition.put("tab_" + typeString[i], Math.abs(typeCount[i] - notifition.getInt("tab_" + typeString[i] + "_last")));
           notifition.put("tab_" + typeString[i] + "_last", typeCount[i]);
-        }
       }
 
       if ((new File(pgyerVersionPath)).exists()) {

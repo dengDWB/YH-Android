@@ -36,5 +36,5 @@ public class PrivateURLs {
   public final static boolean kTabBarMessage = true;
   
   public final static boolean kSubjectComment = true;
-  public final static boolean kSubjectShare   = true;
+  public final static boolean kSubjectShare   = false;
 }
