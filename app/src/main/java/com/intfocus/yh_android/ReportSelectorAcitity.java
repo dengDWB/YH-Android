@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -88,6 +89,14 @@ public class ReportSelectorAcitity extends BaseActivity  {
         }
       }
     });
+
+    List<ImageView> colorViews = new ArrayList<>();
+    colorViews.add((ImageView) findViewById(R.id.colorView0));
+    colorViews.add((ImageView) findViewById(R.id.colorView1));
+    colorViews.add((ImageView) findViewById(R.id.colorView2));
+    colorViews.add((ImageView) findViewById(R.id.colorView3));
+    colorViews.add((ImageView) findViewById(R.id.colorView4));
+    initColorView(colorViews);
   }
 
   protected void onResume() {
