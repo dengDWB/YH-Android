@@ -67,7 +67,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         initTab();
         initUserIDColorView();
         loadWebView();
-        displayAdOrNot(true);
+        // displayAdOrNot(true);
 
         /*
          * 通过解屏进入界面后，进行用户验证
@@ -458,7 +458,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             mWebView.loadUrl(loadingPath("loading"));
             String currentUIVersion = URLs.currentUIVersion(mContext);
 
-            displayAdOrNot(false);
+            // displayAdOrNot(false);
 
             try {
                 switch (v.getId()) {
