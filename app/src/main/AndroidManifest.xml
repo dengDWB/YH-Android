@@ -111,11 +111,6 @@
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
-
-        <!-- Services -->
-        <service android:name=".LocalNotificationService"></service>
-
-
         <!-- Services -->
         <service android:name=".LocalNotificationService"></service>
 

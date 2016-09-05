@@ -130,11 +130,7 @@ public class LocalNotificationService extends Service {
       notifition.put("setting_pgyer", updataCount);
 
       FileUtil.writeFile(notifitionPath, notifition.toString());
-    } catch (JSONException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (PackageManager.NameNotFoundException e) {
+    } catch (JSONException | IOException | PackageManager.NameNotFoundException e) {
       e.printStackTrace();
     }
   }

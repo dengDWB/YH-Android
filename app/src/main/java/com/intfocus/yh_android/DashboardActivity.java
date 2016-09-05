@@ -759,9 +759,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             noticeJSON.put("setting_password", -1);
 
             FileUtil.writeFile(noticePath, noticeJSON.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (JSONException | IOException e) {
             e.printStackTrace();
         }
     }

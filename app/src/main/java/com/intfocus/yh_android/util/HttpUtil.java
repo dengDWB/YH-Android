@@ -310,7 +310,6 @@ public class HttpUtil {
     /**
      * Check if there is any connectivity to a Wifi network
      * @param context
-     * @param type
      * @return
      */
     public static boolean isConnectedWifi(Context context){
@@ -321,7 +320,6 @@ public class HttpUtil {
     /**
      * Check if there is any connectivity to a mobile network
      * @param context
-     * @param type
      * @return
      */
     public static boolean isConnectedMobile(Context context){
