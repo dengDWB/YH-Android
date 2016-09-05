@@ -537,7 +537,7 @@ public class BaseActivity extends Activity {
     };
 
     void initColorView(List<ImageView> colorViews) {
-        String[] colors = {"#ffffff", "#ffcd0a", "#fd9053", "#dd0929", "#016a43", "#9d203c", "#093db5", "#6a3906", "#192162", "#000000"};
+        String[] colors = {"#00ffff", "#ffcd0a", "#fd9053", "#dd0929", "#016a43", "#9d203c", "#093db5", "#6a3906", "#192162", "#000000"};
         String userIDStr = String.format("%d", userID);
         int numDiff = colorViews.size() - userIDStr.length();
         numDiff = numDiff < 0 ? 0 : numDiff;

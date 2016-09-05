@@ -425,6 +425,8 @@ public class SettingActivity extends BaseActivity {
                                 FileUtil.checkAssets(mContext, "images", true);
                                 FileUtil.checkAssets(mContext, "javascripts", true);
                                 FileUtil.checkAssets(mContext, "stylesheets", true);
+                                FileUtil.checkAssets(mContext, "BarCodeScan", false);
+                                // FileUtil.checkAssets(mContext, "advertisement", false);
 
                                 toast("校正完成");
                             }
