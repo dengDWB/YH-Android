@@ -221,7 +221,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         mWebView.loadUrl(urlStringForLoading);
 
         browserAd = (WebView) findViewById(R.id.browserAd);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dip2px(this, 100));
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dip2px(this, 130));
         browserAd.setLayoutParams(layoutParams);
         browserAd.getSettings().setJavaScriptEnabled(true);
         browserAd.getSettings().setDefaultTextEncodingName("utf-8");
