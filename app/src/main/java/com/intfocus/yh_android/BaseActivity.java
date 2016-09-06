@@ -739,6 +739,7 @@ public class BaseActivity extends Activity {
         checkAssetUpdated(shouldReloadUIThread, "images", true);
         checkAssetUpdated(shouldReloadUIThread, "stylesheets", true);
         checkAssetUpdated(shouldReloadUIThread, "javascripts", true);
+        checkAssetUpdated(shouldReloadUIThread, "BarCodeScan", false);
         checkAssetUpdated(shouldReloadUIThread, "advertisement", false);
     }
 
