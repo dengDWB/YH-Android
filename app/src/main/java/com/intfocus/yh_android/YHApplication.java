@@ -113,7 +113,7 @@ public class YHApplication extends Application {
         FileUtil.checkAssets(mContext, "stylesheets", true);
         FileUtil.checkAssets(mContext, "javascripts", true);
         FileUtil.checkAssets(mContext, "BarCodeScan", false);
-        // FileUtil.checkAssets(mContext, "advertisement", false);
+        FileUtil.checkAssets(mContext, "advertisement", false);
 
         /*
          *  手机待机再激活时发送开屏广播
@@ -161,7 +161,7 @@ public class YHApplication extends Application {
 
             String assetZipPath;
             File assetZipFile;
-            String[] assetsName = {"assets.zip", "loading.zip", "fonts.zip", "images.zip", "stylesheets.zip", "javascripts.zip", "BarCodeScan.zip"}; // ,"advertisement.zip"
+            String[] assetsName = {"assets.zip", "loading.zip", "fonts.zip", "images.zip", "stylesheets.zip", "javascripts.zip", "BarCodeScan.zip","advertisement.zip"};
             for (String string : assetsName) {
                 assetZipPath = String.format("%s/%s", sharedPath, string);
                 assetZipFile = new File(assetZipPath);
