@@ -25,6 +25,8 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.Toast;
+
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
@@ -66,7 +68,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         initTab();
         initUserIDColorView();
         loadWebView();
-        // displayAdOrNot(true);
+        displayAdOrNot(true);
 
         /*
          * 通过解屏进入界面后，进行用户验证
@@ -85,7 +87,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
         initNotificationService();
 
         new Thread(mRunnableForDetecting).start();
-
 
         checkUserModifiedInitPassword();
     }
@@ -458,8 +459,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
             mWebView.loadUrl(loadingPath("loading"));
             String currentUIVersion = URLs.currentUIVersion(mContext);
 
-            // displayAdOrNot(false);
-
+             displayAdOrNot(false);
             try {
                 switch (v.getId()) {
                     case R.id.tabKPI:
@@ -589,6 +589,10 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
                     public void run() {
                         switch (openType) {
                             case "browser":
+                                if (openLink == null) {
+                                    toast("无效链接");
+                                    break;
+                                }
                                 Intent intent = new Intent(Intent.ACTION_VIEW);
                                 Uri content_url = Uri.parse(openLink);
                                 intent.setData(content_url);
@@ -606,10 +610,22 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
                                 mTabMessage.performClick();
                                 break;
                             case "report":
+                                String[] reportValue = {openLink,ObjeckID,objectType,objectTitle};
+                                for (String value : reportValue) {
+                                    if (value == null || value.equals("")) {
+                                        toast("页面跳转失败");
+                                        return;
+                                    }
+                                }
                                 Intent subjectIntent = new Intent(DashboardActivity.this, SubjectActivity.class);
+                                subjectIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                                 subjectIntent.putExtra("link", openLink);
-                                subjectIntent.putExtra("bannerName", openType);
+                                subjectIntent.putExtra("bannerName", objectTitle);
+                                subjectIntent.putExtra("objectID",ObjeckID);
+                                subjectIntent.putExtra("objectType",objectType);
                                 startActivity(subjectIntent);
+                                break;
+                            default:
                                 break;
                         }
                 }
