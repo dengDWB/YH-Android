@@ -3,8 +3,6 @@ package com.intfocus.yh_android;
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -23,8 +21,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.ScaleAnimation;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -32,21 +28,17 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.Toast;
-
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.readystatesoftware.viewbadger.BadgeView;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -618,6 +610,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 							mTabAPP.performClick();
 							break;
 						case "tab_message":
+							if(openLink.equals("0") || openLink.equals("1") || openLink.equals("2")) {
+								storeTabIndex("message", Integer.parseInt(openLink));
+							}
 							mTabMessage.performClick();
 							break;
 						case "report":
@@ -644,7 +639,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		}
 
 		@JavascriptInterface
-		public void scrollUp() {
+		public void hideAd() {
 			viewAnimation(browserAd,false,dip2px(DashboardActivity.this,130),0);
 		}
 
