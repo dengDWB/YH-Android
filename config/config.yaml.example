@@ -2,6 +2,7 @@ pgyer: &pgyer
   user_key: '-'
   api_key: '-'
 yonghui:
+  app_code: 'yonghui'
   slogan: '融合共享，成于至善'
   application_id: 'com.intfocus.-'
   display_status:
@@ -42,6 +43,7 @@ yonghui:
       app_id: '-'
       app_secret: '-'
 yonghuitest:
+  app_code: 'yonghuitest'
   slogan: '融合共享，成于至善'
   application_id: 'com.intfocus.-'
   display_status:
@@ -82,6 +84,7 @@ yonghuitest:
       app_id: '-'
       app_secret: '-'
 shengyiplus:
+  app_code: 'shengyiplus'
   slogan: '融合共享，成于至善'
   application_id: 'com.intfocus.-'
   display_status:
@@ -122,6 +125,7 @@ shengyiplus:
       app_id: '-'
       app_secret: '-'
 qiyoutong:
+  app_code: 'qiyoutong'
   slogan: '融合共享，成于至善'
   application_id: 'com.intfocus.-'
   display_status:

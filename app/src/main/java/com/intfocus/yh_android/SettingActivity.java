@@ -392,7 +392,7 @@ public class SettingActivity extends BaseActivity {
             Bundle extras = intent.getExtras();
             if (extras != null) {
                 Bitmap userIcon = extras.getParcelable("data");
-                gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, "yh-test" + "_" + user.getString("user_num") + "_" + getDate() + ".jpg");
+                gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.kAppCode + "_" + user.getString("user_num") + "_" + getDate() + ".jpg");
                 gravatarFileName = gravatarImgPath.substring(gravatarImgPath.lastIndexOf("/")+1, gravatarImgPath.length());
                 mIconImageView.setImageBitmap(userIcon);
                 popupWindow.dismiss();
