@@ -515,7 +515,7 @@ public class FileUtil {
         try {
             // 获得输出流，写入文件
             outStream = new FileOutputStream(file);
-            bmp.compress(Bitmap.CompressFormat.PNG, 90, outStream);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 90, outStream);
             outStream.close();
         } catch (IOException e) {
             Log.e("snapshot", e.toString());
