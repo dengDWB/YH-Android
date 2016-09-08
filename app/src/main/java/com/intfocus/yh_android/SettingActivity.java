@@ -24,17 +24,34 @@ import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.intfocus.yh_android.screen_lock.InitPassCodeActivity;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
+import com.intfocus.yh_android.util.PrivateURLs;
 import com.intfocus.yh_android.util.URLs;
 import com.readystatesoftware.viewbadger.BadgeView;
 import com.umeng.message.PushAgent;
 import com.umeng.message.UmengRegistrar;
+
 import java.io.File;
 import java.io.IOException;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class SettingActivity extends BaseActivity {
     private TextView mUserID;
@@ -57,7 +74,7 @@ public class SettingActivity extends BaseActivity {
     private BadgeView bvChangePWD;
     private IconImageView mIconImageView;
     private PopupWindow popupWindow;
-    private String iconPath;
+    private String gravatarJsonPath, gravatarImgPath, gravatarFileName;
 
     /* 请求识别码 */
     private static final int CODE_GALLERY_REQUEST = 0xa0;
@@ -111,6 +128,7 @@ public class SettingActivity extends BaseActivity {
         initializeUI();
         setSettingViewControlBadges();
     }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -134,13 +152,24 @@ public class SettingActivity extends BaseActivity {
             mDeviceID.setText(TextUtils.split(android.os.Build.MODEL, " - ")[0]);
             mApiDomain.setText(URLs.kBaseUrl.replace("http://", "").replace("https://", ""));
 
-            iconPath = FileUtil.dirPath(mContext,URLs.CONFIG_DIRNAME,"icon.jpg");
-            if (new File(iconPath).exists()) {
-                Bitmap bitmap = BitmapFactory.decodeFile(iconPath);
+            gravatarJsonPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, "gravatar.json");
+
+            if (new File(gravatarJsonPath).exists()) {
+                JSONObject gravatarJson = new JSONObject(FileUtil.readFile(gravatarJsonPath));
+                gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarJson.getString("name"));
+                gravatarFileName = gravatarJson.getString("name");
+                Bitmap bitmap = BitmapFactory.decodeFile(gravatarImgPath);
                 mIconImageView.setImageBitmap(bitmap);
             }
             else {
-                mIconImageView.setImageResource(R.drawable.login_bg_logo);
+                if (user.has("gravatar") && (user.getString("gravatar").indexOf("http") != -1)) {
+                    String gravatarUrl = user.getString("gravatar");
+                    gravatarFileName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/")+1, gravatarUrl.length());
+                    gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarFileName);
+                    httpGetBitmap(gravatarUrl);
+                } else {
+                    mIconImageView.setImageResource(R.drawable.login_bg_logo);
+                }
             }
 
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -161,6 +190,80 @@ public class SettingActivity extends BaseActivity {
         } catch (NameNotFoundException | JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public void writeJson (String path, String name, boolean upload_state, String gravatar_id, boolean isDelete){
+        try {
+            String previousImgPath = "";
+            JSONObject jsonObject;
+            if (new File(path).exists()) {
+                jsonObject = new JSONObject(FileUtil.readFile(path));
+                previousImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, jsonObject.getString("name"));
+                if (isDelete) {
+                    new File(previousImgPath).delete();
+                }
+            }
+            else {
+                jsonObject = new JSONObject();
+            }
+
+            jsonObject.put("name", name);
+            jsonObject.put("upload_state", upload_state);
+            if (!gravatar_id.equals("")) {
+                jsonObject.put("gravatar_id", gravatar_id);
+            }
+            FileUtil.writeFile(path, jsonObject.toString());
+            Log.i("uploadStr", FileUtil.readFile(path));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void httpGetBitmap(String urlString) {
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(urlString).build();
+        Call call = client.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                if (e != null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mIconImageView.setImageResource(R.drawable.login_bg_logo);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.code() == 200) {
+                    try{
+                        InputStream is = response.body().byteStream();
+                        final Bitmap bm = BitmapFactory.decodeStream(is);
+                        FileUtil.saveImage(gravatarImgPath, bm);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mIconImageView.setImageBitmap(bm);
+                            }
+                        });
+                        writeJson(gravatarJsonPath, gravatarFileName, true, "", false);
+                    }catch (Exception e){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mIconImageView.setImageResource(R.drawable.login_bg_logo);
+                            }
+                        });
+                    }
+                }
+            }
+        });
     }
 
     private static String getApplicationName(Context context) {
@@ -285,13 +388,83 @@ public class SettingActivity extends BaseActivity {
      * 提取保存裁剪之后的图片数据，并设置头像部分的View
      */
     private void setImageToHeadView(Intent intent) {
-        Bundle extras = intent.getExtras();
-        if (extras != null) {
-            Bitmap userIcon = extras.getParcelable("data");
-            popupWindow.dismiss();
-            FileUtil.saveImage(iconPath,userIcon);
-            mIconImageView.setImageBitmap(userIcon);
+        try {
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                Bitmap userIcon = extras.getParcelable("data");
+                gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, "yh-test" + "_" + user.getString("user_num") + "_" + getDate() + ".jpg");
+                gravatarFileName = gravatarImgPath.substring(gravatarImgPath.lastIndexOf("/")+1, gravatarImgPath.length());
+                mIconImageView.setImageBitmap(userIcon);
+                popupWindow.dismiss();
+                FileUtil.saveImage(gravatarImgPath, userIcon);
+                writeJson(gravatarJsonPath, gravatarFileName, false, "", true);
+                uploadImg();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+    }
+
+    private void uploadImg() {
+        try {
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .connectTimeout(3, TimeUnit.SECONDS)
+                    .writeTimeout(3, TimeUnit.SECONDS)
+                    .readTimeout(3, TimeUnit.SECONDS)
+                    .build();
+
+            File file = new File(gravatarImgPath);
+            RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpg"), file);
+            MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+            builder.addFormDataPart("gravatar", file.getName(), fileBody);
+
+            MultipartBody requestBody = builder.build();
+
+            Request request = new Request.Builder()
+                        .url(String.format(URLs.IMG_UPLOAD_PATH, PrivateURLs.kBaseUrl, user.getString("user_device_id"), user.getString("user_id")))
+                        .post(requestBody)
+                        .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            toast("上传失败");
+                        }
+                    });
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    if (response.code() == 201) {
+                        try {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    toast("上传成功");
+                                }
+                            });
+                            JSONObject json = new JSONObject(response.body().string());
+                            writeJson(gravatarJsonPath, gravatarFileName, true, json.getString("gravatar_id"), false);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public String getDate(){
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+        Date date = new Date(System.currentTimeMillis());
+        return format.format(date);
     }
 
     /*

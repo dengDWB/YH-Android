@@ -1,6 +1,10 @@
 package com.intfocus.yh_android.util;
 
 import android.content.Context;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -8,8 +12,6 @@ import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * api链接，宏
@@ -40,6 +42,8 @@ public class URLs extends PrivateURLs implements Serializable {
     public final static String RESET_PASSWORD_PATH       = "%s/mobile/%s/update_user_password";
 
     public final static String REPORT_DATA_FILENAME      = "group_%s_template_%s_report_%s.js";
+
+    public final static String IMG_UPLOAD_PATH           = "%s/api/v1/device/%s/upload/user/%s/gravatar";
 
     public final static String USER_CONFIG_FILENAME      = "user.json";
     public final static String CONFIG_DIRNAME            = "Configs";
