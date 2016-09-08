@@ -218,7 +218,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	 * 配置 mWebView
 	 */
 	public void loadWebView() {
-		mAnimationTime = getResources().getInteger(android.R.integer.config_mediumAnimTime);//动画效果时间
 		pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
 		initWebView();
 		setPullToRefreshWebView(true);
@@ -708,37 +707,43 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	/*
 	 * view 缩放动画
 	 */
-	public void viewAnimation(final View view, final Boolean isShow,int startHeight,int endHeight) {
-		final ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-		ValueAnimator valueAnimator = ValueAnimator.ofInt(startHeight, endHeight);
-		valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+	public void viewAnimation(final View view, final Boolean isShow,final int startHeight,final int endHeight) {
+		runOnUiThread(new Runnable() {
 			@Override
-			public void onAnimationUpdate(ValueAnimator animation) {
-				int adHeight = (int) animation.getAnimatedValue();
-				layoutParams.height = adHeight;
-				view.setLayoutParams(layoutParams);
-				view.requestLayout();
-			}
-		});
+			public void run() {
+				mAnimationTime = getResources().getInteger(android.R.integer.config_mediumAnimTime);//动画效果时间
+				final ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+				ValueAnimator valueAnimator = ValueAnimator.ofInt(startHeight, endHeight);
+				valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+					@Override
+					public void onAnimationUpdate(ValueAnimator animation) {
+						int adHeight = (int) animation.getAnimatedValue();
+						layoutParams.height = adHeight;
+						view.setLayoutParams(layoutParams);
+						view.requestLayout();
+					}
+				});
 
-		valueAnimator.addListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationStart(Animator animation) {
-				super.onAnimationStart(animation);
-				if (isShow) {
-					view.setVisibility(View.VISIBLE);
-				}
-			}
-			@Override
-			public void onAnimationEnd(Animator animation) {
-				super.onAnimationEnd(animation);
-				if (!isShow) {
-					view.setVisibility(View.GONE);
-				}
+				valueAnimator.addListener(new AnimatorListenerAdapter() {
+					@Override
+					public void onAnimationStart(Animator animation) {
+						super.onAnimationStart(animation);
+						if (isShow) {
+							view.setVisibility(View.VISIBLE);
+						}
+					}
+					@Override
+					public void onAnimationEnd(Animator animation) {
+						super.onAnimationEnd(animation);
+						if (!isShow) {
+							view.setVisibility(View.GONE);
+						}
+					}
+				});
+				valueAnimator.setDuration(mAnimationTime);
+				valueAnimator.start();
 			}
 		});
-		valueAnimator.setDuration(mAnimationTime);
-		valueAnimator.start();
 	}
 
 	private void initUrlStrings() {
