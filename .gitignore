@@ -11,6 +11,8 @@ app/src/main/java/com/intfocus/yh_android/util/PrivateURLs.java
 /build
 app/build
 *.iml
+*.swp
+*.swo
 
 # Built application files
 *.apk
