@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -158,6 +159,7 @@ public class HttpUtil {
 
             retMap.put("code", String.format("%d", response.code()));
             retMap.put("body", response.body().string());
+            Log.i("code",response.code()+"");
 
             LogUtil.d("code", retMap.get("code"));
             LogUtil.d("responseBody", retMap.get("body"));
@@ -310,7 +312,7 @@ public class HttpUtil {
     /**
      * Check if there is any connectivity to a Wifi network
      * @param context
-     * @param type
+//     * @param type
      * @return
      */
     public static boolean isConnectedWifi(Context context){
@@ -321,7 +323,7 @@ public class HttpUtil {
     /**
      * Check if there is any connectivity to a mobile network
      * @param context
-     * @param type
+//     * @param type
      * @return
      */
     public static boolean isConnectedMobile(Context context){
