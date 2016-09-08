@@ -260,7 +260,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
              */
             isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
             if(isSupportSearch) {
-                displayBannerTitleAndSearchIcon();;
+                displayBannerTitleAndSearchIcon();
             }
 
             new Thread(new Runnable() {
@@ -415,14 +415,14 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         } catch (Exception e) {
             e.printStackTrace();
         }
-    };
+    }
 
     /*
      * 返回
      */
     public void dismissActivity(View v) {
         SubjectActivity.this.onBackPressed();
-    };
+    }
 
     private class pullToRefreshTask extends AsyncTask<Void, Void, Void> {
         @Override

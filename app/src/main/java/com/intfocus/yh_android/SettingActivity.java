@@ -34,11 +34,11 @@ import com.readystatesoftware.viewbadger.BadgeView;
 import com.umeng.message.PushAgent;
 import com.umeng.message.UmengRegistrar;
 
+import java.io.File;
+import java.io.IOException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -187,9 +187,7 @@ public class SettingActivity extends BaseActivity {
             }
             mPygerLink.setText(betaLink.isEmpty() ? "已是最新版本" : String.format("有发布版本%s", pgyerInfo));
             mPygerLink.setTextColor(Color.parseColor(betaLink.isEmpty() ? "#808080" : "#0000ff"));
-        } catch (NameNotFoundException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
+        } catch (NameNotFoundException | JSONException e) {
             e.printStackTrace();
         }
     }
@@ -474,11 +472,7 @@ public class SettingActivity extends BaseActivity {
      */
     public static boolean hasSdcard() {
         String state = Environment.getExternalStorageState();
-        if (state.equals(Environment.MEDIA_MOUNTED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return state.equals(Environment.MEDIA_MOUNTED);
     }
 
     /*
@@ -486,7 +480,7 @@ public class SettingActivity extends BaseActivity {
      */
     public void dismissActivity(View v) {
         SettingActivity.this.onBackPressed();
-    };
+    }
 
     /*
      * 退出登录
@@ -604,13 +598,13 @@ public class SettingActivity extends BaseActivity {
                                 FileUtil.checkAssets(mContext, "images", true);
                                 FileUtil.checkAssets(mContext, "javascripts", true);
                                 FileUtil.checkAssets(mContext, "stylesheets", true);
+                                FileUtil.checkAssets(mContext, "BarCodeScan", false);
+                                FileUtil.checkAssets(mContext, "advertisement", false);
 
                                 toast("校正完成");
                             }
                         });
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
+                    } catch (JSONException | IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -675,9 +669,7 @@ public class SettingActivity extends BaseActivity {
                 }
                 betaJSON.put("old_ui", isChecked);
                 FileUtil.writeFile(betaConfigPath, betaJSON.toString());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (JSONException | IOException e) {
                 e.printStackTrace();
             }
         }

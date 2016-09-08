@@ -142,9 +142,7 @@ public class BaseActivity extends Activity {
                             pushJSON.put("push_valid", false);
                             pushJSON.put("push_device_token", registrationId);
                             FileUtil.writeFile(pushConfigPath, pushJSON.toString());
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
+                        } catch (JSONException | IOException e) {
                             e.printStackTrace();
                         }
                     }
@@ -399,9 +397,7 @@ public class BaseActivity extends Activity {
 
                             String settingsConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
                             FileUtil.writeFile(settingsConfigPath, userJSON.toString());
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
+                        } catch (JSONException | IOException e) {
                             e.printStackTrace();
                         }
 
@@ -541,7 +537,7 @@ public class BaseActivity extends Activity {
     };
 
     void initColorView(List<ImageView> colorViews) {
-        String[] colors = {"#ffffff", "#ffcd0a", "#fd9053", "#dd0929", "#016a43", "#9d203c", "#093db5", "#6a3906", "#192162", "#000000"};
+        String[] colors = {"#00ffff", "#ffcd0a", "#fd9053", "#dd0929", "#016a43", "#9d203c", "#093db5", "#6a3906", "#192162", "#000000"};
         String userIDStr = String.format("%d", userID);
         int numDiff = colorViews.size() - userIDStr.length();
         numDiff = numDiff < 0 ? 0 : numDiff;
@@ -743,6 +739,7 @@ public class BaseActivity extends Activity {
         checkAssetUpdated(shouldReloadUIThread, "images", true);
         checkAssetUpdated(shouldReloadUIThread, "stylesheets", true);
         checkAssetUpdated(shouldReloadUIThread, "javascripts", true);
+        checkAssetUpdated(shouldReloadUIThread, "BarCodeScan", false);
         checkAssetUpdated(shouldReloadUIThread, "advertisement", false);
     }
 

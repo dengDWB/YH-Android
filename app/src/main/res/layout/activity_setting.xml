@@ -277,11 +277,11 @@
 
         <ImageView
             android:id="@+id/bannerBack"
-            style="@style/BannerBackButton"
+            style="@style/BannerBackWhiteButton"
             android:onClick="dismissActivity"/>
 
         <TextView
-            style="@style/BannerBackText"
+            style="@style/BannerBackWhiteText"
             android:layout_toRightOf="@id/bannerBack"
             android:onClick="dismissActivity"/>
     </RelativeLayout>

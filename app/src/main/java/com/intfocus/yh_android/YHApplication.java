@@ -51,7 +51,7 @@ public class YHApplication extends Application {
                     Log.i("currentActivityName", currentActivityName.trim().equals("ConfirmPassCodeActivity") ? "YES" : "NO");
                 }
                 catch(NoSuchMethodError e) {
-                    e.printStackTrace();;
+                    e.printStackTrace();
                 }
             }
             Log.i("currentActivityName", "[" + currentActivityName + "]");
@@ -161,7 +161,7 @@ public class YHApplication extends Application {
 
             String assetZipPath;
             File assetZipFile;
-            String[] assetsName = {"assets.zip", "loading.zip", "fonts.zip", "images.zip", "stylesheets.zip", "javascripts.zip"};
+            String[] assetsName = {"assets.zip", "loading.zip", "fonts.zip", "images.zip", "stylesheets.zip", "javascripts.zip", "BarCodeScan.zip","advertisement.zip"};
             for (String string : assetsName) {
                 assetZipPath = String.format("%s/%s", sharedPath, string);
                 assetZipFile = new File(assetZipPath);
