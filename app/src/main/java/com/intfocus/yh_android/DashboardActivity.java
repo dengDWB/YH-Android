@@ -119,6 +119,24 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		super.onDestroy();
 	}
 
+	@Override
+	public void onBackPressed() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("退出应用程序")
+				.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				})
+				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// 返回DashboardActivity
+					}
+				}).show();
+	}
+
 	/*
 	 * 仪表盘界面可以显示广告
 	 */
