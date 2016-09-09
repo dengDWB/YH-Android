@@ -471,7 +471,6 @@ public class SettingActivity extends BaseActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
 
     public String getDate(){
