@@ -34,11 +34,11 @@ import com.readystatesoftware.viewbadger.BadgeView;
 import com.umeng.message.PushAgent;
 import com.umeng.message.UmengRegistrar;
 
-import java.io.File;
-import java.io.IOException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -158,15 +158,24 @@ public class SettingActivity extends BaseActivity {
                 JSONObject gravatarJson = new JSONObject(FileUtil.readFile(gravatarJsonPath));
                 gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarJson.getString("name"));
                 gravatarFileName = gravatarJson.getString("name");
+                String gravatarUrl = user.getString("gravatar");
+                String gravatarFileName1 = gravatarUrl.substring(gravatarUrl.lastIndexOf("/")+1, gravatarUrl.length());
+                if (!(gravatarFileName.equals(gravatarFileName1))) {
+                    gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarFileName1);
+                    gravatarFileName = gravatarFileName1;
+                    httpGetBitmap(gravatarUrl, true);
+                    return;
+                }
                 Bitmap bitmap = BitmapFactory.decodeFile(gravatarImgPath);
                 mIconImageView.setImageBitmap(bitmap);
+
             }
             else {
                 if (user.has("gravatar") && (user.getString("gravatar").indexOf("http") != -1)) {
                     String gravatarUrl = user.getString("gravatar");
                     gravatarFileName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/")+1, gravatarUrl.length());
                     gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarFileName);
-                    httpGetBitmap(gravatarUrl);
+                    httpGetBitmap(gravatarUrl, false);
                 } else {
                     mIconImageView.setImageResource(R.drawable.login_bg_logo);
                 }
@@ -222,7 +231,7 @@ public class SettingActivity extends BaseActivity {
 
     }
 
-    public void httpGetBitmap(String urlString) {
+    public void httpGetBitmap(String urlString, final boolean isDelete) {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(urlString).build();
         Call call = client.newCall(request);
@@ -252,7 +261,11 @@ public class SettingActivity extends BaseActivity {
                                 mIconImageView.setImageBitmap(bm);
                             }
                         });
-                        writeJson(gravatarJsonPath, gravatarFileName, true, "", false);
+                        if (isDelete) {
+                            writeJson(gravatarJsonPath, gravatarFileName, true, "", true);
+                        } else {
+                            writeJson(gravatarJsonPath, gravatarFileName, true, "", false);
+                        }
                     }catch (Exception e){
                         runOnUiThread(new Runnable() {
                             @Override
@@ -392,7 +405,7 @@ public class SettingActivity extends BaseActivity {
             Bundle extras = intent.getExtras();
             if (extras != null) {
                 Bitmap userIcon = extras.getParcelable("data");
-                gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, "yh-test" + "_" + user.getString("user_num") + "_" + getDate() + ".jpg");
+                gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.kAppCode + "_" + user.getString("user_num") + "_" + getDate() + ".jpg");
                 gravatarFileName = gravatarImgPath.substring(gravatarImgPath.lastIndexOf("/")+1, gravatarImgPath.length());
                 mIconImageView.setImageBitmap(userIcon);
                 popupWindow.dismiss();
