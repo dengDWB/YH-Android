@@ -9,7 +9,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -29,7 +28,6 @@ import android.widget.Toast;
 import com.intfocus.yh_android.screen_lock.InitPassCodeActivity;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
-import com.intfocus.yh_android.util.HttpUtil;
 import com.intfocus.yh_android.util.PrivateURLs;
 import com.intfocus.yh_android.util.URLs;
 import com.readystatesoftware.viewbadger.BadgeView;
@@ -44,8 +42,6 @@ import org.json.JSONObject;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -79,7 +75,6 @@ public class SettingActivity extends BaseActivity {
     private IconImageView mIconImageView;
     private PopupWindow popupWindow;
     private String gravatarJsonPath, gravatarImgPath, gravatarFileName;
-    private String gravatarUrl;
 
     /* 请求识别码 */
     private static final int CODE_GALLERY_REQUEST = 0xa0;
@@ -224,45 +219,7 @@ public class SettingActivity extends BaseActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
 
-    public class setUserIcon extends AsyncTask<Void,Integer,Boolean> {
-        @Override
-        protected void onPreExecute() {
-            // 准备任务
-            if (new File(gravatarImgPath).exists()) {
-                Bitmap bitmap = BitmapFactory.decodeFile(gravatarImgPath);
-                mIconImageView.setImageBitmap(bitmap);
-            }
-            else {
-                mIconImageView.setImageResource(R.drawable.login_bg_logo);
-            }
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            Map<String, String> response = HttpUtil.httpGet(gravatarUrl, new HashMap());
-            if (response.get("code") == "200") {
-                String responseBody = response.get("body");
-                final Bitmap bm = BitmapFactory.decodeByteArray();
-                FileUtil.saveImage(gravatarImgPath, bm);
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            super.onPostExecute(result);
-            if (result) {
-                InputStream is = response.body().byteStream();
-                final Bitmap bm = BitmapFactory.decodeStream(is);
-                FileUtil.saveImage(gravatarImgPath, bm);
-                mIconImageView.setImageBitmap(bm);
-            } else {
-
-            }
-        }
     }
 
     public void httpGetBitmap(String urlString) {
