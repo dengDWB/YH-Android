@@ -116,18 +116,6 @@ if slop_opts[:gradle]
 end
 
 #
-# reset mipmap and loading.zip
-#
-if slop_opts[:mipmap]
-  puts %(- done: launcher@mipmap)
-  `rm -fr app/src/main/res/mipmap-* && cp -fr config/Assets/mipmap-#{current_app}/mipmap-* app/src/main/res/`
-  puts %(- done: loading zip)
-  `cp -f config/Assets/loading-#{current_app}.zip app/src/main/assets/loading.zip`
-  puts %(- done: banner_logo)
-  `cp -f config/Assets/drawable-#{current_app}/*.png app/src/main/res/drawable/`
-end
-
-#
 # reset app/src/main/AndroidManifest.xml
 #
 manifest_xml_path = 'app/src/main/AndroidManifest.xml'
@@ -214,6 +202,7 @@ if slop_opts[:java]
       package com.intfocus.yh_android.util;
 
       public class PrivateURLs {
+        public final static String kAppCode      = "#{Settings.app_code}";
         public final static String kThemeColor   = "#31809f";
         public final static String kInitPassword = "123456";
         public final static String kBaseUrl      = "#{Settings.server}";
