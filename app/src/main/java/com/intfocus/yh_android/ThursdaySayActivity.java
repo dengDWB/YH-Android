@@ -14,14 +14,14 @@ public class ThursdaySayActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_blog);
+        setContentView(R.layout.activity_thursday_say);
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
         initWebView();
         setPullToRefreshWebView(true);
 
         mWebView.requestFocus();
         mWebView.loadUrl(urlStringForLoading);
-        urlString = String.format(URLs.BLOG_PLINK_PATH, PrivateURLs.kBaseUrl);
+        urlString = String.format(URLs.THURSDAY_SAY_PLINK_PATH, PrivateURLs.kBaseUrl);
         new Thread(mRunnableForDetecting).start();
     }
 

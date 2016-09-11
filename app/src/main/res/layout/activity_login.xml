@@ -54,12 +54,7 @@
     </LinearLayout>
 
     <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginRight="15dp"
-        android:layout_marginLeft="15dp"
-        android:background="#FFFFFF" />
+        style="@style/LoginActivityLineView" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -90,12 +85,7 @@
     </LinearLayout>
 
     <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginRight="15dp"
-        android:layout_marginLeft="15dp"
-        android:background="#FFFFFF" />
+        style="@style/LoginActivityLineView" />
 
     <Button
         android:layout_marginTop="30dp"
