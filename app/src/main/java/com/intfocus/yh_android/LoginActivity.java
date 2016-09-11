@@ -3,10 +3,14 @@ package com.intfocus.yh_android;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
+
 import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
@@ -15,6 +19,7 @@ import com.intfocus.yh_android.util.URLs;
 public class LoginActivity extends BaseActivity {
     private EditText usernameEditText, passwordEditText;
     private String usernameString, passwordString;
+    private TextView versionTv;
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -55,6 +60,15 @@ public class LoginActivity extends BaseActivity {
 
         usernameEditText = (EditText) findViewById(R.id.etUsername);
         passwordEditText = (EditText) findViewById(R.id.etPassword);
+        versionTv = (TextView) findViewById(R.id.versionTv);
+        PackageInfo packageInfo = null;
+        try {
+            packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            String versionInfo = String.format("%s(%d)", packageInfo.versionName, packageInfo.versionCode);
+            versionTv.setText(versionInfo);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
 
         /*
          * 检测登录界面，版本是否升级

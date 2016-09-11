@@ -801,8 +801,15 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	private void initLocalNotifications() {
 		try {
 			String noticePath = FileUtil.dirPath(mContext, "Cached", URLs.LOCAL_NOTIFICATION_FILENAME);
+			notificationJSON = FileUtil.readConfigFile(noticePath);
 			if ((new File(noticePath)).exists()) {
-				return;
+				// 通知样式添加新的字段，因为版本迭代的问题，有些用户local_notification没有新的字段，所以检测是否有这些字段
+				if(notificationJSON.has("setting_thursday_say") && notificationJSON.has("setting_thursday_say_last")){
+					return;
+				}
+				else {
+					new File(noticePath).delete();
+				}
 			}
 
 			JSONObject noticeJSON = new JSONObject();
