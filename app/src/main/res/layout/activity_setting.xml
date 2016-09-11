@@ -190,6 +190,22 @@
                         android:textSize="12dp"/>
                 </RelativeLayout>
 
+                <RelativeLayout style="@style/SettingGroup">
+
+                    <TextView
+                        android:id="@+id/check_thursday_say"
+                        style="@style/SettingButton"
+                        android:text="小四说"/>
+
+                    <TextView
+                        android:id="@+id/thursday_say_link"
+                        style="@style/SettingValue"
+                        android:layout_marginTop="3dp"
+                        android:text="请点击"
+                        android:textColor="#0000ff"
+                        android:textSize="12dp"/>
+                </RelativeLayout>
+
                 <View style="@style/Divider"/>
 
                 <TextView
