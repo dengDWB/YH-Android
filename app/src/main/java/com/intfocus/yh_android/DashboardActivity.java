@@ -28,19 +28,22 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.readystatesoftware.viewbadger.BadgeView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class DashboardActivity extends BaseActivity implements View.OnClickListener {
 	public static final String ACTION_UPDATENOTIFITION = "action.updateNotifition";
@@ -202,7 +205,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			if (messageNotifition > 0 && objectType != 5) {
 				setBadgeView("tab", bvMessage);
 			}
-			if (notificationJSON.getInt("setting_pgyer") == 1 || notificationJSON.getInt("setting_password") == 1) {
+			if (notificationJSON.getInt("setting_pgyer") == 1 || notificationJSON.getInt("setting_password") == 1 || notificationJSON.getInt("setting_thursday_say") > 0) {
 				setBadgeView("setting", bvBannerSetting);
 				setBadgeView("user", bvUser);
 			} else {
@@ -796,6 +799,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			noticeJSON.put("setting", -1);
 			noticeJSON.put("setting_pgyer", -1);
 			noticeJSON.put("setting_password", -1);
+			noticeJSON.put("setting_thursday_say", -1);
+			noticeJSON.put("setting_thursday_say_last", -1);
 
 			FileUtil.writeFile(noticePath, noticeJSON.toString());
 		} catch (JSONException | IOException e) {

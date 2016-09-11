@@ -7,9 +7,14 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.util.Log;
+
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.HttpUtil;
 import com.intfocus.yh_android.util.URLs;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -18,8 +23,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by lijunjie on 16/8/25.
@@ -32,9 +35,9 @@ public class LocalNotificationService extends Service {
   private TimerTask timerTask;
   private PackageInfo packageInfo;
   private String notifitionPath, pgyerVersionPath, userConfigPath;
-  private String kpiUrl, analyseUrl, appUrl, messageUrl;
+  private String kpiUrl, analyseUrl, appUrl, messageUrl, blogUrl;
   private String pgyerCode, versionCode;
-  private int kpiCount, analyseCount, appCount, messageCount, updataCount, passwordCount;
+  private int kpiCount, analyseCount, appCount, messageCount, updataCount, passwordCount, thursdaySayCount;
   private Context mContext;
   private Intent sendIntent;
 
@@ -68,6 +71,7 @@ public class LocalNotificationService extends Service {
       analyseUrl = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
       appUrl = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
       messageUrl = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"), user.getString("group_id"), user.getString("user_id"));
+      blogUrl = String.format(URLs.BLOG_PLINK_PATH, URLs.kBaseUrl);
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -96,10 +100,11 @@ public class LocalNotificationService extends Service {
    */
   private void processDataCount() {
     try {
-      kpiCount = getDataCount("kpi", kpiUrl);
-      analyseCount = getDataCount("analyse", analyseUrl);
-      appCount = getDataCount("app", appUrl);
-      messageCount = getDataCount("message", messageUrl);
+      kpiCount = getDataCount("kpi", kpiUrl, true);
+      analyseCount = getDataCount("analyse", analyseUrl, true);
+      appCount = getDataCount("app", appUrl, true);
+      messageCount = getDataCount("message", messageUrl, true);
+      thursdaySayCount = getDataCount("setting_thursday_say", blogUrl ,false);
 
 			/*
 			 * 遍历获取 Tab 栏上需要显示的通知数量 ("tab_*" 的值)
@@ -110,6 +115,9 @@ public class LocalNotificationService extends Service {
           notifition.put("tab_" + typeString[i], Math.abs(typeCount[i] - notifition.getInt("tab_" + typeString[i] + "_last")));
           notifition.put("tab_" + typeString[i] + "_last", typeCount[i]);
       }
+
+      notifition.put("setting_thursday_say", Math.abs(thursdaySayCount - notifition.getInt("setting_thursday_say_last")));
+      notifition.put("setting_thursday_say_last", thursdaySayCount);
 
       if ((new File(pgyerVersionPath)).exists()) {
         pgyerJSON = FileUtil.readConfigFile(pgyerVersionPath);
@@ -136,9 +144,15 @@ public class LocalNotificationService extends Service {
   /*
    * 正则获取当前 DataCount，未获取到值则返回原数值
    */
-  private int getDataCount(String tabTpye, String urlString) throws JSONException, IOException {
+  private int getDataCount(String tabTpye, String urlString, Boolean isTab) throws JSONException, IOException {
     Map<String, String> response = HttpUtil.httpGet(urlString, new HashMap<String, String>());
-    int lastCount = notifition.getInt("tab_" + tabTpye + "_last");
+    int lastCount = 0;
+    if (isTab) {
+      lastCount = notifition.getInt("tab_" + tabTpye + "_last");
+    }
+    else {
+      lastCount = notifition.getInt(tabTpye + "_last");
+    }
     if (response.get("code").equals("200")) {
       String strRegex = "\\bMobileBridge.setDashboardDataCount.+";
       String countRegex = "\\d+";
@@ -154,8 +168,14 @@ public class LocalNotificationService extends Service {
 				 * 如果tab_*_last 的值为 -1,表示第一次加载
 				 */
         if (lastCount == -1) {
-          notifition.put("tab_" + tabTpye + "_last", dataCount);
-          notifition.put("tab_" + tabTpye, 0);
+            if (isTab) {
+                notifition.put("tab_" + tabTpye + "_last", dataCount);
+                notifition.put("tab_" + tabTpye, 0);
+            }
+            else {
+                notifition.put(tabTpye + "_last", dataCount);
+                notifition.put(tabTpye, 0);
+            }
           FileUtil.writeFile(notifitionPath, notifition.toString());
         }
         return dataCount;

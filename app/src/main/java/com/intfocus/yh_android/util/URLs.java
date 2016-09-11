@@ -45,6 +45,8 @@ public class URLs extends PrivateURLs implements Serializable {
 
     public final static String IMG_UPLOAD_PATH           = "%s/api/v1/device/%s/upload/user/%s/gravatar";
 
+    public final static String BLOG_PLINK_PATH           = "%s/thursday_say";
+
     public final static String USER_CONFIG_FILENAME      = "user.json";
     public final static String CONFIG_DIRNAME            = "Configs";
     public final static String SETTINGS_CONFIG_FILENAME  = "setting.json";
