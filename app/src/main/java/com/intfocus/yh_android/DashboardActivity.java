@@ -782,8 +782,14 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	private void initLocalNotifications() {
 		try {
 			String noticePath = FileUtil.dirPath(mContext, "Cached", URLs.LOCAL_NOTIFICATION_FILENAME);
+			notificationJSON = FileUtil.readConfigFile(noticePath);
 			if ((new File(noticePath)).exists()) {
-				return;
+				if(notificationJSON.has("setting_thursday_say") && notificationJSON.has("setting_thursday_say_last")){
+					return;
+				}
+				else {
+					new File(noticePath).delete();
+				}
 			}
 
 			JSONObject noticeJSON = new JSONObject();

@@ -85,7 +85,7 @@
     </LinearLayout>
 
     <View
-        style="@style/LoginActivityLineView" />
+    style="@style/LoginActivityLineView" />
 
     <Button
         android:layout_marginTop="30dp"
@@ -98,4 +98,14 @@
         android:textSize="20dip"
         android:onClick="actionSubmit"
         android:background="@drawable/btn_style" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1.23.45(678)"/>
+    </RelativeLayout>
 </LinearLayout>
