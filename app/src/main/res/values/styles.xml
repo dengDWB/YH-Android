@@ -205,4 +205,13 @@
         <item name="android:background">@color/colors4</item>
     </style>
 
+    <style name="LoginActivityLineView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">2dp</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:layout_marginRight">15dp</item>
+        <item name="android:layout_marginLeft">15dp</item>
+        <item name="android:background">@color/colors0</item>
+    </style>
+
 </resources>

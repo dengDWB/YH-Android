@@ -71,7 +71,7 @@ public class LocalNotificationService extends Service {
       analyseUrl = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
       appUrl = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
       messageUrl = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"), user.getString("group_id"), user.getString("user_id"));
-      thursdaySayUrl = String.format(URLs.BLOG_PLINK_PATH, URLs.kBaseUrl);
+      thursdaySayUrl = String.format(URLs.THURSDAY_SAY_PLINK_PATH, URLs.kBaseUrl);
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -144,7 +144,7 @@ public class LocalNotificationService extends Service {
   /*
    * 正则获取当前 DataCount，未获取到值则返回原数值
    */
-  private int getDataCount(String tabTpye, String urlString, Boolean isTab) throws JSONException, IOException {
+  private int getDataCount(String tabTpye, String urlString, boolean isTab) throws JSONException, IOException {
     Map<String, String> response = HttpUtil.httpGet(urlString, new HashMap<String, String>());
     int lastCount = 0;
     if (isTab) {
