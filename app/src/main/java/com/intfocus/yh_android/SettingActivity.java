@@ -184,7 +184,7 @@ public class SettingActivity extends BaseActivity {
                     gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarFileName);
                     httpGetBitmap(gravatarUrl, false);
                 } else {
-                    mIconImageView.setImageResource(R.drawable.login_bg_logo);
+                    mIconImageView.setImageResource(R.drawable.login_logo);
                 }
             }
 
@@ -248,7 +248,7 @@ public class SettingActivity extends BaseActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mIconImageView.setImageResource(R.drawable.login_bg_logo);
+                            mIconImageView.setImageResource(R.drawable.login_logo);
                         }
                     });
                 }
@@ -276,7 +276,7 @@ public class SettingActivity extends BaseActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                mIconImageView.setImageResource(R.drawable.login_bg_logo);
+                                mIconImageView.setImageResource(R.drawable.login_logo);
                             }
                         });
                     }
