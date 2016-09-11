@@ -159,7 +159,7 @@ public class SettingActivity extends BaseActivity {
             mDeviceID.setText(TextUtils.split(android.os.Build.MODEL, " - ")[0]);
             mApiDomain.setText(URLs.kBaseUrl.replace("http://", "").replace("https://", ""));
 
-            gravatarJsonPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, "gravatar.json");
+            gravatarJsonPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.GRAVATAR_FILENAME);
 
             if (new File(gravatarJsonPath).exists()) {
                 JSONObject gravatarJson = new JSONObject(FileUtil.readFile(gravatarJsonPath));
@@ -440,7 +440,7 @@ public class SettingActivity extends BaseActivity {
             MultipartBody requestBody = builder.build();
 
             Request request = new Request.Builder()
-                        .url(String.format(URLs.IMG_UPLOAD_PATH, PrivateURLs.kBaseUrl, user.getString("user_device_id"), user.getString("user_id")))
+                        .url(String.format(URLs.GRAVATAR_FILENAME, PrivateURLs.kBaseUrl, user.getString("user_device_id"), user.getString("user_id")))
                         .post(requestBody)
                         .build();
 
@@ -710,7 +710,7 @@ public class SettingActivity extends BaseActivity {
         @Override
         public void onClick(View v) {
             try {
-                String noticePath = FileUtil.dirPath(mContext, "Cached", URLs.LOCAL_NOTIFICATION_FILENAME);
+                String noticePath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
                 JSONObject notificationJson = new JSONObject(FileUtil.readFile(noticePath));
                 notificationJson.put("setting_thursday_say", 0);
                 FileUtil.writeFile(noticePath, notificationJson.toString());
@@ -729,7 +729,7 @@ public class SettingActivity extends BaseActivity {
      * 设置界面，需要显示通知样式的控件，检测是否需要通知
      */
     private void setSettingViewControlBadges() {
-        String notificationPath = FileUtil.dirPath(mContext, "Cached", URLs.LOCAL_NOTIFICATION_FILENAME);
+        String notificationPath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
         if(!(new File(notificationPath)).exists()) {
             return;
         }

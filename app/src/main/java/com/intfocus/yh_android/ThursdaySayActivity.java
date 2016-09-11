@@ -21,7 +21,7 @@ public class ThursdaySayActivity extends BaseActivity {
 
         mWebView.requestFocus();
         mWebView.loadUrl(urlStringForLoading);
-        urlString = String.format(URLs.THURSDAY_SAY_PLINK_PATH, PrivateURLs.kBaseUrl);
+        urlString = String.format(URLs.THURSDAY_SAY_PATH, PrivateURLs.kBaseUrl, URLs.currentUIVersion(ThursdaySayActivity.this));
         new Thread(mRunnableForDetecting).start();
     }
 
