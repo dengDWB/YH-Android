@@ -72,9 +72,12 @@ public class SettingActivity extends BaseActivity {
     private TextView mWarnPWD;
     private BadgeView bvCheckUpgrade;
     private BadgeView bvChangePWD;
+    private BadgeView bvCheckThursdaySay;
     private IconImageView mIconImageView;
     private PopupWindow popupWindow;
     private String gravatarJsonPath, gravatarImgPath, gravatarFileName;
+    private TextView mCheckThursdaySay;
+    private TextView mThursdaySayPink;
 
     /* 请求识别码 */
     private static final int CODE_GALLERY_REQUEST = 0xa0;
@@ -105,6 +108,8 @@ public class SettingActivity extends BaseActivity {
         Button mLogout = (Button) findViewById(R.id.logout);
         mLockSwitch = (Switch) findViewById(R.id.lock_switch);
         mIconImageView =(IconImageView) findViewById(R.id.img_icon);
+        mCheckThursdaySay = (TextView) findViewById(R.id.check_thursday_say);
+        mThursdaySayPink = (TextView) findViewById(R.id.thursday_say_link);
 
         screenLockInfo = "取消锁屏成功";
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));
@@ -114,6 +119,7 @@ public class SettingActivity extends BaseActivity {
 
         bvCheckUpgrade = new BadgeView(this, mCheckUpgrade);
         bvChangePWD = new BadgeView(this, mChangePWD);
+        bvCheckThursdaySay = new BadgeView(this, mCheckThursdaySay);
 
         mChangeLock.setOnClickListener(mChangeLockListener);
         mChangePWD.setOnClickListener(mChangePWDListener);
@@ -123,6 +129,7 @@ public class SettingActivity extends BaseActivity {
         mUISwitch.setOnCheckedChangeListener(mSwitchUIListener);
         mPygerLink.setOnClickListener(mPgyerLinkListener);
         mIconImageView.setOnClickListener(mIconImageViewListener);
+        mThursdaySayPink.setOnClickListener(mThursdaySayListener);
 
         initIconMenu();
         initializeUI();
@@ -222,7 +229,6 @@ public class SettingActivity extends BaseActivity {
                 jsonObject.put("gravatar_id", gravatar_id);
             }
             FileUtil.writeFile(path, jsonObject.toString());
-            Log.i("uploadStr", FileUtil.readFile(path));
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -700,6 +706,25 @@ public class SettingActivity extends BaseActivity {
         }
     };
 
+    private View.OnClickListener mThursdaySayListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            try {
+                String noticePath = FileUtil.dirPath(mContext, "Cached", URLs.LOCAL_NOTIFICATION_FILENAME);
+                JSONObject notificationJson = new JSONObject(FileUtil.readFile(noticePath));
+                notificationJson.put("setting_thursday_say", 0);
+                FileUtil.writeFile(noticePath, notificationJson.toString());
+
+                Intent blogLinkIntent = new Intent(SettingActivity.this,BlogActivity.class);
+                startActivity(blogLinkIntent);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
     /**
      * 设置界面，需要显示通知样式的控件，检测是否需要通知
      */
@@ -730,6 +755,11 @@ public class SettingActivity extends BaseActivity {
             if (notificationJSON.getInt("setting_pgyer") == 1) {
                 mCheckUpgrade.setText("   检测更新");
                 setBadgeView("setting_pgyer", bvCheckUpgrade);
+            }
+
+            if (notificationJSON.getInt("setting_thursday_say") >= 1){
+                mCheckThursdaySay.setText("   小四说");
+                setBadgeView("setting_thursday_say", bvCheckThursdaySay);
             }
 
             FileUtil.writeFile(notificationPath, notificationJSON.toString());

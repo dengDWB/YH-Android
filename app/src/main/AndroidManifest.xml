@@ -104,6 +104,10 @@
             android:theme="@style/Theme.UMDefault"
             android:excludeFromRecents="true"/>
         <activity
+            android:name=".BlogActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+        <activity
             android:name="com.intfocus.yh_android.wxapi.WXEntryActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
