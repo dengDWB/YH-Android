@@ -104,7 +104,7 @@
             android:theme="@style/Theme.UMDefault"
             android:excludeFromRecents="true"/>
         <activity
-            android:name=".BlogActivity"
+            android:name=".ThursdaySayActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity

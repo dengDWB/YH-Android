@@ -10,7 +10,7 @@ import com.intfocus.yh_android.util.URLs;
 /**
  * Created by 40284 on 2016/9/10.
  */
-public class BlogActivity extends BaseActivity {
+public class ThursdaySayActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +26,6 @@ public class BlogActivity extends BaseActivity {
     }
 
     public void dismissActivity(View v) {
-        BlogActivity.this.onBackPressed();
+        ThursdaySayActivity.this.onBackPressed();
     }
 }

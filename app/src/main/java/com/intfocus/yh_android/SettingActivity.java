@@ -715,7 +715,7 @@ public class SettingActivity extends BaseActivity {
                 notificationJson.put("setting_thursday_say", 0);
                 FileUtil.writeFile(noticePath, notificationJson.toString());
 
-                Intent blogLinkIntent = new Intent(SettingActivity.this,BlogActivity.class);
+                Intent blogLinkIntent = new Intent(SettingActivity.this,ThursdaySayActivity.class);
                 startActivity(blogLinkIntent);
             } catch (JSONException e) {
                 e.printStackTrace();

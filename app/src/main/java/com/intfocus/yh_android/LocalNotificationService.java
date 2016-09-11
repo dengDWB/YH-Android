@@ -35,7 +35,7 @@ public class LocalNotificationService extends Service {
   private TimerTask timerTask;
   private PackageInfo packageInfo;
   private String notifitionPath, pgyerVersionPath, userConfigPath;
-  private String kpiUrl, analyseUrl, appUrl, messageUrl, blogUrl;
+  private String kpiUrl, analyseUrl, appUrl, messageUrl, thursdaySayUrl;
   private String pgyerCode, versionCode;
   private int kpiCount, analyseCount, appCount, messageCount, updataCount, passwordCount, thursdaySayCount;
   private Context mContext;
@@ -71,7 +71,7 @@ public class LocalNotificationService extends Service {
       analyseUrl = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
       appUrl = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
       messageUrl = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"), user.getString("group_id"), user.getString("user_id"));
-      blogUrl = String.format(URLs.BLOG_PLINK_PATH, URLs.kBaseUrl);
+      thursdaySayUrl = String.format(URLs.BLOG_PLINK_PATH, URLs.kBaseUrl);
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -104,7 +104,7 @@ public class LocalNotificationService extends Service {
       analyseCount = getDataCount("analyse", analyseUrl, true);
       appCount = getDataCount("app", appUrl, true);
       messageCount = getDataCount("message", messageUrl, true);
-      thursdaySayCount = getDataCount("setting_thursday_say", blogUrl ,false);
+      thursdaySayCount = getDataCount("setting_thursday_say", thursdaySayUrl ,false);
 
 			/*
 			 * 遍历获取 Tab 栏上需要显示的通知数量 ("tab_*" 的值)
