@@ -124,6 +124,6 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:textColor="#c0c0c0"
-            android:textSize="10sp"/>
+            android:textSize="16sp"/>
     </RelativeLayout>
 </RelativeLayout>
