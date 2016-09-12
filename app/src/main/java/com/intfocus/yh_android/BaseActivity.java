@@ -910,6 +910,7 @@ public class BaseActivity extends Activity {
                 break;
             case "setting_pgyer":
             case "setting_password":
+            case "setting_thursday_say":
                 badgeView.setBadgePosition(BadgeView.POSITION_TOP_LEFT);
                 break;
             case "user":

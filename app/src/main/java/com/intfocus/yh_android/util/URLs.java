@@ -33,6 +33,7 @@ public class URLs extends PrivateURLs implements Serializable {
     public final static String API_PUSH_DEVICE_TOKEN_PATH = "%s/api/v1/device/%s/push_token/%s";
     public final static String API_BARCODE_SCAN_PATH      = "%s/api/v1/group/%s/role/%s/user/%s/store/%s/barcode_scan?code_info=%s&code_type=%s";
     public final static String API_ASSETS_PATH            = "%s/api/v1/download/%s.zip";
+    public final static String API_UPLOAD_GRAVATAR_PATH       = "%s/api/v1/device/%s/upload/user/%s/gravatar";
 
     public final static String KPI_PATH                  = "%s/mobile/%s/group/%s/role/%s/kpi";
     public final static String MESSAGE_PATH              = "%s/mobile/%s/role/%s/group/%s/user/%s/message";
@@ -40,10 +41,10 @@ public class URLs extends PrivateURLs implements Serializable {
     public final static String ANALYSE_PATH              = "%s/mobile/%s/role/%s/analyse";
     public final static String COMMENT_PATH              = "%s/mobile/%s/id/%s/type/%s/comment";
     public final static String RESET_PASSWORD_PATH       = "%s/mobile/%s/update_user_password";
+    public final static String THURSDAY_SAY_PATH         = "%s/mobile/%s/thursday_say";
 
     public final static String REPORT_DATA_FILENAME      = "group_%s_template_%s_report_%s.js";
 
-    public final static String IMG_UPLOAD_PATH           = "%s/api/v1/device/%s/upload/user/%s/gravatar";
 
     public final static String USER_CONFIG_FILENAME      = "user.json";
     public final static String CONFIG_DIRNAME            = "Configs";
@@ -57,6 +58,8 @@ public class URLs extends PrivateURLs implements Serializable {
     public final static String CACHED_DIRNAME            = "Cached";
     public final static String CACHED_HEADER_FILENAME    = "cached_header.json";
     public final static String CURRENT_VERSION_FILENAME  = "current_version.txt";
+    public final static String GRAVATAR_FILENAME         = "gravatar.json";
+    public final static String BARCODE_RESULT_FILENAME   = "barcode_scan_result.json";
     public final static String PGYER_VERSION_FILENAME    = "pgyer_version.txt";
     public final static String LOCAL_NOTIFICATION_FILENAME = "local_notification.json";
 

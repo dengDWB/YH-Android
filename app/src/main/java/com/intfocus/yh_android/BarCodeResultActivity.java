@@ -9,6 +9,7 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
+import com.intfocus.yh_android.util.URLs;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,7 +46,7 @@ public class BarCodeResultActivity extends BaseActivity {
 
     String htmlOriginPath = sharedPath + "/BarCodeScan/scan_bar_code.html";
     htmlContent = FileUtil.readFile(htmlOriginPath);
-    cachedPath = FileUtil.dirPath(mContext, "Cached", "barcode.json");
+    cachedPath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.BARCODE_RESULT_FILENAME);
     htmlPath = String.format("%s.tmp", htmlOriginPath);
 
     try {

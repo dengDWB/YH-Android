@@ -7,9 +7,14 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.util.Log;
+
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.HttpUtil;
 import com.intfocus.yh_android.util.URLs;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -18,23 +23,21 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by lijunjie on 16/8/25.
  */
 public class LocalNotificationService extends Service {
-  private JSONObject notifition;
-  private JSONObject user;
+  private JSONObject notificationJSON;
+  private JSONObject userJSON;
   private JSONObject pgyerJSON;
   private Timer timer;
   private TimerTask timerTask;
   private PackageInfo packageInfo;
-  private String notifitionPath, pgyerVersionPath, userConfigPath;
-  private String kpiUrl, analyseUrl, appUrl, messageUrl;
+  private String notificationPath, pgyerVersionPath, userConfigPath;
+  private String kpiUrl, analyseUrl, appUrl, messageUrl, thursdaySayUrl;
   private String pgyerCode, versionCode;
-  private int kpiCount, analyseCount, appCount, messageCount, updataCount, passwordCount;
+  private int kpiCount, analyseCount, appCount, messageCount, updataCount, passwordCount, thursdaySayCount;
   private Context mContext;
   private Intent sendIntent;
 
@@ -48,7 +51,7 @@ public class LocalNotificationService extends Service {
     super.onCreate();
     mContext = this;
 
-    notifitionPath = FileUtil.dirPath(mContext, "Cached", URLs.LOCAL_NOTIFICATION_FILENAME);
+    notificationPath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
     userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
     pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.PGYER_VERSION_FILENAME);
 
@@ -59,15 +62,16 @@ public class LocalNotificationService extends Service {
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
-    user = FileUtil.readConfigFile(userConfigPath);
+    userJSON = FileUtil.readConfigFile(userConfigPath);
     pgyerJSON = FileUtil.readConfigFile(pgyerVersionPath);
-    notifition = FileUtil.readConfigFile(notifitionPath);
+    notificationJSON = FileUtil.readConfigFile(notificationPath);
     try {
       String currentUIVersion = URLs.currentUIVersion(mContext);
-      kpiUrl = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
-      analyseUrl = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
-      appUrl = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
-      messageUrl = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"), user.getString("group_id"), user.getString("user_id"));
+      kpiUrl = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, userJSON.getString("group_id"), userJSON.getString("role_id"));
+      analyseUrl = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, userJSON.getString("role_id"));
+      appUrl = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, userJSON.getString("role_id"));
+      messageUrl = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, userJSON.getString("role_id"), userJSON.getString("group_id"), userJSON.getString("user_id"));
+      thursdaySayUrl = String.format(URLs.THURSDAY_SAY_PATH, URLs.kBaseUrl, currentUIVersion);
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -76,7 +80,7 @@ public class LocalNotificationService extends Service {
   }
 
   /*
-   * 通知定时刷新任务,间隔 15 分钟发送一次广播
+   * 通知定时刷新任务,间隔 30 分钟发送一次广播
    */
   private void notifitionTask() {
     timer = new Timer();
@@ -88,7 +92,7 @@ public class LocalNotificationService extends Service {
         sendBroadcast(sendIntent);
       }
     };
-    timer.schedule(timerTask, 0, 15 * 60 * 1000);//间隔 15 分钟
+    timer.schedule(timerTask, 0, 30 * 60 * 1000);
   }
 
   /*
@@ -96,19 +100,20 @@ public class LocalNotificationService extends Service {
    */
   private void processDataCount() {
     try {
-      kpiCount = getDataCount("kpi", kpiUrl);
-      analyseCount = getDataCount("analyse", analyseUrl);
-      appCount = getDataCount("app", appUrl);
-      messageCount = getDataCount("message", messageUrl);
+      kpiCount = getDataCount("tab_kpi", kpiUrl);
+      analyseCount = getDataCount("tab_analyse", analyseUrl);
+      appCount = getDataCount("tab_app", appUrl);
+      messageCount = getDataCount("tab_message", messageUrl);
+      thursdaySayCount = getDataCount("setting_thursday_say", thursdaySayUrl);
 
 			/*
 			 * 遍历获取 Tab 栏上需要显示的通知数量 ("tab_*" 的值)
 			 */
-      String[] typeString = {"kpi", "analyse", "app", "message"};
-      int[] typeCount = {kpiCount, analyseCount, appCount, messageCount};
+      String[] typeString = {"tab_kpi", "tab_analyse", "tab_app", "tab_message", "setting_thursday_say"};
+      int[] typeCount = {kpiCount, analyseCount, appCount, messageCount, thursdaySayCount};
       for (int i = 0; i < typeString.length; i++) {
-          notifition.put("tab_" + typeString[i], Math.abs(typeCount[i] - notifition.getInt("tab_" + typeString[i] + "_last")));
-          notifition.put("tab_" + typeString[i] + "_last", typeCount[i]);
+        notificationJSON.put(typeString[i], Math.abs(typeCount[i] - notificationJSON.getInt(typeString[i] + "_last")));
+        notificationJSON.put(typeString[i] + "_last", typeCount[i]);
       }
 
       if ((new File(pgyerVersionPath)).exists()) {
@@ -123,11 +128,14 @@ public class LocalNotificationService extends Service {
         updataCount = -1;
       }
 
-      passwordCount = user.getString("password").equals(URLs.MD5("123456")) ? 1 : -1;
-      notifition.put("setting_password", passwordCount);
-      notifition.put("setting_pgyer", updataCount);
+      passwordCount = userJSON.getString("password").equals(URLs.MD5(URLs.kInitPassword)) ? 1 : -1;
+      notificationJSON.put("setting_password", passwordCount);
+      notificationJSON.put("setting_pgyer", updataCount);
 
-      FileUtil.writeFile(notifitionPath, notifition.toString());
+      int settingCount = (notificationJSON.getInt("setting_password") > 0 || notificationJSON.getInt("setting_pgyer") > 0 || notificationJSON.getInt("setting_thursday_say") > 0) ? 1 : 0;
+      notificationJSON.put("setting", settingCount);
+
+      FileUtil.writeFile(notificationPath, notificationJSON.toString());
     } catch (JSONException | IOException | PackageManager.NameNotFoundException e) {
       e.printStackTrace();
     }
@@ -136,9 +144,10 @@ public class LocalNotificationService extends Service {
   /*
    * 正则获取当前 DataCount，未获取到值则返回原数值
    */
-  private int getDataCount(String tabTpye, String urlString) throws JSONException, IOException {
+  private int getDataCount(String keyName, String urlString) throws JSONException, IOException {
     Map<String, String> response = HttpUtil.httpGet(urlString, new HashMap<String, String>());
-    int lastCount = notifition.getInt("tab_" + tabTpye + "_last");
+    int lastCount = notificationJSON.getInt(keyName + "_last");
+
     if (response.get("code").equals("200")) {
       String strRegex = "\\bMobileBridge.setDashboardDataCount.+";
       String countRegex = "\\d+";
@@ -154,20 +163,20 @@ public class LocalNotificationService extends Service {
 				 * 如果tab_*_last 的值为 -1,表示第一次加载
 				 */
         if (lastCount == -1) {
-          notifition.put("tab_" + tabTpye + "_last", dataCount);
-          notifition.put("tab_" + tabTpye, 0);
-          FileUtil.writeFile(notifitionPath, notifition.toString());
+          notificationJSON.put(keyName + "_last", dataCount);
+          notificationJSON.put(keyName, 1);
+          FileUtil.writeFile(notificationPath, notificationJSON.toString());
         }
         return dataCount;
       } else {
-        Log.i("notifition", "未匹配到数值");
+        Log.i("notification", "未匹配到数值");
         return lastCount;
       }
     } else if (response.get("code").equals("304")) {
-      Log.i("notifition", "当前无通知");
+      Log.i("notification", "当前无通知");
       return lastCount;
     } else {
-      Log.i("notifition", "网络请求失败");
+      Log.i("notification", "网络请求失败");
       return lastCount;
     }
   }

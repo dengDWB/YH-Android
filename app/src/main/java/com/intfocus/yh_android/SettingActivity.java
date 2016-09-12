@@ -34,11 +34,11 @@ import com.readystatesoftware.viewbadger.BadgeView;
 import com.umeng.message.PushAgent;
 import com.umeng.message.UmengRegistrar;
 
-import java.io.File;
-import java.io.IOException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -72,9 +72,12 @@ public class SettingActivity extends BaseActivity {
     private TextView mWarnPWD;
     private BadgeView bvCheckUpgrade;
     private BadgeView bvChangePWD;
+    private BadgeView bvCheckThursdaySay;
     private IconImageView mIconImageView;
     private PopupWindow popupWindow;
     private String gravatarJsonPath, gravatarImgPath, gravatarFileName;
+    private TextView mCheckThursdaySay;
+    private TextView mThursdaySayPink;
 
     /* 请求识别码 */
     private static final int CODE_GALLERY_REQUEST = 0xa0;
@@ -105,6 +108,8 @@ public class SettingActivity extends BaseActivity {
         Button mLogout = (Button) findViewById(R.id.logout);
         mLockSwitch = (Switch) findViewById(R.id.lock_switch);
         mIconImageView =(IconImageView) findViewById(R.id.img_icon);
+        mCheckThursdaySay = (TextView) findViewById(R.id.check_thursday_say);
+        mThursdaySayPink = (TextView) findViewById(R.id.thursday_say_link);
 
         screenLockInfo = "取消锁屏成功";
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));
@@ -114,6 +119,7 @@ public class SettingActivity extends BaseActivity {
 
         bvCheckUpgrade = new BadgeView(this, mCheckUpgrade);
         bvChangePWD = new BadgeView(this, mChangePWD);
+        bvCheckThursdaySay = new BadgeView(this, mCheckThursdaySay);
 
         mChangeLock.setOnClickListener(mChangeLockListener);
         mChangePWD.setOnClickListener(mChangePWDListener);
@@ -123,6 +129,7 @@ public class SettingActivity extends BaseActivity {
         mUISwitch.setOnCheckedChangeListener(mSwitchUIListener);
         mPygerLink.setOnClickListener(mPgyerLinkListener);
         mIconImageView.setOnClickListener(mIconImageViewListener);
+        mThursdaySayPink.setOnClickListener(mThursdaySayListener);
 
         initIconMenu();
         initializeUI();
@@ -152,23 +159,32 @@ public class SettingActivity extends BaseActivity {
             mDeviceID.setText(TextUtils.split(android.os.Build.MODEL, " - ")[0]);
             mApiDomain.setText(URLs.kBaseUrl.replace("http://", "").replace("https://", ""));
 
-            gravatarJsonPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, "gravatar.json");
+            gravatarJsonPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.GRAVATAR_FILENAME);
 
             if (new File(gravatarJsonPath).exists()) {
                 JSONObject gravatarJson = new JSONObject(FileUtil.readFile(gravatarJsonPath));
                 gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarJson.getString("name"));
                 gravatarFileName = gravatarJson.getString("name");
+                String gravatarUrl = user.getString("gravatar");
+                String gravatarFileName1 = gravatarUrl.substring(gravatarUrl.lastIndexOf("/")+1, gravatarUrl.length());
+                if (!(gravatarFileName.equals(gravatarFileName1))) {
+                    gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarFileName1);
+                    gravatarFileName = gravatarFileName1;
+                    httpGetBitmap(gravatarUrl, true);
+                    return;
+                }
                 Bitmap bitmap = BitmapFactory.decodeFile(gravatarImgPath);
                 mIconImageView.setImageBitmap(bitmap);
+
             }
             else {
                 if (user.has("gravatar") && (user.getString("gravatar").indexOf("http") != -1)) {
                     String gravatarUrl = user.getString("gravatar");
                     gravatarFileName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/")+1, gravatarUrl.length());
                     gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarFileName);
-                    httpGetBitmap(gravatarUrl);
+                    httpGetBitmap(gravatarUrl, false);
                 } else {
-                    mIconImageView.setImageResource(R.drawable.login_bg_logo);
+                    mIconImageView.setImageResource(R.drawable.login_logo);
                 }
             }
 
@@ -213,7 +229,6 @@ public class SettingActivity extends BaseActivity {
                 jsonObject.put("gravatar_id", gravatar_id);
             }
             FileUtil.writeFile(path, jsonObject.toString());
-            Log.i("uploadStr", FileUtil.readFile(path));
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -222,7 +237,7 @@ public class SettingActivity extends BaseActivity {
 
     }
 
-    public void httpGetBitmap(String urlString) {
+    public void httpGetBitmap(String urlString, final boolean isDelete) {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(urlString).build();
         Call call = client.newCall(request);
@@ -233,7 +248,7 @@ public class SettingActivity extends BaseActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mIconImageView.setImageResource(R.drawable.login_bg_logo);
+                            mIconImageView.setImageResource(R.drawable.login_logo);
                         }
                     });
                 }
@@ -252,12 +267,16 @@ public class SettingActivity extends BaseActivity {
                                 mIconImageView.setImageBitmap(bm);
                             }
                         });
-                        writeJson(gravatarJsonPath, gravatarFileName, true, "", false);
+                        if (isDelete) {
+                            writeJson(gravatarJsonPath, gravatarFileName, true, "", true);
+                        } else {
+                            writeJson(gravatarJsonPath, gravatarFileName, true, "", false);
+                        }
                     }catch (Exception e){
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                mIconImageView.setImageResource(R.drawable.login_bg_logo);
+                                mIconImageView.setImageResource(R.drawable.login_logo);
                             }
                         });
                     }
@@ -421,7 +440,7 @@ public class SettingActivity extends BaseActivity {
             MultipartBody requestBody = builder.build();
 
             Request request = new Request.Builder()
-                        .url(String.format(URLs.IMG_UPLOAD_PATH, PrivateURLs.kBaseUrl, user.getString("user_device_id"), user.getString("user_id")))
+                        .url(String.format(URLs.GRAVATAR_FILENAME, PrivateURLs.kBaseUrl, user.getString("user_device_id"), user.getString("user_id")))
                         .post(requestBody)
                         .build();
 
@@ -687,11 +706,30 @@ public class SettingActivity extends BaseActivity {
         }
     };
 
+    private View.OnClickListener mThursdaySayListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            try {
+                String noticePath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
+                JSONObject notificationJson = new JSONObject(FileUtil.readFile(noticePath));
+                notificationJson.put("setting_thursday_say", 0);
+                FileUtil.writeFile(noticePath, notificationJson.toString());
+
+                Intent blogLinkIntent = new Intent(SettingActivity.this,ThursdaySayActivity.class);
+                startActivity(blogLinkIntent);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
     /**
      * 设置界面，需要显示通知样式的控件，检测是否需要通知
      */
     private void setSettingViewControlBadges() {
-        String notificationPath = FileUtil.dirPath(mContext, "Cached", URLs.LOCAL_NOTIFICATION_FILENAME);
+        String notificationPath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
         if(!(new File(notificationPath)).exists()) {
             return;
         }
@@ -717,6 +755,11 @@ public class SettingActivity extends BaseActivity {
             if (notificationJSON.getInt("setting_pgyer") == 1) {
                 mCheckUpgrade.setText("   检测更新");
                 setBadgeView("setting_pgyer", bvCheckUpgrade);
+            }
+
+            if (notificationJSON.getInt("setting_thursday_say") >= 1){
+                mCheckThursdaySay.setText("   小四说");
+                setBadgeView("setting_thursday_say", bvCheckThursdaySay);
             }
 
             FileUtil.writeFile(notificationPath, notificationJSON.toString());
