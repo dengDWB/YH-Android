@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -77,7 +78,7 @@ public class SettingActivity extends BaseActivity {
     private PopupWindow popupWindow;
     private String gravatarJsonPath, gravatarImgPath, gravatarFileName;
     private TextView mCheckThursdaySay;
-    private TextView mThursdaySayPink;
+    private ImageButton mThursdaySayPink;
 
     /* 请求识别码 */
     private static final int CODE_GALLERY_REQUEST = 0xa0;
@@ -109,7 +110,7 @@ public class SettingActivity extends BaseActivity {
         mLockSwitch = (Switch) findViewById(R.id.lock_switch);
         mIconImageView =(IconImageView) findViewById(R.id.img_icon);
         mCheckThursdaySay = (TextView) findViewById(R.id.check_thursday_say);
-        mThursdaySayPink = (TextView) findViewById(R.id.thursday_say_link);
+        mThursdaySayPink = (ImageButton) findViewById(R.id.thursday_say_link);
 
         screenLockInfo = "取消锁屏成功";
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));
