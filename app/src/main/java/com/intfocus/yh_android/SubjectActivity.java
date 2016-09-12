@@ -343,7 +343,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
      * 分享截图至微信
      */
     public void actionShare2Weixin(View v) {
-        String filePath = FileUtil.basePath(mContext) + "/" + "Cached" + "/" + "timestmap.png";
+        String filePath = FileUtil.basePath(mContext) + "/" + URLs.CACHED_DIRNAME + "/" + "timestmap.png";
         mWebView.setDrawingCacheEnabled(true);
         mWebView.buildDrawingCache();
         Bitmap imgBmp = Bitmap.createBitmap(mWebView.getWidth(), mWebView.getHeight(), Bitmap.Config.ARGB_8888);
