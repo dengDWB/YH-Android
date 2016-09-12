@@ -190,15 +190,15 @@
                         android:textSize="12dp"/>
                 </RelativeLayout>
 
-                <RelativeLayout style="@style/SettingGroup">
+                <RelativeLayout style="@style/SettingGroup"
+                    android:onClick="launchThursdaySayActivity">
 
                     <TextView
                         android:id="@+id/check_thursday_say"
                         style="@style/SettingKey"
                         android:text="小四说"/>
 
-                    <ImageButton
-                        android:id="@+id/thursday_say_link"
+                    <ImageView
                         android:layout_height="20dp"
                         android:layout_width="20dp"
                         android:layout_alignParentRight="true"
