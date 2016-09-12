@@ -121,6 +121,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 	@Override
 	public void onBackPressed() {
+		super.onBackPressed();
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage("退出应用程序")
 				.setPositiveButton("确认", new DialogInterface.OnClickListener() {
