@@ -28,19 +28,22 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.readystatesoftware.viewbadger.BadgeView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class DashboardActivity extends BaseActivity implements View.OnClickListener {
 	public static final String ACTION_UPDATENOTIFITION = "action.updateNotifition";
@@ -72,19 +75,19 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		loadWebView();
 		displayAdOrNot(true);
 
-        /*
+		/*
 		 * 通过解屏进入界面后，进行用户验证
-         */
+     */
 		checkWhetherFromScreenLockActivity();
 
-        /*
+		/*
 		 * 检测服务器静态资源是否更新，并下载
-         */
+     */
 		checkAssetsUpdated(true);
 
-        /*
-         * 动态注册广播用于接收通知
-         */
+		/*
+		 * 动态注册广播用于接收通知
+		 */
 		initLocalNotifications();
 		initNotificationService();
 
@@ -95,9 +98,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 	protected void onResume() {
 		mMyApp.setCurrentActivity(this);
-        /*
-         * 启动 Activity 时也需要判断小红点是否显示
-         */
+		/*
+		 * 启动 Activity 时也需要判断小红点是否显示
+		 */
 		receiveNotification();
 		super.onResume();
 	}
@@ -123,7 +126,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	public void onBackPressed() {
 		super.onBackPressed();
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage("退出应用程序")
+		builder.setTitle("温馨提示")
+				.setMessage(String.format("确认退出【%s】？", getResources().getString(R.string.app_name)))
 				.setPositiveButton("确认", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -202,7 +206,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	 */
 	private void receiveNotification() {
 		try {
-			String noticePath = FileUtil.dirPath(mContext, "Cached", URLs.LOCAL_NOTIFICATION_FILENAME);
+			String noticePath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
 			notificationJSON = FileUtil.readConfigFile(noticePath);
 			kpiNotifition = notificationJSON.getInt("tab_kpi");
 			analyseNotifition = notificationJSON.getInt("tab_analyse");
@@ -221,7 +225,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			if (messageNotifition > 0 && objectType != 5) {
 				setBadgeView("tab", bvMessage);
 			}
-			if (notificationJSON.getInt("setting_pgyer") == 1 || notificationJSON.getInt("setting_password") == 1) {
+			if (notificationJSON.getInt("setting")  > 0) {
 				setBadgeView("setting", bvBannerSetting);
 				setBadgeView("user", bvUser);
 			} else {
@@ -520,7 +524,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 						break;
 				}
 
-				String notificationPath = FileUtil.dirPath(mContext, "Cached", URLs.LOCAL_NOTIFICATION_FILENAME);
+				String notificationPath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
 				FileUtil.writeFile(notificationPath, notificationJSON.toString());
 
 				new Thread(mRunnableForDetecting).start();
@@ -785,9 +789,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			e.printStackTrace();
 		}
 
-        /*
-         * 默认标签栏选中【仪表盘】
-         */
+		/*
+		 * 默认标签栏选中【仪表盘】
+		 */
 		objectType = 1;
 		urlString = urlStrings.get(0);
 	}
@@ -797,26 +801,29 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	 */
 	private void initLocalNotifications() {
 		try {
-			String noticePath = FileUtil.dirPath(mContext, "Cached", URLs.LOCAL_NOTIFICATION_FILENAME);
-			if ((new File(noticePath)).exists()) {
-				return;
-			}
+			String noticePath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
+			notificationJSON = FileUtil.readConfigFile(noticePath);
 
-			JSONObject noticeJSON = new JSONObject();
-			noticeJSON.put("app", -1);
-			noticeJSON.put("tab_kpi", -1);
-			noticeJSON.put("tab_kpi_last", -1);
-			noticeJSON.put("tab_analyse", -1);
-			noticeJSON.put("tab_analyse_last", -1);
-			noticeJSON.put("tab_app", "-1");
-			noticeJSON.put("tab_app_last", -1);
-			noticeJSON.put("tab_message", -1);
-			noticeJSON.put("tab_message_last", -1);
-			noticeJSON.put("setting", -1);
-			noticeJSON.put("setting_pgyer", -1);
-			noticeJSON.put("setting_password", -1);
+			/*
+			 * 版本迭代的问题：
+			 * 1. 动态添加新字段
+			 * 2. 不可影响已存在字段存放的数据
+			 */
+			if (!notificationJSON.has("app")) { notificationJSON.put("app", -1); }
+			if (!notificationJSON.has("tab_kpi")) { notificationJSON.put("tab_kpi", -1); }
+			if (!notificationJSON.has("tab_kpi_last")) { notificationJSON.put("tab_kpi_last", -1); }
+			if (!notificationJSON.has("tab_analyse")) { notificationJSON.put("tab_analyse", -1); }
+			if (!notificationJSON.has("tab_analyse_last")) { notificationJSON.put("tab_analyse_last", -1); }
+			if (!notificationJSON.has("tab_app")) { notificationJSON.put("tab_app", -1); }
+			if (!notificationJSON.has("tab_app_last")) { notificationJSON.put("tab_app_last", -1); }
+			if (!notificationJSON.has("tab_message")) { notificationJSON.put("tab_message", -1); }
+			if (!notificationJSON.has("tab_message_last")) { notificationJSON.put("tab_message_last", -1); }
+			if (!notificationJSON.has("setting")) { notificationJSON.put("setting", -1); }
+			if (!notificationJSON.has("setting_pgyer")) { notificationJSON.put("setting_pgyer", -1); }
+			if (!notificationJSON.has("setting_password")) { notificationJSON.put("setting_password", -1); }
+			if (!notificationJSON.has("setting_thursday_say")) { notificationJSON.put("setting_thursday_say", -1); }
 
-			FileUtil.writeFile(noticePath, noticeJSON.toString());
+			FileUtil.writeFile(noticePath, notificationJSON.toString());
 		} catch (JSONException | IOException e) {
 			e.printStackTrace();
 		}

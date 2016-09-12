@@ -76,7 +76,7 @@ public class IconImageView extends ImageView {
 			canvas.drawBitmap(bitmap, rect, rect, paint);
 			return output;
 		} catch (Exception e){
-			return BitmapFactory.decodeResource(getResources(), R.drawable.login_bg_logo);
+			return BitmapFactory.decodeResource(getResources(), R.drawable.login_logo);
 		}
 
 	}
