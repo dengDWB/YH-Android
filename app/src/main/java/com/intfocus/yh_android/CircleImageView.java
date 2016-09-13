@@ -16,18 +16,18 @@ import android.widget.ImageView;
 /**
  * Created by Liurl on 2016/9/2.
  */
-public class IconImageView extends ImageView {
+public class CircleImageView extends ImageView {
 	private Paint paint ;
 
-	public IconImageView(Context context) {
+	public CircleImageView(Context context) {
 		this(context,null);
 	}
 
-	public IconImageView(Context context, AttributeSet attrs) {
+	public CircleImageView(Context context, AttributeSet attrs) {
 		this(context, attrs,0);
 	}
 
-	public IconImageView(Context context, AttributeSet attrs, int defStyle) {
+	public CircleImageView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		paint = new Paint();
 	}

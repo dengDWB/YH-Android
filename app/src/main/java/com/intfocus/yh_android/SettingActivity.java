@@ -73,11 +73,10 @@ public class SettingActivity extends BaseActivity {
     private BadgeView bvCheckUpgrade;
     private BadgeView bvChangePWD;
     private BadgeView bvCheckThursdaySay;
-    private IconImageView mIconImageView;
+    private CircleImageView mIconImageView;
     private PopupWindow popupWindow;
     private String gravatarJsonPath, gravatarImgPath, gravatarFileName;
     private TextView mCheckThursdaySay;
-    private TextView mThursdaySayPink;
 
     /* 请求识别码 */
     private static final int CODE_GALLERY_REQUEST = 0xa0;
@@ -107,9 +106,8 @@ public class SettingActivity extends BaseActivity {
         TextView mCheckAssets = (TextView) findViewById(R.id.check_assets);
         Button mLogout = (Button) findViewById(R.id.logout);
         mLockSwitch = (Switch) findViewById(R.id.lock_switch);
-        mIconImageView =(IconImageView) findViewById(R.id.img_icon);
+        mIconImageView =(CircleImageView) findViewById(R.id.img_icon);
         mCheckThursdaySay = (TextView) findViewById(R.id.check_thursday_say);
-        mThursdaySayPink = (TextView) findViewById(R.id.thursday_say_link);
 
         screenLockInfo = "取消锁屏成功";
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));
@@ -129,7 +127,6 @@ public class SettingActivity extends BaseActivity {
         mUISwitch.setOnCheckedChangeListener(mSwitchUIListener);
         mPygerLink.setOnClickListener(mPgyerLinkListener);
         mIconImageView.setOnClickListener(mIconImageViewListener);
-        mThursdaySayPink.setOnClickListener(mThursdaySayListener);
 
         initIconMenu();
         initializeUI();
@@ -500,6 +497,22 @@ public class SettingActivity extends BaseActivity {
         SettingActivity.this.onBackPressed();
     }
 
+    public void launchThursdaySayActivity(View v) {
+        try {
+            String noticePath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
+            JSONObject notificationJson = new JSONObject(FileUtil.readFile(noticePath));
+            notificationJson.put("setting_thursday_say", 0);
+            FileUtil.writeFile(noticePath, notificationJson.toString());
+
+            Intent blogLinkIntent = new Intent(SettingActivity.this,ThursdaySayActivity.class);
+            startActivity(blogLinkIntent);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     /*
      * 退出登录
      */
@@ -703,25 +716,6 @@ public class SettingActivity extends BaseActivity {
         public void onClick(View v) {
             Intent browserIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(URLs.kPgyerUrl));
             startActivity(browserIntent);
-        }
-    };
-
-    private View.OnClickListener mThursdaySayListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            try {
-                String noticePath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
-                JSONObject notificationJson = new JSONObject(FileUtil.readFile(noticePath));
-                notificationJson.put("setting_thursday_say", 0);
-                FileUtil.writeFile(noticePath, notificationJson.toString());
-
-                Intent blogLinkIntent = new Intent(SettingActivity.this,ThursdaySayActivity.class);
-                startActivity(blogLinkIntent);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     };
 

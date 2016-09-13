@@ -44,7 +44,7 @@ public class BarCodeResultActivity extends BaseActivity {
     colorViews.add((ImageView) findViewById(R.id.colorView4));
     initColorView(colorViews);
 
-    String htmlOriginPath = sharedPath + "/BarCodeScan/scan_bar_code.html";
+    String htmlOriginPath = String.format("%s/BarCodeScan/%s",sharedPath,URLs.SCAN_BARCODE_FILENAME);
     htmlContent = FileUtil.readFile(htmlOriginPath);
     cachedPath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.BARCODE_RESULT_FILENAME);
     htmlPath = String.format("%s.tmp", htmlOriginPath);

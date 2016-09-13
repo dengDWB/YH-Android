@@ -33,7 +33,7 @@ public class URLs extends PrivateURLs implements Serializable {
     public final static String API_PUSH_DEVICE_TOKEN_PATH = "%s/api/v1/device/%s/push_token/%s";
     public final static String API_BARCODE_SCAN_PATH      = "%s/api/v1/group/%s/role/%s/user/%s/store/%s/barcode_scan?code_info=%s&code_type=%s";
     public final static String API_ASSETS_PATH            = "%s/api/v1/download/%s.zip";
-    public final static String API_UPLOAD_GRAVATAR_PATH       = "%s/api/v1/device/%s/upload/user/%s/gravatar";
+    public final static String API_UPLOAD_GRAVATAR_PATH   = "%s/api/v1/device/%s/upload/user/%s/gravatar";
 
     public final static String KPI_PATH                  = "%s/mobile/%s/group/%s/role/%s/kpi";
     public final static String MESSAGE_PATH              = "%s/mobile/%s/role/%s/group/%s/user/%s/message";
@@ -60,6 +60,7 @@ public class URLs extends PrivateURLs implements Serializable {
     public final static String CURRENT_VERSION_FILENAME  = "current_version.txt";
     public final static String GRAVATAR_FILENAME         = "gravatar.json";
     public final static String BARCODE_RESULT_FILENAME   = "barcode_scan_result.json";
+    public final static String SCAN_BARCODE_FILENAME     = "scan_bar_code.html";
     public final static String PGYER_VERSION_FILENAME    = "pgyer_version.txt";
     public final static String LOCAL_NOTIFICATION_FILENAME = "local_notification.json";
 

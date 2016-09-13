@@ -20,7 +20,7 @@
                 android:layout_height="180dp"
                 android:background="@drawable/bg_user">
 
-                <com.intfocus.yh_android.IconImageView
+                <com.intfocus.yh_android.CircleImageView
                 android:id="@+id/img_icon"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
@@ -190,20 +190,19 @@
                         android:textSize="12dp"/>
                 </RelativeLayout>
 
-                <RelativeLayout style="@style/SettingGroup">
+                <RelativeLayout style="@style/SettingGroup"
+                    android:onClick="launchThursdaySayActivity">
 
                     <TextView
                         android:id="@+id/check_thursday_say"
                         style="@style/SettingKey"
                         android:text="小四说"/>
 
-                    <TextView
-                        android:id="@+id/thursday_say_link"
-                        style="@style/SettingValue"
-                        android:layout_marginTop="3dp"
-                        android:text="点击阅读"
-                        android:textColor="#0000ff"
-                        android:textSize="12dp"/>
+                    <ImageView
+                        android:layout_height="20dp"
+                        android:layout_width="20dp"
+                        android:layout_alignParentRight="true"
+                        android:background="@drawable/icon_thursday_say_pink" />
                 </RelativeLayout>
 
                 <View style="@style/Divider"/>
