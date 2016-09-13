@@ -552,7 +552,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	 */
 	public void launchSettingActivity(View v) {
 		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
-		popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -87), dip2px(this, 10));
+		popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
 
         /*
          * 用户行为记录, 单独异常处理，不可影响用户体验
