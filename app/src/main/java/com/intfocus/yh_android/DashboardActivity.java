@@ -28,7 +28,6 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.ScrollView;
 
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
@@ -78,12 +77,12 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 		/*
 		 * 通过解屏进入界面后，进行用户验证
-     */
+     	 */
 		checkWhetherFromScreenLockActivity();
 
 		/*
 		 * 检测服务器静态资源是否更新，并下载
-     */
+     	 */
 		checkAssetsUpdated(true);
 
 		/*
@@ -170,10 +169,10 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 		boolean isShouldDisplayAd = mCurrentTab == mTabKPI && new File(adIndexPath).exists();
 		if (isShouldDisplayAd) {
-			viewAnimation(browserAd,true,0,dip2px(DashboardActivity.this,130));
+			viewAnimation(browserAd,true,0, dip2px(DashboardActivity.this,140));
 		}
 		else {
-			viewAnimation(browserAd,false,dip2px(DashboardActivity.this,130),0);
+			viewAnimation(browserAd,false, dip2px(DashboardActivity.this,140),0);
 		}
 	}
 
@@ -245,23 +244,21 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
 		initWebView();
 		setPullToRefreshWebView(true);
-
 		mWebView.requestFocus();
-		mWebView.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");
+		mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);
 		mWebView.loadUrl(urlStringForLoading);
 
 		browserAd = (WebView) findViewById(R.id.browserAd);
-		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dip2px(this, 130));
-		browserAd.setLayoutParams(layoutParams);
-		browserAd.getSettings().setJavaScriptEnabled(false);
+		browserAd.getSettings().setUseWideViewPort(true);
+		browserAd.getSettings().setLoadWithOverviewMode(true);
+		browserAd.getSettings().setJavaScriptEnabled(true);
+		browserAd.setOverScrollMode(View.OVER_SCROLL_NEVER);
 		browserAd.getSettings().setDefaultTextEncodingName("utf-8");
 		browserAd.requestFocus();
-		browserAd.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");
+		browserAd.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);
 		browserAd.setWebViewClient(new WebViewClient());
 		browserAd.setWebChromeClient(new WebChromeClient() {
 		});
-		browserAd.getSettings().setUseWideViewPort(true);
-		browserAd.getSettings().setLoadWithOverviewMode(true);
 	}
 
 	/*
@@ -663,7 +660,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 		@JavascriptInterface
 		public void hideAd() {
-			viewAnimation(browserAd,false,dip2px(DashboardActivity.this,130),0);
+			viewAnimation(browserAd,false, dip2px(DashboardActivity.this,140),0);
 		}
 
 		@JavascriptInterface

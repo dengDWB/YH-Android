@@ -106,14 +106,14 @@ public class YHApplication extends Application {
          *  sharedPath/filename.zip md5值 <=> user.plist中filename_md5
          *  不一致时，则删除原解压后文件夹，重新解压zip
          */
-        FileUtil.checkAssets(mContext, "loading", false);
-        FileUtil.checkAssets(mContext, "assets", false);
-        FileUtil.checkAssets(mContext, "fonts", true);
-        FileUtil.checkAssets(mContext, "images", true);
-        FileUtil.checkAssets(mContext, "stylesheets", true);
-        FileUtil.checkAssets(mContext, "javascripts", true);
-        FileUtil.checkAssets(mContext, "BarCodeScan", false);
-        FileUtil.checkAssets(mContext, "advertisement", false);
+        FileUtil.checkAssets(mContext, URLs.kAssets, false);
+        FileUtil.checkAssets(mContext, URLs.kLoding, false);
+        FileUtil.checkAssets(mContext, URLs.kFonts, true);
+        FileUtil.checkAssets(mContext, URLs.kImages, true);
+        FileUtil.checkAssets(mContext, URLs.kStylesheets, true);
+        FileUtil.checkAssets(mContext, URLs.kJavaScripts, true);
+        FileUtil.checkAssets(mContext, URLs.kBarCodeScan, false);
+        FileUtil.checkAssets(mContext, URLs.kAdverttisement, false);
 
         /*
          *  手机待机再激活时发送开屏广播
@@ -161,9 +161,10 @@ public class YHApplication extends Application {
 
             String assetZipPath;
             File assetZipFile;
-            String[] assetsName = {"assets.zip", "loading.zip", "fonts.zip", "images.zip", "stylesheets.zip", "javascripts.zip", "BarCodeScan.zip","advertisement.zip"};
+            String[] assetsName = {URLs.kAssets,URLs.kLoding,URLs.kFonts,URLs.kImages,URLs.kStylesheets,URLs.kJavaScripts,URLs.kBarCodeScan,URLs.kAdverttisement};
+
             for (String string : assetsName) {
-                assetZipPath = String.format("%s/%s", sharedPath, string);
+                assetZipPath = String.format("%s/%s.zip", sharedPath, string);
                 assetZipFile = new File(assetZipPath);
                 if (!assetZipFile.exists()) { assetZipFile.delete(); }
                 FileUtil.copyAssetFile(mContext, string, assetZipPath);

@@ -58,11 +58,28 @@ public class URLs extends PrivateURLs implements Serializable {
     public final static String CACHED_DIRNAME            = "Cached";
     public final static String CACHED_HEADER_FILENAME    = "cached_header.json";
     public final static String CURRENT_VERSION_FILENAME  = "current_version.txt";
-    public final static String GRAVATAR_FILENAME         = "gravatar.json";
+    public final static String GRAVATARJSON_FILENAME         = "gravatar.json";
     public final static String BARCODE_RESULT_FILENAME   = "barcode_scan_result.json";
     public final static String SCAN_BARCODE_FILENAME     = "scan_bar_code.html";
     public final static String PGYER_VERSION_FILENAME    = "pgyer_version.txt";
     public final static String LOCAL_NOTIFICATION_FILENAME = "local_notification.json";
+
+    public final static String kTabKpiName               = "tab_kpi";
+    public final static String kTabAnalyseName           = "tab_analyse";
+    public final static String kTanAppName               = "tab_app";
+    public final static String kTabMessageName           = "tab_message";
+    public final static String kThursdaySayName          = "setting_thursday_say";
+
+    public final static String kJSInterfaceName          = "AndroidJSBridge";
+
+    public final static String kAssets                   = "assets";
+    public final static String kLoding                   = "loading";
+    public final static String kFonts                    = "fonts";
+    public final static String kImages                   = "images";
+    public final static String kStylesheets              = "stylesheets";
+    public final static String kJavaScripts              = "javascripts";
+    public final static String kBarCodeScan              = "BarCodeScan";
+    public final static String kAdverttisement           = "advertisement";
 
     public static String storage_base(Context context) {
         //    String path = "";
