@@ -73,7 +73,7 @@ public class SettingActivity extends BaseActivity {
     private BadgeView bvCheckUpgrade;
     private BadgeView bvChangePWD;
     private BadgeView bvCheckThursdaySay;
-    private IconImageView mIconImageView;
+    private CircleImageView mIconImageView;
     private PopupWindow popupWindow;
     private String gravatarJsonPath, gravatarImgPath, gravatarFileName;
     private TextView mCheckThursdaySay;
@@ -107,7 +107,7 @@ public class SettingActivity extends BaseActivity {
         TextView mCheckAssets = (TextView) findViewById(R.id.check_assets);
         Button mLogout = (Button) findViewById(R.id.logout);
         mLockSwitch = (Switch) findViewById(R.id.lock_switch);
-        mIconImageView =(IconImageView) findViewById(R.id.img_icon);
+        mIconImageView =(CircleImageView) findViewById(R.id.img_icon);
         mCheckThursdaySay = (TextView) findViewById(R.id.check_thursday_say);
         mThursdaySayPink = (TextView) findViewById(R.id.thursday_say_link);
 

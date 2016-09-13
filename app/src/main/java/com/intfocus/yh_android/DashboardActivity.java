@@ -28,6 +28,7 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.ScrollView;
 
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
@@ -124,7 +125,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 	@Override
 	public void onBackPressed() {
-		super.onBackPressed();
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("温馨提示")
 				.setMessage(String.format("确认退出【%s】？", getResources().getString(R.string.app_name)))
@@ -139,7 +139,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 					public void onClick(DialogInterface dialog, int which) {
 						// 返回DashboardActivity
 					}
-				}).show();
+				});
+		builder.show();
 	}
 
 	/*
@@ -252,7 +253,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		browserAd = (WebView) findViewById(R.id.browserAd);
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dip2px(this, 130));
 		browserAd.setLayoutParams(layoutParams);
-		browserAd.getSettings().setJavaScriptEnabled(true);
+		browserAd.getSettings().setJavaScriptEnabled(false);
 		browserAd.getSettings().setDefaultTextEncodingName("utf-8");
 		browserAd.requestFocus();
 		browserAd.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");

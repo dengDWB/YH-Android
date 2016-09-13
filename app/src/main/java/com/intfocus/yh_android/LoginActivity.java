@@ -28,7 +28,7 @@ public class LoginActivity extends BaseActivity {
         setContentView(R.layout.activity_login);
 
         /*
-         *  如果是从触屏界面过来，则直接进入主界面
+         *  如果是从触屏界面过来，则直接进入主界面如
          *  不是的话，相当于直接启动应用，则检测是否有设置锁屏
          */
         Intent intent = getIntent();
