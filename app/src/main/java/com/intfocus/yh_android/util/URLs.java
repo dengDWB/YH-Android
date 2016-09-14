@@ -45,7 +45,6 @@ public class URLs extends PrivateURLs implements Serializable {
 
     public final static String REPORT_DATA_FILENAME      = "group_%s_template_%s_report_%s.js";
 
-
     public final static String USER_CONFIG_FILENAME      = "user.json";
     public final static String CONFIG_DIRNAME            = "Configs";
     public final static String SETTINGS_CONFIG_FILENAME  = "setting.json";

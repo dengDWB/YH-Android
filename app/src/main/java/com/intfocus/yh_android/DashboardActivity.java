@@ -146,6 +146,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	 * 仪表盘界面可以显示广告
 	 */
 	private void displayAdOrNot(boolean isShouldLoadHtml) {
+		if (!URLs.kAdBrowser) return; // 隐藏广告位
 		String adIndexBasePath = FileUtil.sharedPath(this) + "/advertisement/index_android";
 		String adIndexPath = adIndexBasePath + ".html";
 		String adIndexWithTimestampPath = adIndexBasePath + ".timestamp.html";
@@ -165,7 +166,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		if (isShouldLoadHtml) {
 			browserAd.loadUrl(String.format("file:///%s", adIndexWithTimestampPath));
 		}
-
 
 		boolean isShouldDisplayAd = mCurrentTab == mTabKPI && new File(adIndexPath).exists();
 		if (isShouldDisplayAd) {
@@ -247,6 +247,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		mWebView.requestFocus();
 		mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);
 		mWebView.loadUrl(urlStringForLoading);
+
 
 		browserAd = (WebView) findViewById(R.id.browserAd);
 		browserAd.getSettings().setUseWideViewPort(true);
