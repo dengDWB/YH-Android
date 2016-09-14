@@ -13,7 +13,7 @@ package com.intfocus.yh_android.util;
 
 public class PrivateURLs {
   public final static String kAppCode         = "yonghuitest";
-  public final static String kThemeColor      = "#31809f";
+  public final static String kThemeColor      = "#53a93f";
   public final static String kBannerBgColor   = "#53a93f";
   public final static String kBannerTextColor = "#ffffff";
   public final static String kInitPassword    = "123456";

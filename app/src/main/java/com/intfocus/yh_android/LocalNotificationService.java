@@ -88,7 +88,6 @@ public class LocalNotificationService extends Service {
       @Override
       public void run() {
         processDataCount();//先计算通知的数量
-        Log.i("Timer", URLs.timestamp());
         sendBroadcast(sendIntent);
       }
     };

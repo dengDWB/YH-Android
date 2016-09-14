@@ -213,6 +213,7 @@ public class FileUtil {
             }
 
             byte[] hashedBytes = digest.digest();
+            inputStream.close();
             return convertByteArrayToHexString(hashedBytes);
         } catch (IOException | NoSuchAlgorithmException e) {
             e.printStackTrace();

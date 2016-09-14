@@ -92,7 +92,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 
         mWebView.requestFocus();
         pullToRefreshWebView.setVisibility(View.VISIBLE);
-        mWebView.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");
+        mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);
         mWebView.loadUrl(urlStringForLoading);
 
         // 刷新监听事件

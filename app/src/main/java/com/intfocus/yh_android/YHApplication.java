@@ -2,8 +2,10 @@ package com.intfocus.yh_android;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Application;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -24,6 +26,7 @@ import org.OpenUDID.OpenUDID_manager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by lijunjie on 16/1/15.
@@ -40,7 +43,7 @@ public class YHApplication extends Application {
         @TargetApi(Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(!intent.getAction().equals(Intent.ACTION_SCREEN_ON)) return;
+            if(!intent.getAction().equals(Intent.ACTION_SCREEN_ON) || isBackground(mContext)) return;
             Log.i("BroadcastReceiver", "Screen On");
 
             String currentActivityName = null;
@@ -106,14 +109,14 @@ public class YHApplication extends Application {
          *  sharedPath/filename.zip md5值 <=> user.plist中filename_md5
          *  不一致时，则删除原解压后文件夹，重新解压zip
          */
-        FileUtil.checkAssets(mContext, "loading", false);
-        FileUtil.checkAssets(mContext, "assets", false);
-        FileUtil.checkAssets(mContext, "fonts", true);
-        FileUtil.checkAssets(mContext, "images", true);
-        FileUtil.checkAssets(mContext, "stylesheets", true);
-        FileUtil.checkAssets(mContext, "javascripts", true);
-        FileUtil.checkAssets(mContext, "BarCodeScan", false);
-        FileUtil.checkAssets(mContext, "advertisement", false);
+        FileUtil.checkAssets(mContext, URLs.kAssets, false);
+        FileUtil.checkAssets(mContext, URLs.kLoding, false);
+        FileUtil.checkAssets(mContext, URLs.kFonts, true);
+        FileUtil.checkAssets(mContext, URLs.kImages, true);
+        FileUtil.checkAssets(mContext, URLs.kStylesheets, true);
+        FileUtil.checkAssets(mContext, URLs.kJavaScripts, true);
+        FileUtil.checkAssets(mContext, URLs.kBarCodeScan, false);
+        FileUtil.checkAssets(mContext, URLs.kAdverttisement, false);
 
         /*
          *  手机待机再激活时发送开屏广播
@@ -161,9 +164,10 @@ public class YHApplication extends Application {
 
             String assetZipPath;
             File assetZipFile;
-            String[] assetsName = {"assets.zip", "loading.zip", "fonts.zip", "images.zip", "stylesheets.zip", "javascripts.zip", "BarCodeScan.zip","advertisement.zip"};
+            String[] assetsName = {URLs.kAssets,URLs.kLoding,URLs.kFonts,URLs.kImages,URLs.kStylesheets,URLs.kJavaScripts,URLs.kBarCodeScan,URLs.kAdverttisement};
+
             for (String string : assetsName) {
-                assetZipPath = String.format("%s/%s", sharedPath, string);
+                assetZipPath = String.format("%s/%s.zip", sharedPath, string);
                 assetZipFile = new File(assetZipPath);
                 if (!assetZipFile.exists()) { assetZipFile.delete(); }
                 FileUtil.copyAssetFile(mContext, string, assetZipPath);
@@ -183,4 +187,33 @@ public class YHApplication extends Application {
         Log.i("setCurrentActivity", mCurrentActivity == null ? "null" : mCurrentActivity.getClass().getSimpleName());
         this.mCurrentActivity = mCurrentActivity;
     }
+
+    /*
+     * 判断应用当前是否处于后台
+     */
+    private boolean isBackground(Context context) {
+        boolean isBackground = true;
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {
+            List<ActivityManager.RunningAppProcessInfo> runningProcesses = am.getRunningAppProcesses();
+            for (ActivityManager.RunningAppProcessInfo processInfo : runningProcesses) {
+                if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                    for (String activeProcess : processInfo.pkgList) {
+                        if (activeProcess.equals(context.getPackageName())) {
+                            isBackground = false;
+                        }
+                    }
+                }
+            }
+        } else {
+            List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+            ComponentName componentInfo = taskInfo.get(0).topActivity;
+            if (componentInfo.getPackageName().equals(context.getPackageName())) {
+                isBackground = false;
+            }
+        }
+
+        return isBackground;
+    }
+
 }
