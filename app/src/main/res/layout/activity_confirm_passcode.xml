@@ -6,7 +6,7 @@
               android:background="#fff"
               android:orientation="vertical"
               android:weightSum="10.5"
-              tools:context=".screen_lock.ConfirmPassCodeActivity">
+              tools:context=".PassSettingActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
