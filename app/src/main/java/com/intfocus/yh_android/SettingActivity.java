@@ -73,7 +73,7 @@ public class SettingActivity extends BaseActivity {
     private BadgeView bvCheckUpgrade;
     private BadgeView bvChangePWD;
     private BadgeView bvCheckThursdaySay;
-    private IconImageView mIconImageView;
+    private CircleImageView mIconImageView;
     private PopupWindow popupWindow;
     private String gravatarJsonPath, gravatarImgPath, gravatarFileName;
     private TextView mCheckThursdaySay;
@@ -106,7 +106,7 @@ public class SettingActivity extends BaseActivity {
         TextView mCheckAssets = (TextView) findViewById(R.id.check_assets);
         Button mLogout = (Button) findViewById(R.id.logout);
         mLockSwitch = (Switch) findViewById(R.id.lock_switch);
-        mIconImageView =(IconImageView) findViewById(R.id.img_icon);
+        mIconImageView =(CircleImageView) findViewById(R.id.img_icon);
         mCheckThursdaySay = (TextView) findViewById(R.id.check_thursday_say);
 
         screenLockInfo = "取消锁屏成功";
@@ -156,7 +156,7 @@ public class SettingActivity extends BaseActivity {
             mDeviceID.setText(TextUtils.split(android.os.Build.MODEL, " - ")[0]);
             mApiDomain.setText(URLs.kBaseUrl.replace("http://", "").replace("https://", ""));
 
-            gravatarJsonPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.GRAVATAR_FILENAME);
+            gravatarJsonPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.GRAVATARJSON_FILENAME);
 
             if (new File(gravatarJsonPath).exists()) {
                 JSONObject gravatarJson = new JSONObject(FileUtil.readFile(gravatarJsonPath));
@@ -437,7 +437,7 @@ public class SettingActivity extends BaseActivity {
             MultipartBody requestBody = builder.build();
 
             Request request = new Request.Builder()
-                        .url(String.format(URLs.GRAVATAR_FILENAME, PrivateURLs.kBaseUrl, user.getString("user_device_id"), user.getString("user_id")))
+                        .url(String.format(URLs.API_UPLOAD_GRAVATAR_PATH, PrivateURLs.kBaseUrl, user.getString("user_device_id"), user.getString("user_id")))
                         .post(requestBody)
                         .build();
 
@@ -505,6 +505,7 @@ public class SettingActivity extends BaseActivity {
             FileUtil.writeFile(noticePath, notificationJson.toString());
 
             Intent blogLinkIntent = new Intent(SettingActivity.this,ThursdaySayActivity.class);
+            blogLinkIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(blogLinkIntent);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -623,14 +624,14 @@ public class SettingActivity extends BaseActivity {
                             @Override public void run() {
                                 checkAssetsUpdated(false);
 
-                                FileUtil.checkAssets(mContext, "assets", false);
-                                FileUtil.checkAssets(mContext, "loading", false);
-                                FileUtil.checkAssets(mContext, "fonts",true);
-                                FileUtil.checkAssets(mContext, "images", true);
-                                FileUtil.checkAssets(mContext, "javascripts", true);
-                                FileUtil.checkAssets(mContext, "stylesheets", true);
-                                FileUtil.checkAssets(mContext, "BarCodeScan", false);
-                                FileUtil.checkAssets(mContext, "advertisement", false);
+                                FileUtil.checkAssets(mContext, URLs.kAssets, false);
+                                FileUtil.checkAssets(mContext, URLs.kLoding, false);
+                                FileUtil.checkAssets(mContext, URLs.kFonts, true);
+                                FileUtil.checkAssets(mContext, URLs.kImages, true);
+                                FileUtil.checkAssets(mContext, URLs.kStylesheets, true);
+                                FileUtil.checkAssets(mContext, URLs.kJavaScripts, true);
+                                FileUtil.checkAssets(mContext, URLs.kBarCodeScan, false);
+                                FileUtil.checkAssets(mContext, URLs.kAdverttisement, false);
 
                                 toast("校正完成");
                             }
@@ -734,24 +735,25 @@ public class SettingActivity extends BaseActivity {
             int passwordCount = user.getString("password").equals(URLs.MD5(URLs.kInitPassword)) ? 1 : -1;
             notificationJSON.put("setting_password", passwordCount);
 
-            if (passwordCount == 1) {
+            if (passwordCount > 0) {
                 mWarnPWD.setTextColor(Color.parseColor("#808080"));
                 mWarnPWD.setTextSize(16);
                 mWarnPWD.setText("请修改初始密码");
                 mChangePWD.setText("   修改登录密码");
                 setBadgeView("setting_password", bvChangePWD);
-            } else {
+            }
+            else {
                 mWarnPWD.setVisibility(View.GONE);
                 mChangePWD.setText("修改登录密码");
                 bvChangePWD.setVisibility(View.GONE);
             }
 
-            if (notificationJSON.getInt("setting_pgyer") == 1) {
+            if (notificationJSON.getInt("setting_pgyer") > 0) {
                 mCheckUpgrade.setText("   检测更新");
                 setBadgeView("setting_pgyer", bvCheckUpgrade);
             }
 
-            if (notificationJSON.getInt("setting_thursday_say") >= 1){
+            if (notificationJSON.getInt("setting_thursday_say") > 0){
                 mCheckThursdaySay.setText("   小四说");
                 setBadgeView("setting_thursday_say", bvCheckThursdaySay);
             }

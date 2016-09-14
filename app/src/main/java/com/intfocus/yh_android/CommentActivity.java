@@ -40,7 +40,7 @@ public class CommentActivity extends BaseActivity {
         setPullToRefreshWebView(true);
 
         mWebView.requestFocus();
-        mWebView.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");
+        mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);
         mWebView.loadUrl(urlStringForLoading);
 
         Intent intent = getIntent();

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,21 +62,22 @@ public class StoreSelectorActivity extends BaseActivity {
       e.printStackTrace();
     }
 
-    /**
-     *  筛选项列表按字母排序，以便于用户查找
-     */
-    Collections.sort(dataList, new Comparator<JSONObject>() {
-      @Override public int compare(JSONObject one, JSONObject two) {
-        String one_name = "", two_name = "";
-        try {
-          one_name = one.getString("name");
-          two_name = two.getString("name");
-        } catch (JSONException e) {
-          e.printStackTrace();
-        }
-        return Collator.getInstance(Locale.CHINESE).compare(one_name, two_name);
-      }
-    });
+//
+//    /**
+//     *  筛选项列表按字母排序，以便于用户查找
+//     */
+//    Collections.sort(dataList, new Comparator<JSONObject>() {
+//      @Override public int compare(JSONObject one, JSONObject two) {
+//        String one_name = "", two_name = "";
+//        try {
+//          one_name = one.getString("name");
+//          two_name = two.getString("name");
+//        } catch (JSONException e) {
+//          e.printStackTrace();
+//        }
+//        return Collator.getInstance(Locale.CHINESE).compare(one_name, two_name);
+//      }
+//    });
 
     mListView = (ListView) findViewById(R.id.listStores);
     ListArrayAdapter mArrayAdapter = new ListArrayAdapter(this, R.layout.list_item_report_selector, storeNameList);

@@ -77,12 +77,12 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 		/*
 		 * 通过解屏进入界面后，进行用户验证
-     */
+     	 */
 		checkWhetherFromScreenLockActivity();
 
 		/*
 		 * 检测服务器静态资源是否更新，并下载
-     */
+     	 */
 		checkAssetsUpdated(true);
 
 		/*
@@ -138,13 +138,18 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 					public void onClick(DialogInterface dialog, int which) {
 						// 返回DashboardActivity
 					}
-				}).show();
+				});
+		builder.show();
 	}
 
 	/*
 	 * 仪表盘界面可以显示广告
 	 */
 	private void displayAdOrNot(boolean isShouldLoadHtml) {
+		/*
+		 * 隐藏广告位
+		 */
+		if (!URLs.kDashboardAd) { return; }
 		String adIndexBasePath = FileUtil.sharedPath(this) + "/advertisement/index_android";
 		String adIndexPath = adIndexBasePath + ".html";
 		String adIndexWithTimestampPath = adIndexBasePath + ".timestamp.html";
@@ -165,13 +170,12 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			browserAd.loadUrl(String.format("file:///%s", adIndexWithTimestampPath));
 		}
 
-
 		boolean isShouldDisplayAd = mCurrentTab == mTabKPI && new File(adIndexPath).exists();
 		if (isShouldDisplayAd) {
-			viewAnimation(browserAd,true,0,dip2px(DashboardActivity.this,130));
+			viewAnimation(browserAd, true,0, dip2px(DashboardActivity.this, 140));
 		}
 		else {
-			viewAnimation(browserAd,false,dip2px(DashboardActivity.this,130),0);
+			viewAnimation(browserAd, false, dip2px(DashboardActivity.this,140),0);
 		}
 	}
 
@@ -243,23 +247,22 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
 		initWebView();
 		setPullToRefreshWebView(true);
-
 		mWebView.requestFocus();
-		mWebView.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");
+		mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);
 		mWebView.loadUrl(urlStringForLoading);
 
+
 		browserAd = (WebView) findViewById(R.id.browserAd);
-		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dip2px(this, 130));
-		browserAd.setLayoutParams(layoutParams);
+		browserAd.getSettings().setUseWideViewPort(true);
+		browserAd.getSettings().setLoadWithOverviewMode(true);
 		browserAd.getSettings().setJavaScriptEnabled(true);
+		browserAd.setOverScrollMode(View.OVER_SCROLL_NEVER);
 		browserAd.getSettings().setDefaultTextEncodingName("utf-8");
 		browserAd.requestFocus();
-		browserAd.addJavascriptInterface(new JavaScriptInterface(), "AndroidJSBridge");
+		browserAd.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);
 		browserAd.setWebViewClient(new WebViewClient());
 		browserAd.setWebChromeClient(new WebChromeClient() {
 		});
-		browserAd.getSettings().setUseWideViewPort(true);
-		browserAd.getSettings().setLoadWithOverviewMode(true);
 	}
 
 	/*
@@ -360,6 +363,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			viewSeparator.setVisibility(URLs.kDropMenuScan ? View.VISIBLE : View.GONE);
 
 			linearScan.setVisibility(URLs.kDropMenuScan ? View.VISIBLE : View.GONE);
+			linearScan.setOnClickListener(this);
 		} else {
 			linearScan.setOnClickListener(this);
 		}
@@ -369,6 +373,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			viewSeparator.setVisibility(URLs.kDropMenuVoice ? View.VISIBLE : View.GONE);
 
 			linearVoice.setVisibility(URLs.kDropMenuVoice ? View.VISIBLE : View.GONE);
+			linearVoice.setOnClickListener(this);
 		} else {
 			linearVoice.setOnClickListener(this);
 		}
@@ -378,6 +383,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			viewSeparator.setVisibility(URLs.kDropMenuSearch ? View.VISIBLE : View.GONE);
 
 			linearSearch.setVisibility(URLs.kDropMenuSearch ? View.VISIBLE : View.GONE);
+			linearSearch.setOnClickListener(this);
 		} else {
 			linearSearch.setOnClickListener(this);
 		}
@@ -439,7 +445,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			mTabAnalyse.setVisibility(URLs.kTabBarAnalyse ? View.VISIBLE : View.GONE);
 			mTabAPP.setVisibility(URLs.kTabBarApp ? View.VISIBLE : View.GONE);
 			mTabMessage.setVisibility(URLs.kTabBarMessage ? View.VISIBLE : View.GONE);
-		} else {
+		}
+		else {
 			findViewById(R.id.toolBar).setVisibility(View.GONE);
 		}
 
@@ -531,9 +538,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 				e.printStackTrace();
 			}
 
-            /*
-             * 用户行为记录, 单独异常处理，不可影响用户体验
-             */
+			/*
+			 * 用户行为记录, 单独异常处理，不可影响用户体验
+			 */
 			try {
 				logParams = new JSONObject();
 				logParams.put("action", "点击/主页面/标签栏");
@@ -552,9 +559,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 		popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
 
-        /*
-         * 用户行为记录, 单独异常处理，不可影响用户体验
-         */
+		/*
+		 * 用户行为记录, 单独异常处理，不可影响用户体验
+		 */
 		try {
 			logParams = new JSONObject();
 			logParams.put("action", "点击/主页面/设置");
@@ -590,9 +597,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 				}
 			});
 
-            /*
-             * 用户行为记录, 单独异常处理，不可影响用户体验
-             */
+			/*
+			 * 用户行为记录, 单独异常处理，不可影响用户体验
+			 */
 			try {
 				logParams = new JSONObject();
 				logParams.put("action", "点击/主页面/浏览器");
@@ -661,7 +668,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 		@JavascriptInterface
 		public void hideAd() {
-			viewAnimation(browserAd,false,dip2px(DashboardActivity.this,130),0);
+			viewAnimation(browserAd,false, dip2px(DashboardActivity.this,140),0);
 		}
 
 		@JavascriptInterface
@@ -711,9 +718,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		public void jsException(final String ex) {
 			Log.i("jsException", ex);
 
-            /*
-             * 用户行为记录, 单独异常处理，不可影响用户体验
-             */
+			/*
+			 * 用户行为记录, 单独异常处理，不可影响用户体验
+			 */
 			try {
 				logParams = new JSONObject();
 				logParams.put("action", "JS异常");
@@ -802,7 +809,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		try {
 			String noticePath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
 			notificationJSON = FileUtil.readConfigFile(noticePath);
-
 			/*
 			 * 版本迭代的问题：
 			 * 1. 动态添加新字段

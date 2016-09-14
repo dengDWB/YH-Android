@@ -218,6 +218,7 @@ if slop_opts[:java]
         public final static String kWXAppId      = "#{Settings.umeng_weixin.android.app_id}";
         public final static String kWXAppSecret  = "#{Settings.umeng_weixin.android.app_secret}";
 
+        public final static boolean kDashboardAd      = #{Settings.display_status.dashboard_ad == 1 ? 'true' : 'false'};
         public final static boolean kDropMenuScan     = #{Settings.display_status.drop_menu_scan == 1 ? 'true' : 'false'};
         public final static boolean kDropMenuSearch   = #{Settings.display_status.drop_menu_search == 1 ? 'true' : 'false'};
         public final static boolean kDropMenuVoice    = #{Settings.display_status.drop_menu_voice == 1 ? 'true' : 'false'};
