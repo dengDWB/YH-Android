@@ -41,4 +41,6 @@ public class PrivateURLs {
   
   public final static boolean kSubjectComment = true;
   public final static boolean kSubjectShare   = true;
+
+  public final static boolean kAdBrowser  = false;
 }
