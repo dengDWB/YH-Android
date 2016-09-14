@@ -88,6 +88,12 @@ public class BarCodeResultActivity extends BaseActivity {
   public void onResume() {
     super.onResume();
 
+    JSONObject cachedJSON = FileUtil.readConfigFile(cachedPath);
+    try {
+      storeID = cachedJSON.getJSONObject("store").getString("id");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
     String loadingString = "{\"chart\": \"[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]\", \"tabs\": [{ title: \"提示\", table: { length: 1, \"1\": [\"加载中...\"]}}]}";
     FileUtil.barCodeScanResult(mContext, loadingString);
     updateHtmlContentTimetamp();
@@ -126,6 +132,7 @@ public class BarCodeResultActivity extends BaseActivity {
 
   public void actionLaunchStoreSelectorActivity(View v) throws InterruptedException {
     Intent intent = new Intent(mContext, StoreSelectorActivity.class);
+    intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
     mContext.startActivity(intent);
   }
 }
