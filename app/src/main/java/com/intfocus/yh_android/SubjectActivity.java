@@ -17,6 +17,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +43,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -128,6 +130,23 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         colorViews.add((ImageView) findViewById(R.id.colorView3));
         colorViews.add((ImageView) findViewById(R.id.colorView4));
         initColorView(colorViews);
+    }
+
+
+    private void initDropMenuItem() {
+        ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
+        int[] imgID = {R.drawable.banner_search, R.drawable.banner_share, R.drawable.banner_comment};
+        String[] itemName = {"筛选", "分享", "评论"};
+        for (int i = 0;i < itemName.length; i++) {
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("ItemImage",imgID[i]);
+            map.put("ItemText", itemName[i]);
+            listItem.add(map);
+        }
+
+        SimpleAdapter mSimpleAdapter = new SimpleAdapter(this, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
+
+        initDropMenu(mSimpleAdapter);
     }
 
     protected void onResume() {

@@ -26,6 +26,7 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.SimpleAdapter;
 
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
@@ -42,9 +43,10 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
-public class DashboardActivity extends BaseActivity implements View.OnClickListener {
+public class DashboardActivity extends BaseActivity {
 	public static final String ACTION_UPDATENOTIFITION = "action.updateNotifition";
 	private static final int ZBAR_CAMERA_PERMISSION = 1;
 	private TabView mCurrentTab;
@@ -68,7 +70,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		initUrlStrings();
 
 		LinearLayout[] item = {linearUserInfo, linearScan, linearVoice, linearSearch};
-		initDropMenu(R.layout.activity_dashboard_dialog,item);
+		initDropMenuItem();
 		initTab();
 		initUserIDColorView();
 		loadWebView();
@@ -93,6 +95,22 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		new Thread(mRunnableForDetecting).start();
 
 		checkUserModifiedInitPassword();
+	}
+
+	private void initDropMenuItem() {
+		ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
+		int[] imgID = {R.drawable.icon_scan, R.drawable.icon_voice, R.drawable.icon_search, R.drawable.icon_user};
+		String[] itemName = {"扫一扫", "语音播报", "搜索", "个人信息"};
+		for (int i = 0;i < itemName.length; i++) {
+			HashMap<String, Object> map = new HashMap<>();
+			map.put("ItemImage",imgID[i]);
+			map.put("ItemText", itemName[i]);
+			listItem.add(map);
+		}
+
+		SimpleAdapter mSimpleAdapter = new SimpleAdapter(this, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
+
+		initDropMenu(mSimpleAdapter);
 	}
 
 	protected void onResume() {
@@ -148,7 +166,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		/*
 		 * 隐藏广告位
 		 */
-		if (!URLs.kDashboardAd) { return; }
+		if (!URLs.kDashboardAd) {
+			return;
+		}
 		String adIndexBasePath = FileUtil.sharedPath(this) + "/advertisement/index_android";
 		String adIndexPath = adIndexBasePath + ".html";
 		String adIndexWithTimestampPath = adIndexBasePath + ".timestamp.html";
@@ -171,10 +191,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 		boolean isShouldDisplayAd = mCurrentTab == mTabKPI && new File(adIndexPath).exists();
 		if (isShouldDisplayAd) {
-			viewAnimation(browserAd, true,0, dip2px(DashboardActivity.this, 140));
-		}
-		else {
-			viewAnimation(browserAd, false, dip2px(DashboardActivity.this,140),0);
+			viewAnimation(browserAd, true, 0, dip2px(DashboardActivity.this, 140));
+		} else {
+			viewAnimation(browserAd, false, dip2px(DashboardActivity.this, 140), 0);
 		}
 	}
 
@@ -186,7 +205,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		filter.addAction(ACTION_UPDATENOTIFITION);
 		notificationBroadcastReceiver = new NotificationBroadcastReceiver();
 		registerReceiver(notificationBroadcastReceiver, filter);
-        /*
+		/*
          * 打开通知服务,用于发送通知
          */
 		Intent startService = new Intent(this, LocalNotificationService.class);
@@ -227,7 +246,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			if (messageNotifition > 0 && objectType != 5) {
 				setBadgeView("tab", bvMessage);
 			}
-			if (notificationJSON.getInt("setting")  > 0) {
+			if (notificationJSON.getInt("setting") > 0) {
 				setBadgeView("setting", bvBannerSetting);
 				setBadgeView("user", bvUser);
 			} else {
@@ -337,37 +356,40 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	/*
 	 * 标题栏设置按钮下拉菜单点击响应事件
 	 */
-	@Override
-	public void onClick(View v) {
-		popupWindow.dismiss();
 
-		switch (v.getId()) {
-			case R.id.linearUserInfo:
-				Intent settingIntent = new Intent(mContext, SettingActivity.class);
-				mContext.startActivity(settingIntent);
-				break;
+	private final View.OnClickListener mDropMenuListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			popupWindow.dismiss();
 
-			case R.id.linearScan:
-				if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-						!= PackageManager.PERMISSION_GRANTED) {
-					ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, ZBAR_CAMERA_PERMISSION);
-				} else {
-					Intent barCodeScannerIntent = new Intent(mContext, BarCodeScannerActivity.class);
-					mContext.startActivity(barCodeScannerIntent);
-				}
-				break;
+			switch (v.getId()) {
+				case R.id.linearUserInfo:
+					Intent settingIntent = new Intent(mContext, SettingActivity.class);
+					mContext.startActivity(settingIntent);
+					break;
 
-			case R.id.linearSearch:
-				toast("功能开发中，敬请期待");
-				break;
+				case R.id.linearScan:
+					if (ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.CAMERA)
+							!= PackageManager.PERMISSION_GRANTED) {
+						ActivityCompat.requestPermissions(DashboardActivity.this, new String[]{Manifest.permission.CAMERA}, ZBAR_CAMERA_PERMISSION);
+					} else {
+						Intent barCodeScannerIntent = new Intent(mContext, BarCodeScannerActivity.class);
+						mContext.startActivity(barCodeScannerIntent);
+					}
+					break;
 
-			case R.id.linearVoice:
-				toast("功能开发中，敬请期待");
-				break;
-			default:
-				break;
+				case R.id.linearSearch:
+					toast("功能开发中，敬请期待");
+					break;
+
+				case R.id.linearVoice:
+					toast("功能开发中，敬请期待");
+					break;
+				default:
+					break;
+			}
 		}
-	}
+	};
 
 	@SuppressLint("SetJavaScriptEnabled")
 	@JavascriptInterface
@@ -383,8 +405,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			mTabAnalyse.setVisibility(URLs.kTabBarAnalyse ? View.VISIBLE : View.GONE);
 			mTabAPP.setVisibility(URLs.kTabBarApp ? View.VISIBLE : View.GONE);
 			mTabMessage.setVisibility(URLs.kTabBarMessage ? View.VISIBLE : View.GONE);
-		}
-		else {
+		} else {
 			findViewById(R.id.toolBar).setVisibility(View.GONE);
 		}
 
@@ -576,7 +597,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 							mTabAPP.performClick();
 							break;
 						case "tab_message":
-							if(openLink.equals("0") || openLink.equals("1") || openLink.equals("2")) {
+							if (openLink.equals("0") || openLink.equals("1") || openLink.equals("2")) {
 								storeTabIndex("message", Integer.parseInt(openLink));
 							}
 							mTabMessage.performClick();
@@ -606,7 +627,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 		@JavascriptInterface
 		public void hideAd() {
-			viewAnimation(browserAd,false, dip2px(DashboardActivity.this,140),0);
+			viewAnimation(browserAd, false, dip2px(DashboardActivity.this, 140), 0);
 		}
 
 		@JavascriptInterface
@@ -674,7 +695,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	/*
 	 * view 缩放动画
 	 */
-	public void viewAnimation(final View view, final Boolean isShow,final int startHeight,final int endHeight) {
+	public void viewAnimation(final View view, final Boolean isShow, final int startHeight, final int endHeight) {
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -699,6 +720,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 							view.setVisibility(View.VISIBLE);
 						}
 					}
+
 					@Override
 					public void onAnimationEnd(Animator animation) {
 						super.onAnimationEnd(animation);
@@ -752,19 +774,45 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			 * 1. 动态添加新字段
 			 * 2. 不可影响已存在字段存放的数据
 			 */
-			if (!notificationJSON.has("app")) { notificationJSON.put("app", -1); }
-			if (!notificationJSON.has("tab_kpi")) { notificationJSON.put("tab_kpi", -1); }
-			if (!notificationJSON.has("tab_kpi_last")) { notificationJSON.put("tab_kpi_last", -1); }
-			if (!notificationJSON.has("tab_analyse")) { notificationJSON.put("tab_analyse", -1); }
-			if (!notificationJSON.has("tab_analyse_last")) { notificationJSON.put("tab_analyse_last", -1); }
-			if (!notificationJSON.has("tab_app")) { notificationJSON.put("tab_app", -1); }
-			if (!notificationJSON.has("tab_app_last")) { notificationJSON.put("tab_app_last", -1); }
-			if (!notificationJSON.has("tab_message")) { notificationJSON.put("tab_message", -1); }
-			if (!notificationJSON.has("tab_message_last")) { notificationJSON.put("tab_message_last", -1); }
-			if (!notificationJSON.has("setting")) { notificationJSON.put("setting", -1); }
-			if (!notificationJSON.has("setting_pgyer")) { notificationJSON.put("setting_pgyer", -1); }
-			if (!notificationJSON.has("setting_password")) { notificationJSON.put("setting_password", -1); }
-			if (!notificationJSON.has("setting_thursday_say")) { notificationJSON.put("setting_thursday_say", -1); }
+			if (!notificationJSON.has("app")) {
+				notificationJSON.put("app", -1);
+			}
+			if (!notificationJSON.has("tab_kpi")) {
+				notificationJSON.put("tab_kpi", -1);
+			}
+			if (!notificationJSON.has("tab_kpi_last")) {
+				notificationJSON.put("tab_kpi_last", -1);
+			}
+			if (!notificationJSON.has("tab_analyse")) {
+				notificationJSON.put("tab_analyse", -1);
+			}
+			if (!notificationJSON.has("tab_analyse_last")) {
+				notificationJSON.put("tab_analyse_last", -1);
+			}
+			if (!notificationJSON.has("tab_app")) {
+				notificationJSON.put("tab_app", -1);
+			}
+			if (!notificationJSON.has("tab_app_last")) {
+				notificationJSON.put("tab_app_last", -1);
+			}
+			if (!notificationJSON.has("tab_message")) {
+				notificationJSON.put("tab_message", -1);
+			}
+			if (!notificationJSON.has("tab_message_last")) {
+				notificationJSON.put("tab_message_last", -1);
+			}
+			if (!notificationJSON.has("setting")) {
+				notificationJSON.put("setting", -1);
+			}
+			if (!notificationJSON.has("setting_pgyer")) {
+				notificationJSON.put("setting_pgyer", -1);
+			}
+			if (!notificationJSON.has("setting_password")) {
+				notificationJSON.put("setting_password", -1);
+			}
+			if (!notificationJSON.has("setting_thursday_say")) {
+				notificationJSON.put("setting_thursday_say", -1);
+			}
 
 			FileUtil.writeFile(noticePath, notificationJSON.toString());
 		} catch (JSONException | IOException e) {
