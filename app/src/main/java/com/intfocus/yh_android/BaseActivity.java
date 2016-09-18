@@ -618,16 +618,15 @@ public class BaseActivity extends Activity {
         UpdateManagerListener updateManagerListener = new UpdateManagerListener() {
             @Override
             public void onUpdateAvailable(final String result) {
-                LogUtil.d("checkPgyerUpgrade", result);
-                String message = "", versionCode = "-1", versionName = "-1", currentVersionCode = "0";
+                String message = "", versionCode = "-1", versionName = "-1", currentVersionCode = "-1";
                 String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.PGYER_VERSION_FILENAME);
                 try {
                     if(new File(pgyerVersionPath).exists()) {
-                        JSONObject currentVersion = FileUtil.readConfigFile(pgyerVersionPath);
-                        message = currentVersion.getString("message");
+                        JSONObject currentVersionJSON = FileUtil.readConfigFile(pgyerVersionPath);
+                        message = currentVersionJSON.getString("message");
 
                         if (message.isEmpty()) {
-                            JSONObject responseData = currentVersion.getJSONObject("data");
+                            JSONObject responseData = currentVersionJSON.getJSONObject("data");
                             currentVersionCode = responseData.getString("versionCode");
                         }
                     }
@@ -635,10 +634,10 @@ public class BaseActivity extends Activity {
                     JSONObject response = new JSONObject(result);
                     message = response.getString("message");
                     if (message.isEmpty()) {
-                        JSONObject responseData = response.getJSONObject("data");
-                        message = responseData.getString("releaseNote");
-                        versionCode = responseData.getString("versionCode");
-                        versionName = responseData.getString("versionName");
+                        JSONObject responseVersionJSON = response.getJSONObject("data");
+                        message = responseVersionJSON.getString("releaseNote");
+                        versionCode = responseVersionJSON.getString("versionCode");
+                        versionName = responseVersionJSON.getString("versionName");
 
                         FileUtil.writeFile(pgyerVersionPath, result);
                     }

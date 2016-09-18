@@ -145,7 +145,10 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	 * 仪表盘界面可以显示广告
 	 */
 	private void displayAdOrNot(boolean isShouldLoadHtml) {
-		if (!URLs.kAdBrowser) return; // 隐藏广告位
+		/*
+		 * 隐藏广告位
+		 */
+		if (!URLs.kDashboardAd) { return; }
 		String adIndexBasePath = FileUtil.sharedPath(this) + "/advertisement/index_android";
 		String adIndexPath = adIndexBasePath + ".html";
 		String adIndexWithTimestampPath = adIndexBasePath + ".timestamp.html";
@@ -168,10 +171,10 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 		boolean isShouldDisplayAd = mCurrentTab == mTabKPI && new File(adIndexPath).exists();
 		if (isShouldDisplayAd) {
-			viewAnimation(browserAd,true,0, dip2px(DashboardActivity.this,140));
+			viewAnimation(browserAd, true,0, dip2px(DashboardActivity.this, 140));
 		}
 		else {
-			viewAnimation(browserAd,false, dip2px(DashboardActivity.this,140),0);
+			viewAnimation(browserAd, false, dip2px(DashboardActivity.this,140),0);
 		}
 	}
 
@@ -380,7 +383,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			mTabAnalyse.setVisibility(URLs.kTabBarAnalyse ? View.VISIBLE : View.GONE);
 			mTabAPP.setVisibility(URLs.kTabBarApp ? View.VISIBLE : View.GONE);
 			mTabMessage.setVisibility(URLs.kTabBarMessage ? View.VISIBLE : View.GONE);
-		} else {
+		}
+		else {
 			findViewById(R.id.toolBar).setVisibility(View.GONE);
 		}
 
@@ -472,9 +476,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 				e.printStackTrace();
 			}
 
-            /*
-             * 用户行为记录, 单独异常处理，不可影响用户体验
-             */
+			/*
+			 * 用户行为记录, 单独异常处理，不可影响用户体验
+			 */
 			try {
 				logParams = new JSONObject();
 				logParams.put("action", "点击/主页面/标签栏");
@@ -493,9 +497,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 		popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
 
-        /*
-         * 用户行为记录, 单独异常处理，不可影响用户体验
-         */
+		/*
+		 * 用户行为记录, 单独异常处理，不可影响用户体验
+		 */
 		try {
 			logParams = new JSONObject();
 			logParams.put("action", "点击/主页面/设置");
@@ -531,9 +535,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 				}
 			});
 
-            /*
-             * 用户行为记录, 单独异常处理，不可影响用户体验
-             */
+			/*
+			 * 用户行为记录, 单独异常处理，不可影响用户体验
+			 */
 			try {
 				logParams = new JSONObject();
 				logParams.put("action", "点击/主页面/浏览器");
@@ -652,9 +656,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		public void jsException(final String ex) {
 			Log.i("jsException", ex);
 
-            /*
-             * 用户行为记录, 单独异常处理，不可影响用户体验
-             */
+			/*
+			 * 用户行为记录, 单独异常处理，不可影响用户体验
+			 */
 			try {
 				logParams = new JSONObject();
 				logParams.put("action", "JS异常");
@@ -743,7 +747,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		try {
 			String noticePath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
 			notificationJSON = FileUtil.readConfigFile(noticePath);
-
 			/*
 			 * 版本迭代的问题：
 			 * 1. 动态添加新字段

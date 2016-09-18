@@ -88,17 +88,7 @@ public class BarCodeResultActivity extends BaseActivity {
   public void onResume() {
     super.onResume();
 
-    JSONObject cachedJSON = FileUtil.readConfigFile(cachedPath);
-    try {
-      storeID = cachedJSON.getJSONObject("store").getString("id");
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    String loadingString = "{\"chart\": \"[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]\", \"tabs\": [{ title: \"提示\", table: { length: 1, \"1\": [\"加载中...\"]}}]}";
-    FileUtil.barCodeScanResult(mContext, loadingString);
-    updateHtmlContentTimetamp();
-    mWebView.loadUrl(String.format("file:///%s", htmlPath));
-
+    mWebView.loadUrl(loadingPath("loading"));
     new Thread(new Runnable() {
       @Override public void run() {
         ApiHelper.barCodeScan(mContext, groupID, roleID, userNum, storeID, codeInfo, codeType);
