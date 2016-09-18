@@ -101,7 +101,7 @@ public class YHApplication extends Application {
          *  新安装、或升级后，把代码包中的静态资源重新拷贝覆盖一下
          *  避免再从服务器下载更新，浪费用户流量
          */
-        copyAssetFiles(basePath, sharedPath);
+         copyAssetFiles(basePath, sharedPath);
 
         /*
          *  校正静态资源

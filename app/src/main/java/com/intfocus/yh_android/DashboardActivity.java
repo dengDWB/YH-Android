@@ -827,6 +827,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			if (!notificationJSON.has("setting_pgyer")) { notificationJSON.put("setting_pgyer", -1); }
 			if (!notificationJSON.has("setting_password")) { notificationJSON.put("setting_password", -1); }
 			if (!notificationJSON.has("setting_thursday_say")) { notificationJSON.put("setting_thursday_say", -1); }
+			if (!notificationJSON.has("setting_thursday_say_last")) { notificationJSON.put("setting_thursday_say_last", -1); }
 
 			FileUtil.writeFile(noticePath, notificationJSON.toString());
 		} catch (JSONException | IOException e) {
