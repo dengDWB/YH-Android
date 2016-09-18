@@ -12,13 +12,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
@@ -41,6 +39,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,7 +48,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	public static final String ACTION_UPDATENOTIFITION = "action.updateNotifition";
 	private static final int ZBAR_CAMERA_PERMISSION = 1;
 	private TabView mCurrentTab;
-	private PopupWindow popupWindow;
 	private BadgeView bvUser, bvVoice;
 	private LinearLayout linearUserInfo, linearScan, linearVoice, linearSearch;
 	private ArrayList<String> urlStrings;
@@ -69,7 +67,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 		initUrlStrings();
 
-		initDropMenu();
+		LinearLayout[] item = {linearUserInfo, linearScan, linearVoice, linearSearch};
+		initDropMenu(R.layout.activity_dashboard_dialog,item);
 		initTab();
 		initUserIDColorView();
 		loadWebView();
@@ -330,64 +329,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		colorViews.add((ImageView) findViewById(R.id.colorView3));
 		colorViews.add((ImageView) findViewById(R.id.colorView4));
 		initColorView(colorViews);
-	}
-
-	/*
-	 * 标题栏设置按钮下拉菜单样式
-	 */
-	public void initDropMenu() {
-		View contentView = LayoutInflater.from(this).inflate(R.layout.activity_dashboard_dialog, null);
-
-		linearScan = (LinearLayout) contentView.findViewById(R.id.linearScan);
-		linearSearch = (LinearLayout) contentView.findViewById(R.id.linearSearch);
-		linearVoice = (LinearLayout) contentView.findViewById(R.id.linearVoice);
-		linearUserInfo = (LinearLayout) contentView.findViewById(R.id.linearUserInfo);
-
-		popupWindow = new PopupWindow(this);
-		popupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
-		popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-		popupWindow.setContentView(contentView);
-		popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
-		popupWindow.setOutsideTouchable(false);
-		popupWindow.setFocusable(true);
-
-        /*
-         * 根据配置动态设置显示下拉菜单选项
-         */
-		View viewSeparator;
-		if (!URLs.kDropMenuScan) {
-			viewSeparator = contentView.findViewById(R.id.linearScanSeparator);
-			viewSeparator.setVisibility(URLs.kDropMenuScan ? View.VISIBLE : View.GONE);
-
-			linearScan.setVisibility(URLs.kDropMenuScan ? View.VISIBLE : View.GONE);
-		} else {
-			linearScan.setOnClickListener(this);
-		}
-
-		if (!URLs.kDropMenuVoice) {
-			viewSeparator = contentView.findViewById(R.id.linearVoiceSeparator);
-			viewSeparator.setVisibility(URLs.kDropMenuVoice ? View.VISIBLE : View.GONE);
-
-			linearVoice.setVisibility(URLs.kDropMenuVoice ? View.VISIBLE : View.GONE);
-		} else {
-			linearVoice.setOnClickListener(this);
-		}
-
-		if (!URLs.kDropMenuSearch) {
-			viewSeparator = contentView.findViewById(R.id.linearSearchSeparator);
-			viewSeparator.setVisibility(URLs.kDropMenuSearch ? View.VISIBLE : View.GONE);
-
-			linearSearch.setVisibility(URLs.kDropMenuSearch ? View.VISIBLE : View.GONE);
-		} else {
-			linearSearch.setOnClickListener(this);
-		}
-
-		if (!URLs.kDropMenuUserInfo) {
-			linearUserInfo.setVisibility(URLs.kDropMenuUserInfo ? View.VISIBLE : View.GONE);
-			linearUserInfo.setOnClickListener(this);
-		} else {
-			linearUserInfo.setOnClickListener(this);
-		}
 	}
 
 	/*
