@@ -11,6 +11,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,13 +23,17 @@ import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.ILoadingLayout;
@@ -74,6 +79,7 @@ public class BaseActivity extends Activity {
     protected String urlStringForDetecting;
     protected ProgressDialog mProgressDialog;
     protected YHApplication mMyApp;
+    protected PopupWindow popupWindow;
     PullToRefreshWebView pullToRefreshWebView;
     android.webkit.WebView mWebView;
     JSONObject user;
@@ -83,6 +89,7 @@ public class BaseActivity extends Activity {
     String urlStringForLoading;
     JSONObject logParams = new JSONObject();
     Context mContext;
+    Activity currActivity;
     int displayDpi; //屏幕密度
 
     @Override
@@ -160,7 +167,7 @@ public class BaseActivity extends Activity {
     }
 
     private void clearReferences(){
-        Activity currActivity = mMyApp.getCurrentActivity();
+        currActivity = mMyApp.getCurrentActivity();
         if (this.equals(currActivity)) {
             mMyApp.setCurrentActivity(null);
         }
@@ -611,16 +618,15 @@ public class BaseActivity extends Activity {
         UpdateManagerListener updateManagerListener = new UpdateManagerListener() {
             @Override
             public void onUpdateAvailable(final String result) {
-                LogUtil.d("checkPgyerUpgrade", result);
-                String message = "", versionCode = "-1", versionName = "-1", currentVersionCode = "0";
+                String message = "", versionCode = "-1", versionName = "-1", currentVersionCode = "-1";
                 String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.PGYER_VERSION_FILENAME);
                 try {
                     if(new File(pgyerVersionPath).exists()) {
-                        JSONObject currentVersion = FileUtil.readConfigFile(pgyerVersionPath);
-                        message = currentVersion.getString("message");
+                        JSONObject currentVersionJSON = FileUtil.readConfigFile(pgyerVersionPath);
+                        message = currentVersionJSON.getString("message");
 
                         if (message.isEmpty()) {
-                            JSONObject responseData = currentVersion.getJSONObject("data");
+                            JSONObject responseData = currentVersionJSON.getJSONObject("data");
                             currentVersionCode = responseData.getString("versionCode");
                         }
                     }
@@ -628,10 +634,10 @@ public class BaseActivity extends Activity {
                     JSONObject response = new JSONObject(result);
                     message = response.getString("message");
                     if (message.isEmpty()) {
-                        JSONObject responseData = response.getJSONObject("data");
-                        message = responseData.getString("releaseNote");
-                        versionCode = responseData.getString("versionCode");
-                        versionName = responseData.getString("versionName");
+                        JSONObject responseVersionJSON = response.getJSONObject("data");
+                        message = responseVersionJSON.getString("releaseNote");
+                        versionCode = responseVersionJSON.getString("versionCode");
+                        versionName = responseVersionJSON.getString("versionName");
 
                         FileUtil.writeFile(pgyerVersionPath, result);
                     }
@@ -691,6 +697,27 @@ public class BaseActivity extends Activity {
         };
 
         PgyUpdateManager.register(BaseActivity.this, updateManagerListener);
+    }
+
+    /*
+	 * 标题栏设置按钮下拉菜单样式
+	 */
+    public void initDropMenu(int resourceLayout,LinearLayout[] itemLayout) {
+        View contentView = LayoutInflater.from(this).inflate(R.layout.activity_dashboard_dialog, null);
+
+        for (LinearLayout item : itemLayout) {
+            int itemID = getResources().getIdentifier(item + "","id",getPackageName());
+            item = (LinearLayout) contentView.findViewById(itemID);
+            item.setOnClickListener();
+        }
+
+        popupWindow = new PopupWindow(this);
+        popupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setContentView(contentView);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
+        popupWindow.setOutsideTouchable(false);
+        popupWindow.setFocusable(true);
     }
 
     /**

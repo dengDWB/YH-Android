@@ -735,24 +735,25 @@ public class SettingActivity extends BaseActivity {
             int passwordCount = user.getString("password").equals(URLs.MD5(URLs.kInitPassword)) ? 1 : -1;
             notificationJSON.put("setting_password", passwordCount);
 
-            if (passwordCount == 1) {
+            if (passwordCount > 0) {
                 mWarnPWD.setTextColor(Color.parseColor("#808080"));
                 mWarnPWD.setTextSize(16);
                 mWarnPWD.setText("请修改初始密码");
                 mChangePWD.setText("   修改登录密码");
                 setBadgeView("setting_password", bvChangePWD);
-            } else {
+            }
+            else {
                 mWarnPWD.setVisibility(View.GONE);
                 mChangePWD.setText("修改登录密码");
                 bvChangePWD.setVisibility(View.GONE);
             }
 
-            if (notificationJSON.getInt("setting_pgyer") == 1) {
+            if (notificationJSON.getInt("setting_pgyer") > 0) {
                 mCheckUpgrade.setText("   检测更新");
                 setBadgeView("setting_pgyer", bvCheckUpgrade);
             }
 
-            if (notificationJSON.getInt("setting_thursday_say") >= 1){
+            if (notificationJSON.getInt("setting_thursday_say") > 0){
                 mCheckThursdaySay.setText("   小四说");
                 setBadgeView("setting_thursday_say", bvCheckThursdaySay);
             }

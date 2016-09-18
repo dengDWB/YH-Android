@@ -12,13 +12,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
@@ -41,6 +39,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,7 +48,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	public static final String ACTION_UPDATENOTIFITION = "action.updateNotifition";
 	private static final int ZBAR_CAMERA_PERMISSION = 1;
 	private TabView mCurrentTab;
-	private PopupWindow popupWindow;
 	private BadgeView bvUser, bvVoice;
 	private LinearLayout linearUserInfo, linearScan, linearVoice, linearSearch;
 	private ArrayList<String> urlStrings;
@@ -69,7 +67,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 		initUrlStrings();
 
-		initDropMenu();
+		LinearLayout[] item = {linearUserInfo, linearScan, linearVoice, linearSearch};
+		initDropMenu(R.layout.activity_dashboard_dialog,item);
 		initTab();
 		initUserIDColorView();
 		loadWebView();
@@ -146,7 +145,10 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	 * 仪表盘界面可以显示广告
 	 */
 	private void displayAdOrNot(boolean isShouldLoadHtml) {
-		if (!URLs.kAdBrowser) return; // 隐藏广告位
+		/*
+		 * 隐藏广告位
+		 */
+		if (!URLs.kDashboardAd) { return; }
 		String adIndexBasePath = FileUtil.sharedPath(this) + "/advertisement/index_android";
 		String adIndexPath = adIndexBasePath + ".html";
 		String adIndexWithTimestampPath = adIndexBasePath + ".timestamp.html";
@@ -169,10 +171,10 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 		boolean isShouldDisplayAd = mCurrentTab == mTabKPI && new File(adIndexPath).exists();
 		if (isShouldDisplayAd) {
-			viewAnimation(browserAd,true,0, dip2px(DashboardActivity.this,140));
+			viewAnimation(browserAd, true,0, dip2px(DashboardActivity.this, 140));
 		}
 		else {
-			viewAnimation(browserAd,false, dip2px(DashboardActivity.this,140),0);
+			viewAnimation(browserAd, false, dip2px(DashboardActivity.this,140),0);
 		}
 	}
 
@@ -333,64 +335,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	}
 
 	/*
-	 * 标题栏设置按钮下拉菜单样式
-	 */
-	public void initDropMenu() {
-		View contentView = LayoutInflater.from(this).inflate(R.layout.activity_dashboard_dialog, null);
-
-		linearScan = (LinearLayout) contentView.findViewById(R.id.linearScan);
-		linearSearch = (LinearLayout) contentView.findViewById(R.id.linearSearch);
-		linearVoice = (LinearLayout) contentView.findViewById(R.id.linearVoice);
-		linearUserInfo = (LinearLayout) contentView.findViewById(R.id.linearUserInfo);
-
-		popupWindow = new PopupWindow(this);
-		popupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
-		popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-		popupWindow.setContentView(contentView);
-		popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
-		popupWindow.setOutsideTouchable(false);
-		popupWindow.setFocusable(true);
-
-        /*
-         * 根据配置动态设置显示下拉菜单选项
-         */
-		View viewSeparator;
-		if (!URLs.kDropMenuScan) {
-			viewSeparator = contentView.findViewById(R.id.linearScanSeparator);
-			viewSeparator.setVisibility(URLs.kDropMenuScan ? View.VISIBLE : View.GONE);
-
-			linearScan.setVisibility(URLs.kDropMenuScan ? View.VISIBLE : View.GONE);
-		} else {
-			linearScan.setOnClickListener(this);
-		}
-
-		if (!URLs.kDropMenuVoice) {
-			viewSeparator = contentView.findViewById(R.id.linearVoiceSeparator);
-			viewSeparator.setVisibility(URLs.kDropMenuVoice ? View.VISIBLE : View.GONE);
-
-			linearVoice.setVisibility(URLs.kDropMenuVoice ? View.VISIBLE : View.GONE);
-		} else {
-			linearVoice.setOnClickListener(this);
-		}
-
-		if (!URLs.kDropMenuSearch) {
-			viewSeparator = contentView.findViewById(R.id.linearSearchSeparator);
-			viewSeparator.setVisibility(URLs.kDropMenuSearch ? View.VISIBLE : View.GONE);
-
-			linearSearch.setVisibility(URLs.kDropMenuSearch ? View.VISIBLE : View.GONE);
-		} else {
-			linearSearch.setOnClickListener(this);
-		}
-
-		if (!URLs.kDropMenuUserInfo) {
-			linearUserInfo.setVisibility(URLs.kDropMenuUserInfo ? View.VISIBLE : View.GONE);
-			linearUserInfo.setOnClickListener(this);
-		} else {
-			linearUserInfo.setOnClickListener(this);
-		}
-	}
-
-	/*
 	 * 标题栏设置按钮下拉菜单点击响应事件
 	 */
 	@Override
@@ -439,7 +383,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			mTabAnalyse.setVisibility(URLs.kTabBarAnalyse ? View.VISIBLE : View.GONE);
 			mTabAPP.setVisibility(URLs.kTabBarApp ? View.VISIBLE : View.GONE);
 			mTabMessage.setVisibility(URLs.kTabBarMessage ? View.VISIBLE : View.GONE);
-		} else {
+		}
+		else {
 			findViewById(R.id.toolBar).setVisibility(View.GONE);
 		}
 
@@ -531,9 +476,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 				e.printStackTrace();
 			}
 
-            /*
-             * 用户行为记录, 单独异常处理，不可影响用户体验
-             */
+			/*
+			 * 用户行为记录, 单独异常处理，不可影响用户体验
+			 */
 			try {
 				logParams = new JSONObject();
 				logParams.put("action", "点击/主页面/标签栏");
@@ -552,9 +497,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 		popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
 
-        /*
-         * 用户行为记录, 单独异常处理，不可影响用户体验
-         */
+		/*
+		 * 用户行为记录, 单独异常处理，不可影响用户体验
+		 */
 		try {
 			logParams = new JSONObject();
 			logParams.put("action", "点击/主页面/设置");
@@ -590,9 +535,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 				}
 			});
 
-            /*
-             * 用户行为记录, 单独异常处理，不可影响用户体验
-             */
+			/*
+			 * 用户行为记录, 单独异常处理，不可影响用户体验
+			 */
 			try {
 				logParams = new JSONObject();
 				logParams.put("action", "点击/主页面/浏览器");
@@ -711,9 +656,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		public void jsException(final String ex) {
 			Log.i("jsException", ex);
 
-            /*
-             * 用户行为记录, 单独异常处理，不可影响用户体验
-             */
+			/*
+			 * 用户行为记录, 单独异常处理，不可影响用户体验
+			 */
 			try {
 				logParams = new JSONObject();
 				logParams.put("action", "JS异常");
@@ -802,7 +747,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		try {
 			String noticePath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
 			notificationJSON = FileUtil.readConfigFile(noticePath);
-
 			/*
 			 * 版本迭代的问题：
 			 * 1. 动态添加新字段

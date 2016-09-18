@@ -57,7 +57,7 @@ public class URLs extends PrivateURLs implements Serializable {
     public final static String CACHED_DIRNAME            = "Cached";
     public final static String CACHED_HEADER_FILENAME    = "cached_header.json";
     public final static String CURRENT_VERSION_FILENAME  = "current_version.txt";
-    public final static String GRAVATARJSON_FILENAME         = "gravatar.json";
+    public final static String GRAVATARJSON_FILENAME     = "gravatar.json";
     public final static String BARCODE_RESULT_FILENAME   = "barcode_scan_result.json";
     public final static String SCAN_BARCODE_FILENAME     = "scan_bar_code.html";
     public final static String PGYER_VERSION_FILENAME    = "pgyer_version.txt";
