@@ -145,7 +145,11 @@ public class LocalNotificationService extends Service {
    */
   private int getDataCount(String keyName, String urlString) throws JSONException, IOException {
     Map<String, String> response = HttpUtil.httpGet(urlString, new HashMap<String, String>());
-    int lastCount = notificationJSON.getInt(keyName + "_last");
+    String keyLastName = keyName + "_last";
+    if(!notificationJSON.has(keyName)) { notificationJSON.put(keyName, -1); }
+    if(!notificationJSON.has(keyLastName)) { notificationJSON.put(keyLastName, -1); }
+
+    int lastCount = notificationJSON.getInt(keyLastName);
 
     if (response.get("code").equals("200")) {
       String strRegex = "\\bMobileBridge.setDashboardDataCount.+";
@@ -162,7 +166,7 @@ public class LocalNotificationService extends Service {
 				 * 如果tab_*_last 的值为 -1,表示第一次加载
 				 */
         if (lastCount == -1) {
-          notificationJSON.put(keyName + "_last", dataCount);
+          notificationJSON.put(keyLastName, dataCount);
           notificationJSON.put(keyName, 1);
           FileUtil.writeFile(notificationPath, notificationJSON.toString());
         }
