@@ -108,7 +108,7 @@ public class LocalNotificationService extends Service {
 			/*
 			 * 遍历获取 Tab 栏上需要显示的通知数量 ("tab_*" 的值)
 			 */
-      String[] typeString = {URLs.kTabKpi, URLs.kTabKpi, URLs.kTabKpi, URLs.kTabKpi, URLs.kSettingThursdaySay};
+      String[] typeString = {URLs.kTabKpi, URLs.kTabAnalyse, URLs.kTabApp, URLs.kTabMessage, URLs.kSettingThursdaySay};
       int[] typeCount = {kpiCount, analyseCount, appCount, messageCount, thursdaySayCount};
       for (int i = 0; i < typeString.length; i++) {
         notificationJSON.put(typeString[i], Math.abs(typeCount[i] - notificationJSON.getInt(typeString[i] + "_last")));
