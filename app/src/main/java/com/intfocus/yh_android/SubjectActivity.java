@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
@@ -57,6 +58,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     private int groupID, objectID, objectType;
     private String userNum;
     private RelativeLayout bannerView;
+    private ArrayList<HashMap<String, Object>> listItem = new ArrayList<>();
+    private Boolean isShowSearchButton = false;
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -77,20 +80,16 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             userNum = "not-set";
         }
 
-        ImageView bannerComment = (ImageView) findViewById(R.id.bannerComment);
-        bannerComment.setVisibility(URLs.kSubjectComment ? View.VISIBLE : View.GONE);
-        ImageView bannerShare = (ImageView) findViewById(R.id.bannerShare);
-        bannerShare.setVisibility(URLs.kSubjectShare ? View.VISIBLE : View.GONE);
-        ImageView bannerSearch = (ImageView) findViewById(R.id.bannerSearch);
-        bannerSearch.setVisibility(View.GONE);
-
         bannerView = (RelativeLayout) findViewById(R.id.actionBar);
         TextView mTitle = (TextView) findViewById(R.id.bannerTitle);
+
         mPDFView = (PDFView) findViewById(R.id.pdfview);
         mPDFView.setVisibility(View.INVISIBLE);
 
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
         initWebView();
+
+        initDropMenuItem();
 
         mWebView.requestFocus();
         pullToRefreshWebView.setVisibility(View.VISIBLE);
@@ -123,6 +122,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         isInnerLink = !(link.startsWith("http://") || link.startsWith("https://"));
         mTitle.setText(bannerName);
 
+
         List<ImageView> colorViews = new ArrayList<>();
         colorViews.add((ImageView) findViewById(R.id.colorView0));
         colorViews.add((ImageView) findViewById(R.id.colorView1));
@@ -132,22 +132,68 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         initColorView(colorViews);
     }
 
+    /*
+     * 标题栏点击设置按钮显示下拉菜单
+     */
+    public void launchDropMenuActivity(View v) {
+        ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
+        popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
 
+		/*
+		 * 用户行为记录, 单独异常处理，不可影响用户体验
+		 */
+        try {
+            logParams = new JSONObject();
+            logParams.put("action", "点击/报表/下拉菜单");
+            new Thread(mRunnableForLogger).start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*
+     * 初始化标题栏下拉菜单
+     */
     private void initDropMenuItem() {
-        ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
-        int[] imgID = {R.drawable.banner_search, R.drawable.banner_share, R.drawable.banner_comment};
-        String[] itemName = {"筛选", "分享", "评论"};
+        String[] itemName = {"分享","评论"};
+        int[] itemImage = {R.drawable.banner_share,R.drawable.banner_comment};
         for (int i = 0;i < itemName.length; i++) {
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("ItemImage",imgID[i]);
+            HashMap<String, Object> map = new HashMap<String, Object>();
+            map.put("ItemImage",itemImage[i]);
             map.put("ItemText", itemName[i]);
             listItem.add(map);
         }
 
         SimpleAdapter mSimpleAdapter = new SimpleAdapter(this, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
-
-        initDropMenu(mSimpleAdapter);
+        initDropMenu(mSimpleAdapter,mDropMenuListener);
     }
+
+    /*
+ 	 * 标题栏设置按钮下拉菜单点击响应事件
+ 	 */
+    private final AdapterView.OnItemClickListener mDropMenuListener = new AdapterView.OnItemClickListener() {
+        public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+                                long arg3) {
+            popupWindow.dismiss();
+
+            switch (listItem.get(arg2).get("ItemText").toString()) {
+                case "筛选":
+                    actionLaunchReportSelectorActivity();
+                    break;
+
+                case "分享":
+                    actionShare2Weixin();
+                    break;
+
+                case "评论":
+                    actionLaunchCommentActivity();
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    };
 
     protected void onResume() {
         checkInterfaceOrientation(this.getResources().getConfiguration());
@@ -159,13 +205,15 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     protected void displayBannerTitleAndSearchIcon() {
         runOnUiThread(new Runnable() {
             @Override public void run() {
-                ImageView bannerSearch = (ImageView) findViewById(R.id.bannerSearch);
-                if (!URLs.kSubjectComment && !URLs.kSubjectShare) {
-                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(dip2px(50), RelativeLayout.LayoutParams.MATCH_PARENT);
-                    params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-                    bannerSearch.setLayoutParams(params);
+                if (!isShowSearchButton) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("ItemImage", R.drawable.banner_search);
+                    map.put("ItemText", "筛选");
+                    listItem.add(map);
+                    SimpleAdapter mSimpleAdapter = new SimpleAdapter(mContext, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
+                    initDropMenu(mSimpleAdapter,mDropMenuListener);
+                    isShowSearchButton = true;
                 }
-                bannerSearch.setVisibility(View.VISIBLE);
 
                 String selectedItem = FileUtil.reportSelectedItem(mContext, String.format("%d", groupID), templateID, reportID);
                 if (selectedItem == null || selectedItem.length() == 0) {
@@ -277,10 +325,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
              *  初次加载时，判断筛选功能的条件还未生效
              *  此处仅在第二次及以后才会生效
              */
-            isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
-            if(isSupportSearch) {
-                displayBannerTitleAndSearchIcon();
-            }
+                isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
+                if(isSupportSearch) {
+                    displayBannerTitleAndSearchIcon();
+                }
 
             new Thread(new Runnable() {
                 @Override
@@ -349,7 +397,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     /*
      * 内部报表具有筛选功能时，调用筛选项界面
      */
-    public void actionLaunchReportSelectorActivity(View v) {
+    public void actionLaunchReportSelectorActivity() {
         Intent intent = new Intent(mContext, ReportSelectorAcitity.class);
         intent.putExtra("bannerName", bannerName);
         intent.putExtra("groupID", groupID);
@@ -361,7 +409,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     /*
      * 分享截图至微信
      */
-    public void actionShare2Weixin(View v) {
+    public void actionShare2Weixin() {
         String filePath = FileUtil.basePath(mContext) + "/" + URLs.CACHED_DIRNAME + "/" + "timestmap.png";
         mWebView.setDrawingCacheEnabled(true);
         mWebView.buildDrawingCache();
@@ -417,7 +465,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     /*
      * 评论
      */
-    public void actionLaunchCommentActivity(View v) {
+    public void actionLaunchCommentActivity() {
         Intent intent = new Intent(mContext, CommentActivity.class);
         intent.putExtra("bannerName", bannerName);
         intent.putExtra("objectID", objectID);
@@ -560,10 +608,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                      *  判断筛选的条件: arrayString 数组不为空
                      *  报表第一次加载时，此处为判断筛选功能的关键点
                      */
-                    isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
-                    if(isSupportSearch) {
-                        displayBannerTitleAndSearchIcon();
-                    }
+                        isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
+                        if(isSupportSearch) {
+                            displayBannerTitleAndSearchIcon();
+                        }
                 }
             } catch (IOException e) {
                 e.printStackTrace();

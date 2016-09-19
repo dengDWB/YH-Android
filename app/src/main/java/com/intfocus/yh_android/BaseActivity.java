@@ -33,11 +33,13 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.ILoadingLayout;
@@ -59,6 +61,7 @@ import com.umeng.message.PushAgent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -706,15 +709,12 @@ public class BaseActivity extends Activity {
     /*
 	 * 标题栏设置按钮下拉菜单样式
 	 */
-    public void initDropMenu(SimpleAdapter adapter) {
+    public void initDropMenu(SimpleAdapter adapter,AdapterView.OnItemClickListener itemClickListener) {
         View contentView = LayoutInflater.from(this).inflate(R.layout.menu_dialog, null);
 
         ListView listView = (ListView) contentView.findViewById(R.id.list_dropmenu);
-//        ViewGroup.LayoutParams layoutParams = listView.getLayoutParams();
-//        layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-//        layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-//        listView.setLayoutParams(layoutParams);
         listView.setAdapter(adapter);
+        listView.setOnItemClickListener(itemClickListener);
 
         popupWindow = new PopupWindow(this);
         popupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);

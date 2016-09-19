@@ -23,10 +23,12 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
@@ -37,6 +39,7 @@ import com.readystatesoftware.viewbadger.BadgeView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,8 +54,8 @@ public class DashboardActivity extends BaseActivity {
 	private static final int ZBAR_CAMERA_PERMISSION = 1;
 	private TabView mCurrentTab;
 	private BadgeView bvUser, bvVoice;
-	private LinearLayout linearUserInfo, linearScan, linearVoice, linearSearch;
 	private ArrayList<String> urlStrings;
+	private ArrayList<HashMap<String, Object>> listItem;
 	private JSONObject notificationJSON;
 	private BadgeView bvKpi, bvAnalyse, bvApp, bvMessage, bvBannerSetting;
 	private int objectType, kpiNotifition, analyseNotifition, appNotifition, messageNotifition;
@@ -60,6 +63,7 @@ public class DashboardActivity extends BaseActivity {
 	private TabView mTabKPI, mTabAnalyse, mTabAPP, mTabMessage;
 	private WebView browserAd;
 	private int mAnimationTime;
+	private SimpleAdapter mSimpleAdapter;
 
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
@@ -68,8 +72,6 @@ public class DashboardActivity extends BaseActivity {
 		setContentView(R.layout.activity_dashboard);
 
 		initUrlStrings();
-
-		LinearLayout[] item = {linearUserInfo, linearScan, linearVoice, linearSearch};
 		initDropMenuItem();
 		initTab();
 		initUserIDColorView();
@@ -98,7 +100,7 @@ public class DashboardActivity extends BaseActivity {
 	}
 
 	private void initDropMenuItem() {
-		ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
+		listItem = new ArrayList<HashMap<String, Object>>();
 		int[] imgID = {R.drawable.icon_scan, R.drawable.icon_voice, R.drawable.icon_search, R.drawable.icon_user};
 		String[] itemName = {"扫一扫", "语音播报", "搜索", "个人信息"};
 		for (int i = 0;i < itemName.length; i++) {
@@ -108,10 +110,48 @@ public class DashboardActivity extends BaseActivity {
 			listItem.add(map);
 		}
 
-		SimpleAdapter mSimpleAdapter = new SimpleAdapter(this, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
+		mSimpleAdapter = new SimpleAdapter(this, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
 
-		initDropMenu(mSimpleAdapter);
+		initDropMenu(mSimpleAdapter, mDropMenuListener);
 	}
+
+	/*
+ 	 * 标题栏设置按钮下拉菜单点击响应事件
+ 	 */
+	private final AdapterView.OnItemClickListener mDropMenuListener = new AdapterView.OnItemClickListener() {
+		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+								long arg3) {
+			popupWindow.dismiss();
+
+			switch (listItem.get(arg2).get("ItemText").toString()) {
+				case "个人信息":
+					Intent settingIntent = new Intent(mContext, SettingActivity.class);
+					mContext.startActivity(settingIntent);
+					break;
+
+				case "扫一扫":
+					if (ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.CAMERA)
+							!= PackageManager.PERMISSION_GRANTED) {
+						ActivityCompat.requestPermissions(DashboardActivity.this, new String[]{Manifest.permission.CAMERA}, ZBAR_CAMERA_PERMISSION);
+					} else {
+						Intent barCodeScannerIntent = new Intent(mContext, BarCodeScannerActivity.class);
+						mContext.startActivity(barCodeScannerIntent);
+					}
+					break;
+
+				case "语音播报":
+					toast("功能开发中，敬请期待");
+					break;
+
+				case "搜索":
+					toast("功能开发中，敬请期待");
+					break;
+				default:
+					break;
+			}
+		}
+	};
+
 
 	protected void onResume() {
 		mMyApp.setCurrentActivity(this);
@@ -353,44 +393,6 @@ public class DashboardActivity extends BaseActivity {
 		initColorView(colorViews);
 	}
 
-	/*
-	 * 标题栏设置按钮下拉菜单点击响应事件
-	 */
-
-	private final View.OnClickListener mDropMenuListener = new View.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			popupWindow.dismiss();
-
-			switch (v.getId()) {
-				case R.id.linearUserInfo:
-					Intent settingIntent = new Intent(mContext, SettingActivity.class);
-					mContext.startActivity(settingIntent);
-					break;
-
-				case R.id.linearScan:
-					if (ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.CAMERA)
-							!= PackageManager.PERMISSION_GRANTED) {
-						ActivityCompat.requestPermissions(DashboardActivity.this, new String[]{Manifest.permission.CAMERA}, ZBAR_CAMERA_PERMISSION);
-					} else {
-						Intent barCodeScannerIntent = new Intent(mContext, BarCodeScannerActivity.class);
-						mContext.startActivity(barCodeScannerIntent);
-					}
-					break;
-
-				case R.id.linearSearch:
-					toast("功能开发中，敬请期待");
-					break;
-
-				case R.id.linearVoice:
-					toast("功能开发中，敬请期待");
-					break;
-				default:
-					break;
-			}
-		}
-	};
-
 	@SuppressLint("SetJavaScriptEnabled")
 	@JavascriptInterface
 	private void initTab() {
@@ -399,6 +401,7 @@ public class DashboardActivity extends BaseActivity {
 		mTabAPP = (TabView) findViewById(R.id.tabApp);
 		mTabMessage = (TabView) findViewById(R.id.tabMessage);
 		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
+		TextView mUserInfo =(TextView) findViewById(R.id.text_menu_item);
 
 		if (URLs.kTabBar) {
 			mTabKPI.setVisibility(URLs.kTabBarKPI ? View.VISIBLE : View.GONE);
@@ -422,7 +425,7 @@ public class DashboardActivity extends BaseActivity {
 		bvApp = new BadgeView(this, mTabAPP);
 		bvMessage = new BadgeView(this, mTabMessage);
 		bvBannerSetting = new BadgeView(this, mBannerSetting);
-		bvUser = new BadgeView(this, linearUserInfo);
+		bvUser = new BadgeView(this, mUserInfo);
 	}
 
 	/*
@@ -514,7 +517,7 @@ public class DashboardActivity extends BaseActivity {
 	/*
 	 * 标题栏点击设置按钮显示下拉菜单
 	 */
-	public void launchSettingActivity(View v) {
+	public void launchDropMenuActivity(View v) {
 		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 		popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
 
@@ -523,7 +526,7 @@ public class DashboardActivity extends BaseActivity {
 		 */
 		try {
 			logParams = new JSONObject();
-			logParams.put("action", "点击/主页面/设置");
+			logParams.put("action", "点击/主页面/下拉菜单");
 			new Thread(mRunnableForLogger).start();
 		} catch (Exception e) {
 			e.printStackTrace();

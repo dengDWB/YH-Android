@@ -27,29 +27,12 @@
             style="@style/BannerTitle" />
 
         <ImageView
-            android:id="@+id/bannerSearch"
-            android:src="@drawable/banner_search"
-            style="@style/BannerButton"
-            android:padding="12dp"
-            android:layout_marginRight="-7dp"
-            android:layout_toLeftOf="@+id/bannerShare"
-            android:onClick="actionLaunchReportSelectorActivity" />
-
-        <ImageView
-            android:id="@+id/bannerShare"
-            android:src="@drawable/banner_share"
-            style="@style/BannerButton"
-            android:padding="12dp"
-            android:layout_marginLeft="-7dp"
-            android:layout_marginRight="-7dp"
-            android:layout_toLeftOf="@+id/bannerComment"
-            android:onClick="actionShare2Weixin" />
-
-        <ImageView
-            android:id="@+id/bannerComment"
+            android:id="@+id/bannerSetting"
             style="@style/BannerRightButton"
-            android:src="@drawable/banner_comment"
-            android:onClick="actionLaunchCommentActivity" />
+            android:layout_alignBottom="@+id/colorViewLayout"
+            android:layout_marginTop="0dp"
+            android:onClick="launchDropMenuActivity"
+            android:src="@drawable/banner_setting"/>
 
         <RelativeLayout
             android:id="@+id/colorViewLayout"
