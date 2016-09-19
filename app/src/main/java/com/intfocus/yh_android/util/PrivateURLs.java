@@ -18,7 +18,7 @@ public class PrivateURLs {
   public final static String kBannerTextColor = "#ffffff";
   public final static String kInitPassword    = "123456";
   
-  public final static String kBaseUrl      = "http://yonghui.idata.mobi";
+  public final static String kBaseUrl      = "http://yonghui-test.idata.mobi";
   public final static String kBaseUrl1     = "http://10.0.3.2:4567";
 
   public final static String kPgyerAppId   = "c586f556015342bcf89f8300ccfbebc2";
