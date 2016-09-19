@@ -44,9 +44,9 @@ public class CommentActivity extends BaseActivity {
         mWebView.loadUrl(urlStringForLoading);
 
         Intent intent = getIntent();
-        bannerName = intent.getStringExtra("bannerName");
-        objectID   = intent.getIntExtra("objectID", -1);
-        objectType = intent.getIntExtra("objectType", -1);
+        bannerName = intent.getStringExtra(URLs.kBannerName);
+        objectID   = intent.getIntExtra(URLs.kObjectId, -1);
+        objectType = intent.getIntExtra(URLs.kObjectType, -1);
 
         mTitle.setText(bannerName);
         urlString = String.format(URLs.COMMENT_PATH, URLs.kBaseUrl, URLs.currentUIVersion(mContext), objectID, objectType);
@@ -103,8 +103,8 @@ public class CommentActivity extends BaseActivity {
              */
             try {
                 logParams = new JSONObject();
-                logParams.put("action", "发表/评论");
-                logParams.put("obj_title", bannerName);
+                logParams.put(URLs.kAction, "发表/评论");
+                logParams.put(URLs.kObjTitle, bannerName);
                 new Thread(mRunnableForLogger).start();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -118,10 +118,10 @@ public class CommentActivity extends BaseActivity {
              */
             try {
                 logParams = new JSONObject();
-                logParams.put("action", "JS异常");
+                logParams.put(URLs.kAction, "JS异常");
                 logParams.put("obj_id", objectID);
-                logParams.put("obj_type", objectType);
-                logParams.put("obj_title", String.format("评论页面/%s/%s", bannerName, ex));
+                logParams.put(URLs.kObjType, objectType);
+                logParams.put(URLs.kObjTitle, String.format("评论页面/%s/%s", bannerName, ex));
                 new Thread(mRunnableForLogger).start();
             } catch (Exception e) {
                 e.printStackTrace();

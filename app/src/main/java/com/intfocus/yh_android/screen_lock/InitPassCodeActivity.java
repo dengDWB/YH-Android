@@ -244,8 +244,8 @@ public class InitPassCodeActivity extends Activity {
                         if ((new File(userConfigPath)).exists()) {
                             userJSON = FileUtil.readConfigFile(userConfigPath);
                         }
-                        userJSON.put("use_gesture_password", true);
-                        userJSON.put("gesture_password", stringBuilder.toString());
+                        userJSON.put(URLs.kUseGesturePassword, true);
+                        userJSON.put(URLs.kGesturePassword, stringBuilder.toString());
 
                         FileUtil.writeFile(userConfigPath, userJSON.toString());
                         String settingsConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
@@ -259,7 +259,7 @@ public class InitPassCodeActivity extends Activity {
                                     ApiHelper.screenLock(userInfo.get("user_device_id").toString(), stringBuilder.toString(), true);
 
                                     JSONObject params = new JSONObject();
-                                    params.put("action", "设置锁屏");
+                                    params.put(URLs.kAction, "设置锁屏");
                                     ApiHelper.actionLog(mContext, params);
                                 } catch (JSONException e) {
                                     e.printStackTrace();

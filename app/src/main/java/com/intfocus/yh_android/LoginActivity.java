@@ -17,6 +17,8 @@ import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.URLs;
 
 public class LoginActivity extends BaseActivity {
+    public final static String kFromActivity = "from_activity";
+    public final static String kSuccess      = "success";
     private EditText usernameEditText, passwordEditText;
     private String usernameString, passwordString;
     private TextView versionTv;
@@ -32,10 +34,10 @@ public class LoginActivity extends BaseActivity {
          *  不是的话，相当于直接启动应用，则检测是否有设置锁屏
          */
         Intent intent = getIntent();
-        if (intent.hasExtra("from_activity") && intent.getStringExtra("from_activity").equals("ConfirmPassCodeActivity")) {
-            Log.i("getIndent", intent.getStringExtra("from_activity"));
+        if (intent.hasExtra(kFromActivity) && intent.getStringExtra(kFromActivity).equals("ConfirmPassCodeActivity")) {
+            Log.i("getIndent", intent.getStringExtra(kFromActivity));
             intent = new Intent(LoginActivity.this, DashboardActivity.class);
-            intent.putExtra("from_activity", intent.getStringExtra("from_activity"));
+            intent.putExtra(kFromActivity, intent.getStringExtra(kFromActivity));
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             LoginActivity.this.startActivity(intent);
 
@@ -115,7 +117,7 @@ public class LoginActivity extends BaseActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (info.compareTo("success") > 0 || info.compareTo("success") < 0) {
+                            if (info.compareTo(kSuccess) > 0 || info.compareTo(kSuccess) < 0) {
                                 if (mProgressDialog != null) {
                                     mProgressDialog.dismiss();
                                 }

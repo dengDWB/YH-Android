@@ -46,6 +46,8 @@ import java.util.Date;
 import java.util.List;
 
 public class DashboardActivity extends BaseActivity implements View.OnClickListener {
+	public final static String kTab = "tab";
+	public final static String kUserId = "user_id";
 	public static final String ACTION_UPDATENOTIFITION = "action.updateNotifition";
 	private static final int ZBAR_CAMERA_PERMISSION = 1;
 	private TabView mCurrentTab;
@@ -211,25 +213,25 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		try {
 			String noticePath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
 			notificationJSON = FileUtil.readConfigFile(noticePath);
-			kpiNotifition = notificationJSON.getInt("tab_kpi");
-			analyseNotifition = notificationJSON.getInt("tab_analyse");
-			appNotifition = notificationJSON.getInt("tab_app");
-			messageNotifition = notificationJSON.getInt("tab_message");
+			kpiNotifition = notificationJSON.getInt(URLs.kTabKpi);
+			analyseNotifition = notificationJSON.getInt(URLs.kTabAnalyse);
+			appNotifition = notificationJSON.getInt(URLs.kTabApp);
+			messageNotifition = notificationJSON.getInt(URLs.kTabMessage);
 
 			if (kpiNotifition > 0 && objectType != 1) {
-				setBadgeView("tab", bvKpi);
+				setBadgeView(kTab, bvKpi);
 			}
 			if (analyseNotifition > 0 && objectType != 2) {
-				setBadgeView("tab", bvAnalyse);
+				setBadgeView(kTab, bvAnalyse);
 			}
 			if (appNotifition > 0 && objectType != 3) {
-				setBadgeView("tab", bvApp);
+				setBadgeView(kTab, bvApp);
 			}
 			if (messageNotifition > 0 && objectType != 5) {
-				setBadgeView("tab", bvMessage);
+				setBadgeView(kTab, bvMessage);
 			}
-			if (notificationJSON.getInt("setting")  > 0) {
-				setBadgeView("setting", bvBannerSetting);
+			if (notificationJSON.getInt(URLs.kSetting)  > 0) {
+				setBadgeView(URLs.kSetting, bvBannerSetting);
 				setBadgeView("user", bvUser);
 			} else {
 				bvBannerSetting.setVisibility(View.GONE);
@@ -281,7 +283,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 						String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
 						JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
-						String info = ApiHelper.authentication(mContext, userJSON.getString("user_num"), userJSON.getString("password"));
+						String info = ApiHelper.authentication(mContext, userJSON.getString("user_num"), userJSON.getString(URLs.kPassword));
 						if (!info.isEmpty() && (info.contains("用户") || info.contains("密码"))) {
 							userJSON.put("is_login", false);
 							FileUtil.writeFile(userConfigPath, userJSON.toString());
@@ -301,7 +303,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	 */
 	public void checkUserModifiedInitPassword() {
 		try {
-			if (!user.getString("password").equals(URLs.MD5(URLs.kInitPassword))) {
+			if (!user.getString(URLs.kPassword).equals(URLs.MD5(URLs.kInitPassword))) {
 				return;
 			}
 
@@ -495,38 +497,38 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 				switch (v.getId()) {
 					case R.id.tabKPI:
 						objectType = 1;
-						urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
+						urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
 
 						bvKpi.setVisibility(View.GONE);
-						notificationJSON.put("tab_kpi", 0);
+						notificationJSON.put(URLs.kTabKpi, 0);
 						break;
 					case R.id.tabAnalyse:
 						objectType = 2;
-						urlString = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
+						urlString = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 
 						bvAnalyse.setVisibility(View.GONE);
-						notificationJSON.put("tab_analyse", 0);
+						notificationJSON.put(URLs.kTabAnalyse, 0);
 						break;
 					case R.id.tabApp:
 						objectType = 3;
-						urlString = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
+						urlString = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 
 						bvApp.setVisibility(View.GONE);
-						notificationJSON.put("tab_app", 0);
+						notificationJSON.put(URLs.kTabApp, 0);
 						break;
 					case R.id.tabMessage:
 						objectType = 5;
-						urlString = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"), user.getString("group_id"), user.getString("user_id"));
+						urlString = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
 
 						bvMessage.setVisibility(View.GONE);
-						notificationJSON.put("tab_message", 0);
+						notificationJSON.put(URLs.kTabMessage, 0);
 						break;
 					default:
 						objectType = 1;
-						urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
+						urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
 
 						bvKpi.setVisibility(View.GONE);
-						notificationJSON.put("tab_kpi", 0);
+						notificationJSON.put(URLs.kTabKpi, 0);
 						break;
 				}
 
@@ -543,8 +545,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			 */
 			try {
 				logParams = new JSONObject();
-				logParams.put("action", "点击/主页面/标签栏");
-				logParams.put("obj_type", objectType);
+				logParams.put(URLs.kAction, "点击/主页面/标签栏");
+				logParams.put(URLs.kObjType, objectType);
 				new Thread(mRunnableForLogger).start();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -564,7 +566,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		 */
 		try {
 			logParams = new JSONObject();
-			logParams.put("action", "点击/主页面/设置");
+			logParams.put(URLs.kAction, "点击/主页面/设置");
 			new Thread(mRunnableForLogger).start();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -589,10 +591,10 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 					Intent intent = new Intent(DashboardActivity.this, SubjectActivity.class);
 					intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-					intent.putExtra("bannerName", bannerName);
-					intent.putExtra("link", link);
-					intent.putExtra("objectID", objectID);
-					intent.putExtra("objectType", objectType);
+					intent.putExtra(URLs.kBannerName, bannerName);
+					intent.putExtra(URLs.kLink, link);
+					intent.putExtra(URLs.kObjectId, objectID);
+					intent.putExtra(URLs.kObjectType, objectType);
 					mContext.startActivity(intent);
 				}
 			});
@@ -602,10 +604,10 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			 */
 			try {
 				logParams = new JSONObject();
-				logParams.put("action", "点击/主页面/浏览器");
+				logParams.put(URLs.kAction, "点击/主页面/浏览器");
 				logParams.put("obj_id", objectID);
-				logParams.put("obj_type", objectType);
-				logParams.put("obj_title", bannerName);
+				logParams.put(URLs.kObjType, objectType);
+				logParams.put(URLs.kObjTitle, bannerName);
 				new Thread(mRunnableForLogger).start();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -629,15 +631,15 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 							intent.setData(content_url);
 							startActivity(intent);
 							break;
-						case "tab_kpi":
+						case URLs.kTabKpi:
 							break;
-						case "tab_analyse":
+						case URLs.kTabAnalyse:
 							mTabAnalyse.performClick();
 							break;
-						case "tab_app":
+						case URLs.kTabApp:
 							mTabAPP.performClick();
 							break;
-						case "tab_message":
+						case URLs.kTabMessage:
 							if(openLink.equals("0") || openLink.equals("1") || openLink.equals("2")) {
 								storeTabIndex("message", Integer.parseInt(openLink));
 							}
@@ -653,10 +655,10 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 							}
 							Intent subjectIntent = new Intent(DashboardActivity.this, SubjectActivity.class);
 							subjectIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-							subjectIntent.putExtra("link", openLink);
-							subjectIntent.putExtra("bannerName", objectTitle);
-							subjectIntent.putExtra("objectID", ObjeckID);
-							subjectIntent.putExtra("objectType", objectType);
+							subjectIntent.putExtra(URLs.kLink, openLink);
+							subjectIntent.putExtra(URLs.kBannerName, objectTitle);
+							subjectIntent.putExtra(URLs.kObjectId, ObjeckID);
+							subjectIntent.putExtra(URLs.kObjectType, objectType);
 							startActivity(subjectIntent);
 							break;
 						default:
@@ -723,9 +725,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			 */
 			try {
 				logParams = new JSONObject();
-				logParams.put("action", "JS异常");
-				logParams.put("obj_type", objectType);
-				logParams.put("obj_title", String.format("主页面/%s", ex));
+				logParams.put(URLs.kAction, "JS异常");
+				logParams.put(URLs.kObjType, objectType);
+				logParams.put(URLs.kObjTitle, String.format("主页面/%s", ex));
 				new Thread(mRunnableForLogger).start();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -781,15 +783,15 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		String currentUIVersion = URLs.currentUIVersion(mContext);
 		String tmpString;
 		try {
-			tmpString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
+			tmpString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
-			tmpString = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
+			tmpString = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
-			tmpString = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"));
+			tmpString = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
-			tmpString = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("role_id"), user.getString("group_id"), user.getString("user_id"));
+			tmpString = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
 			urlStrings.add(tmpString);
-			tmpString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString("group_id"), user.getString("role_id"));
+			tmpString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -815,18 +817,18 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			 * 2. 不可影响已存在字段存放的数据
 			 */
 			if (!notificationJSON.has("app")) { notificationJSON.put("app", -1); }
-			if (!notificationJSON.has("tab_kpi")) { notificationJSON.put("tab_kpi", -1); }
+			if (!notificationJSON.has(URLs.kTabKpi)) { notificationJSON.put(URLs.kTabKpi, -1); }
 			if (!notificationJSON.has("tab_kpi_last")) { notificationJSON.put("tab_kpi_last", -1); }
-			if (!notificationJSON.has("tab_analyse")) { notificationJSON.put("tab_analyse", -1); }
+			if (!notificationJSON.has(URLs.kTabAnalyse)) { notificationJSON.put(URLs.kTabAnalyse, -1); }
 			if (!notificationJSON.has("tab_analyse_last")) { notificationJSON.put("tab_analyse_last", -1); }
-			if (!notificationJSON.has("tab_app")) { notificationJSON.put("tab_app", -1); }
+			if (!notificationJSON.has(URLs.kTabApp)) { notificationJSON.put(URLs.kTabApp, -1); }
 			if (!notificationJSON.has("tab_app_last")) { notificationJSON.put("tab_app_last", -1); }
-			if (!notificationJSON.has("tab_message")) { notificationJSON.put("tab_message", -1); }
+			if (!notificationJSON.has(URLs.kTabMessage)) { notificationJSON.put(URLs.kTabMessage, -1); }
 			if (!notificationJSON.has("tab_message_last")) { notificationJSON.put("tab_message_last", -1); }
-			if (!notificationJSON.has("setting")) { notificationJSON.put("setting", -1); }
-			if (!notificationJSON.has("setting_pgyer")) { notificationJSON.put("setting_pgyer", -1); }
-			if (!notificationJSON.has("setting_password")) { notificationJSON.put("setting_password", -1); }
-			if (!notificationJSON.has("setting_thursday_say")) { notificationJSON.put("setting_thursday_say", -1); }
+			if (!notificationJSON.has(URLs.kSetting)) { notificationJSON.put(URLs.kSetting, -1); }
+			if (!notificationJSON.has(URLs.kSettingPgyer)) { notificationJSON.put(URLs.kSettingPgyer, -1); }
+			if (!notificationJSON.has(URLs.kSettingPassword)) { notificationJSON.put(URLs.kSettingPassword, -1); }
+			if (!notificationJSON.has(URLs.kSettingThursdaySay)) { notificationJSON.put(URLs.kSettingThursdaySay, -1); }
 			if (!notificationJSON.has("setting_thursday_say_last")) { notificationJSON.put("setting_thursday_say_last", -1); }
 
 			FileUtil.writeFile(noticePath, notificationJSON.toString());

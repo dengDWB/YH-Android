@@ -23,6 +23,17 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class ApiHelper {
+    public final static String kAppVersion = "app_version";
+    public final static String kFontsMd5 = "fonts_md5";
+    public final static String kImagesMd5 = "images_md5";
+    public final static String kStylesheetsMd5 = "stylesheets_md5";
+    public final static String kJavaScriptsMd5 = "javascripts_md5";
+    public final static String kInfo = "info";
+    public final static String kPushValid = "push_valid";
+    public final static String kValid = "valid";
+    public final static String kUserId = "user_id";
+    public final static String kUserName = "user_name";
+    public final static String kUserDeviceId = "user_device_id";
 
     /*
      * 用户登录验证
@@ -41,55 +52,55 @@ public class ApiHelper {
             JSONObject params = new JSONObject();
             params.put("device", device);
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            params.put("app_version", String.format("a%s", packageInfo.versionName));
+            params.put(kAppVersion, String.format("a%s", packageInfo.versionName));
             Log.i("DeviceParams", params.toString());
 
             Map<String, String> response = HttpUtil.httpPost(urlString, params);
             String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), URLs.USER_CONFIG_FILENAME);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
-            userJSON.put("password", password);
-            userJSON.put("is_login", response.get("code").equals("200"));
+            userJSON.put(URLs.kPassword, password);
+            userJSON.put(URLs.kIsLogin, response.get(URLs.kCode).equals("200"));
 
-            if (response.get("code").equals("400")) {
+            if (response.get(URLs.kCode).equals("400")) {
                 return "请检查网络环境";
-            } else if (response.get("code").equals("401")) {
-                return new JSONObject(response.get("body")).getString("info");
-            } else if (response.get("code").equals("408")) {
+            } else if (response.get(URLs.kCode).equals("401")) {
+                return new JSONObject(response.get(URLs.kBody)).getString(kInfo);
+            } else if (response.get(URLs.kCode).equals("408")) {
                 return "连接超时";
-            } else if (!response.get("code").equals("200")) {
-                return response.get("body");
+            } else if (!response.get(URLs.kCode).equals("200")) {
+                return response.get(URLs.kBody);
             }
             // FileUtil.dirPath 需要优先写入登录用户信息
-            JSONObject responseJSON = new JSONObject(response.get("body"));
+            JSONObject responseJSON = new JSONObject(response.get(URLs.kBody));
             userJSON = ApiHelper.merge(userJSON, responseJSON);
             FileUtil.writeFile(userConfigPath, userJSON.toString());
 
             String settingsConfigPath = FileUtil.dirPath(context, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
             if ((new File(settingsConfigPath)).exists()) {
                 JSONObject settingJSON = FileUtil.readConfigFile(settingsConfigPath);
-                userJSON.put("use_gesture_password", settingJSON.has("use_gesture_password") ? settingJSON.getBoolean("use_gesture_password") : false);
-                userJSON.put("gesture_password", settingJSON.has("gesture_password") ? settingJSON.getString("gesture_password") : "");
+                userJSON.put(URLs.kUseGesturePassword, settingJSON.has(URLs.kUseGesturePassword) ? settingJSON.getBoolean(URLs.kUseGesturePassword) : false);
+                userJSON.put(URLs.kGesturePassword, settingJSON.has(URLs.kGesturePassword) ? settingJSON.getString(URLs.kGesturePassword) : "");
             } else {
-                userJSON.put("use_gesture_password", false);
-                userJSON.put("gesture_password", "");
+                userJSON.put(URLs.kUseGesturePassword, false);
+                userJSON.put(URLs.kGesturePassword, "");
             }
 
-            JSONObject assetsJSON = userJSON.getJSONObject("assets");
-            userJSON.put("fonts_md5", assetsJSON.getString("fonts_md5"));
-            userJSON.put("images_md5", assetsJSON.getString("images_md5"));
-            userJSON.put("stylesheets_md5", assetsJSON.getString("stylesheets_md5"));
-            userJSON.put("javascripts_md5", assetsJSON.getString("javascripts_md5"));
+            JSONObject assetsJSON = userJSON.getJSONObject(URLs.kAssets);
+            userJSON.put(kFontsMd5, assetsJSON.getString(kFontsMd5));
+            userJSON.put(kImagesMd5, assetsJSON.getString(kImagesMd5));
+            userJSON.put(kStylesheetsMd5, assetsJSON.getString(kStylesheetsMd5));
+            userJSON.put(kJavaScriptsMd5, assetsJSON.getString(kJavaScriptsMd5));
 
             FileUtil.writeFile(userConfigPath, userJSON.toString());
 
             Log.i("CurrentUser", userJSON.toString());
-            if (response.get("code").equals("200")) {
+            if (response.get(URLs.kCode).equals("200")) {
                 // 第三方消息推送，设备标识
                 ApiHelper.pushDeviceToken(context, userJSON.getString("device_uuid"));
 
                 FileUtil.writeFile(settingsConfigPath, userJSON.toString());
             } else {
-                responseState = responseJSON.getString("info");
+                responseState = responseJSON.getString(kInfo);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -109,11 +120,11 @@ public class ApiHelper {
         Map<String, String> headers = ApiHelper.checkResponseHeader(urlString, assetsPath);
         Map<String, String> response = HttpUtil.httpGet(urlString, headers);
 
-        if (response.get("code").equals("200")) {
+        if (response.get(URLs.kCode).equals("200")) {
             try {
                 ApiHelper.storeResponseHeader(urlString, assetsPath, response);
 
-                FileUtil.writeFile(javascriptPath, response.get("body"));
+                FileUtil.writeFile(javascriptPath, response.get(URLs.kBody));
 
                 String searchItemsPath = String.format("%s.search_items", javascriptPath);
                 File searchItemsFile = new File(searchItemsPath);
@@ -149,8 +160,8 @@ public class ApiHelper {
             Map<String, String> headers = ApiHelper.checkResponseHeader(urlString, assetsPath);
 
             Map<String, String> response = HttpUtil.httpGet(urlKey, headers);
-            String statusCode = response.get("code");
-            retMap.put("code", statusCode);
+            String statusCode = response.get(URLs.kCode);
+            retMap.put(URLs.kCode, statusCode);
 
             String htmlName = HttpUtil.UrlToFileName(urlString);
             String htmlPath = String.format("%s/%s", assetsPath, htmlName);
@@ -159,16 +170,16 @@ public class ApiHelper {
             if (statusCode.equals("200")) {
                 ApiHelper.storeResponseHeader(urlKey, assetsPath, response);
 
-                String htmlContent = response.get("body");
+                String htmlContent = response.get(URLs.kBody);
                 htmlContent = htmlContent.replace("/javascripts/", String.format("%s/javascripts/", relativeAssetsPath));
                 htmlContent = htmlContent.replace("/stylesheets/", String.format("%s/stylesheets/", relativeAssetsPath));
                 htmlContent = htmlContent.replace("/images/", String.format("%s/images/", relativeAssetsPath));
                 FileUtil.writeFile(htmlPath, htmlContent);
             } else {
-                retMap.put("code", statusCode);
+                retMap.put(URLs.kCode, statusCode);
             }
         } catch (Exception e) {
-            retMap.put("code", "500");
+            retMap.put(URLs.kCode, "500");
             e.printStackTrace();
         }
 
@@ -182,12 +193,12 @@ public class ApiHelper {
             String urlString = String.format(URLs.API_RESET_PASSWORD_PATH, URLs.kBaseUrl, userID);
 
             Map<String, String> params = new HashMap<>();
-            params.put("password", newPassword);
+            params.put(URLs.kPassword, newPassword);
             retMap = HttpUtil.httpPost(urlString, params);
         } catch (Exception e) {
             e.printStackTrace();
-            retMap.put("code", "500");
-            retMap.put("body", e.getLocalizedMessage());
+            retMap.put(URLs.kCode, "500");
+            retMap.put(URLs.kBody, e.getLocalizedMessage());
         }
         return retMap;
     }
@@ -238,11 +249,11 @@ public class ApiHelper {
             if (headersJSON.has(urlKey)) {
                 headerJSON = (JSONObject) headersJSON.get(urlKey);
 
-                if (headerJSON.has("ETag")) {
-                    headers.put("ETag", headerJSON.getString("ETag"));
+                if (headerJSON.has(URLs.kETag)) {
+                    headers.put(URLs.kETag, headerJSON.getString(URLs.kETag));
                 }
-                if (headerJSON.has("Last-Modified")) {
-                    headers.put("Last-Modified", headerJSON.getString("Last-Modified"));
+                if (headerJSON.has(URLs.kLastModified)) {
+                    headers.put(URLs.kLastModified, headerJSON.getString(URLs.kLastModified));
                 }
             }
         } catch (JSONException e) {
@@ -270,11 +281,11 @@ public class ApiHelper {
 
             JSONObject headerJSON = new JSONObject();
 
-            if (response.containsKey("ETag")) {
-                headerJSON.put("ETag", response.get("ETag"));
+            if (response.containsKey(URLs.kETag)) {
+                headerJSON.put(URLs.kETag, response.get(URLs.kETag));
             }
-            if (response.containsKey("Last-Modified")) {
-                headerJSON.put("Last-Modified", response.get("Last-Modified"));
+            if (response.containsKey(URLs.kLastModified)) {
+                headerJSON.put(URLs.kLastModified, response.get(URLs.kLastModified));
             }
 
             headersJSON.put(urlKey, headerJSON);
@@ -323,7 +334,7 @@ public class ApiHelper {
             }
 
             URLConnection conn = url.openConnection();
-            String etag = conn.getHeaderField("ETag");
+            String etag = conn.getHeaderField(URLs.kETag);
 
             boolean isDownloaded = outputFile.exists() && headerJSON.has(urlString) && etag != null && !etag.isEmpty() && headerJSON.getString(urlString).equals(etag);
 
@@ -380,19 +391,19 @@ public class ApiHelper {
             String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), URLs.USER_CONFIG_FILENAME);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
-            param.put("user_id", userJSON.getInt("user_id"));
-            param.put("user_name", userJSON.getString("user_name"));
-            param.put("user_device_id", userJSON.getInt("user_device_id"));
+            param.put(kUserId, userJSON.getInt(kUserId));
+            param.put(kUserName, userJSON.getString(kUserName));
+            param.put(kUserDeviceId, userJSON.getInt(kUserDeviceId));
 
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            param.put("app_version", String.format("a%s", packageInfo.versionName));
+            param.put(kAppVersion, String.format("a%s", packageInfo.versionName));
 
             JSONObject params = new JSONObject();
             params.put("action_log", param);
 
             JSONObject userParams = new JSONObject();
-            userParams.put("user_name", userJSON.getString("user_name"));
-            userParams.put("user_pass", userJSON.getString("password"));
+            userParams.put(kUserName, userJSON.getString(kUserName));
+            userParams.put("user_pass", userJSON.getString(URLs.kPassword));
             params.put("user", userParams);
 
             String urlString = String.format(URLs.API_ACTION_LOG_PATH, URLs.kBaseUrl);
@@ -414,20 +425,20 @@ public class ApiHelper {
             String pushConfigPath = String.format("%s/%s", FileUtil.basePath(context), URLs.PUSH_CONFIG_FILENAME);
             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
 
-            if(pushJSON.has("push_valid") && pushJSON.getBoolean("push_valid") && pushJSON.has("push_device_token") && pushJSON
-                .getString("push_device_token").length() == 44) return true;
-            if(pushJSON.has("push_device_token") && pushJSON.getString("push_device_token").length() != 44) return false;
+            if(pushJSON.has(kPushValid) && pushJSON.getBoolean(kPushValid) && pushJSON.has(URLs.kPushDeviceToken) && pushJSON
+                .getString(URLs.kPushDeviceToken).length() == 44) return true;
+            if(pushJSON.has(URLs.kPushDeviceToken) && pushJSON.getString(URLs.kPushDeviceToken).length() != 44) return false;
 
-            if(pushJSON.has("push_device_token")) {
-                String urlString = String.format(URLs.API_PUSH_DEVICE_TOKEN_PATH, URLs.kBaseUrl, deviceUUID, pushJSON.getString("push_device_token"));
+            if(pushJSON.has(URLs.kPushDeviceToken)) {
+                String urlString = String.format(URLs.API_PUSH_DEVICE_TOKEN_PATH, URLs.kBaseUrl, deviceUUID, pushJSON.getString(URLs.kPushDeviceToken));
                 Map<String, String> response = HttpUtil.httpPost(urlString, new JSONObject());
-                JSONObject responseJSON = new JSONObject(response.get("body"));
+                JSONObject responseJSON = new JSONObject(response.get(URLs.kBody));
 
-                pushJSON.put("push_valid",
-                    responseJSON.has("valid") && responseJSON.getBoolean("valid"));
+                pushJSON.put(kPushValid,
+                    responseJSON.has(kValid) && responseJSON.getBoolean(kValid));
                 FileUtil.writeFile(pushConfigPath, pushJSON.toString());
 
-                return pushJSON.has("push_valid") && pushJSON.getBoolean("push_valid");
+                return pushJSON.has(kPushValid) && pushJSON.getBoolean(kPushValid);
             } else {
                 return false;
             }
@@ -450,15 +461,15 @@ public class ApiHelper {
     public static void barCodeScan(Context mContext, String groupID, String roleID, String userNum, String storeID, String codeInfo, String codeType) {
         try {
             JSONObject params = new JSONObject();
-            params.put("code_info", codeInfo);
-            params.put("code_type", codeType);
+            params.put(URLs.kCodeInfo, codeInfo);
+            params.put(URLs.kCodeType, codeType);
 
             String urlString = String.format(URLs.API_BARCODE_SCAN_PATH, URLs.kBaseUrl, groupID, roleID, userNum, storeID, codeInfo, codeType);
             Map<String, String> response = HttpUtil.httpGet(urlString, new HashMap());
             // Map<String, String> response = HttpUtil.httpPost(urlString, params);
 
-            String responseString = response.get("body");
-            if (!response.get("code").equals("200") && !response.get("code").equals("201")) {
+            String responseString = response.get(URLs.kBody);
+            if (!response.get(URLs.kCode).equals("200") && !response.get(URLs.kCode).equals("201")) {
                 responseString = "{\"chart\": \"[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]\", \"tabs\": [{ title: \"提示\", table: { length: 1, \"1\": [\"获取数据失败...\"]}}]}";
             }
 

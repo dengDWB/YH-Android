@@ -67,10 +67,10 @@ public class LocalNotificationService extends Service {
     notificationJSON = FileUtil.readConfigFile(notificationPath);
     try {
       String currentUIVersion = URLs.currentUIVersion(mContext);
-      kpiUrl = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, userJSON.getString("group_id"), userJSON.getString("role_id"));
-      analyseUrl = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, userJSON.getString("role_id"));
-      appUrl = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, userJSON.getString("role_id"));
-      messageUrl = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, userJSON.getString("role_id"), userJSON.getString("group_id"), userJSON.getString("user_id"));
+      kpiUrl = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, userJSON.getString(URLs.kGroupId), userJSON.getString(URLs.kRoleId));
+      analyseUrl = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, userJSON.getString(URLs.kRoleId));
+      appUrl = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, userJSON.getString(URLs.kRoleId));
+      messageUrl = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, userJSON.getString(URLs.kRoleId), userJSON.getString(URLs.kGroupId), userJSON.getString("user_id"));
       thursdaySayUrl = String.format(URLs.THURSDAY_SAY_PATH, URLs.kBaseUrl, currentUIVersion);
     } catch (JSONException e) {
       e.printStackTrace();
@@ -99,16 +99,16 @@ public class LocalNotificationService extends Service {
    */
   private void processDataCount() {
     try {
-      kpiCount = getDataCount("tab_kpi", kpiUrl);
-      analyseCount = getDataCount("tab_analyse", analyseUrl);
-      appCount = getDataCount("tab_app", appUrl);
-      messageCount = getDataCount("tab_message", messageUrl);
-      thursdaySayCount = getDataCount("setting_thursday_say", thursdaySayUrl);
+      kpiCount = getDataCount(URLs.kTabKpi, kpiUrl);
+      analyseCount = getDataCount(URLs.kTabAnalyse, analyseUrl);
+      appCount = getDataCount(URLs.kTabApp, appUrl);
+      messageCount = getDataCount(URLs.kTabMessage, messageUrl);
+      thursdaySayCount = getDataCount(URLs.kSettingThursdaySay, thursdaySayUrl);
 
 			/*
 			 * 遍历获取 Tab 栏上需要显示的通知数量 ("tab_*" 的值)
 			 */
-      String[] typeString = {"tab_kpi", "tab_analyse", "tab_app", "tab_message", "setting_thursday_say"};
+      String[] typeString = {URLs.kTabKpi, URLs.kTabKpi, URLs.kTabKpi, URLs.kTabKpi, URLs.kSettingThursdaySay};
       int[] typeCount = {kpiCount, analyseCount, appCount, messageCount, thursdaySayCount};
       for (int i = 0; i < typeString.length; i++) {
         notificationJSON.put(typeString[i], Math.abs(typeCount[i] - notificationJSON.getInt(typeString[i] + "_last")));
@@ -117,7 +117,7 @@ public class LocalNotificationService extends Service {
 
       if ((new File(pgyerVersionPath)).exists()) {
         pgyerJSON = FileUtil.readConfigFile(pgyerVersionPath);
-        JSONObject responseData = pgyerJSON.getJSONObject("data");
+        JSONObject responseData = pgyerJSON.getJSONObject(URLs.kData);
         pgyerCode = responseData.getString("versionCode");
         packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
         versionCode = String.valueOf(packageInfo.versionCode);
@@ -127,12 +127,12 @@ public class LocalNotificationService extends Service {
         updataCount = -1;
       }
 
-      passwordCount = userJSON.getString("password").equals(URLs.MD5(URLs.kInitPassword)) ? 1 : -1;
-      notificationJSON.put("setting_password", passwordCount);
-      notificationJSON.put("setting_pgyer", updataCount);
+      passwordCount = userJSON.getString(URLs.kPassword).equals(URLs.MD5(URLs.kInitPassword)) ? 1 : -1;
+      notificationJSON.put(URLs.kSettingPassword, passwordCount);
+      notificationJSON.put(URLs.kSettingPgyer, updataCount);
 
-      int settingCount = (notificationJSON.getInt("setting_password") > 0 || notificationJSON.getInt("setting_pgyer") > 0 || notificationJSON.getInt("setting_thursday_say") > 0) ? 1 : 0;
-      notificationJSON.put("setting", settingCount);
+      int settingCount = (notificationJSON.getInt(URLs.kSettingPassword) > 0 || notificationJSON.getInt(URLs.kSettingPgyer) > 0 || notificationJSON.getInt(URLs.kSettingThursdaySay) > 0) ? 1 : 0;
+      notificationJSON.put(URLs.kSetting, settingCount);
 
       FileUtil.writeFile(notificationPath, notificationJSON.toString());
     } catch (JSONException | IOException | PackageManager.NameNotFoundException e) {
@@ -151,7 +151,7 @@ public class LocalNotificationService extends Service {
 
     int lastCount = notificationJSON.getInt(keyLastName);
 
-    if (response.get("code").equals("200")) {
+    if (response.get(URLs.kCode).equals("200")) {
       String strRegex = "\\bMobileBridge.setDashboardDataCount.+";
       String countRegex = "\\d+";
       Pattern patternString = Pattern.compile(strRegex);

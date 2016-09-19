@@ -35,22 +35,22 @@ public class FileUtil {
             String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), URLs.USER_CONFIG_FILENAME);
             if ((new File(userConfigPath)).exists()) {
                 JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
-                if (!userJSON.has("use_gesture_password")) {
-                    userJSON.put("use_gesture_password", false);
+                if (!userJSON.has(URLs.kUseGesturePassword)) {
+                    userJSON.put(URLs.kUseGesturePassword, false);
                     Log.i("ScreenLock", "use_gesture_password not set");
                 }
-                if (!userJSON.has("gesture_password")) {
-                    userJSON.put("gesture_password", "");
+                if (!userJSON.has(URLs.kGesturePassword)) {
+                    userJSON.put(URLs.kGesturePassword, "");
                     Log.i("ScreenLock", "gesture_password not set");
                 }
-                if (!userJSON.has("is_login")) {
-                    userJSON.put("is_login", false);
+                if (!userJSON.has(URLs.kIsLogin)) {
+                    userJSON.put(URLs.kIsLogin, false);
                     Log.i("ScreenLock", "is_login not set");
                 }
 
                 FileUtil.writeFile(userConfigPath, userJSON.toString());
 
-                return userJSON.getBoolean("is_login") && userJSON.getBoolean("use_gesture_password") && !userJSON.getString("gesture_password").isEmpty();
+                return userJSON.getBoolean(URLs.kIsLogin) && userJSON.getBoolean(URLs.kUseGesturePassword) && !userJSON.getString(URLs.kGesturePassword).isEmpty();
             } else {
                 Log.i("ScreenLock", "userConfigPath not exist");
 

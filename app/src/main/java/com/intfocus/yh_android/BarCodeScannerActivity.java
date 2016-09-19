@@ -6,8 +6,12 @@ import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import com.intfocus.yh_android.util.URLs;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import me.dm7.barcodescanner.zbar.Result;
 import me.dm7.barcodescanner.zbar.ZBarScannerView;
 
@@ -69,8 +73,8 @@ public class BarCodeScannerActivity extends BaseActivity implements ZBarScannerV
       }
       else {
         Intent intent = new Intent(mContext, BarCodeResultActivity.class);
-        intent.putExtra("code_info", rawResult.getContents());
-        intent.putExtra("code_type", rawResult.getBarcodeFormat().getName());
+        intent.putExtra(URLs.kCodeInfo, rawResult.getContents());
+        intent.putExtra(URLs.kCodeType, rawResult.getBarcodeFormat().getName());
         mContext.startActivity(intent);
       }
     }

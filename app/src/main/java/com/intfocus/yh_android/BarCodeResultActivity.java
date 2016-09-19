@@ -7,20 +7,24 @@ import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageView;
+
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.URLs;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by lijunjie on 16/6/10.
  */
 public class BarCodeResultActivity extends BaseActivity {
+  public final static String kId = "id";
   private String htmlContent, htmlPath, cachedPath;
   private String codeInfo, codeType, groupID, roleID, userNum;
   private String storeID;
@@ -51,19 +55,19 @@ public class BarCodeResultActivity extends BaseActivity {
 
     try {
       Intent intent = getIntent();
-      codeInfo = intent.getStringExtra("code_info");
-      codeType = intent.getStringExtra("code_type");
-      groupID = user.getString("group_id");
-      roleID = user.getString("role_id");
+      codeInfo = intent.getStringExtra(URLs.kCodeInfo);
+      codeType = intent.getStringExtra(URLs.kCodeType);
+      groupID = user.getString(URLs.kGroupId);
+      roleID = user.getString(URLs.kRoleId);
       userNum = user.getString("user_num");
 
       /*
        * 初始化默认选中门店（第一家）
        */
       JSONObject cachedJSON = FileUtil.readConfigFile(cachedPath);
-      if((!cachedJSON.has("store") || !cachedJSON.getJSONObject("store").has("id")) &&
-          user.has("store_ids") && user.getJSONArray("store_ids").length() > 0) {
-        cachedJSON.put("store", user.getJSONArray("store_ids").get(0));
+      if((!cachedJSON.has(URLs.kStore) || !cachedJSON.getJSONObject(URLs.kStore).has(kId)) &&
+          user.has(URLs.kStoreIds) && user.getJSONArray(URLs.kStoreIds).length() > 0) {
+        cachedJSON.put(URLs.kStore, user.getJSONArray(URLs.kStoreIds).get(0));
         FileUtil.writeFile(cachedPath, cachedJSON.toString());
       }
 
@@ -71,12 +75,12 @@ public class BarCodeResultActivity extends BaseActivity {
        * 商品条形码写入缓存
        */
       JSONObject cachedCodeJSON = new JSONObject();
-      cachedCodeJSON.put("code_info", codeInfo);
-      cachedCodeJSON.put("code_type", codeType);
+      cachedCodeJSON.put(URLs.kCodeInfo, codeInfo);
+      cachedCodeJSON.put(URLs.kCodeType, codeType);
       cachedJSON.put("barcode", cachedCodeJSON);
       FileUtil.writeFile(cachedPath, cachedJSON.toString());
 
-      storeID = cachedJSON.getJSONObject("store").getString("id");
+      storeID = cachedJSON.getJSONObject(URLs.kStore).getString(kId);
     } catch (JSONException e) {
       e.printStackTrace();
     } catch (Exception e) {

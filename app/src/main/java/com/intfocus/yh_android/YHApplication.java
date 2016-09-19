@@ -116,7 +116,7 @@ public class YHApplication extends Application {
         FileUtil.checkAssets(mContext, URLs.kStylesheets, true);
         FileUtil.checkAssets(mContext, URLs.kJavaScripts, true);
         FileUtil.checkAssets(mContext, URLs.kBarCodeScan, false);
-        FileUtil.checkAssets(mContext, URLs.kAdverttisement, false);
+        FileUtil.checkAssets(mContext, URLs.kAdvertisement, false);
 
         /*
          *  手机待机再激活时发送开屏广播
@@ -164,13 +164,13 @@ public class YHApplication extends Application {
 
             String assetZipPath;
             File assetZipFile;
-            String[] assetsName = {URLs.kAssets,URLs.kLoding,URLs.kFonts,URLs.kImages,URLs.kStylesheets,URLs.kJavaScripts,URLs.kBarCodeScan,URLs.kAdverttisement};
+            String[] assetsName = {URLs.kAssets,URLs.kLoding,URLs.kFonts,URLs.kImages,URLs.kStylesheets,URLs.kJavaScripts,URLs.kBarCodeScan,URLs.kAdvertisement};
 
             for (String string : assetsName) {
                 assetZipPath = String.format("%s/%s.zip", sharedPath, string);
                 assetZipFile = new File(assetZipPath);
                 if (!assetZipFile.exists()) { assetZipFile.delete(); }
-                FileUtil.copyAssetFile(mContext, string, assetZipPath);
+                FileUtil.copyAssetFile(mContext, String.format("%s.zip",string), assetZipPath);
             }
             FileUtil.writeFile(versionConfigPath, packageInfo.versionName);
         }

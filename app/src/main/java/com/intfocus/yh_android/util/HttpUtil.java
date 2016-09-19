@@ -25,6 +25,13 @@ import okhttp3.Response;
 
 public class HttpUtil {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    public static final String kUserAgent = "User-Agent";
+    public static final String kContentType ="Content-Type";
+    public static final String kFailedToConnectTo = "failed to connect to";
+    public static final String kUnauthorized = "unauthorized";
+    public static final String kUnableToResolveHost = "unable to resolve host";
+    public static final String kApplicationJson = "application/json";
+    public static final String kAccept = "Accept";
 
     /**
      * ִ执行一个HTTP GET请求，返回请求响应的HTML
@@ -43,13 +50,13 @@ public class HttpUtil {
                 .build();
         okhttp3.Request.Builder builder = new Request.Builder()
                 .url(urlString)
-                .addHeader("User-Agent", HttpUtil.webViewUserAgent());
+                .addHeader(kUserAgent, HttpUtil.webViewUserAgent());
 
-        if (headers.containsKey("ETag")) {
-            builder = builder.addHeader("IF-None-Match", headers.get("ETag"));
+        if (headers.containsKey(URLs.kETag)) {
+            builder = builder.addHeader("IF-None-Match", headers.get(URLs.kETag));
         }
-        if (headers.containsKey("Last-Modified")) {
-            builder = builder.addHeader("If-Modified-Since", headers.get("Last-Modified"));
+        if (headers.containsKey(URLs.kLastModified)) {
+            builder = builder.addHeader("If-Modified-Since", headers.get(URLs.kLastModified));
         }
         Response response;
         Request request = builder.build();
@@ -60,10 +67,10 @@ public class HttpUtil {
             for (int i = 0, len = responseHeaders.size(); i < len; i++) {
                 retMap.put(responseHeaders.name(i), responseHeaders.value(i));
                 // Log.i("HEADER", String.format("Key : %s, Value: %s", responseHeaders.name(i), responseHeaders.value(i)));
-                isJSON = responseHeaders.name(i).equalsIgnoreCase("Content-Type") && responseHeaders.value(i).contains("application/json");
+                isJSON = responseHeaders.name(i).equalsIgnoreCase(kContentType) && responseHeaders.value(i).contains(kApplicationJson);
             }
-            retMap.put("code", String.format("%d", response.code()));
-            retMap.put("body", response.body().string());
+            retMap.put(URLs.kCode, String.format("%d", response.code()));
+            retMap.put(URLs.kBody, response.body().string());
             LogUtil.d("BODY", retMap.get("body"));
 
             if(isJSON) {
@@ -75,22 +82,22 @@ public class HttpUtil {
             if(e != null && e.getMessage() != null) {
                 LogUtil.d("UnknownHostException2", e.getMessage());
             }
-            retMap.put("code", "400");
-            retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+            retMap.put(URLs.kCode, "400");
+            retMap.put(URLs.kBody, "{\"info\": \"请检查网络环境！\"}");
         } catch (Exception e) {
             // Default Response
-            retMap.put("code", "400");
-            retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+            retMap.put(URLs.kCode, "400");
+            retMap.put(URLs.kBody, "{\"info\": \"请检查网络环境！\"}");
 
             if(e != null && e.getMessage() != null) {
                 String errorMessage = e.getMessage().toLowerCase();
                 LogUtil.d("Exception", errorMessage);
-                if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
-                    retMap.put("code", "400");
-                    retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
-                } else if (errorMessage.contains("unauthorized")) {
-                    retMap.put("code", "401");
-                    retMap.put("body", "{\"info\": \"用户名或密码错误\"}");
+                if (errorMessage.contains(kUnableToResolveHost) || errorMessage.contains(kFailedToConnectTo)) {
+                    retMap.put(URLs.kCode, "400");
+                    retMap.put(URLs.kBody, "{\"info\": \"请检查网络环境！\"}");
+                } else if (errorMessage.contains(kUnauthorized)) {
+                    retMap.put(URLs.kCode, "401");
+                    retMap.put(URLs.kBody, "{\"info\": \"用户名或密码错误\"}");
                 }
             }
         }
@@ -143,9 +150,9 @@ public class HttpUtil {
         try {
             request = requestBuilder
                     .url(urlString)
-                    .addHeader("Accept", "application/json")
-                    .addHeader("Content-type", "application/json")
-                    .addHeader("User-Agent", HttpUtil.webViewUserAgent())
+                    .addHeader(kAccept, kApplicationJson)
+                    .addHeader(kContentType, kApplicationJson)
+                    .addHeader(kUserAgent, HttpUtil.webViewUserAgent())
                     .build();
             response = client.newCall(request).execute();
 
@@ -157,9 +164,8 @@ public class HttpUtil {
                     responseHeaders.value(i)));
             }
 
-            retMap.put("code", String.format("%d", response.code()));
-            retMap.put("body", response.body().string());
-            Log.i("code",response.code()+"");
+            retMap.put(URLs.kCode, String.format("%d", response.code()));
+            retMap.put(URLs.kBody, response.body().string());
 
             LogUtil.d("code", retMap.get("code"));
             LogUtil.d("responseBody", retMap.get("body"));
@@ -167,22 +173,22 @@ public class HttpUtil {
             if(e != null && e.getMessage() != null) {
                 LogUtil.d("UnknownHostException", e.getMessage());
             }
-            retMap.put("code", "400");
-            retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+            retMap.put(URLs.kCode, "400");
+            retMap.put(URLs.kBody, "{\"info\": \"请检查网络环境！\"}");
         } catch (Exception e) {
             // Default Response
-            retMap.put("code", "400");
-            retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+            retMap.put(URLs.kCode, "400");
+            retMap.put(URLs.kBody, "{\"info\": \"请检查网络环境！\"}");
 
             if(e != null && e.getMessage() != null) {
                 String errorMessage = e.getMessage().toLowerCase();
                 LogUtil.d("Exception", errorMessage);
-                if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
-                    retMap.put("code", "400");
-                    retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
-                } else if (errorMessage.contains("unauthorized")) {
-                    retMap.put("code", "401");
-                    retMap.put("body", "{\"info\": \"用户名或密码错误\"}");
+                if (errorMessage.contains(kUnableToResolveHost) || errorMessage.contains(kFailedToConnectTo)) {
+                    retMap.put(URLs.kCode, "400");
+                    retMap.put(URLs.kBody, "{\"info\": \"请检查网络环境！\"}");
+                } else if (errorMessage.contains(kUnauthorized)) {
+                    retMap.put(URLs.kCode, "401");
+                    retMap.put(URLs.kBody, "{\"info\": \"用户名或密码错误\"}");
                 }
             }
         }
@@ -212,9 +218,9 @@ public class HttpUtil {
         try {
             request = requestBuilder
                     .url(urlString)
-                    .addHeader("Accept", "application/json")
-                    .addHeader("Content-type", "application/json")
-                    .addHeader("User-Agent", HttpUtil.webViewUserAgent())
+                    .addHeader(kAccept, kApplicationJson)
+                    .addHeader(kContentType, kApplicationJson)
+                    .addHeader(kUserAgent, HttpUtil.webViewUserAgent())
                     .build();
             response = client.newCall(request).execute();
             Headers responseHeaders = response.headers();
@@ -223,7 +229,7 @@ public class HttpUtil {
                 LogUtil.d("HEADER", String.format("Key : %s, Value: %s", responseHeaders.name(i),
                     responseHeaders.value(i)));
             }
-            retMap.put("code", String.format("%d", response.code()));
+            retMap.put(URLs.kCode, String.format("%d", response.code()));
             retMap.put("body", response.body().string());
 
             LogUtil.d("code", retMap.get("code"));
@@ -232,21 +238,21 @@ public class HttpUtil {
             if(e != null && e.getMessage() != null) {
                 LogUtil.d("UnknownHostException2", e.getMessage());
             }
-            retMap.put("code", "400");
-            retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+            retMap.put(URLs.kCode, "400");
+            retMap.put(URLs.kBody, "{\"info\": \"请检查网络环境！\"}");
         } catch (Exception e) {
-            retMap.put("code", "400");
-            retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
+            retMap.put(URLs.kCode, "400");
+            retMap.put(URLs.kBody, "{\"info\": \"请检查网络环境！\"}");
 
             if(e != null && e.getMessage() != null) {
                 String errorMessage = e.getMessage().toLowerCase();
                 LogUtil.d("Exception2", errorMessage);
-                if (errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
-                    retMap.put("code", "400");
-                    retMap.put("body", "{\"info\": \"请检查网络环境！\"}");
-                } else if (errorMessage.contains("unauthorized")) {
-                    retMap.put("code", "401");
-                    retMap.put("body", "{\"info\": \"用户名或密码错误\"}");
+                if (errorMessage.contains(kUnableToResolveHost) || errorMessage.contains("failed to connect to")) {
+                    retMap.put(URLs.kCode, "400");
+                    retMap.put(URLs.kBody, "{\"info\": \"请检查网络环境！\"}");
+                } else if (errorMessage.contains(kUnauthorized)) {
+                    retMap.put(URLs.kCode, "401");
+                    retMap.put(URLs.kBody, "{\"info\": \"用户名或密码错误\"}");
                 }
             }
         }
@@ -277,9 +283,9 @@ public class HttpUtil {
     private static void dealWithException(String errorMessage, Map<String, String> retMap) {
         LogUtil.d("DDEBUG", errorMessage);
         errorMessage = errorMessage.toLowerCase();
-        if (errorMessage.contains("timed out") || errorMessage.contains("unable to resolve host") || errorMessage.contains("failed to connect to")) {
-            retMap.put("code", "408");
-            retMap.put("body", "{\"info\": \"连接超时,请检查网络环境\"}");
+        if (errorMessage.contains("timed out") || errorMessage.contains(kUnableToResolveHost) || errorMessage.contains(kFailedToConnectTo)) {
+            retMap.put(URLs.kCode, "408");
+            retMap.put(URLs.kBody, "{\"info\": \"连接超时,请检查网络环境\"}");
         }
     }
 
