@@ -5,7 +5,7 @@ android {
     buildToolsVersion '22.0.1'
 
     defaultConfig {
-        applicationId 'com.intfocus.yh_android'
+        applicationId 'com.intfocus.yonghuitest'
         minSdkVersion 14
         targetSdkVersion 22
     }
