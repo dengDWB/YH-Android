@@ -17,6 +17,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.LogUtil;
+import com.intfocus.yh_android.util.URLs;
+
 import java.io.IOException;
 import java.text.Collator;
 import java.util.ArrayList;
@@ -42,8 +44,8 @@ public class ReportSelectorAcitity extends BaseActivity  {
     setContentView(R.layout.activity_report_selector);
 
     Intent intent = getIntent();
-    groupID = intent.getIntExtra("groupID", 0);
-    bannerName = intent.getStringExtra("bannerName");
+    groupID = intent.getIntExtra(URLs.kGroupId, 0);
+    bannerName = intent.getStringExtra(URLs.kBannerName);
     reportID = intent.getStringExtra("reportID");
     templateID = intent.getStringExtra("templateID");
 

@@ -81,6 +81,10 @@ import java.util.Map;
  */
 public class BaseActivity extends Activity {
 
+    public final static String kLoading = "loading";
+    public final static String kPath = "path";
+    public final static String kMessage = "message";
+    public final static String kVersionCode = "versionCode";
     protected String sharedPath;
     protected String relativeAssetsPath;
     protected String urlStringForDetecting;
@@ -113,14 +117,14 @@ public class BaseActivity extends Activity {
         sharedPath = FileUtil.sharedPath(mContext);
         assetsPath = sharedPath;
         urlStringForDetecting = URLs.kBaseUrl;
-        relativeAssetsPath = "assets";
-        urlStringForLoading = loadingPath("loading");
+        relativeAssetsPath = URLs.kAssets;
+        urlStringForLoading = loadingPath(kLoading);
 
         String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
         if ((new File(userConfigPath)).exists()) {
             try {
                 user = FileUtil.readConfigFile(userConfigPath);
-                if (user.has("is_login") && user.getBoolean("is_login")) {
+                if (user.has(URLs.kIsLogin) && user.getBoolean(URLs.kIsLogin)) {
                     userID = user.getInt("user_id");
                     assetsPath = FileUtil.dirPath(mContext, URLs.HTML_DIRNAME);
                     urlStringForDetecting = String.format(URLs.API_DEVICE_STATE_PATH, URLs.kBaseUrl, user.getInt("user_device_id"));
@@ -154,7 +158,7 @@ public class BaseActivity extends Activity {
                             String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.PUSH_CONFIG_FILENAME);
                             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
                             pushJSON.put("push_valid", false);
-                            pushJSON.put("push_device_token", registrationId);
+                            pushJSON.put(URLs.kPushDeviceToken, registrationId);
                             FileUtil.writeFile(pushConfigPath, pushJSON.toString());
                         } catch (JSONException | IOException e) {
                             e.printStackTrace();
@@ -307,8 +311,8 @@ public class BaseActivity extends Activity {
              * 用户行为记录, 单独异常处理，不可影响用户体验
              */
             try {
-                logParams.put("action", "刷新/浏览器");
-                logParams.put("obj_title", urlString);
+                logParams.put(URLs.kAction, "刷新/浏览器");
+                logParams.put(URLs.kObjTitle, urlString);
                 new Thread(mRunnableForLogger).start();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -333,7 +337,7 @@ public class BaseActivity extends Activity {
         public void run() {
             Map<String, String> response = HttpUtil.httpGet(urlStringForDetecting,
                 new HashMap<String, String>());
-            int statusCode = Integer.parseInt(response.get("code"));
+            int statusCode = Integer.parseInt(response.get(URLs.kCode));
             if (statusCode == 200 && !urlStringForDetecting.equals(URLs.kBaseUrl)) {
                 try {
                     JSONObject json = new JSONObject(response.get("body"));
@@ -401,7 +405,7 @@ public class BaseActivity extends Activity {
                     public void onClick(DialogInterface dialog, int which) {
                         try {
                             JSONObject configJSON = new JSONObject();
-                            configJSON.put("is_login", false);
+                            configJSON.put(URLs.kIsLogin, false);
 
                             String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
                             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
@@ -437,11 +441,11 @@ public class BaseActivity extends Activity {
                 HandlerWithAPI mHandlerWithAPI = new HandlerWithAPI(weakActivity.get());
                 mHandlerWithAPI.setVariables(mWebView, mSharedPath);
                 Message message = mHandlerWithAPI.obtainMessage();
-                message.what = Integer.parseInt(response.get("code"));
-                message.obj = response.get("path");
+                message.what = Integer.parseInt(response.get(URLs.kCode));
+                message.obj = response.get(kPath);
 
                 LogUtil.d("mRunnableWithAPI",
-                    String.format("code: %s, path: %s", response.get("code"), response.get("path")));
+                    String.format("code: %s, path: %s", response.get(URLs.kCode), response.get(kPath)));
                 mHandlerWithAPI.sendMessage(message);
                 Looper.loop();
             }
@@ -535,7 +539,7 @@ public class BaseActivity extends Activity {
         @Override
         public void run() {
             try {
-                String action = logParams.getString("action");
+                String action = logParams.getString(URLs.kAction);
                 if(action == null) {
                     return;
                 }
@@ -607,7 +611,7 @@ public class BaseActivity extends Activity {
              */
             try {
                 logParams = new JSONObject();
-                logParams.put("action", "点击/设置页面/检测更新");
+                logParams.put(URLs.kAction, "点击/设置页面/检测更新");
                 new Thread(mRunnableForLogger).start();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -630,20 +634,20 @@ public class BaseActivity extends Activity {
                 try {
                     if(new File(pgyerVersionPath).exists()) {
                         JSONObject currentVersionJSON = FileUtil.readConfigFile(pgyerVersionPath);
-                        message = currentVersionJSON.getString("message");
+                        message = currentVersionJSON.getString(kMessage);
 
                         if (message.isEmpty()) {
-                            JSONObject responseData = currentVersionJSON.getJSONObject("data");
-                            currentVersionCode = responseData.getString("versionCode");
+                            JSONObject responseData = currentVersionJSON.getJSONObject(URLs.kData);
+                            currentVersionCode = responseData.getString(kVersionCode);
                         }
                     }
 
                     JSONObject response = new JSONObject(result);
-                    message = response.getString("message");
+                    message = response.getString(kMessage);
                     if (message.isEmpty()) {
-                        JSONObject responseVersionJSON = response.getJSONObject("data");
+                        JSONObject responseVersionJSON = response.getJSONObject(URLs.kData);
                         message = responseVersionJSON.getString("releaseNote");
-                        versionCode = responseVersionJSON.getString("versionCode");
+                        versionCode = responseVersionJSON.getString(kVersionCode);
                         versionName = responseVersionJSON.getString("versionName");
 
                         FileUtil.writeFile(pgyerVersionPath, result);
@@ -766,13 +770,13 @@ public class BaseActivity extends Activity {
      * to do
      */
     void checkAssetsUpdated(boolean shouldReloadUIThread) {
-        checkAssetUpdated(shouldReloadUIThread, "loading", false);
-        checkAssetUpdated(shouldReloadUIThread, "fonts", true);
-        checkAssetUpdated(shouldReloadUIThread, "images", true);
-        checkAssetUpdated(shouldReloadUIThread, "stylesheets", true);
-        checkAssetUpdated(shouldReloadUIThread, "javascripts", true);
-        checkAssetUpdated(shouldReloadUIThread, "BarCodeScan", false);
-        checkAssetUpdated(shouldReloadUIThread, "advertisement", false);
+        checkAssetUpdated(shouldReloadUIThread, kLoading, false);
+        checkAssetUpdated(shouldReloadUIThread, URLs.kFonts, true);
+        checkAssetUpdated(shouldReloadUIThread, URLs.kImages, true);
+        checkAssetUpdated(shouldReloadUIThread, URLs.kStylesheets, true);
+        checkAssetUpdated(shouldReloadUIThread, URLs.kJavaScripts, true);
+        checkAssetUpdated(shouldReloadUIThread, URLs.kBarCodeScan, false);
+        checkAssetUpdated(shouldReloadUIThread, URLs.kAdvertisement, false);
     }
 
     private boolean checkAssetUpdated(boolean shouldReloadUIThread, String assetName, boolean isInAssets) {
@@ -934,15 +938,15 @@ public class BaseActivity extends Activity {
         //badgeView.setText(badgerCount);  //暂不需要计数
         badgeView.setBadgePosition(BadgeView.POSITION_TOP_RIGHT);
         switch (type) {
-            case "setting":
+            case URLs.kSetting:
                 badgeView.setBadgeMargin(20, 15);
                 break;
             case "tab":
                 badgeView.setBadgeMargin(45, 0);
                 break;
-            case "setting_pgyer":
-            case "setting_password":
-            case "setting_thursday_say":
+            case URLs.kSettingPgyer:
+            case URLs.kSettingPassword:
+            case URLs.kSettingThursdaySay:
                 badgeView.setBadgePosition(BadgeView.POSITION_TOP_LEFT);
                 break;
             case "user":
