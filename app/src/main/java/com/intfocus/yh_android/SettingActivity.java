@@ -162,15 +162,20 @@ public class SettingActivity extends BaseActivity {
 
             if (new File(gravatarJsonPath).exists()) {
                 JSONObject gravatarJson = new JSONObject(FileUtil.readFile(gravatarJsonPath));
-                gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarJson.getString(URLs.kName));
                 gravatarFileName = gravatarJson.getString(URLs.kName);
+                gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarFileName);
                 String gravatarUrl = user.getString(kGravatar);
                 String gravatarFileName1 = gravatarUrl.substring(gravatarUrl.lastIndexOf("/")+1, gravatarUrl.length());
-                if (!(gravatarFileName.equals(gravatarFileName1))) {
-                    gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarFileName1);
-                    gravatarFileName = gravatarFileName1;
-                    httpGetBitmap(gravatarUrl, true);
-                    return;
+                //对比user.plist中gravatar字段的时间戳和gravatar.json中name时间戳大于则下载网上的图片
+                long gravatarFileNameInt1 = Long.parseLong(gravatarFileName1.replace(".jpg","").replace(PrivateURLs.kAppCode + user.getString(URLs.kUserNum)+"_", ""));
+                long gravatarFileNameInt = Long.parseLong(gravatarFileName.replace(".jpg","").replace(PrivateURLs.kAppCode + user.getString(URLs.kUserNum)+"_",""));
+                if (gravatarFileNameInt1 > gravatarFileNameInt) {
+                    if (!(gravatarFileName.equals(gravatarFileName1))) {
+                        gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarFileName1);
+                        gravatarFileName = gravatarFileName1;
+                        httpGetBitmap(gravatarUrl, true);
+                        return;
+                    }
                 }
                 Bitmap bitmap = BitmapFactory.decodeFile(gravatarImgPath);
                 mIconImageView.setImageBitmap(bitmap);
@@ -222,12 +227,13 @@ public class SettingActivity extends BaseActivity {
                 jsonObject = new JSONObject();
             }
 
-            jsonObject.put(URLs.kName, URLs.kName);
+            jsonObject.put(URLs.kName, name);
             jsonObject.put("upload_state", upload_state);
             if (!gravatar_id.equals("")) {
                 jsonObject.put(kGravatarId, gravatar_id);
             }
             FileUtil.writeFile(path, jsonObject.toString());
+            Log.i("upload", FileUtil.readFile(path));
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -426,9 +432,9 @@ public class SettingActivity extends BaseActivity {
     private void uploadImg() {
         try {
             OkHttpClient client = new OkHttpClient.Builder()
-                    .connectTimeout(3, TimeUnit.SECONDS)
-                    .writeTimeout(3, TimeUnit.SECONDS)
-                    .readTimeout(3, TimeUnit.SECONDS)
+                    .connectTimeout(5, TimeUnit.SECONDS)
+                    .writeTimeout(5, TimeUnit.SECONDS)
+                    .readTimeout(5, TimeUnit.SECONDS)
                     .build();
 
             File file = new File(gravatarImgPath);
@@ -446,7 +452,7 @@ public class SettingActivity extends BaseActivity {
             client.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-
+                    uploadImg();
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -459,17 +465,19 @@ public class SettingActivity extends BaseActivity {
                 public void onResponse(Call call, Response response) throws IOException {
                     if (response.code() == 201) {
                         try {
+                            JSONObject json = new JSONObject(response.body().string());
+                            writeJson(gravatarJsonPath, gravatarFileName, true, json.getString(kGravatarId), false);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     toast("上传成功");
                                 }
                             });
-                            JSONObject json = new JSONObject(response.body().string());
-                            writeJson(gravatarJsonPath, gravatarFileName, true, json.getString(kGravatarId), false);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                    } else {
+                        uploadImg();
                     }
                 }
             });
