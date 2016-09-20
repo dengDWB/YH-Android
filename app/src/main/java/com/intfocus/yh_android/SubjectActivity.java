@@ -72,8 +72,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
          * JSON Data
          */
         try {
-            groupID = user.getInt("group_id");
-            userNum = user.getString("user_num");
+            groupID = user.getInt(URLs.kGroupId);
+            userNum = user.getString(URLs.kUserNum);
         } catch (JSONException e) {
             e.printStackTrace();
             groupID = -2;
@@ -114,11 +114,11 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
          * Intent Data || JSON Data
          */
         Intent intent = getIntent();
-        link = intent.getStringExtra("link");
+        link = intent.getStringExtra(URLs.kLink);
 
-        bannerName = intent.getStringExtra("bannerName");
-        objectID = intent.getIntExtra("objectID", -1);
-        objectType = intent.getIntExtra("objectType", -1);
+        bannerName = intent.getStringExtra(URLs.kBannerName);
+        objectID = intent.getIntExtra(URLs.kObjectId, -1);
+        objectType = intent.getIntExtra(URLs.kObjectType, -1);
         isInnerLink = !(link.startsWith("http://") || link.startsWith("https://"));
         mTitle.setText(bannerName);
 
@@ -399,7 +399,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
      */
     public void actionLaunchReportSelectorActivity() {
         Intent intent = new Intent(mContext, ReportSelectorAcitity.class);
-        intent.putExtra("bannerName", bannerName);
+        intent.putExtra(URLs.kBannerName, bannerName);
         intent.putExtra("groupID", groupID);
         intent.putExtra("reportID", reportID);
         intent.putExtra("templateID", templateID);
@@ -467,9 +467,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
      */
     public void actionLaunchCommentActivity() {
         Intent intent = new Intent(mContext, CommentActivity.class);
-        intent.putExtra("bannerName", bannerName);
-        intent.putExtra("objectID", objectID);
-        intent.putExtra("objectType", objectType);
+        intent.putExtra(URLs.kBannerName, bannerName);
+        intent.putExtra(URLs.kObjectId, objectID);
+        intent.putExtra(URLs.kObjectType, objectType);
         mContext.startActivity(intent);
 
         /*
@@ -477,7 +477,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
          */
         try {
             logParams = new JSONObject();
-            logParams.put("action", "点击/主题页面/评论");
+            logParams.put(URLs.kAction, "点击/主题页面/评论");
             new Thread(mRunnableForLogger).start();
         } catch (Exception e) {
             e.printStackTrace();
@@ -515,8 +515,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                  */
                 try {
                     logParams = new JSONObject();
-                    logParams.put("action", "刷新/浏览器");
-                    logParams.put("obj_title", urlString);
+                    logParams.put(URLs.kAction, "刷新/浏览器");
+                    logParams.put(URLs.kObjTitle, urlString);
                     new Thread(mRunnableForLogger).start();
                 }
                 catch (Exception e) {
@@ -586,10 +586,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
              */
             try {
                 logParams = new JSONObject();
-                logParams.put("action", "JS异常");
+                logParams.put(URLs.kAction, "JS异常");
                 logParams.put("obj_id", objectID);
-                logParams.put("obj_type", objectType);
-                logParams.put("obj_title", String.format("主题页面/%s/%s", bannerName, ex));
+                logParams.put(URLs.kObjType, objectType);
+                logParams.put(URLs.kObjTitle, String.format("主题页面/%s/%s", bannerName, ex));
                 new Thread(mRunnableForLogger).start();
             }
             catch (Exception e) {

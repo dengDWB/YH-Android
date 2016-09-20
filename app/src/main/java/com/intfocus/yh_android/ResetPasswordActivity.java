@@ -62,16 +62,16 @@ public class ResetPasswordActivity extends BaseActivity {
         @JavascriptInterface
         public void resetPassword(final String oldPassword, final String newPassword) {
             try {
-                if (URLs.MD5(oldPassword).equals(user.get("password"))) {
+                if (URLs.MD5(oldPassword).equals(user.get(URLs.kPassword))) {
                     Map<String, String> response = ApiHelper.resetPassword(user.get("user_id").toString(), URLs.MD5(newPassword));
 
-                    JSONObject responseInfo = new JSONObject(response.get("body"));
+                    JSONObject responseInfo = new JSONObject(response.get(URLs.kBody));
 
                     Builder alertDialog = new AlertDialog.Builder(ResetPasswordActivity.this);
                     alertDialog.setTitle("温馨提示");
                     alertDialog.setMessage(responseInfo.getString("info"));
 
-                    if (response.get("code").equals("200") || response.get("code").equals("201")) {
+                    if (response.get(URLs.kCode).equals("200") || response.get(URLs.kCode).equals("201")) {
                         alertDialog.setPositiveButton(
                                 "重新登录",
                                 new DialogInterface.OnClickListener() {
@@ -100,7 +100,7 @@ public class ResetPasswordActivity extends BaseActivity {
                          */
                         try {
                             logParams = new JSONObject();
-                            logParams.put("action", "重置密码");
+                            logParams.put(URLs.kAction, "重置密码");
                             new Thread(mRunnableForLogger).start();
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -136,8 +136,8 @@ public class ResetPasswordActivity extends BaseActivity {
              */
             try {
                 logParams = new JSONObject();
-                logParams.put("action", "JS异常");
-                logParams.put("obj_title", String.format("重置密码页面/%s", ex));
+                logParams.put(URLs.kAction, "JS异常");
+                logParams.put(URLs.kObjTitle, String.format("重置密码页面/%s", ex));
                 new Thread(mRunnableForLogger).start();
             } catch (Exception e) {
                 e.printStackTrace();
