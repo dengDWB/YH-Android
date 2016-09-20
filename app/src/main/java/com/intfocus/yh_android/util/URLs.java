@@ -63,11 +63,10 @@ public class URLs extends PrivateURLs implements Serializable {
     public final static String PGYER_VERSION_FILENAME    = "pgyer_version.txt";
     public final static String LOCAL_NOTIFICATION_FILENAME = "local_notification.json";
 
-    public final static String kTabKpiName               = "tab_kpi";
-    public final static String kTabAnalyseName           = "tab_analyse";
-    public final static String kTanAppName               = "tab_app";
-    public final static String kTabMessageName           = "tab_message";
-    public final static String kThursdaySayName          = "setting_thursday_say";
+    public final static String kTabKpi                   = "tab_kpi";
+    public final static String kTabAnalyse               = "tab_analyse";
+    public final static String kTabApp                   = "tab_app";
+    public final static String kTabMessage               = "tab_message";
 
     public final static String kJSInterfaceName          = "AndroidJSBridge";
 
@@ -78,7 +77,38 @@ public class URLs extends PrivateURLs implements Serializable {
     public final static String kStylesheets              = "stylesheets";
     public final static String kJavaScripts              = "javascripts";
     public final static String kBarCodeScan              = "BarCodeScan";
-    public final static String kAdverttisement           = "advertisement";
+    public final static String kAdvertisement            = "advertisement";
+
+    public final static String kAction                   = "action";
+    public final static String kPassword                 = "password";
+    public final static String kSettingThursdaySay       = "setting_thursday_say";
+    public final static String kRoleId                   = "role_id";
+    public final static String kGroupId                  = "group_id";
+    public final static String kSetting                  = "setting";
+    public final static String kSettingPgyer             = "setting_pgyer";
+    public final static String kSettingPassword          = "setting_password";
+    public final static String kData                     = "data";
+    public final static String kCodeInfo                 = "code_info";
+    public final static String kCodeType                 = "code_type";
+    public final static String kBannerName               = "bannerName";
+    public final static String kObjectId                 = "objectID";
+    public final static String kObjectType               = "objectType";
+    public final static String kObjTitle                 = "obj_title";
+    public final static String kObjType                  = "obj_type";
+    public final static String kLink                     = "link";
+    public final static String kUserNum                  = "user_num";
+    public final static String kStore                    = "store";
+    public final static String kStoreIds                 = "store_ids";
+    public final static String kName                     = "name";
+    public final static String kUseGesturePassword       = "use_gesture_password";
+    public final static String kGesturePassword          = "gesture_password";
+    public final static String kIsLogin                  = "is_login";
+    public final static String kPushDeviceToken          = "push_device_token";
+
+    public final static String kCode                     = "code";
+    public final static String kBody                     = "body";
+    public final static String kETag                     = "ETag";
+    public final static String kLastModified             = "Last_Modified";
 
     public static String storage_base(Context context) {
         //    String path = "";

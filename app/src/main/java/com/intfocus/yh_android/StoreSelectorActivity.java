@@ -6,7 +6,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,18 +14,17 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by lijunjie on 16/8/15.
@@ -49,13 +47,13 @@ public class StoreSelectorActivity extends BaseActivity {
     try {
       cachedPath = FileUtil.dirPath(mContext,  URLs.CACHED_DIRNAME, URLs.BARCODE_RESULT_FILENAME);
       cachedJSON = FileUtil.readConfigFile(cachedPath);
-      currentStore = cachedJSON.getJSONObject("store");
+      currentStore = cachedJSON.getJSONObject(URLs.kStore);
 
-      if (user.has("store_ids") && user.getJSONArray("store_ids").length() > 0) {
-        JSONArray stores = user.getJSONArray("store_ids");
+      if (user.has(URLs.kStoreIds) && user.getJSONArray(URLs.kStoreIds).length() > 0) {
+        JSONArray stores = user.getJSONArray(URLs.kStoreIds);
         for(int i = 0, len = stores.length(); i < len; i ++) {
           dataList.add(stores.getJSONObject(i));
-          storeNameList.add(stores.getJSONObject(i).getString("name"));
+          storeNameList.add(stores.getJSONObject(i).getString(URLs.kName));
         }
       }
     } catch (JSONException e) {
@@ -90,7 +88,7 @@ public class StoreSelectorActivity extends BaseActivity {
       @Override
       public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
         try {
-          cachedJSON.put("store", dataList.get(arg2));
+          cachedJSON.put(URLs.kStore, dataList.get(arg2));
           FileUtil.writeFile(cachedPath, cachedJSON.toString());
 
           dismissActivity(null);
@@ -137,7 +135,7 @@ public class StoreSelectorActivity extends BaseActivity {
        */
       String currentStoreName = "";
       try {
-        currentStoreName = currentStore.getString("name");
+        currentStoreName = currentStore.getString(URLs.kName);
       } catch (JSONException e) {
         e.printStackTrace();
       }
