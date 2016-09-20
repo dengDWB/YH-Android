@@ -62,7 +62,7 @@ public class DashboardActivity extends BaseActivity{
 	private TabView mTabKPI, mTabAnalyse, mTabAPP, mTabMessage;
 	private WebView browserAd;
 	private int mAnimationTime;
-	private SimpleAdapter mSimpleAdapter;
+	private MenuAdapter mSimpleAdapter;
 
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
@@ -109,7 +109,7 @@ public class DashboardActivity extends BaseActivity{
 			listItem.add(map);
 		}
 
-		mSimpleAdapter = new SimpleAdapter(this, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
+		mSimpleAdapter = new MenuAdapter(this, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
 
 		initDropMenu(mSimpleAdapter, mDropMenuListener);
 	}

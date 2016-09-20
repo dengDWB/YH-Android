@@ -89,8 +89,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
         initWebView();
 
-        initDropMenuItem();
-
         mWebView.requestFocus();
         pullToRefreshWebView.setVisibility(View.VISIBLE);
         mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);

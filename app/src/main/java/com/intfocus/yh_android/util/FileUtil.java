@@ -500,7 +500,6 @@ public class FileUtil {
     //FileUtil.writeFile(searchItemsPath, json.toString());
 
     /*
->>>>>>> 4a0d1914261cc033e5ee0697319a9dc90ecfe896
 	 * 保存截屏文件
 	 *
 	 */
@@ -522,4 +521,5 @@ public class FileUtil {
 			Log.e("snapshot", e.toString());
 		}
 	}
+
 }
