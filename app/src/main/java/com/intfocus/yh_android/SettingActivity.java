@@ -167,8 +167,8 @@ public class SettingActivity extends BaseActivity {
                 String gravatarUrl = user.getString(kGravatar);
                 String gravatarFileName1 = gravatarUrl.substring(gravatarUrl.lastIndexOf("/")+1, gravatarUrl.length());
                 //对比user.plist中gravatar字段的时间戳和gravatar.json中name时间戳大于则下载网上的图片
-                long gravatarFileNameInt1 = Long.parseLong(gravatarFileName1.replace(".jpg","").replace(PrivateURLs.kAppCode + user.getString(URLs.kUserNum)+"_", ""));
-                long gravatarFileNameInt = Long.parseLong(gravatarFileName.replace(".jpg","").replace(PrivateURLs.kAppCode + user.getString(URLs.kUserNum)+"_",""));
+                long gravatarFileNameInt1 = Long.parseLong(gravatarFileName1.replace(".jpg","").replace(PrivateURLs.kAppCode + "_" + user.getString(URLs.kUserNum)+"_", ""));
+                long gravatarFileNameInt = Long.parseLong(gravatarFileName.replace(".jpg","").replace(PrivateURLs.kAppCode + "_" + user.getString(URLs.kUserNum)+"_",""));
                 if (gravatarFileNameInt1 > gravatarFileNameInt) {
                     if (!(gravatarFileName.equals(gravatarFileName1))) {
                         gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarFileName1);
