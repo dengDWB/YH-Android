@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
+import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.URLs;
 
 public class LoginActivity extends BaseActivity {
@@ -126,7 +127,7 @@ public class LoginActivity extends BaseActivity {
                             }
 
                             // 检测用户空间，版本是否升级
-                            assetsPath = FileUtil.dirPath(mContext, URLs.HTML_DIRNAME);
+                            assetsPath = FileUtil.dirPath(mContext, K.kHTMLDirName);
                             checkVersionUpgrade(assetsPath);
 
                             // 跳转至主界面

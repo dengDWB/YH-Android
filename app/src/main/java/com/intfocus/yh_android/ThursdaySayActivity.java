@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
+import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.PrivateURLs;
 import com.intfocus.yh_android.util.URLs;
 
@@ -21,7 +22,7 @@ public class ThursdaySayActivity extends BaseActivity {
 
         mWebView.requestFocus();
         mWebView.loadUrl(urlStringForLoading);
-        urlString = String.format(URLs.THURSDAY_SAY_PATH, PrivateURLs.kBaseUrl, URLs.currentUIVersion(ThursdaySayActivity.this));
+        urlString = String.format(K.kThursdaySayMobilePath, PrivateURLs.kBaseUrl, URLs.currentUIVersion(ThursdaySayActivity.this));
         new Thread(mRunnableForDetecting).start();
     }
 

@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.intfocus.yh_android.screen_lock.InitPassCodeActivity;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
+import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.PrivateURLs;
 import com.intfocus.yh_android.util.URLs;
 import com.readystatesoftware.viewbadger.BadgeView;
@@ -152,44 +153,37 @@ public class SettingActivity extends BaseActivity {
             mRoleID.setText(user.getString("role_name"));
             mGroupID.setText(user.getString("group_name"));
             mPushState.setText(PushAgent.getInstance(mContext).isEnabled() ? "开启" : "关闭");
-
             mAppName.setText(getApplicationName(SettingActivity.this));
-
             mDeviceID.setText(TextUtils.split(android.os.Build.MODEL, " - ")[0]);
-            mApiDomain.setText(URLs.kBaseUrl.replace("http://", "").replace("https://", ""));
+            mApiDomain.setText(K.kBaseUrl.replace("http://", "").replace("https://", ""));
 
-            gravatarJsonPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.GRAVATARJSON_FILENAME);
-
+            gravatarJsonPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kGravatarConfigFileName);
             if (new File(gravatarJsonPath).exists()) {
-                JSONObject gravatarJson = new JSONObject(FileUtil.readFile(gravatarJsonPath));
-                gravatarFileName = gravatarJson.getString(URLs.kName);
-                gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarFileName);
-                String gravatarUrl = user.getString(kGravatar);
-                String gravatarFileName1 = gravatarUrl.substring(gravatarUrl.lastIndexOf("/")+1, gravatarUrl.length());
-                //对比user.plist中gravatar字段的时间戳和gravatar.json中name时间戳大于则下载网上的图片
-                long gravatarFileNameInt1 = Long.parseLong(gravatarFileName1.replace(".jpg","").replace(PrivateURLs.kAppCode + "_" + user.getString(URLs.kUserNum)+"_", ""));
-                long gravatarFileNameInt = Long.parseLong(gravatarFileName.replace(".jpg","").replace(PrivateURLs.kAppCode + "_" + user.getString(URLs.kUserNum)+"_",""));
-                if (gravatarFileNameInt1 > gravatarFileNameInt) {
-                    if (!(gravatarFileName.equals(gravatarFileName1))) {
-                        gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarFileName1);
-                        gravatarFileName = gravatarFileName1;
-                        httpGetBitmap(gravatarUrl, true);
-                        return;
-                    }
+                JSONObject gravatarJSON = FileUtil.readConfigFile(gravatarJsonPath);
+                gravatarFileName = gravatarJSON.getString(URLs.kName);
+                gravatarImgPath = FileUtil.dirPath(mContext, K.kConfigDirName, gravatarFileName);
+                String currentGravatarUrl = user.getString(kGravatar);
+                String currentGravatarFileName = currentGravatarUrl.substring(currentGravatarUrl.lastIndexOf("/")+1, currentGravatarUrl.length());
+                // 以用户验证响应的 gravatar 值为准，不一致则下载
+                if (!(gravatarFileName.equals(currentGravatarFileName))) {
+                    gravatarImgPath = FileUtil.dirPath(mContext, K.kConfigDirName, currentGravatarFileName);
+                    gravatarFileName = currentGravatarFileName;
+                    httpGetBitmap(currentGravatarUrl, true);
+                    return;
                 }
+
                 Bitmap bitmap = BitmapFactory.decodeFile(gravatarImgPath);
                 mIconImageView.setImageBitmap(bitmap);
-
             }
             else {
                 if (user.has(kGravatar) && (user.getString(kGravatar).indexOf("http") != -1)) {
                     String gravatarUrl = user.getString(kGravatar);
                     gravatarFileName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/")+1, gravatarUrl.length());
-                    gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarFileName);
+                    gravatarImgPath = FileUtil.dirPath(mContext, K.kConfigDirName, gravatarFileName);
                     httpGetBitmap(gravatarUrl, false);
-                } else {
-                    mIconImageView.setImageResource(R.drawable.login_logo);
                 }
+
+                mIconImageView.setImageResource(R.drawable.login_logo);
             }
 
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -197,7 +191,7 @@ public class SettingActivity extends BaseActivity {
             mAppVersion.setText(versionInfo);
             mAppIdentifier.setText(packageInfo.packageName);
 
-            String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.PGYER_VERSION_FILENAME),
+            String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPgyerVersionConfigFileName),
                    betaLink = "", pgyerInfo = "";
             if((new File(pgyerVersionPath)).exists()) {
                 JSONObject pgyerJSON = FileUtil.readConfigFile(pgyerVersionPath);
@@ -218,7 +212,7 @@ public class SettingActivity extends BaseActivity {
             JSONObject jsonObject;
             if (new File(path).exists()) {
                 jsonObject = new JSONObject(FileUtil.readFile(path));
-                previousImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, jsonObject.getString(URLs.kName));
+                previousImgPath = FileUtil.dirPath(mContext, K.kConfigDirName, jsonObject.getString(URLs.kName));
                 if (isDelete) {
                     new File(previousImgPath).delete();
                 }
@@ -239,7 +233,6 @@ public class SettingActivity extends BaseActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public void httpGetBitmap(String urlString, final boolean isDelete) {
@@ -249,14 +242,14 @@ public class SettingActivity extends BaseActivity {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if (e != null) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mIconImageView.setImageResource(R.drawable.login_logo);
-                        }
-                    });
-                }
+                if (e == null) { return; }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mIconImageView.setImageResource(R.drawable.login_logo);
+                    }
+                });
             }
 
             @Override
@@ -272,12 +265,9 @@ public class SettingActivity extends BaseActivity {
                                 mIconImageView.setImageBitmap(bm);
                             }
                         });
-                        if (isDelete) {
-                            writeJson(gravatarJsonPath, gravatarFileName, true, "", true);
-                        } else {
-                            writeJson(gravatarJsonPath, gravatarFileName, true, "", false);
-                        }
-                    }catch (Exception e){
+
+                        writeJson(gravatarJsonPath, gravatarFileName, true, "", isDelete);
+                    } catch (Exception e){
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -416,7 +406,7 @@ public class SettingActivity extends BaseActivity {
             Bundle extras = intent.getExtras();
             if (extras != null) {
                 Bitmap userIcon = extras.getParcelable(URLs.kData);
-                gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.kAppCode + "_" + user.getString(URLs.kUserNum) + "_" + getDate() + ".jpg");
+                gravatarImgPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kAppCode + "_" + user.getString(URLs.kUserNum) + "_" + getDate() + ".jpg");
                 gravatarFileName = gravatarImgPath.substring(gravatarImgPath.lastIndexOf("/")+1, gravatarImgPath.length());
                 mIconImageView.setImageBitmap(userIcon);
                 popupWindow.dismiss();
@@ -445,7 +435,7 @@ public class SettingActivity extends BaseActivity {
             MultipartBody requestBody = builder.build();
 
             Request request = new Request.Builder()
-                        .url(String.format(URLs.API_UPLOAD_GRAVATAR_PATH, PrivateURLs.kBaseUrl, user.getString("user_device_id"), user.getString("user_id")))
+                        .url(String.format(K.kUploadGravatarAPIPath, PrivateURLs.kBaseUrl, user.getString("user_device_id"), user.getString("user_id")))
                         .post(requestBody)
                         .build();
 
@@ -509,7 +499,7 @@ public class SettingActivity extends BaseActivity {
 
     public void launchThursdaySayActivity(View v) {
         try {
-            String noticePath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
+            String noticePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
             JSONObject notificationJson = new JSONObject(FileUtil.readFile(noticePath));
             notificationJson.put(URLs.kSettingThursdaySay, 0);
             FileUtil.writeFile(noticePath, notificationJson.toString());
@@ -604,16 +594,17 @@ public class SettingActivity extends BaseActivity {
                         /*
                          * 用户报表数据js文件存放在公共区域
                          */
-                        String headerPath = String.format("%s/%s", FileUtil.sharedPath(mContext), URLs.CACHED_HEADER_FILENAME);
+                        String headerPath = String.format("%s/%s", FileUtil.sharedPath(mContext), K.kCachedHeaderConfigFileName);
                         new File(headerPath).delete();
-                        headerPath = String.format("%s/%s", FileUtil.dirPath(mContext, URLs.HTML_DIRNAME), URLs.CACHED_HEADER_FILENAME);
+                        headerPath = String.format("%s/%s", FileUtil.dirPath(mContext, K.kHTMLDirName), K.kCachedHeaderConfigFileName);
+
                         new File(headerPath).delete();
 
                         /*
                          * Umeng Device Token
                          */
                         String device_token = UmengRegistrar.getRegistrationId(mContext);
-                        String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.PUSH_CONFIG_FILENAME);
+                        String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushConfigFileName);
                         JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
                         if(!pushJSON.has(URLs.kPushDeviceToken) || pushJSON.getString(URLs.kPushDeviceToken).length() != 44 ||
                             device_token.length() != 44 || !pushJSON.getString(URLs.kPushDeviceToken).equals(device_token)) {
@@ -665,14 +656,14 @@ public class SettingActivity extends BaseActivity {
                 startActivity(InitPassCodeActivity.createIntent(mContext));
             } else {
                 try {
-                    String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
+                    String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
                     if((new File(userConfigPath)).exists()) {
                         JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
                         userJSON.put(URLs.kUseGesturePassword, false);
                         userJSON.put(URLs.kGesturePassword, "");
 
                         FileUtil.writeFile(userConfigPath, userJSON.toString());
-                        String settingsConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
+                        String settingsConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kSettingConfigFileName);
                         FileUtil.writeFile(settingsConfigPath, userJSON.toString());
                     }
 
@@ -704,7 +695,7 @@ public class SettingActivity extends BaseActivity {
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             // TODO Auto-generated method stub
             try {
-                String betaConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.BETA_CONFIG_FILENAME);
+                String betaConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBetaConfigFileName);
                 JSONObject betaJSON = new JSONObject();
                 if(new File(betaConfigPath).exists()) {
                     betaJSON = FileUtil.readConfigFile(betaConfigPath);
@@ -725,7 +716,7 @@ public class SettingActivity extends BaseActivity {
     final View.OnClickListener mPgyerLinkListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Intent browserIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(URLs.kPgyerUrl));
+            Intent browserIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(K.kPgyerUrl));
             startActivity(browserIntent);
         }
     };
@@ -734,7 +725,7 @@ public class SettingActivity extends BaseActivity {
      * 设置界面，需要显示通知样式的控件，检测是否需要通知
      */
     private void setSettingViewControlBadges() {
-        String notificationPath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
+        String notificationPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
         if(!(new File(notificationPath)).exists()) {
             return;
         }
@@ -742,7 +733,7 @@ public class SettingActivity extends BaseActivity {
         try {
             JSONObject notificationJSON = FileUtil.readConfigFile(notificationPath);
             // 每次进入设置页面都判断密码是否修改以及是否需要更新
-            int passwordCount = user.getString(URLs.kPassword).equals(URLs.MD5(URLs.kInitPassword)) ? 1 : -1;
+            int passwordCount = user.getString(URLs.kPassword).equals(URLs.MD5(K.kInitPassword)) ? 1 : -1;
             notificationJSON.put(URLs.kSettingPassword, passwordCount);
 
             if (passwordCount > 0) {
@@ -750,7 +741,7 @@ public class SettingActivity extends BaseActivity {
                 mWarnPWD.setTextSize(16);
                 mWarnPWD.setText("请修改初始密码");
                 mChangePWD.setText("   修改登录密码");
-                setBadgeView(URLs.kSettingPassword, bvChangePWD);
+                RedPointView.showRedPoint(mContext, URLs.kSettingPassword, bvChangePWD);
             }
             else {
                 mWarnPWD.setVisibility(View.GONE);
@@ -760,12 +751,12 @@ public class SettingActivity extends BaseActivity {
 
             if (notificationJSON.getInt(URLs.kSettingPgyer) > 0) {
                 mCheckUpgrade.setText("   检测更新");
-                setBadgeView(URLs.kSettingPgyer, bvCheckUpgrade);
+                RedPointView.showRedPoint(mContext, URLs.kSettingPgyer, bvCheckUpgrade);
             }
 
             if (notificationJSON.getInt(URLs.kSettingThursdaySay) > 0){
                 mCheckThursdaySay.setText("   小四说");
-                setBadgeView(URLs.kSettingThursdaySay, bvCheckThursdaySay);
+                RedPointView.showRedPoint(mContext, URLs.kSettingThursdaySay, bvCheckThursdaySay);
             }
 
             FileUtil.writeFile(notificationPath, notificationJSON.toString());

@@ -48,6 +48,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.HttpUtil;
+import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.TypedObject;
 import com.intfocus.yh_android.util.URLs;
@@ -116,18 +117,18 @@ public class BaseActivity extends Activity {
         mContext = BaseActivity.this;
         sharedPath = FileUtil.sharedPath(mContext);
         assetsPath = sharedPath;
-        urlStringForDetecting = URLs.kBaseUrl;
-        relativeAssetsPath = URLs.kAssets;
+        urlStringForDetecting = K.kBaseUrl;
+        relativeAssetsPath = "assets";
         urlStringForLoading = loadingPath(kLoading);
 
-        String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
+        String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
         if ((new File(userConfigPath)).exists()) {
             try {
                 user = FileUtil.readConfigFile(userConfigPath);
                 if (user.has(URLs.kIsLogin) && user.getBoolean(URLs.kIsLogin)) {
                     userID = user.getInt("user_id");
-                    assetsPath = FileUtil.dirPath(mContext, URLs.HTML_DIRNAME);
-                    urlStringForDetecting = String.format(URLs.API_DEVICE_STATE_PATH, URLs.kBaseUrl, user.getInt("user_device_id"));
+                    assetsPath = FileUtil.dirPath(mContext, K.kHTMLDirName);
+                    urlStringForDetecting = String.format(K.kDeviceStateAPIPath, K.kBaseUrl, user.getInt("user_device_id"));
                     relativeAssetsPath = "../../Shared/assets";
                 }
             } catch (JSONException e) {
@@ -155,7 +156,7 @@ public class BaseActivity extends Activity {
                                 return;
                             }
                             // onRegistered方法的参数registrationId即是device_token
-                            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.PUSH_CONFIG_FILENAME);
+                            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushConfigFileName);
                             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
                             pushJSON.put("push_valid", false);
                             pushJSON.put(URLs.kPushDeviceToken, registrationId);
@@ -338,7 +339,7 @@ public class BaseActivity extends Activity {
             Map<String, String> response = HttpUtil.httpGet(urlStringForDetecting,
                 new HashMap<String, String>());
             int statusCode = Integer.parseInt(response.get(URLs.kCode));
-            if (statusCode == 200 && !urlStringForDetecting.equals(URLs.kBaseUrl)) {
+            if (statusCode == 200 && !urlStringForDetecting.equals(K.kBaseUrl)) {
                 try {
                     JSONObject json = new JSONObject(response.get("body"));
                     statusCode = json.getBoolean("device_state") ? 200 : 401;
@@ -407,13 +408,13 @@ public class BaseActivity extends Activity {
                             JSONObject configJSON = new JSONObject();
                             configJSON.put(URLs.kIsLogin, false);
 
-                            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
+                            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
                             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
                             userJSON = ApiHelper.merge(userJSON, configJSON);
                             FileUtil.writeFile(userConfigPath, userJSON.toString());
 
-                            String settingsConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
+                            String settingsConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kSettingConfigFileName);
                             FileUtil.writeFile(settingsConfigPath, userJSON.toString());
                         } catch (JSONException | IOException e) {
                             e.printStackTrace();
@@ -571,14 +572,13 @@ public class BaseActivity extends Activity {
 
     void modifiedUserConfig(JSONObject configJSON) {
         try {
-            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext),
-                URLs.USER_CONFIG_FILENAME);
+            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
             userJSON = ApiHelper.merge(userJSON, configJSON);
             FileUtil.writeFile(userConfigPath, userJSON.toString());
 
-            String settingsConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
+            String settingsConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kSettingConfigFileName);
             FileUtil.writeFile(settingsConfigPath, userJSON.toString());
         } catch (IOException e) {
             e.printStackTrace();
@@ -630,7 +630,7 @@ public class BaseActivity extends Activity {
             @Override
             public void onUpdateAvailable(final String result) {
                 String message = "", versionCode = "-1", versionName = "-1", currentVersionCode = "-1";
-                String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.PGYER_VERSION_FILENAME);
+                String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPgyerVersionConfigFileName);
                 try {
                     if(new File(pgyerVersionPath).exists()) {
                         JSONObject currentVersionJSON = FileUtil.readConfigFile(pgyerVersionPath);
@@ -735,7 +735,7 @@ public class BaseActivity extends Activity {
     void checkVersionUpgrade(String assetsPath) {
         try {
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            String versionConfigPath = String.format("%s/%s", assetsPath, URLs.CURRENT_VERSION_FILENAME);
+            String versionConfigPath = String.format("%s/%s", assetsPath, K.kCurrentVersionFileName);
 
             String localVersion = "new-installer";
             boolean isUpgrade = true;
@@ -747,12 +747,12 @@ public class BaseActivity extends Activity {
             if (isUpgrade) {
                 LogUtil.d("VersionUpgrade",
                     String.format("%s => %s remove %s/%s", localVersion, packageInfo.versionName,
-                        assetsPath, URLs.CACHED_HEADER_FILENAME));
+                        assetsPath, K.kCachedHeaderConfigFileName));
 
                 /*
                  * 用户报表数据js文件存放在公共区域
                  */
-                String headerPath = String.format("%s/%s", sharedPath, URLs.CACHED_HEADER_FILENAME);
+                String headerPath = String.format("%s/%s", sharedPath, K.kCachedHeaderConfigFileName);
                 File headerFile = new File(headerPath);
                 if (headerFile.exists()) {
                     headerFile.delete();
@@ -785,7 +785,7 @@ public class BaseActivity extends Activity {
             String assetZipPath = String.format("%s/%s.zip", sharedPath, assetName);
             isShouldUpdateAssets = !(new File(assetZipPath)).exists();
 
-            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
+            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
             String localKeyName = String.format("local_%s_md5", assetName);
             String keyName = String.format("%s_md5", assetName);
@@ -798,7 +798,7 @@ public class BaseActivity extends Activity {
                     userJSON.getString(keyName)));
             // execute this when the downloader must be fired
             final DownloadAssetsTask downloadTask = new DownloadAssetsTask(mContext, shouldReloadUIThread, assetName, isInAssets);
-            downloadTask.execute(String.format(URLs.API_ASSETS_PATH, URLs.kBaseUrl, assetName), assetZipPath);
+            downloadTask.execute(String.format(K.kDownloadAssetsAPIPath, K.kBaseUrl, assetName), assetZipPath);
 
             return true;
         } catch (JSONException e) {
@@ -915,48 +915,6 @@ public class BaseActivity extends Activity {
                 }
             }
         }
-    }
-
-    /*
-	   * 设置应用内通知小红点参数
-	   */
-    public void setBadgeView(String type, BadgeView badgeView) {
-        //根据不同屏幕显示密度设置小红点大小
-        if (displayDpi < 320) {
-            badgeView.setWidth(9);
-            badgeView.setHeight(9);
-        }
-        else if (displayDpi >= 320 && displayDpi < 480) {
-            badgeView.setWidth(19);
-            badgeView.setHeight(19);
-        }
-        else if (displayDpi >= 480) {
-            badgeView.setWidth(25);
-            badgeView.setHeight(25);
-        }
-
-        //badgeView.setText(badgerCount);  //暂不需要计数
-        badgeView.setBadgePosition(BadgeView.POSITION_TOP_RIGHT);
-        switch (type) {
-            case URLs.kSetting:
-                badgeView.setBadgeMargin(20, 15);
-                break;
-            case "tab":
-                badgeView.setBadgeMargin(45, 0);
-                break;
-            case URLs.kSettingPgyer:
-            case URLs.kSettingPassword:
-            case URLs.kSettingThursdaySay:
-                badgeView.setBadgePosition(BadgeView.POSITION_TOP_LEFT);
-                break;
-            case "user":
-                badgeView.setBadgeMargin(0, 5);
-                break;
-            default:
-                badgeView.setBadgeMargin(45, 0);
-                break;
-        }
-        badgeView.show();
     }
 
     class JavaScriptBase {

@@ -1,15 +1,13 @@
 package com.intfocus.yh_android;
 
 import android.content.Context;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.intfocus.yh_android.util.FileUtil;
+import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.URLs;
 import com.readystatesoftware.viewbadger.BadgeView;
 
@@ -38,7 +36,7 @@ public class MenuAdapter extends SimpleAdapter {
 		super(context, data, resource, from, to);
 		this.listItem = (ArrayList<HashMap<String, Object>>) data;
 		this.mContext = context;
-		noticePath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
+		noticePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {

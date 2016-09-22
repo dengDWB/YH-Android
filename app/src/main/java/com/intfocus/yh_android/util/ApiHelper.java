@@ -40,7 +40,7 @@ public class ApiHelper {
      * params: {device: {name, platform, os, os_version, uuid}}
      */
     public static String authentication(Context context, String username, String password) {
-        String responseState = "success", urlString = String.format(URLs.API_USER_PATH, URLs.kBaseUrl, "android", username, password);
+        String responseState = "success", urlString = String.format(K.kUserAuthenticateAPIPath, K.kBaseUrl, "android", username, password);
         try {
             JSONObject device = new JSONObject();
             device.put("name", android.os.Build.MODEL);
@@ -56,7 +56,7 @@ public class ApiHelper {
             Log.i("DeviceParams", params.toString());
 
             Map<String, String> response = HttpUtil.httpPost(urlString, params);
-            String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), URLs.USER_CONFIG_FILENAME);
+            String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), K.kUserConfigFileName);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
             userJSON.put(URLs.kPassword, password);
             userJSON.put(URLs.kIsLogin, response.get(URLs.kCode).equals("200"));
@@ -75,7 +75,7 @@ public class ApiHelper {
             userJSON = ApiHelper.merge(userJSON, responseJSON);
             FileUtil.writeFile(userConfigPath, userJSON.toString());
 
-            String settingsConfigPath = FileUtil.dirPath(context, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
+            String settingsConfigPath = FileUtil.dirPath(context, K.kConfigDirName, K.kSettingConfigFileName);
             if ((new File(settingsConfigPath)).exists()) {
                 JSONObject settingJSON = FileUtil.readConfigFile(settingsConfigPath);
                 userJSON.put(URLs.kUseGesturePassword, settingJSON.has(URLs.kUseGesturePassword) ? settingJSON.getBoolean(URLs.kUseGesturePassword) : false);
@@ -113,7 +113,7 @@ public class ApiHelper {
      *  获取报表网页数据
      */
     public static void reportData(Context context, String groupID, String templateID, String reportID) {
-        String urlString = String.format(URLs.API_DATA_PATH, URLs.kBaseUrl, groupID, templateID, reportID);
+        String urlString = String.format(K.kReportDataAPIPath, K.kBaseUrl, groupID, templateID, reportID);
         String javascriptPath = FileUtil.reportJavaScriptDataPath(context, groupID, templateID, reportID);
 
         String assetsPath = FileUtil.sharedPath(context);
@@ -143,7 +143,7 @@ public class ApiHelper {
      * 发表评论
      */
     public static void writeComment(int userID, int objectType, int objectID, Map params) throws UnsupportedEncodingException {
-        String urlString = String.format(URLs.API_COMMENT_PATH, URLs.kBaseUrl, userID, objectID,
+        String urlString = String.format(K.kCommentAPIPath, K.kBaseUrl, userID, objectID,
             objectType);
 
         Map<String, String> response = HttpUtil.httpPost(urlString, params);
@@ -190,7 +190,7 @@ public class ApiHelper {
         Map<String, String> retMap = new HashMap<>();
 
         try {
-            String urlString = String.format(URLs.API_RESET_PASSWORD_PATH, URLs.kBaseUrl, userID);
+            String urlString = String.format(K.kRsetPwdAPIPath, K.kBaseUrl, userID);
 
             Map<String, String> params = new HashMap<>();
             params.put(URLs.kPassword, newPassword);
@@ -210,7 +210,7 @@ public class ApiHelper {
      * @param 缓存头文件相对文件夹
      */
     public static void clearResponseHeader(String urlKey, String assetsPath) {
-        String headersFilePath = String.format("%s/%s", assetsPath, URLs.CACHED_HEADER_FILENAME);
+        String headersFilePath = String.format("%s/%s", assetsPath, K.kCachedHeaderConfigFileName);
         if (!(new File(headersFilePath)).exists()) {
             return;
         }
@@ -240,7 +240,7 @@ public class ApiHelper {
         try {
             JSONObject headersJSON = new JSONObject();
 
-            String headersFilePath = String.format("%s/%s", assetsPath, URLs.CACHED_HEADER_FILENAME);
+            String headersFilePath = String.format("%s/%s", assetsPath, K.kCachedHeaderConfigFileName);
             if ((new File(headersFilePath)).exists()) {
                 headersJSON = FileUtil.readConfigFile(headersFilePath);
             }
@@ -274,7 +274,7 @@ public class ApiHelper {
         try {
             JSONObject headersJSON = new JSONObject();
 
-            String headersFilePath = String.format("%s/%s", assetsPath, URLs.CACHED_HEADER_FILENAME);
+            String headersFilePath = String.format("%s/%s", assetsPath, K.kCachedHeaderConfigFileName);
             if ((new File(headersFilePath)).exists()) {
                 headersJSON = FileUtil.readConfigFile(headersFilePath);
             }
@@ -326,7 +326,7 @@ public class ApiHelper {
     public static void downloadFile(Context context, String urlString, File outputFile) {
         try {
             URL url = new URL(urlString);
-            String headerPath = String.format("%s/%s/%s", FileUtil.basePath(context), URLs.CACHED_DIRNAME, URLs.CACHED_HEADER_FILENAME);
+            String headerPath = String.format("%s/%s/%s", FileUtil.basePath(context), K.kCachedDirName, K.kCachedHeaderConfigFileName);
 
             JSONObject headerJSON = new JSONObject();
             if ((new File(headerPath)).exists()) {
@@ -370,7 +370,7 @@ public class ApiHelper {
      * @param password 锁屏密码
      */
     public static void screenLock(String deviceID, String password, boolean state) {
-        String urlString = String.format(URLs.API_SCREEN_LOCK_PATH, URLs.kBaseUrl, deviceID);
+        String urlString = String.format(K.kScreenLockAPIPath, K.kBaseUrl, deviceID);
 
         Map<String, String> params = new HashMap<>();
         params.put("screen_lock_state", "1");
@@ -388,7 +388,7 @@ public class ApiHelper {
      */
     public static void actionLog(Context context, JSONObject param) {
         try {
-            String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), URLs.USER_CONFIG_FILENAME);
+            String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), K.kUserConfigFileName);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
             param.put(kUserId, userJSON.getInt(kUserId));
@@ -406,7 +406,7 @@ public class ApiHelper {
             userParams.put("user_pass", userJSON.getString(URLs.kPassword));
             params.put("user", userParams);
 
-            String urlString = String.format(URLs.API_ACTION_LOG_PATH, URLs.kBaseUrl);
+            String urlString = String.format(K.kActionLogAPIPath, K.kBaseUrl);
             HttpUtil.httpPost(urlString, params);
         } catch (JSONException | PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -422,7 +422,7 @@ public class ApiHelper {
      */
     public static boolean pushDeviceToken(Context context, String deviceUUID) {
         try {
-            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(context), URLs.PUSH_CONFIG_FILENAME);
+            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(context), K.kPushConfigFileName);
             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
 
             if(pushJSON.has(kPushValid) && pushJSON.getBoolean(kPushValid) && pushJSON.has(URLs.kPushDeviceToken) && pushJSON
@@ -430,7 +430,7 @@ public class ApiHelper {
             if(pushJSON.has(URLs.kPushDeviceToken) && pushJSON.getString(URLs.kPushDeviceToken).length() != 44) return false;
 
             if(pushJSON.has(URLs.kPushDeviceToken)) {
-                String urlString = String.format(URLs.API_PUSH_DEVICE_TOKEN_PATH, URLs.kBaseUrl, deviceUUID, pushJSON.getString(URLs.kPushDeviceToken));
+                String urlString = String.format(K.kPushDeviceTokenAPIPath, K.kBaseUrl, deviceUUID, pushJSON.getString(URLs.kPushDeviceToken));
                 Map<String, String> response = HttpUtil.httpPost(urlString, new JSONObject());
                 JSONObject responseJSON = new JSONObject(response.get(URLs.kBody));
 
@@ -464,15 +464,11 @@ public class ApiHelper {
             params.put(URLs.kCodeInfo, codeInfo);
             params.put(URLs.kCodeType, codeType);
 
-            String urlString = String.format(URLs.API_BARCODE_SCAN_PATH, URLs.kBaseUrl, groupID, roleID, userNum, storeID, codeInfo, codeType);
+            String urlString = String.format(K.kBarCodeScanAPIPath, K.kBaseUrl, groupID, roleID, userNum, storeID, codeInfo, codeType);
             Map<String, String> response = HttpUtil.httpGet(urlString, new HashMap());
             // Map<String, String> response = HttpUtil.httpPost(urlString, params);
 
             String responseString = response.get(URLs.kBody);
-            if (!response.get(URLs.kCode).equals("200") && !response.get(URLs.kCode).equals("201")) {
-                responseString = "{\"chart\": \"[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]\", \"tabs\": [{ title: \"提示\", table: { length: 1, \"1\": [\"获取数据失败...\"]}}]}";
-            }
-
             FileUtil.barCodeScanResult(mContext, responseString);
         } catch(JSONException e) {
             e.printStackTrace();

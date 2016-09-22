@@ -26,6 +26,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
+import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.URLs;
 import com.joanzapata.pdfview.PDFView;
 import com.joanzapata.pdfview.listener.OnErrorOccurredListener;
@@ -312,7 +313,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
             templateID = TextUtils.split(link, "/")[6];
             reportID = TextUtils.split(link, "/")[8];
             String urlPath = format(link.replace("%@", "%d"), groupID);
-            urlString = String.format("%s%s", URLs.kBaseUrl, urlPath);
+            urlString = String.format("%s%s", K.kBaseUrl, urlPath);
             webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
             /**
@@ -383,7 +384,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     private final Runnable mRunnableForPDF = new Runnable() {
         @Override
         public void run() {
-            String outputPath = String.format("%s/%s/%s.pdf", FileUtil.basePath(mContext), URLs.CACHED_DIRNAME, URLs.MD5(urlString));
+            String outputPath = String.format("%s/%s/%s.pdf", FileUtil.basePath(mContext), K.kCachedDirName, URLs.MD5(urlString));
             pdfFile = new File(outputPath);
             ApiHelper.downloadFile(mContext, urlString, pdfFile);
 
@@ -408,7 +409,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
      * 分享截图至微信
      */
     public void actionShare2Weixin() {
-        String filePath = FileUtil.basePath(mContext) + "/" + URLs.CACHED_DIRNAME + "/" + "timestmap.png";
+        String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
         mWebView.setDrawingCacheEnabled(true);
         mWebView.buildDrawingCache();
         Bitmap imgBmp = Bitmap.createBitmap(mWebView.getWidth(), mWebView.getHeight(), Bitmap.Config.ARGB_8888);
@@ -503,7 +504,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                     urlKey = urlString.contains("?") ? TextUtils.split(urlString, "?")[0] : urlString;
                     ApiHelper.clearResponseHeader(urlKey, assetsPath);
                 }
-                urlKey = String.format(URLs.API_DATA_PATH, URLs.kBaseUrl, groupID, templateID, reportID);
+                urlKey = String.format(K.kReportDataAPIPath, K.kBaseUrl, groupID, templateID, reportID);
                 ApiHelper.clearResponseHeader(urlKey, FileUtil.sharedPath(mContext));
 
                 ApiHelper.reportData(mContext, String.format("%d", groupID), templateID, reportID);
@@ -541,7 +542,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         @JavascriptInterface
         public void storeTabIndex(final String pageName, final int tabIndex) {
             try {
-                String filePath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.TABINDEX_CONFIG_FILENAME);
+                String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kTabIndexConfigFileName);
 
                 JSONObject config = new JSONObject();
                 if ((new File(filePath).exists())) {
@@ -561,7 +562,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         public int restoreTabIndex(final String pageName) {
             int tabIndex = 0;
             try {
-                String filePath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.TABINDEX_CONFIG_FILENAME);
+                String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kTabIndexConfigFileName);
 
                 JSONObject config = new JSONObject();
                 if ((new File(filePath).exists())) {
