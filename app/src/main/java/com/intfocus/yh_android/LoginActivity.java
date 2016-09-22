@@ -66,7 +66,7 @@ public class LoginActivity extends BaseActivity {
         PackageInfo packageInfo = null;
         try {
             packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            String versionInfo = String.format("%s(%d)", packageInfo.versionName, packageInfo.versionCode);
+            String versionInfo = String.format("a%s(%d)", packageInfo.versionName, packageInfo.versionCode);
             versionTv.setText(versionInfo);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
