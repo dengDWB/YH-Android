@@ -152,34 +152,27 @@ public class SettingActivity extends BaseActivity {
             mRoleID.setText(user.getString("role_name"));
             mGroupID.setText(user.getString("group_name"));
             mPushState.setText(PushAgent.getInstance(mContext).isEnabled() ? "开启" : "关闭");
-
             mAppName.setText(getApplicationName(SettingActivity.this));
-
             mDeviceID.setText(TextUtils.split(android.os.Build.MODEL, " - ")[0]);
             mApiDomain.setText(URLs.kBaseUrl.replace("http://", "").replace("https://", ""));
 
             gravatarJsonPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.GRAVATARJSON_FILENAME);
-
             if (new File(gravatarJsonPath).exists()) {
-                JSONObject gravatarJson = new JSONObject(FileUtil.readFile(gravatarJsonPath));
-                gravatarFileName = gravatarJson.getString(URLs.kName);
+                JSONObject gravatarJSON = FileUtil.readConfigFile(gravatarJsonPath);
+                gravatarFileName = gravatarJSON.getString(URLs.kName);
                 gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarFileName);
-                String gravatarUrl = user.getString(kGravatar);
-                String gravatarFileName1 = gravatarUrl.substring(gravatarUrl.lastIndexOf("/")+1, gravatarUrl.length());
-                //对比user.plist中gravatar字段的时间戳和gravatar.json中name时间戳大于则下载网上的图片
-                long gravatarFileNameInt1 = Long.parseLong(gravatarFileName1.replace(".jpg","").replace(PrivateURLs.kAppCode + "_" + user.getString(URLs.kUserNum)+"_", ""));
-                long gravatarFileNameInt = Long.parseLong(gravatarFileName.replace(".jpg","").replace(PrivateURLs.kAppCode + "_" + user.getString(URLs.kUserNum)+"_",""));
-                if (gravatarFileNameInt1 > gravatarFileNameInt) {
-                    if (!(gravatarFileName.equals(gravatarFileName1))) {
-                        gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarFileName1);
-                        gravatarFileName = gravatarFileName1;
-                        httpGetBitmap(gravatarUrl, true);
-                        return;
-                    }
+                String currentGravatarUrl = user.getString(kGravatar);
+                String currentGravatarFileName = currentGravatarUrl.substring(currentGravatarUrl.lastIndexOf("/")+1, currentGravatarUrl.length());
+                // 以用户验证响应的 gravatar 值为准，不一致则下载
+                if (!(gravatarFileName.equals(currentGravatarFileName))) {
+                    gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, currentGravatarFileName);
+                    gravatarFileName = currentGravatarFileName;
+                    httpGetBitmap(currentGravatarUrl, true);
+                    return;
                 }
+
                 Bitmap bitmap = BitmapFactory.decodeFile(gravatarImgPath);
                 mIconImageView.setImageBitmap(bitmap);
-
             }
             else {
                 if (user.has(kGravatar) && (user.getString(kGravatar).indexOf("http") != -1)) {
@@ -187,9 +180,9 @@ public class SettingActivity extends BaseActivity {
                     gravatarFileName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/")+1, gravatarUrl.length());
                     gravatarImgPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, gravatarFileName);
                     httpGetBitmap(gravatarUrl, false);
-                } else {
-                    mIconImageView.setImageResource(R.drawable.login_logo);
                 }
+
+                mIconImageView.setImageResource(R.drawable.login_logo);
             }
 
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -239,7 +232,6 @@ public class SettingActivity extends BaseActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public void httpGetBitmap(String urlString, final boolean isDelete) {
@@ -249,14 +241,14 @@ public class SettingActivity extends BaseActivity {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if (e != null) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mIconImageView.setImageResource(R.drawable.login_logo);
-                        }
-                    });
-                }
+                if (e == null) { return; }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mIconImageView.setImageResource(R.drawable.login_logo);
+                    }
+                });
             }
 
             @Override
@@ -272,12 +264,9 @@ public class SettingActivity extends BaseActivity {
                                 mIconImageView.setImageBitmap(bm);
                             }
                         });
-                        if (isDelete) {
-                            writeJson(gravatarJsonPath, gravatarFileName, true, "", true);
-                        } else {
-                            writeJson(gravatarJsonPath, gravatarFileName, true, "", false);
-                        }
-                    }catch (Exception e){
+
+                        writeJson(gravatarJsonPath, gravatarFileName, true, "", isDelete);
+                    } catch (Exception e){
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
