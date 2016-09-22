@@ -12,22 +12,19 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
@@ -44,18 +41,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
-public class DashboardActivity extends BaseActivity implements View.OnClickListener {
+public class DashboardActivity extends BaseActivity {
 	public final static String kTab = "tab";
 	public final static String kUserId = "user_id";
+
 	public static final String ACTION_UPDATENOTIFITION = "action.updateNotifition";
 	private static final int ZBAR_CAMERA_PERMISSION = 1;
 	private TabView mCurrentTab;
-	private PopupWindow popupWindow;
-	private BadgeView bvUser, bvVoice;
-	private LinearLayout linearUserInfo, linearScan, linearVoice, linearSearch;
 	private ArrayList<String> urlStrings;
+	private ArrayList<HashMap<String, Object>> listItem;
 	private JSONObject notificationJSON;
 	private BadgeView bvKpi, bvAnalyse, bvApp, bvMessage, bvBannerSetting;
 	private int objectType, kpiNotifition, analyseNotifition, appNotifition, messageNotifition;
@@ -63,6 +60,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	private TabView mTabKPI, mTabAnalyse, mTabAPP, mTabMessage;
 	private WebView browserAd;
 	private int mAnimationTime;
+	private MenuAdapter mSimpleAdapter;
 
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
@@ -71,8 +69,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		setContentView(R.layout.activity_dashboard);
 
 		initUrlStrings();
-
-		initDropMenu();
+		initDropMenuItem();
 		initTab();
 		initUserIDColorView();
 		loadWebView();
@@ -98,6 +95,58 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 		checkUserModifiedInitPassword();
 	}
+
+	private void initDropMenuItem() {
+		listItem = new ArrayList<HashMap<String, Object>>();
+		int[] imgID = {R.drawable.icon_scan, R.drawable.icon_voice, R.drawable.icon_search, R.drawable.icon_user};
+		String[] itemName = {"扫一扫", "语音播报", "搜索", "个人信息"};
+		for (int i = 0; i < itemName.length; i++) {
+			HashMap<String, Object> map = new HashMap<>();
+			map.put("ItemImage", imgID[i]);
+			map.put("ItemText", itemName[i]);
+			listItem.add(map);
+		}
+
+		mSimpleAdapter = new MenuAdapter(this, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
+		initDropMenu(mSimpleAdapter, mDropMenuListener);
+	}
+
+	/*
+ 	 * 标题栏设置按钮下拉菜单点击响应事件
+ 	 */
+	private final AdapterView.OnItemClickListener mDropMenuListener = new AdapterView.OnItemClickListener() {
+		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+								long arg3) {
+			popupWindow.dismiss();
+			switch (listItem.get(arg2).get("ItemText").toString()) {
+				case "个人信息":
+					Intent settingIntent = new Intent(mContext, SettingActivity.class);
+					mContext.startActivity(settingIntent);
+					break;
+
+				case "扫一扫":
+					if (ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.CAMERA)
+							!= PackageManager.PERMISSION_GRANTED) {
+						ActivityCompat.requestPermissions(DashboardActivity.this, new String[]{Manifest.permission.CAMERA}, ZBAR_CAMERA_PERMISSION);
+					} else {
+						Intent barCodeScannerIntent = new Intent(mContext, BarCodeScannerActivity.class);
+						mContext.startActivity(barCodeScannerIntent);
+					}
+					break;
+
+				case "语音播报":
+					toast("功能开发中，敬请期待");
+					break;
+
+				case "搜索":
+					toast("功能开发中，敬请期待");
+					break;
+				default:
+					break;
+			}
+		}
+	};
+
 
 	protected void onResume() {
 		mMyApp.setCurrentActivity(this);
@@ -175,10 +224,9 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 		boolean isShouldDisplayAd = mCurrentTab == mTabKPI && new File(adIndexPath).exists();
 		if (isShouldDisplayAd) {
-			viewAnimation(browserAd, true,0, dip2px(DashboardActivity.this, 140));
-		}
-		else {
-			viewAnimation(browserAd, false, dip2px(DashboardActivity.this,140),0);
+			viewAnimation(browserAd, true, 0, dip2px(DashboardActivity.this, 140));
+		} else {
+			viewAnimation(browserAd, false, dip2px(DashboardActivity.this, 140), 0);
 		}
 	}
 
@@ -190,8 +238,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		filter.addAction(ACTION_UPDATENOTIFITION);
 		notificationBroadcastReceiver = new NotificationBroadcastReceiver();
 		registerReceiver(notificationBroadcastReceiver, filter);
-        /*
-         * 打开通知服务,用于发送通知
+		/*
+		 * 打开通知服务,用于发送通知
          */
 		Intent startService = new Intent(this, LocalNotificationService.class);
 		startService(startService);
@@ -220,23 +268,21 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			messageNotifition = notificationJSON.getInt(URLs.kTabMessage);
 
 			if (kpiNotifition > 0 && objectType != 1) {
-				setBadgeView(kTab, bvKpi);
+				RedPointView.showRedPoint(mContext,kTab, bvKpi);
 			}
 			if (analyseNotifition > 0 && objectType != 2) {
-				setBadgeView(kTab, bvAnalyse);
+				RedPointView.showRedPoint(mContext, kTab, bvAnalyse);
 			}
 			if (appNotifition > 0 && objectType != 3) {
-				setBadgeView(kTab, bvApp);
+				RedPointView.showRedPoint(mContext, kTab, bvApp);
 			}
 			if (messageNotifition > 0 && objectType != 5) {
-				setBadgeView(kTab, bvMessage);
+				RedPointView.showRedPoint(mContext, kTab, bvMessage);
 			}
-			if (notificationJSON.getInt(URLs.kSetting)  > 0) {
-				setBadgeView(URLs.kSetting, bvBannerSetting);
-				setBadgeView("user", bvUser);
+			if (notificationJSON.getInt(URLs.kSetting) > 0) {
+				RedPointView.showRedPoint(mContext, URLs.kSetting, bvBannerSetting);
 			} else {
 				bvBannerSetting.setVisibility(View.GONE);
-				bvUser.setVisibility(View.GONE);
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -338,102 +384,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		initColorView(colorViews);
 	}
 
-	/*
-	 * 标题栏设置按钮下拉菜单样式
-	 */
-	public void initDropMenu() {
-		View contentView = LayoutInflater.from(this).inflate(R.layout.activity_dashboard_dialog, null);
-
-		linearScan = (LinearLayout) contentView.findViewById(R.id.linearScan);
-		linearSearch = (LinearLayout) contentView.findViewById(R.id.linearSearch);
-		linearVoice = (LinearLayout) contentView.findViewById(R.id.linearVoice);
-		linearUserInfo = (LinearLayout) contentView.findViewById(R.id.linearUserInfo);
-
-		popupWindow = new PopupWindow(this);
-		popupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
-		popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-		popupWindow.setContentView(contentView);
-		popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
-		popupWindow.setOutsideTouchable(false);
-		popupWindow.setFocusable(true);
-
-        /*
-         * 根据配置动态设置显示下拉菜单选项
-         */
-		View viewSeparator;
-		if (!K.kDropMenuScan) {
-			viewSeparator = contentView.findViewById(R.id.linearScanSeparator);
-			viewSeparator.setVisibility(K.kDropMenuScan ? View.VISIBLE : View.GONE);
-
-			linearScan.setVisibility(K.kDropMenuScan ? View.VISIBLE : View.GONE);
-			linearScan.setOnClickListener(this);
-		} else {
-			linearScan.setOnClickListener(this);
-		}
-
-		if (!K.kDropMenuVoice) {
-			viewSeparator = contentView.findViewById(R.id.linearVoiceSeparator);
-			viewSeparator.setVisibility(K.kDropMenuVoice ? View.VISIBLE : View.GONE);
-
-			linearVoice.setVisibility(K.kDropMenuVoice ? View.VISIBLE : View.GONE);
-			linearVoice.setOnClickListener(this);
-		} else {
-			linearVoice.setOnClickListener(this);
-		}
-
-		if (!K.kDropMenuSearch) {
-			viewSeparator = contentView.findViewById(R.id.linearSearchSeparator);
-			viewSeparator.setVisibility(K.kDropMenuSearch ? View.VISIBLE : View.GONE);
-
-			linearSearch.setVisibility(K.kDropMenuSearch ? View.VISIBLE : View.GONE);
-			linearSearch.setOnClickListener(this);
-		} else {
-			linearSearch.setOnClickListener(this);
-		}
-
-		if (!K.kDropMenuUserInfo) {
-			linearUserInfo.setVisibility(K.kDropMenuUserInfo ? View.VISIBLE : View.GONE);
-			linearUserInfo.setOnClickListener(this);
-		} else {
-			linearUserInfo.setOnClickListener(this);
-		}
-	}
-
-	/*
-	 * 标题栏设置按钮下拉菜单点击响应事件
-	 */
-	@Override
-	public void onClick(View v) {
-		popupWindow.dismiss();
-
-		switch (v.getId()) {
-			case R.id.linearUserInfo:
-				Intent settingIntent = new Intent(mContext, SettingActivity.class);
-				mContext.startActivity(settingIntent);
-				break;
-
-			case R.id.linearScan:
-				if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-						!= PackageManager.PERMISSION_GRANTED) {
-					ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, ZBAR_CAMERA_PERMISSION);
-				} else {
-					Intent barCodeScannerIntent = new Intent(mContext, BarCodeScannerActivity.class);
-					mContext.startActivity(barCodeScannerIntent);
-				}
-				break;
-
-			case R.id.linearSearch:
-				toast("功能开发中，敬请期待");
-				break;
-
-			case R.id.linearVoice:
-				toast("功能开发中，敬请期待");
-				break;
-			default:
-				break;
-		}
-	}
-
 	@SuppressLint("SetJavaScriptEnabled")
 	@JavascriptInterface
 	private void initTab() {
@@ -450,6 +400,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 			mTabMessage.setVisibility(K.kTabBarMessage ? View.VISIBLE : View.GONE);
 		}
 		else {
+
 			findViewById(R.id.toolBar).setVisibility(View.GONE);
 		}
 
@@ -466,7 +417,6 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		bvApp = new BadgeView(this, mTabAPP);
 		bvMessage = new BadgeView(this, mTabMessage);
 		bvBannerSetting = new BadgeView(this, mBannerSetting);
-		bvUser = new BadgeView(this, linearUserInfo);
 	}
 
 	/*
@@ -558,7 +508,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	/*
 	 * 标题栏点击设置按钮显示下拉菜单
 	 */
-	public void launchSettingActivity(View v) {
+	public void launchDropMenuActivity(View v) {
 		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 		popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
 
@@ -567,7 +517,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		 */
 		try {
 			logParams = new JSONObject();
-			logParams.put(URLs.kAction, "点击/主页面/设置");
+			logParams.put("action", "点击/主页面/下拉菜单");
 			new Thread(mRunnableForLogger).start();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -641,7 +591,8 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 							mTabAPP.performClick();
 							break;
 						case URLs.kTabMessage:
-							if(openLink.equals("0") || openLink.equals("1") || openLink.equals("2")) {
+							if (openLink.equals("0") || openLink.equals("1") || openLink.equals("2")) {
+
 								storeTabIndex("message", Integer.parseInt(openLink));
 							}
 							mTabMessage.performClick();
@@ -671,7 +622,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 
 		@JavascriptInterface
 		public void hideAd() {
-			viewAnimation(browserAd,false, dip2px(DashboardActivity.this,140),0);
+			viewAnimation(browserAd, false, dip2px(DashboardActivity.this, 140), 0);
 		}
 
 		@JavascriptInterface
@@ -739,7 +690,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	/*
 	 * view 缩放动画
 	 */
-	public void viewAnimation(final View view, final Boolean isShow,final int startHeight,final int endHeight) {
+	public void viewAnimation(final View view, final Boolean isShow, final int startHeight, final int endHeight) {
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -764,6 +715,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 							view.setVisibility(View.VISIBLE);
 						}
 					}
+
 					@Override
 					public void onAnimationEnd(Animator animation) {
 						super.onAnimationEnd(animation);

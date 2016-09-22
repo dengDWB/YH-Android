@@ -11,6 +11,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,14 +22,24 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.ILoadingLayout;
@@ -51,6 +62,7 @@ import com.umeng.message.PushAgent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -79,6 +91,7 @@ public class BaseActivity extends Activity {
     protected String urlStringForDetecting;
     protected ProgressDialog mProgressDialog;
     protected YHApplication mMyApp;
+    protected PopupWindow popupWindow;
     PullToRefreshWebView pullToRefreshWebView;
     android.webkit.WebView mWebView;
     JSONObject user;
@@ -88,6 +101,7 @@ public class BaseActivity extends Activity {
     String urlStringForLoading;
     JSONObject logParams = new JSONObject();
     Context mContext;
+    Activity currActivity;
     int displayDpi; //屏幕密度
 
     @Override
@@ -165,7 +179,7 @@ public class BaseActivity extends Activity {
     }
 
     private void clearReferences(){
-        Activity currActivity = mMyApp.getCurrentActivity();
+        currActivity = mMyApp.getCurrentActivity();
         if (this.equals(currActivity)) {
             mMyApp.setCurrentActivity(null);
         }
@@ -696,6 +710,25 @@ public class BaseActivity extends Activity {
         PgyUpdateManager.register(BaseActivity.this, updateManagerListener);
     }
 
+    /*
+	 * 标题栏设置按钮下拉菜单样式
+	 */
+    public void initDropMenu(SimpleAdapter adapter,AdapterView.OnItemClickListener itemClickListener) {
+        View contentView = LayoutInflater.from(this).inflate(R.layout.menu_dialog, null);
+
+        ListView listView = (ListView) contentView.findViewById(R.id.list_dropmenu);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(itemClickListener);
+
+        popupWindow = new PopupWindow(this);
+        popupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setContentView(contentView);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
+        popupWindow.setOutsideTouchable(false);
+        popupWindow.setFocusable(true);
+    }
+
     /**
      * app升级后，清除缓存头文件
      */
@@ -882,48 +915,6 @@ public class BaseActivity extends Activity {
                 }
             }
         }
-    }
-
-    /*
-	   * 设置应用内通知小红点参数
-	   */
-    public void setBadgeView(String type, BadgeView badgeView) {
-        //根据不同屏幕显示密度设置小红点大小
-        if (displayDpi < 320) {
-            badgeView.setWidth(9);
-            badgeView.setHeight(9);
-        }
-        else if (displayDpi >= 320 && displayDpi < 480) {
-            badgeView.setWidth(19);
-            badgeView.setHeight(19);
-        }
-        else if (displayDpi >= 480) {
-            badgeView.setWidth(25);
-            badgeView.setHeight(25);
-        }
-
-        //badgeView.setText(badgerCount);  //暂不需要计数
-        badgeView.setBadgePosition(BadgeView.POSITION_TOP_RIGHT);
-        switch (type) {
-            case URLs.kSetting:
-                badgeView.setBadgeMargin(20, 15);
-                break;
-            case "tab":
-                badgeView.setBadgeMargin(45, 0);
-                break;
-            case URLs.kSettingPgyer:
-            case URLs.kSettingPassword:
-            case URLs.kSettingThursdaySay:
-                badgeView.setBadgePosition(BadgeView.POSITION_TOP_LEFT);
-                break;
-            case "user":
-                badgeView.setBadgeMargin(0, 5);
-                break;
-            default:
-                badgeView.setBadgeMargin(45, 0);
-                break;
-        }
-        badgeView.show();
     }
 
     class JavaScriptBase {

@@ -52,7 +52,7 @@ public class LocalNotificationService extends Service {
     super.onCreate();
     mContext = this;
 
-    notificationPath = FileUtil.dirPath(mContext, K.kCachedDirName, K.kLocalNotificationConfigFileName);
+    notificationPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
     userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
     pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPgyerVersionConfigFileName);
 
@@ -90,6 +90,7 @@ public class LocalNotificationService extends Service {
       public void run() {
         processDataCount();//先计算通知的数量
         sendBroadcast(sendIntent);
+        Log.i("bugbug","执行");
       }
     };
     timer.schedule(timerTask, 0, 30 * 60 * 1000);

@@ -741,7 +741,7 @@ public class SettingActivity extends BaseActivity {
                 mWarnPWD.setTextSize(16);
                 mWarnPWD.setText("请修改初始密码");
                 mChangePWD.setText("   修改登录密码");
-                setBadgeView(URLs.kSettingPassword, bvChangePWD);
+                RedPointView.showRedPoint(mContext, URLs.kSettingPassword, bvChangePWD);
             }
             else {
                 mWarnPWD.setVisibility(View.GONE);
@@ -751,12 +751,12 @@ public class SettingActivity extends BaseActivity {
 
             if (notificationJSON.getInt(URLs.kSettingPgyer) > 0) {
                 mCheckUpgrade.setText("   检测更新");
-                setBadgeView(URLs.kSettingPgyer, bvCheckUpgrade);
+                RedPointView.showRedPoint(mContext, URLs.kSettingPgyer, bvCheckUpgrade);
             }
 
             if (notificationJSON.getInt(URLs.kSettingThursdaySay) > 0){
                 mCheckThursdaySay.setText("   小四说");
-                setBadgeView(URLs.kSettingThursdaySay, bvCheckThursdaySay);
+                RedPointView.showRedPoint(mContext, URLs.kSettingThursdaySay, bvCheckThursdaySay);
             }
 
             FileUtil.writeFile(notificationPath, notificationJSON.toString());

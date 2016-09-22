@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -501,22 +503,23 @@ public class FileUtil {
 	 * 保存截屏文件
 	 *
 	 */
-    public static void saveImage(String filePath,Bitmap bmp) {
-        // 如果有目标文件，删除它
-        File file = new File(filePath);
-        if (file.exists()) {
-            file.delete();
-        }
-        // 声明输出流
-        FileOutputStream outStream = null;
+	public static void saveImage(String filePath, Bitmap bmp) {
+		// 如果有目标文件，删除它
+		File file = new File(filePath);
+		if (file.exists()) {
+			file.delete();
+		}
+		// 声明输出流
+		FileOutputStream outStream = null;
 
-        try {
-            // 获得输出流，写入文件
-            outStream = new FileOutputStream(file);
-            bmp.compress(Bitmap.CompressFormat.JPEG, 90, outStream);
-            outStream.close();
-        } catch (IOException e) {
-            Log.e("snapshot", e.toString());
-        }
-    }
+		try {
+			// 获得输出流，写入文件
+			outStream = new FileOutputStream(file);
+			bmp.compress(Bitmap.CompressFormat.JPEG, 90, outStream);
+			outStream.close();
+		} catch (IOException e) {
+			Log.e("snapshot", e.toString());
+		}
+	}
+
 }
