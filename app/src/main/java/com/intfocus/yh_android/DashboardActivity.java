@@ -45,14 +45,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-public class DashboardActivity extends BaseActivity{
+public class DashboardActivity extends BaseActivity {
 	public final static String kTab = "tab";
 	public final static String kUserId = "user_id";
 
 	public static final String ACTION_UPDATENOTIFITION = "action.updateNotifition";
 	private static final int ZBAR_CAMERA_PERMISSION = 1;
 	private TabView mCurrentTab;
-	private BadgeView bvUser, bvVoice;
 	private ArrayList<String> urlStrings;
 	private ArrayList<HashMap<String, Object>> listItem;
 	private JSONObject notificationJSON;
@@ -102,9 +101,9 @@ public class DashboardActivity extends BaseActivity{
 		listItem = new ArrayList<HashMap<String, Object>>();
 		int[] imgID = {R.drawable.icon_scan, R.drawable.icon_voice, R.drawable.icon_search, R.drawable.icon_user};
 		String[] itemName = {"扫一扫", "语音播报", "搜索", "个人信息"};
-		for (int i = 0;i < itemName.length; i++) {
+		for (int i = 0; i < itemName.length; i++) {
 			HashMap<String, Object> map = new HashMap<>();
-			map.put("ItemImage",imgID[i]);
+			map.put("ItemImage", imgID[i]);
 			map.put("ItemText", itemName[i]);
 			listItem.add(map);
 		}
@@ -121,7 +120,6 @@ public class DashboardActivity extends BaseActivity{
 		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 								long arg3) {
 			popupWindow.dismiss();
-
 			switch (listItem.get(arg2).get("ItemText").toString()) {
 				case "个人信息":
 					Intent settingIntent = new Intent(mContext, SettingActivity.class);
@@ -245,7 +243,7 @@ public class DashboardActivity extends BaseActivity{
 		notificationBroadcastReceiver = new NotificationBroadcastReceiver();
 		registerReceiver(notificationBroadcastReceiver, filter);
 		/*
-         * 打开通知服务,用于发送通知
+		 * 打开通知服务,用于发送通知
          */
 		Intent startService = new Intent(this, LocalNotificationService.class);
 		startService(startService);
@@ -285,12 +283,10 @@ public class DashboardActivity extends BaseActivity{
 			if (messageNotifition > 0 && objectType != 5) {
 				setBadgeView(kTab, bvMessage);
 			}
-			if (notificationJSON.getInt(URLs.kSetting)  > 0) {
+			if (notificationJSON.getInt(URLs.kSetting) > 0) {
 				setBadgeView(URLs.kSetting, bvBannerSetting);
-				setBadgeView("user", bvUser);
 			} else {
 				bvBannerSetting.setVisibility(View.GONE);
-				bvUser.setVisibility(View.GONE);
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -400,7 +396,6 @@ public class DashboardActivity extends BaseActivity{
 		mTabAPP = (TabView) findViewById(R.id.tabApp);
 		mTabMessage = (TabView) findViewById(R.id.tabMessage);
 		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
-		TextView mUserInfo =(TextView) findViewById(R.id.text_menu_item);
 
 		if (URLs.kTabBar) {
 			mTabKPI.setVisibility(URLs.kTabBarKPI ? View.VISIBLE : View.GONE);
@@ -424,7 +419,6 @@ public class DashboardActivity extends BaseActivity{
 		bvApp = new BadgeView(this, mTabAPP);
 		bvMessage = new BadgeView(this, mTabMessage);
 		bvBannerSetting = new BadgeView(this, mBannerSetting);
-		bvUser = new BadgeView(this, mUserInfo);
 	}
 
 	/*
@@ -599,7 +593,7 @@ public class DashboardActivity extends BaseActivity{
 							mTabAPP.performClick();
 							break;
 						case URLs.kTabMessage:
-							if(openLink.equals("0") || openLink.equals("1") || openLink.equals("2")) {
+							if (openLink.equals("0") || openLink.equals("1") || openLink.equals("2")) {
 
 								storeTabIndex("message", Integer.parseInt(openLink));
 							}
@@ -777,20 +771,48 @@ public class DashboardActivity extends BaseActivity{
 			 * 1. 动态添加新字段
 			 * 2. 不可影响已存在字段存放的数据
 			 */
-			if (!notificationJSON.has("app")) { notificationJSON.put("app", -1); }
-			if (!notificationJSON.has(URLs.kTabKpi)) { notificationJSON.put(URLs.kTabKpi, -1); }
-			if (!notificationJSON.has("tab_kpi_last")) { notificationJSON.put("tab_kpi_last", -1); }
-			if (!notificationJSON.has(URLs.kTabAnalyse)) { notificationJSON.put(URLs.kTabAnalyse, -1); }
-			if (!notificationJSON.has("tab_analyse_last")) { notificationJSON.put("tab_analyse_last", -1); }
-			if (!notificationJSON.has(URLs.kTabApp)) { notificationJSON.put(URLs.kTabApp, -1); }
-			if (!notificationJSON.has("tab_app_last")) { notificationJSON.put("tab_app_last", -1); }
-			if (!notificationJSON.has(URLs.kTabMessage)) { notificationJSON.put(URLs.kTabMessage, -1); }
-			if (!notificationJSON.has("tab_message_last")) { notificationJSON.put("tab_message_last", -1); }
-			if (!notificationJSON.has(URLs.kSetting)) { notificationJSON.put(URLs.kSetting, -1); }
-			if (!notificationJSON.has(URLs.kSettingPgyer)) { notificationJSON.put(URLs.kSettingPgyer, -1); }
-			if (!notificationJSON.has(URLs.kSettingPassword)) { notificationJSON.put(URLs.kSettingPassword, -1); }
-			if (!notificationJSON.has(URLs.kSettingThursdaySay)) { notificationJSON.put(URLs.kSettingThursdaySay, -1); }
-			if (!notificationJSON.has("setting_thursday_say_last")) { notificationJSON.put("setting_thursday_say_last", -1); }
+			if (!notificationJSON.has("app")) {
+				notificationJSON.put("app", -1);
+			}
+			if (!notificationJSON.has(URLs.kTabKpi)) {
+				notificationJSON.put(URLs.kTabKpi, -1);
+			}
+			if (!notificationJSON.has("tab_kpi_last")) {
+				notificationJSON.put("tab_kpi_last", -1);
+			}
+			if (!notificationJSON.has(URLs.kTabAnalyse)) {
+				notificationJSON.put(URLs.kTabAnalyse, -1);
+			}
+			if (!notificationJSON.has("tab_analyse_last")) {
+				notificationJSON.put("tab_analyse_last", -1);
+			}
+			if (!notificationJSON.has(URLs.kTabApp)) {
+				notificationJSON.put(URLs.kTabApp, -1);
+			}
+			if (!notificationJSON.has("tab_app_last")) {
+				notificationJSON.put("tab_app_last", -1);
+			}
+			if (!notificationJSON.has(URLs.kTabMessage)) {
+				notificationJSON.put(URLs.kTabMessage, -1);
+			}
+			if (!notificationJSON.has("tab_message_last")) {
+				notificationJSON.put("tab_message_last", -1);
+			}
+			if (!notificationJSON.has(URLs.kSetting)) {
+				notificationJSON.put(URLs.kSetting, -1);
+			}
+			if (!notificationJSON.has(URLs.kSettingPgyer)) {
+				notificationJSON.put(URLs.kSettingPgyer, -1);
+			}
+			if (!notificationJSON.has(URLs.kSettingPassword)) {
+				notificationJSON.put(URLs.kSettingPassword, -1);
+			}
+			if (!notificationJSON.has(URLs.kSettingThursdaySay)) {
+				notificationJSON.put(URLs.kSettingThursdaySay, -1);
+			}
+			if (!notificationJSON.has("setting_thursday_say_last")) {
+				notificationJSON.put("setting_thursday_say_last", -1);
+			}
 
 
 			FileUtil.writeFile(noticePath, notificationJSON.toString());
