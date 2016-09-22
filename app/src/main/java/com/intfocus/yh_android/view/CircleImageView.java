@@ -1,4 +1,4 @@
-package com.intfocus.yh_android;
+package com.intfocus.yh_android.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -12,6 +12,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.ImageView;
+
+import com.intfocus.yh_android.R;
 
 /**
  * Created by Liurl on 2016/9/2.

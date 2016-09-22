@@ -32,6 +32,7 @@ import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
+import com.intfocus.yh_android.view.RedPointView;
 import com.readystatesoftware.viewbadger.BadgeView;
 
 import org.json.JSONException;
