@@ -35,7 +35,6 @@ public class RedPointView {
 		}
 
 		//badgeView.setText(badgerCount);  //暂不需要计数
-		badgeView.setBadgePosition(BadgeView.POSITION_TOP_RIGHT);
 		switch (type) {
 			case URLs.kSetting:
 				badgeView.setBadgeMargin(20, 15);
@@ -48,11 +47,8 @@ public class RedPointView {
 			case URLs.kSettingThursdaySay:
 				badgeView.setBadgePosition(BadgeView.POSITION_TOP_LEFT);
 				break;
-			case "user":
-				badgeView.setBadgeMargin(0, 5);
-				break;
 			default:
-				badgeView.setBadgeMargin(45, 0);
+				badgeView.setBadgePosition(BadgeView.POSITION_TOP_RIGHT);
 				break;
 		}
 		badgeView.show();

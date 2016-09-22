@@ -262,7 +262,7 @@ public class HttpUtil {
     public static String UrlToFileName(String urlString) {
         String path = "default";
         try {
-            urlString = urlString.replace(URLs.kBaseUrl, "");
+            urlString = urlString.replace(K.kBaseUrl, "");
             URI uri = new URI(urlString);
             path = uri.getPath().replace("/", "_");
         } catch (Exception e) {

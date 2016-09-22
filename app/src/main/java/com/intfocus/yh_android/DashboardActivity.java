@@ -25,12 +25,11 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
+import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.readystatesoftware.viewbadger.BadgeView;
@@ -45,14 +44,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-public class DashboardActivity extends BaseActivity{
+public class DashboardActivity extends BaseActivity {
 	public final static String kTab = "tab";
 	public final static String kUserId = "user_id";
 
 	public static final String ACTION_UPDATENOTIFITION = "action.updateNotifition";
 	private static final int ZBAR_CAMERA_PERMISSION = 1;
 	private TabView mCurrentTab;
-	private BadgeView bvUser, bvVoice;
 	private ArrayList<String> urlStrings;
 	private ArrayList<HashMap<String, Object>> listItem;
 	private JSONObject notificationJSON;
@@ -102,15 +100,14 @@ public class DashboardActivity extends BaseActivity{
 		listItem = new ArrayList<HashMap<String, Object>>();
 		int[] imgID = {R.drawable.icon_scan, R.drawable.icon_voice, R.drawable.icon_search, R.drawable.icon_user};
 		String[] itemName = {"扫一扫", "语音播报", "搜索", "个人信息"};
-		for (int i = 0;i < itemName.length; i++) {
+		for (int i = 0; i < itemName.length; i++) {
 			HashMap<String, Object> map = new HashMap<>();
-			map.put("ItemImage",imgID[i]);
+			map.put("ItemImage", imgID[i]);
 			map.put("ItemText", itemName[i]);
 			listItem.add(map);
 		}
 
 		mSimpleAdapter = new MenuAdapter(this, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
-
 		initDropMenu(mSimpleAdapter, mDropMenuListener);
 	}
 
@@ -121,7 +118,6 @@ public class DashboardActivity extends BaseActivity{
 		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 								long arg3) {
 			popupWindow.dismiss();
-
 			switch (listItem.get(arg2).get("ItemText").toString()) {
 				case "个人信息":
 					Intent settingIntent = new Intent(mContext, SettingActivity.class);
@@ -205,9 +201,7 @@ public class DashboardActivity extends BaseActivity{
 		/*
 		 * 隐藏广告位
 		 */
-		if (!URLs.kDashboardAd) {
-			return;
-		}
+		if (!K.kDashboardAd) { return; }
 		String adIndexBasePath = FileUtil.sharedPath(this) + "/advertisement/index_android";
 		String adIndexPath = adIndexBasePath + ".html";
 		String adIndexWithTimestampPath = adIndexBasePath + ".timestamp.html";
@@ -245,7 +239,7 @@ public class DashboardActivity extends BaseActivity{
 		notificationBroadcastReceiver = new NotificationBroadcastReceiver();
 		registerReceiver(notificationBroadcastReceiver, filter);
 		/*
-         * 打开通知服务,用于发送通知
+		 * 打开通知服务,用于发送通知
          */
 		Intent startService = new Intent(this, LocalNotificationService.class);
 		startService(startService);
@@ -266,7 +260,8 @@ public class DashboardActivity extends BaseActivity{
 	 */
 	private void receiveNotification() {
 		try {
-			String noticePath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
+			Log.i("bugbug","notifition is running");
+			String noticePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
 			notificationJSON = FileUtil.readConfigFile(noticePath);
 			kpiNotifition = notificationJSON.getInt(URLs.kTabKpi);
 			analyseNotifition = notificationJSON.getInt(URLs.kTabAnalyse);
@@ -274,23 +269,25 @@ public class DashboardActivity extends BaseActivity{
 			messageNotifition = notificationJSON.getInt(URLs.kTabMessage);
 
 			if (kpiNotifition > 0 && objectType != 1) {
-				setBadgeView(kTab, bvKpi);
+				RedPointView.showRedPoint(mContext,kTab, bvKpi);
 			}
 			if (analyseNotifition > 0 && objectType != 2) {
-				setBadgeView(kTab, bvAnalyse);
+				RedPointView.showRedPoint(mContext, kTab, bvAnalyse);
 			}
 			if (appNotifition > 0 && objectType != 3) {
-				setBadgeView(kTab, bvApp);
+				RedPointView.showRedPoint(mContext, kTab, bvApp);
 			}
 			if (messageNotifition > 0 && objectType != 5) {
-				setBadgeView(kTab, bvMessage);
+				Log.i("bugbug",notificationJSON.getInt(URLs.kSetting) + "is setting count");
+				RedPointView.showRedPoint(mContext, kTab, bvMessage);
 			}
-			if (notificationJSON.getInt(URLs.kSetting)  > 0) {
-				setBadgeView(URLs.kSetting, bvBannerSetting);
-				setBadgeView("user", bvUser);
+			if (notificationJSON.getInt(URLs.kSetting) > 0) {
+				Log.i("bugbug",notificationJSON.getInt(URLs.kSetting) + "is setting count");
+				RedPointView.showRedPoint(mContext, URLs.kSetting, bvBannerSetting);
 			} else {
+				Log.i("bugbug","setting is zero");
+				Log.i("bugbug",notificationJSON.getInt(URLs.kSetting) + "is setting count");
 				bvBannerSetting.setVisibility(View.GONE);
-				bvUser.setVisibility(View.GONE);
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -335,7 +332,7 @@ public class DashboardActivity extends BaseActivity{
 				@Override
 				public synchronized void run() {
 					try {
-						String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
+						String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
 						JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
 						String info = ApiHelper.authentication(mContext, userJSON.getString("user_num"), userJSON.getString(URLs.kPassword));
@@ -358,7 +355,7 @@ public class DashboardActivity extends BaseActivity{
 	 */
 	public void checkUserModifiedInitPassword() {
 		try {
-			if (!user.getString(URLs.kPassword).equals(URLs.MD5(URLs.kInitPassword))) {
+			if (!user.getString(URLs.kPassword).equals(URLs.MD5(K.kInitPassword))) {
 				return;
 			}
 
@@ -400,14 +397,15 @@ public class DashboardActivity extends BaseActivity{
 		mTabAPP = (TabView) findViewById(R.id.tabApp);
 		mTabMessage = (TabView) findViewById(R.id.tabMessage);
 		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
-		TextView mUserInfo =(TextView) findViewById(R.id.text_menu_item);
 
-		if (URLs.kTabBar) {
-			mTabKPI.setVisibility(URLs.kTabBarKPI ? View.VISIBLE : View.GONE);
-			mTabAnalyse.setVisibility(URLs.kTabBarAnalyse ? View.VISIBLE : View.GONE);
-			mTabAPP.setVisibility(URLs.kTabBarApp ? View.VISIBLE : View.GONE);
-			mTabMessage.setVisibility(URLs.kTabBarMessage ? View.VISIBLE : View.GONE);
-		} else {
+		if (K.kTabBar) {
+			mTabKPI.setVisibility(K.kTabBarKPI ? View.VISIBLE : View.GONE);
+			mTabAnalyse.setVisibility(K.kTabBarAnalyse ? View.VISIBLE : View.GONE);
+			mTabAPP.setVisibility(K.kTabBarApp ? View.VISIBLE : View.GONE);
+			mTabMessage.setVisibility(K.kTabBarMessage ? View.VISIBLE : View.GONE);
+		}
+		else {
+
 			findViewById(R.id.toolBar).setVisibility(View.GONE);
 		}
 
@@ -424,7 +422,6 @@ public class DashboardActivity extends BaseActivity{
 		bvApp = new BadgeView(this, mTabAPP);
 		bvMessage = new BadgeView(this, mTabMessage);
 		bvBannerSetting = new BadgeView(this, mBannerSetting);
-		bvUser = new BadgeView(this, mUserInfo);
 	}
 
 	/*
@@ -456,42 +453,42 @@ public class DashboardActivity extends BaseActivity{
 				switch (v.getId()) {
 					case R.id.tabKPI:
 						objectType = 1;
-						urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
+						urlString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
 
 						bvKpi.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabKpi, 0);
 						break;
 					case R.id.tabAnalyse:
 						objectType = 2;
-						urlString = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+						urlString = String.format(K.kAnalyseMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 
 						bvAnalyse.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabAnalyse, 0);
 						break;
 					case R.id.tabApp:
 						objectType = 3;
-						urlString = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+						urlString = String.format(K.kAppMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 
 						bvApp.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabApp, 0);
 						break;
 					case R.id.tabMessage:
 						objectType = 5;
-						urlString = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
+						urlString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
 
 						bvMessage.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabMessage, 0);
 						break;
 					default:
 						objectType = 1;
-						urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
+						urlString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
 
 						bvKpi.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabKpi, 0);
 						break;
 				}
 
-				String notificationPath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
+				String notificationPath = FileUtil.dirPath(mContext, K.kCachedDirName, K.kLocalNotificationConfigFileName);
 				FileUtil.writeFile(notificationPath, notificationJSON.toString());
 
 				new Thread(mRunnableForDetecting).start();
@@ -599,7 +596,7 @@ public class DashboardActivity extends BaseActivity{
 							mTabAPP.performClick();
 							break;
 						case URLs.kTabMessage:
-							if(openLink.equals("0") || openLink.equals("1") || openLink.equals("2")) {
+							if (openLink.equals("0") || openLink.equals("1") || openLink.equals("2")) {
 
 								storeTabIndex("message", Integer.parseInt(openLink));
 							}
@@ -636,7 +633,7 @@ public class DashboardActivity extends BaseActivity{
 		@JavascriptInterface
 		public void storeTabIndex(final String pageName, final int tabIndex) {
 			try {
-				String filePath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.TABINDEX_CONFIG_FILENAME);
+				String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kTabIndexConfigFileName);
 
 				JSONObject config = new JSONObject();
 				if ((new File(filePath).exists())) {
@@ -655,7 +652,7 @@ public class DashboardActivity extends BaseActivity{
 		public int restoreTabIndex(final String pageName) {
 			int tabIndex = 0;
 			try {
-				String filePath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.TABINDEX_CONFIG_FILENAME);
+				String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kTabIndexConfigFileName);
 
 				JSONObject config = new JSONObject();
 				if ((new File(filePath).exists())) {
@@ -744,15 +741,15 @@ public class DashboardActivity extends BaseActivity{
 		String currentUIVersion = URLs.currentUIVersion(mContext);
 		String tmpString;
 		try {
-			tmpString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
+			tmpString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
-			tmpString = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+			tmpString = String.format(K.kAnalyseMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
-			tmpString = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+			tmpString = String.format(K.kAppMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
-			tmpString = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
+			tmpString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
 			urlStrings.add(tmpString);
-			tmpString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
+			tmpString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -770,27 +767,55 @@ public class DashboardActivity extends BaseActivity{
 	 */
 	private void initLocalNotifications() {
 		try {
-			String noticePath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
+			String noticePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
 			notificationJSON = FileUtil.readConfigFile(noticePath);
 			/*
 			 * 版本迭代的问题：
 			 * 1. 动态添加新字段
 			 * 2. 不可影响已存在字段存放的数据
 			 */
-			if (!notificationJSON.has("app")) { notificationJSON.put("app", -1); }
-			if (!notificationJSON.has(URLs.kTabKpi)) { notificationJSON.put(URLs.kTabKpi, -1); }
-			if (!notificationJSON.has("tab_kpi_last")) { notificationJSON.put("tab_kpi_last", -1); }
-			if (!notificationJSON.has(URLs.kTabAnalyse)) { notificationJSON.put(URLs.kTabAnalyse, -1); }
-			if (!notificationJSON.has("tab_analyse_last")) { notificationJSON.put("tab_analyse_last", -1); }
-			if (!notificationJSON.has(URLs.kTabApp)) { notificationJSON.put(URLs.kTabApp, -1); }
-			if (!notificationJSON.has("tab_app_last")) { notificationJSON.put("tab_app_last", -1); }
-			if (!notificationJSON.has(URLs.kTabMessage)) { notificationJSON.put(URLs.kTabMessage, -1); }
-			if (!notificationJSON.has("tab_message_last")) { notificationJSON.put("tab_message_last", -1); }
-			if (!notificationJSON.has(URLs.kSetting)) { notificationJSON.put(URLs.kSetting, -1); }
-			if (!notificationJSON.has(URLs.kSettingPgyer)) { notificationJSON.put(URLs.kSettingPgyer, -1); }
-			if (!notificationJSON.has(URLs.kSettingPassword)) { notificationJSON.put(URLs.kSettingPassword, -1); }
-			if (!notificationJSON.has(URLs.kSettingThursdaySay)) { notificationJSON.put(URLs.kSettingThursdaySay, -1); }
-			if (!notificationJSON.has("setting_thursday_say_last")) { notificationJSON.put("setting_thursday_say_last", -1); }
+			if (!notificationJSON.has("app")) {
+				notificationJSON.put("app", -1);
+			}
+			if (!notificationJSON.has(URLs.kTabKpi)) {
+				notificationJSON.put(URLs.kTabKpi, -1);
+			}
+			if (!notificationJSON.has("tab_kpi_last")) {
+				notificationJSON.put("tab_kpi_last", -1);
+			}
+			if (!notificationJSON.has(URLs.kTabAnalyse)) {
+				notificationJSON.put(URLs.kTabAnalyse, -1);
+			}
+			if (!notificationJSON.has("tab_analyse_last")) {
+				notificationJSON.put("tab_analyse_last", -1);
+			}
+			if (!notificationJSON.has(URLs.kTabApp)) {
+				notificationJSON.put(URLs.kTabApp, -1);
+			}
+			if (!notificationJSON.has("tab_app_last")) {
+				notificationJSON.put("tab_app_last", -1);
+			}
+			if (!notificationJSON.has(URLs.kTabMessage)) {
+				notificationJSON.put(URLs.kTabMessage, -1);
+			}
+			if (!notificationJSON.has("tab_message_last")) {
+				notificationJSON.put("tab_message_last", -1);
+			}
+			if (!notificationJSON.has(URLs.kSetting)) {
+				notificationJSON.put(URLs.kSetting, -1);
+			}
+			if (!notificationJSON.has(URLs.kSettingPgyer)) {
+				notificationJSON.put(URLs.kSettingPgyer, -1);
+			}
+			if (!notificationJSON.has(URLs.kSettingPassword)) {
+				notificationJSON.put(URLs.kSettingPassword, -1);
+			}
+			if (!notificationJSON.has(URLs.kSettingThursdaySay)) {
+				notificationJSON.put(URLs.kSettingThursdaySay, -1);
+			}
+			if (!notificationJSON.has("setting_thursday_say_last")) {
+				notificationJSON.put("setting_thursday_say_last", -1);
+			}
 
 
 			FileUtil.writeFile(noticePath, notificationJSON.toString());
