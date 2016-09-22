@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.intfocus.yh_android.util.FileUtil;
+import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 
@@ -45,7 +46,7 @@ public class StoreSelectorActivity extends BaseActivity {
     setContentView(R.layout.activity_store_selector);
 
     try {
-      cachedPath = FileUtil.dirPath(mContext,  URLs.CACHED_DIRNAME, URLs.BARCODE_RESULT_FILENAME);
+      cachedPath = FileUtil.dirPath(mContext, K.kCachedDirName, K.kBarCodeResultFileName);
       cachedJSON = FileUtil.readConfigFile(cachedPath);
       currentStore = cachedJSON.getJSONObject(URLs.kStore);
 

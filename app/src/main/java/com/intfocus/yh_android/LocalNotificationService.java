@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.HttpUtil;
+import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.URLs;
 
 import org.json.JSONException;
@@ -51,9 +52,9 @@ public class LocalNotificationService extends Service {
     super.onCreate();
     mContext = this;
 
-    notificationPath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
-    userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
-    pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.PGYER_VERSION_FILENAME);
+    notificationPath = FileUtil.dirPath(mContext, K.kCachedDirName, K.kLocalNotificationConfigFileName);
+    userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
+    pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPgyerVersionConfigFileName);
 
     //注册广播发送
     sendIntent = new Intent();
@@ -67,11 +68,11 @@ public class LocalNotificationService extends Service {
     notificationJSON = FileUtil.readConfigFile(notificationPath);
     try {
       String currentUIVersion = URLs.currentUIVersion(mContext);
-      kpiUrl = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, userJSON.getString(URLs.kGroupId), userJSON.getString(URLs.kRoleId));
-      analyseUrl = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, userJSON.getString(URLs.kRoleId));
-      appUrl = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, userJSON.getString(URLs.kRoleId));
-      messageUrl = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, userJSON.getString(URLs.kRoleId), userJSON.getString(URLs.kGroupId), userJSON.getString("user_id"));
-      thursdaySayUrl = String.format(URLs.THURSDAY_SAY_PATH, URLs.kBaseUrl, currentUIVersion);
+      kpiUrl = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, userJSON.getString(URLs.kGroupId), userJSON.getString(URLs.kRoleId));
+      analyseUrl = String.format(K.kAnalyseMobilePath, K.kBaseUrl, currentUIVersion, userJSON.getString(URLs.kRoleId));
+      appUrl = String.format(K.kAppMobilePath, K.kBaseUrl, currentUIVersion, userJSON.getString(URLs.kRoleId));
+      messageUrl = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, userJSON.getString(URLs.kRoleId), userJSON.getString(URLs.kGroupId), userJSON.getString("user_id"));
+      thursdaySayUrl = String.format(K.kThursdaySayMobilePath, K.kBaseUrl, currentUIVersion);
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -127,7 +128,7 @@ public class LocalNotificationService extends Service {
         updataCount = -1;
       }
 
-      passwordCount = userJSON.getString(URLs.kPassword).equals(URLs.MD5(URLs.kInitPassword)) ? 1 : -1;
+      passwordCount = userJSON.getString(URLs.kPassword).equals(URLs.MD5(K.kInitPassword)) ? 1 : -1;
       notificationJSON.put(URLs.kSettingPassword, passwordCount);
       notificationJSON.put(URLs.kSettingPgyer, updataCount);
 

@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.intfocus.yh_android.util.URLs;
+import com.intfocus.yh_android.util.K;
 
 /**
  * Created by wiky on 1/10/16.
@@ -62,7 +62,7 @@ public class TabView extends LinearLayout {
     private void update() {
         if (mActive) {
             mImageView.setImageDrawable(mActiveDrawable);
-            mTextView.setTextColor(Color.parseColor(URLs.kThemeColor));
+            mTextView.setTextColor(Color.parseColor(K.kThemeColor));
         }
         else {
             mImageView.setImageDrawable(mDrawable);

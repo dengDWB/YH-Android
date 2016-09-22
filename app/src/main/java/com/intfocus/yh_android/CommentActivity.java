@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
+import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.URLs;
 
 import org.json.JSONException;
@@ -49,7 +50,7 @@ public class CommentActivity extends BaseActivity {
         objectType = intent.getIntExtra(URLs.kObjectType, -1);
 
         mTitle.setText(bannerName);
-        urlString = String.format(URLs.COMMENT_PATH, URLs.kBaseUrl, URLs.currentUIVersion(mContext), objectID, objectType);
+        urlString = String.format(K.kCommentMobilePath, K.kBaseUrl, URLs.currentUIVersion(mContext), objectID, objectType);
 
         new Thread(mRunnableForDetecting).start();
 

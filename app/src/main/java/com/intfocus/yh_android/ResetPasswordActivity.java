@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
+import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.URLs;
 
 import org.json.JSONException;
@@ -39,7 +40,7 @@ public class ResetPasswordActivity extends BaseActivity {
         mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);
         mWebView.loadUrl(urlStringForLoading);
 
-        urlString = String.format(URLs.RESET_PASSWORD_PATH, URLs.kBaseUrl, URLs.currentUIVersion(mContext));
+        urlString = String.format(K.kResetPwdMobilePath, K.kBaseUrl, URLs.currentUIVersion(mContext));
         new Thread(mRunnableForDetecting).start();
     }
 

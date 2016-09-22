@@ -16,6 +16,7 @@ import android.util.Log;
 
 import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
 import com.intfocus.yh_android.util.FileUtil;
+import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.URLs;
 import com.pgyersdk.crash.PgyCrashManager;
 import com.squareup.leakcanary.LeakCanary;
@@ -79,7 +80,7 @@ public class YHApplication extends Application {
         /*
          * 微信平台验证
          */
-        PlatformConfig.setWeixin(URLs.kWXAppId, URLs.kWXAppSecret);
+        PlatformConfig.setWeixin(K.kWXAppId, K.kWXAppSecret);
 
         /*
          *  蒲公英平台，收集闪退日志
@@ -94,8 +95,8 @@ public class YHApplication extends Application {
         /*
          *  基本目录结构
          */
-        makeSureFolderExist(URLs.CACHED_DIRNAME);
-        makeSureFolderExist(URLs.SHARED_DIRNAME);
+        makeSureFolderExist(K.kSharedDirName);
+        makeSureFolderExist(K.kCachedDirName);
 
         /**
          *  新安装、或升级后，把代码包中的静态资源重新拷贝覆盖一下
@@ -151,7 +152,7 @@ public class YHApplication extends Application {
     private void copyAssetFiles(String basePath, String sharedPath) {
         try {
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            String versionConfigPath = String.format("%s/%s", basePath, URLs.CURRENT_VERSION_FILENAME);
+            String versionConfigPath = String.format("%s/%s", basePath, K.kCurrentVersionFileName);
 
             boolean isUpgrade = true;
             String localVersion = "new-installer";
@@ -160,7 +161,7 @@ public class YHApplication extends Application {
                 isUpgrade = !localVersion.equals(packageInfo.versionName);
             }
             if (!isUpgrade) return;
-            Log.i("VersionUpgrade", String.format("%s => %s remove %s/%s", localVersion, packageInfo.versionName, basePath, URLs.CACHED_HEADER_FILENAME));
+            Log.i("VersionUpgrade", String.format("%s => %s remove %s/%s", localVersion, packageInfo.versionName, basePath, K.kCachedHeaderConfigFileName));
 
             String assetZipPath;
             File assetZipFile;

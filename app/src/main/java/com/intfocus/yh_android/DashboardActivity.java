@@ -32,6 +32,7 @@ import android.widget.PopupWindow;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
+import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.readystatesoftware.viewbadger.BadgeView;
@@ -151,7 +152,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		/*
 		 * 隐藏广告位
 		 */
-		if (!URLs.kDashboardAd) { return; }
+		if (!K.kDashboardAd) { return; }
 		String adIndexBasePath = FileUtil.sharedPath(this) + "/advertisement/index_android";
 		String adIndexPath = adIndexBasePath + ".html";
 		String adIndexWithTimestampPath = adIndexBasePath + ".timestamp.html";
@@ -211,7 +212,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	 */
 	private void receiveNotification() {
 		try {
-			String noticePath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
+			String noticePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
 			notificationJSON = FileUtil.readConfigFile(noticePath);
 			kpiNotifition = notificationJSON.getInt(URLs.kTabKpi);
 			analyseNotifition = notificationJSON.getInt(URLs.kTabAnalyse);
@@ -280,7 +281,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 				@Override
 				public synchronized void run() {
 					try {
-						String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
+						String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
 						JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
 						String info = ApiHelper.authentication(mContext, userJSON.getString("user_num"), userJSON.getString(URLs.kPassword));
@@ -303,7 +304,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	 */
 	public void checkUserModifiedInitPassword() {
 		try {
-			if (!user.getString(URLs.kPassword).equals(URLs.MD5(URLs.kInitPassword))) {
+			if (!user.getString(URLs.kPassword).equals(URLs.MD5(K.kInitPassword))) {
 				return;
 			}
 
@@ -360,38 +361,38 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
          * 根据配置动态设置显示下拉菜单选项
          */
 		View viewSeparator;
-		if (!URLs.kDropMenuScan) {
+		if (!K.kDropMenuScan) {
 			viewSeparator = contentView.findViewById(R.id.linearScanSeparator);
-			viewSeparator.setVisibility(URLs.kDropMenuScan ? View.VISIBLE : View.GONE);
+			viewSeparator.setVisibility(K.kDropMenuScan ? View.VISIBLE : View.GONE);
 
-			linearScan.setVisibility(URLs.kDropMenuScan ? View.VISIBLE : View.GONE);
+			linearScan.setVisibility(K.kDropMenuScan ? View.VISIBLE : View.GONE);
 			linearScan.setOnClickListener(this);
 		} else {
 			linearScan.setOnClickListener(this);
 		}
 
-		if (!URLs.kDropMenuVoice) {
+		if (!K.kDropMenuVoice) {
 			viewSeparator = contentView.findViewById(R.id.linearVoiceSeparator);
-			viewSeparator.setVisibility(URLs.kDropMenuVoice ? View.VISIBLE : View.GONE);
+			viewSeparator.setVisibility(K.kDropMenuVoice ? View.VISIBLE : View.GONE);
 
-			linearVoice.setVisibility(URLs.kDropMenuVoice ? View.VISIBLE : View.GONE);
+			linearVoice.setVisibility(K.kDropMenuVoice ? View.VISIBLE : View.GONE);
 			linearVoice.setOnClickListener(this);
 		} else {
 			linearVoice.setOnClickListener(this);
 		}
 
-		if (!URLs.kDropMenuSearch) {
+		if (!K.kDropMenuSearch) {
 			viewSeparator = contentView.findViewById(R.id.linearSearchSeparator);
-			viewSeparator.setVisibility(URLs.kDropMenuSearch ? View.VISIBLE : View.GONE);
+			viewSeparator.setVisibility(K.kDropMenuSearch ? View.VISIBLE : View.GONE);
 
-			linearSearch.setVisibility(URLs.kDropMenuSearch ? View.VISIBLE : View.GONE);
+			linearSearch.setVisibility(K.kDropMenuSearch ? View.VISIBLE : View.GONE);
 			linearSearch.setOnClickListener(this);
 		} else {
 			linearSearch.setOnClickListener(this);
 		}
 
-		if (!URLs.kDropMenuUserInfo) {
-			linearUserInfo.setVisibility(URLs.kDropMenuUserInfo ? View.VISIBLE : View.GONE);
+		if (!K.kDropMenuUserInfo) {
+			linearUserInfo.setVisibility(K.kDropMenuUserInfo ? View.VISIBLE : View.GONE);
 			linearUserInfo.setOnClickListener(this);
 		} else {
 			linearUserInfo.setOnClickListener(this);
@@ -442,11 +443,11 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		mTabMessage = (TabView) findViewById(R.id.tabMessage);
 		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 
-		if (URLs.kTabBar) {
-			mTabKPI.setVisibility(URLs.kTabBarKPI ? View.VISIBLE : View.GONE);
-			mTabAnalyse.setVisibility(URLs.kTabBarAnalyse ? View.VISIBLE : View.GONE);
-			mTabAPP.setVisibility(URLs.kTabBarApp ? View.VISIBLE : View.GONE);
-			mTabMessage.setVisibility(URLs.kTabBarMessage ? View.VISIBLE : View.GONE);
+		if (K.kTabBar) {
+			mTabKPI.setVisibility(K.kTabBarKPI ? View.VISIBLE : View.GONE);
+			mTabAnalyse.setVisibility(K.kTabBarAnalyse ? View.VISIBLE : View.GONE);
+			mTabAPP.setVisibility(K.kTabBarApp ? View.VISIBLE : View.GONE);
+			mTabMessage.setVisibility(K.kTabBarMessage ? View.VISIBLE : View.GONE);
 		}
 		else {
 			findViewById(R.id.toolBar).setVisibility(View.GONE);
@@ -497,42 +498,42 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 				switch (v.getId()) {
 					case R.id.tabKPI:
 						objectType = 1;
-						urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
+						urlString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
 
 						bvKpi.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabKpi, 0);
 						break;
 					case R.id.tabAnalyse:
 						objectType = 2;
-						urlString = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+						urlString = String.format(K.kAnalyseMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 
 						bvAnalyse.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabAnalyse, 0);
 						break;
 					case R.id.tabApp:
 						objectType = 3;
-						urlString = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+						urlString = String.format(K.kAppMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 
 						bvApp.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabApp, 0);
 						break;
 					case R.id.tabMessage:
 						objectType = 5;
-						urlString = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
+						urlString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
 
 						bvMessage.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabMessage, 0);
 						break;
 					default:
 						objectType = 1;
-						urlString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
+						urlString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
 
 						bvKpi.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabKpi, 0);
 						break;
 				}
 
-				String notificationPath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
+				String notificationPath = FileUtil.dirPath(mContext, K.kCachedDirName, K.kLocalNotificationConfigFileName);
 				FileUtil.writeFile(notificationPath, notificationJSON.toString());
 
 				new Thread(mRunnableForDetecting).start();
@@ -676,7 +677,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		@JavascriptInterface
 		public void storeTabIndex(final String pageName, final int tabIndex) {
 			try {
-				String filePath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.TABINDEX_CONFIG_FILENAME);
+				String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kTabIndexConfigFileName);
 
 				JSONObject config = new JSONObject();
 				if ((new File(filePath).exists())) {
@@ -695,7 +696,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		public int restoreTabIndex(final String pageName) {
 			int tabIndex = 0;
 			try {
-				String filePath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.TABINDEX_CONFIG_FILENAME);
+				String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kTabIndexConfigFileName);
 
 				JSONObject config = new JSONObject();
 				if ((new File(filePath).exists())) {
@@ -783,15 +784,15 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 		String currentUIVersion = URLs.currentUIVersion(mContext);
 		String tmpString;
 		try {
-			tmpString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
+			tmpString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
-			tmpString = String.format(URLs.ANALYSE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+			tmpString = String.format(K.kAnalyseMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
-			tmpString = String.format(URLs.APPLICATION_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+			tmpString = String.format(K.kAppMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
-			tmpString = String.format(URLs.MESSAGE_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
+			tmpString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
 			urlStrings.add(tmpString);
-			tmpString = String.format(URLs.KPI_PATH, URLs.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
+			tmpString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -809,7 +810,7 @@ public class DashboardActivity extends BaseActivity implements View.OnClickListe
 	 */
 	private void initLocalNotifications() {
 		try {
-			String noticePath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.LOCAL_NOTIFICATION_FILENAME);
+			String noticePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
 			notificationJSON = FileUtil.readConfigFile(noticePath);
 			/*
 			 * 版本迭代的问题：

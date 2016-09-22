@@ -10,6 +10,7 @@ import android.widget.ImageView;
 
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
+import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.URLs;
 
 import org.json.JSONException;
@@ -48,9 +49,9 @@ public class BarCodeResultActivity extends BaseActivity {
     colorViews.add((ImageView) findViewById(R.id.colorView4));
     initColorView(colorViews);
 
-    String htmlOriginPath = String.format("%s/BarCodeScan/%s",sharedPath,URLs.SCAN_BARCODE_FILENAME);
+    String htmlOriginPath = String.format("%s/BarCodeScan/%s",sharedPath, K.kScanBarCodeHTMLName);
     htmlContent = FileUtil.readFile(htmlOriginPath);
-    cachedPath = FileUtil.dirPath(mContext, URLs.CACHED_DIRNAME, URLs.BARCODE_RESULT_FILENAME);
+    cachedPath = FileUtil.dirPath(mContext, K.kCachedDirName, K.kBarCodeResultFileName);
     htmlPath = String.format("%s.tmp", htmlOriginPath);
 
     try {

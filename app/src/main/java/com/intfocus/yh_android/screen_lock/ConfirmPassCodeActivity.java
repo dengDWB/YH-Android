@@ -20,6 +20,7 @@ import com.intfocus.yh_android.R;
 import com.intfocus.yh_android.YHApplication;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
+import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.URLs;
 
 import org.json.JSONException;
@@ -216,7 +217,7 @@ public class ConfirmPassCodeActivity extends Activity {
         try {
             Log.i("confirmPassword", "confirmPassword");
 
-            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
+            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
             if (stringBuilder.toString().equals(userJSON.getString(URLs.kGesturePassword))) {
                 /*
@@ -283,12 +284,12 @@ public class ConfirmPassCodeActivity extends Activity {
     public void onCancel(View view) {
         //moveTaskToBack(true);
         try {
-            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
+            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
             userJSON.put("is_login", false);
             FileUtil.writeFile(userConfigPath, userJSON.toString());
 
-            String settingsConfigPath = FileUtil.dirPath(mContext, URLs.CONFIG_DIRNAME, URLs.SETTINGS_CONFIG_FILENAME);
+            String settingsConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kSettingConfigFileName);
             FileUtil.writeFile(settingsConfigPath, userJSON.toString());
         } catch (Exception e) {
             e.printStackTrace();
