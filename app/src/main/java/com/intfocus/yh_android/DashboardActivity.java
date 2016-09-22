@@ -260,7 +260,6 @@ public class DashboardActivity extends BaseActivity {
 	 */
 	private void receiveNotification() {
 		try {
-			Log.i("bugbug","notifition is running");
 			String noticePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
 			notificationJSON = FileUtil.readConfigFile(noticePath);
 			kpiNotifition = notificationJSON.getInt(URLs.kTabKpi);
@@ -278,15 +277,11 @@ public class DashboardActivity extends BaseActivity {
 				RedPointView.showRedPoint(mContext, kTab, bvApp);
 			}
 			if (messageNotifition > 0 && objectType != 5) {
-				Log.i("bugbug",notificationJSON.getInt(URLs.kSetting) + "is setting count");
 				RedPointView.showRedPoint(mContext, kTab, bvMessage);
 			}
 			if (notificationJSON.getInt(URLs.kSetting) > 0) {
-				Log.i("bugbug",notificationJSON.getInt(URLs.kSetting) + "is setting count");
 				RedPointView.showRedPoint(mContext, URLs.kSetting, bvBannerSetting);
 			} else {
-				Log.i("bugbug","setting is zero");
-				Log.i("bugbug",notificationJSON.getInt(URLs.kSetting) + "is setting count");
 				bvBannerSetting.setVisibility(View.GONE);
 			}
 		} catch (JSONException e) {
@@ -774,49 +769,20 @@ public class DashboardActivity extends BaseActivity {
 			 * 1. 动态添加新字段
 			 * 2. 不可影响已存在字段存放的数据
 			 */
-			if (!notificationJSON.has("app")) {
-				notificationJSON.put("app", -1);
-			}
-			if (!notificationJSON.has(URLs.kTabKpi)) {
-				notificationJSON.put(URLs.kTabKpi, -1);
-			}
-			if (!notificationJSON.has("tab_kpi_last")) {
-				notificationJSON.put("tab_kpi_last", -1);
-			}
-			if (!notificationJSON.has(URLs.kTabAnalyse)) {
-				notificationJSON.put(URLs.kTabAnalyse, -1);
-			}
-			if (!notificationJSON.has("tab_analyse_last")) {
-				notificationJSON.put("tab_analyse_last", -1);
-			}
-			if (!notificationJSON.has(URLs.kTabApp)) {
-				notificationJSON.put(URLs.kTabApp, -1);
-			}
-			if (!notificationJSON.has("tab_app_last")) {
-				notificationJSON.put("tab_app_last", -1);
-			}
-			if (!notificationJSON.has(URLs.kTabMessage)) {
-				notificationJSON.put(URLs.kTabMessage, -1);
-			}
-			if (!notificationJSON.has("tab_message_last")) {
-				notificationJSON.put("tab_message_last", -1);
-			}
-			if (!notificationJSON.has(URLs.kSetting)) {
-				notificationJSON.put(URLs.kSetting, -1);
-			}
-			if (!notificationJSON.has(URLs.kSettingPgyer)) {
-				notificationJSON.put(URLs.kSettingPgyer, -1);
-			}
-			if (!notificationJSON.has(URLs.kSettingPassword)) {
-				notificationJSON.put(URLs.kSettingPassword, -1);
-			}
-			if (!notificationJSON.has(URLs.kSettingThursdaySay)) {
-				notificationJSON.put(URLs.kSettingThursdaySay, -1);
-			}
-			if (!notificationJSON.has("setting_thursday_say_last")) {
-				notificationJSON.put("setting_thursday_say_last", -1);
-			}
-
+			if (!notificationJSON.has("app")) { notificationJSON.put("app", -1); }
+			if (!notificationJSON.has(URLs.kTabKpi)) { notificationJSON.put(URLs.kTabKpi, -1); }
+			if (!notificationJSON.has("tab_kpi_last")) { notificationJSON.put("tab_kpi_last", -1); }
+			if (!notificationJSON.has(URLs.kTabAnalyse)) { notificationJSON.put(URLs.kTabAnalyse, -1); }
+			if (!notificationJSON.has("tab_analyse_last")) { notificationJSON.put("tab_analyse_last", -1); }
+			if (!notificationJSON.has(URLs.kTabApp)) { notificationJSON.put(URLs.kTabApp, -1); }
+			if (!notificationJSON.has("tab_app_last")) { notificationJSON.put("tab_app_last", -1); }
+			if (!notificationJSON.has(URLs.kTabMessage)) { notificationJSON.put(URLs.kTabMessage, -1); }
+			if (!notificationJSON.has("tab_message_last")) { notificationJSON.put("tab_message_last", -1); }
+			if (!notificationJSON.has(URLs.kSetting)) { notificationJSON.put(URLs.kSetting, -1); }
+			if (!notificationJSON.has(URLs.kSettingPgyer)) { notificationJSON.put(URLs.kSettingPgyer, -1); }
+			if (!notificationJSON.has(URLs.kSettingPassword)) { notificationJSON.put(URLs.kSettingPassword, -1); }
+			if (!notificationJSON.has(URLs.kSettingThursdaySay)) { notificationJSON.put(URLs.kSettingThursdaySay, -1); }
+			if (!notificationJSON.has("setting_thursday_say_last")) { notificationJSON.put("setting_thursday_say_last", -1); }
 
 			FileUtil.writeFile(noticePath, notificationJSON.toString());
 		} catch (JSONException | IOException e) {

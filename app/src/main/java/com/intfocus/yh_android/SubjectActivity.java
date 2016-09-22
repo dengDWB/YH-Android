@@ -84,11 +84,13 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         bannerView = (RelativeLayout) findViewById(R.id.actionBar);
         TextView mTitle = (TextView) findViewById(R.id.bannerTitle);
 
+
         mPDFView = (PDFView) findViewById(R.id.pdfview);
         mPDFView.setVisibility(View.INVISIBLE);
 
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
         initWebView();
+        initDropMenuItem();
 
         mWebView.requestFocus();
         pullToRefreshWebView.setVisibility(View.VISIBLE);
@@ -397,9 +399,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
      * 内部报表具有筛选功能时，调用筛选项界面
      */
     public void actionLaunchReportSelectorActivity() {
+        Log.i("bugbug","selector is run");
         Intent intent = new Intent(mContext, ReportSelectorAcitity.class);
         intent.putExtra(URLs.kBannerName, bannerName);
-        intent.putExtra("groupID", groupID);
+        intent.putExtra(URLs.kGroupId, groupID);
         intent.putExtra("reportID", reportID);
         intent.putExtra("templateID", templateID);
         mContext.startActivity(intent);
