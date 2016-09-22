@@ -31,6 +31,8 @@ import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.PrivateURLs;
 import com.intfocus.yh_android.util.URLs;
+import com.intfocus.yh_android.view.CircleImageView;
+import com.intfocus.yh_android.view.RedPointView;
 import com.readystatesoftware.viewbadger.BadgeView;
 import com.umeng.message.PushAgent;
 import com.umeng.message.UmengRegistrar;

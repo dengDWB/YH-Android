@@ -1,4 +1,4 @@
-package com.intfocus.yh_android;
+package com.intfocus.yh_android.view;
 
 import android.content.Context;
 import android.util.DisplayMetrics;

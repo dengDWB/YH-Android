@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Picture;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -413,12 +414,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
      */
     public void actionShare2Weixin() {
         String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
-        mWebView.setDrawingCacheEnabled(true);
-        mWebView.buildDrawingCache();
-        Bitmap imgBmp = Bitmap.createBitmap(mWebView.getWidth(), mWebView.getHeight(), Bitmap.Config.ARGB_8888);
-        mWebView.destroyDrawingCache();
+        Picture view = mWebView.capturePicture();
+        Bitmap imgBmp = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(imgBmp);
-        mWebView.draw(c);
+        view.draw(c);
         FileUtil.saveImage(filePath,imgBmp);
 
         File file = new File(filePath);

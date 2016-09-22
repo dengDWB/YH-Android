@@ -20,7 +20,7 @@
                 android:layout_height="180dp"
                 android:background="@drawable/bg_user">
 
-                <com.intfocus.yh_android.CircleImageView
+                <com.intfocus.yh_android.view.CircleImageView
                 android:id="@+id/img_icon"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
