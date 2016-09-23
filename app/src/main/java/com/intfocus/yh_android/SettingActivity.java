@@ -552,7 +552,7 @@ public class SettingActivity extends BaseActivity {
                 e.printStackTrace();
             }
 
-            finish();
+//            finish();
         }
     };
 

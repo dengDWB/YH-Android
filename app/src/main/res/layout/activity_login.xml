@@ -92,6 +92,7 @@
             android:textColorHint="#FFFFFF"
             android:textColor="#FFFFFF"
             android:textSize="20sp"
+            android:singleLine="true"
             android:background="@null" />
     </LinearLayout>
 
