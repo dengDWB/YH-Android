@@ -248,6 +248,7 @@ public class SettingActivity extends BaseActivity {
     }
 
     public void httpGetBitmap(String urlString, final boolean isDelete) {
+
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(urlString).build();
         Call call = client.newCall(request);
@@ -277,7 +278,6 @@ public class SettingActivity extends BaseActivity {
                                 mIconImageView.setImageBitmap(bm);
                             }
                         });
-
                         writeJson(gravatarJsonPath, gravatarFileName, true, "", "", isDelete);
                     } catch (Exception e){
                         runOnUiThread(new Runnable() {

@@ -92,7 +92,7 @@
             android:paddingRight="45dp"
             android:textSize="20sp"
             android:singleLine="true"
-            android:background="@null"/>
+            android:background="@null" />
     </LinearLayout>
 
     <View
