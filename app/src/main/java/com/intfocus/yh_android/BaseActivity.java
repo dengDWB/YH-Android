@@ -27,6 +27,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -70,6 +71,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -173,7 +175,7 @@ public class BaseActivity extends Activity {
 
     protected void onDestroy() {
         clearReferences();
-        fixInputMethodManager();
+        fixInputMethodManager(BaseActivity.this);
         mMyApp = null;
         super.onDestroy();
     }
@@ -185,18 +187,39 @@ public class BaseActivity extends Activity {
         }
     }
 
-    private void fixInputMethodManager() {
-        final Object imm = getSystemService(Context.INPUT_METHOD_SERVICE);
+    private void fixInputMethodManager(Context context) {
+        if (context == null) {
+            return;
+        }
 
-        final TypedObject windowToken
-                = new TypedObject(getWindow().getDecorView().getWindowToken(), IBinder.class);
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm == null) {
+            return;
+        }
 
-        windowToken.invokeMethodExceptionSafe(imm, "windowDismissed", windowToken);
-
-        final TypedObject view
-                = new TypedObject(null, View.class);
-
-        view.invokeMethodExceptionSafe(imm, "startGettingWindowFocus", view);
+        String [] arr = new String[]{"mCurRootView", "mServedView", "mNextServedView"};
+        Field f = null;
+        Object obj_get = null;
+        for (int i = 0;i < arr.length;i ++) {
+            String param = arr[i];
+            try{
+                f = imm.getClass().getDeclaredField(param);
+                if (f.isAccessible() == false) {
+                    f.setAccessible(true);
+                }
+                obj_get = f.get(imm);
+                if (obj_get != null && obj_get instanceof View) {
+                    View v_get = (View) obj_get;
+                    if (v_get.getContext() == context) { // 被InputMethodManager持有引用的context是想要销毁的
+                        f.set(imm, null);                // 置空
+                    } else {
+                        break;
+                    }
+                }
+            }catch(Throwable t){
+                t.printStackTrace();
+            }
+        }
     }
 
     protected String loadingPath(String htmlName) {
