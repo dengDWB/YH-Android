@@ -6,8 +6,8 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Picture;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static android.webkit.WebView.enableSlowWholeDocumentDraw;
 import static java.lang.String.format;
 
 public class SubjectActivity extends BaseActivity implements OnPageChangeListener, OnLoadCompleteListener, OnErrorOccurredListener {
@@ -68,6 +69,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        int sysVersion = Build.VERSION.SDK_INT;
+        if (sysVersion > 20) {
+            enableSlowWholeDocumentDraw();
+        }
         setContentView(R.layout.activity_subject);
         mMyApp.setCurrentActivity(this);
 
@@ -425,11 +430,11 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         mWebView.buildDrawingCache();
         Bitmap imgBmp = Bitmap.createBitmap(mWebView.getMeasuredWidth(),
                 mWebView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-        Canvas bigcanvas = new Canvas(imgBmp);
+        Canvas canvas = new Canvas(imgBmp);
         Paint paint = new Paint();
         int iHeight = imgBmp.getHeight();
-        bigcanvas.drawBitmap(imgBmp, 0, iHeight, paint);
-        mWebView.draw(bigcanvas);
+        canvas.drawBitmap(imgBmp, 0, iHeight, paint);
+        mWebView.draw(canvas);
         FileUtil.saveImage(filePath,imgBmp);
 
         File file = new File(filePath);
