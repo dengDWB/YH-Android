@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Picture;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -414,10 +415,21 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
      */
     public void actionShare2Weixin() {
         String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
-        Picture view = mWebView.capturePicture();
-        Bitmap imgBmp = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(imgBmp);
-        view.draw(c);
+
+        mWebView.measure(View.MeasureSpec.makeMeasureSpec(
+                View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        mWebView.layout(0, 0, mWebView.getMeasuredWidth(),
+                mWebView.getMeasuredHeight());
+        mWebView.setDrawingCacheEnabled(true);
+        mWebView.buildDrawingCache();
+        Bitmap imgBmp = Bitmap.createBitmap(mWebView.getMeasuredWidth(),
+                mWebView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+        Canvas bigcanvas = new Canvas(imgBmp);
+        Paint paint = new Paint();
+        int iHeight = imgBmp.getHeight();
+        bigcanvas.drawBitmap(imgBmp, 0, iHeight, paint);
+        mWebView.draw(bigcanvas);
         FileUtil.saveImage(filePath,imgBmp);
 
         File file = new File(filePath);
