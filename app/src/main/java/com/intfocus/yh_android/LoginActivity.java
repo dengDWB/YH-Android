@@ -64,30 +64,6 @@ public class LoginActivity extends BaseActivity {
 
         usernameEditText = (EditText) findViewById(R.id.etUsername);
         passwordEditText = (EditText) findViewById(R.id.etPassword);
-//        usernameEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//            @Override
-//            public void onFocusChange(View v, boolean hasFocus) {
-//                if (!hasFocus){
-//                    usernameEditText.clearFocus();
-//                    passwordEditText.requestFocus();
-//                    InputMethodManager editTextManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//                    editTextManager.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
-//                    Log.i("Login","转化完成1");
-//                }
-//            }
-//        });
-//        passwordEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//            @Override
-//            public void onFocusChange(View v, boolean hasFocus) {
-//                if (!hasFocus){
-//                    passwordEditText.clearFocus();
-//                    usernameEditText.requestFocus();
-//                    InputMethodManager editTextManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//                    editTextManager.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
-//                    Log.i("Login","转化完成2");
-//                }
-//            }
-//        });
         versionTv = (TextView) findViewById(R.id.versionTv);
         PackageInfo packageInfo = null;
         try {

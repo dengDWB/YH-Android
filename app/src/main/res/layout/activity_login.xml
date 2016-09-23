@@ -27,7 +27,7 @@
         android:layout_marginTop="10dp"
         android:text="@string/login_slogan_text"
         android:gravity="center_horizontal"
-        android:textColor="#FFFFFF" />
+        android:textColor="#FFFFFF"/>
 
     <LinearLayout
         android:id="@+id/linearUsername"
@@ -54,10 +54,9 @@
             android:textColor="#FFFFFF"
             android:gravity="center"
             android:paddingRight="45dp"
-            android:inputType="textVisiblePassword"
             android:textSize="20sp"
             android:singleLine="true"
-            android:background="@null" />
+            android:background="@null"/>
     </LinearLayout>
 
     <View
@@ -87,13 +86,17 @@
             android:layout_height="wrap_content"
             android:hint="@string/login_password_placeholder"
             android:inputType="textPassword"
-            android:gravity="center"
-            android:paddingRight="45dp"
             android:textColorHint="#FFFFFF"
             android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:paddingRight="45dp"
             android:textSize="20sp"
             android:singleLine="true"
+<<<<<<< HEAD
             android:background="@null" />
+=======
+            android:background="@null"/>
+>>>>>>> c070083fbff63ab5e808862eeb8615362579705b
     </LinearLayout>
 
     <View
