@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -68,7 +69,13 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        enableSlowWholeDocumentDraw();
+        /*
+         * 判断当前设备版本，5.0 以上 Android 系统使用才 enableSlowWholeDocumentDraw();
+         */
+        int sysVersion = Build.VERSION.SDK_INT;
+        if (sysVersion > 20) {
+            enableSlowWholeDocumentDraw();
+        }
         setContentView(R.layout.activity_subject);
         mMyApp.setCurrentActivity(this);
 
