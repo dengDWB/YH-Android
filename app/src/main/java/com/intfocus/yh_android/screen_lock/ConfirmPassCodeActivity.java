@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.intfocus.yh_android.BaseActivity;
 import com.intfocus.yh_android.LoginActivity;
 import com.intfocus.yh_android.R;
 import com.intfocus.yh_android.YHApplication;

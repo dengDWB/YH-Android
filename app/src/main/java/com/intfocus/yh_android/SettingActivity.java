@@ -533,7 +533,6 @@ public class SettingActivity extends BaseActivity {
 
             Intent intent = new Intent();
             intent.setClass(SettingActivity.this, LoginActivity.class);
-            intent.putExtra("from_activity", this.getClass().getSimpleName());
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
 
