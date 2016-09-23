@@ -433,14 +433,17 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         mWebView.buildDrawingCache();
         Bitmap imgBmp = Bitmap.createBitmap(mWebView.getMeasuredWidth(),
                 mWebView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+        if (imgBmp == null) { toast("截图失败"); }
         Canvas canvas = new Canvas(imgBmp);
         Paint paint = new Paint();
         int iHeight = imgBmp.getHeight();
         canvas.drawBitmap(imgBmp, 0, iHeight, paint);
         mWebView.draw(canvas);
         FileUtil.saveImage(filePath,imgBmp);
+        imgBmp.recycle(); // 回收 bitmap 资源，避免内存浪费
+
         File file = new File(filePath);
-        if (file.exists()) {
+        if (file.exists() && file.length() > 0) {
             UMImage image = new UMImage(SubjectActivity.this, file);
 
             new ShareAction(this)
@@ -452,7 +455,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                     .open();
         }
         else {
-            Toast.makeText(SubjectActivity.this,"截图失败啦", Toast.LENGTH_SHORT).show();
+            toast("截图失败啦");
         }
     }
 
@@ -464,7 +467,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 
         @Override
         public void onError(SHARE_MEDIA platform, Throwable t) {
-            Toast.makeText(SubjectActivity.this,platform + " 分享失败啦", Toast.LENGTH_SHORT).show();
+            toast("分享失败啦");
             if(t!=null){
                 Log.d("throw","throw:"+t.getMessage());
             }
@@ -472,7 +475,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 
         @Override
         public void onCancel(SHARE_MEDIA platform) {
-            Toast.makeText(SubjectActivity.this,platform + " 分享取消了", Toast.LENGTH_SHORT).show();
+            // 取消分享
         }
     };
 
