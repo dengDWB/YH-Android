@@ -92,11 +92,7 @@
             android:paddingRight="45dp"
             android:textSize="20sp"
             android:singleLine="true"
-<<<<<<< HEAD
             android:background="@null" />
-=======
-            android:background="@null"/>
->>>>>>> c070083fbff63ab5e808862eeb8615362579705b
     </LinearLayout>
 
     <View
