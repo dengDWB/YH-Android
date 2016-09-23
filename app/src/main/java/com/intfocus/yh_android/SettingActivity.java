@@ -208,7 +208,7 @@ public class SettingActivity extends BaseActivity {
         }
     }
 
-    public void writeJson (String path, String name, boolean upload_state, String gravatar_id, boolean isDelete){
+    public void writeJson(String path, String name, boolean upload_state, String gravatar_url, String gravatar_id, boolean isDelete){
         try {
             String previousImgPath = "";
             JSONObject jsonObject;
@@ -225,6 +225,16 @@ public class SettingActivity extends BaseActivity {
 
             jsonObject.put(URLs.kName, name);
             jsonObject.put("upload_state", upload_state);
+            if(gravatar_url.length() > 0 && gravatar_url.indexOf("http") > -1) {
+                jsonObject.put("gravatar_url", gravatar_url);
+
+                /*
+                 * 上传头像成功后，重置user.json#gravatar, 以名再回到设置界面被还原
+                 */
+                String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
+                user.put("gravatar", gravatar_url);
+                FileUtil.writeFile(userConfigPath, user.toString());
+            }
             if (!gravatar_id.equals("")) {
                 jsonObject.put(kGravatarId, gravatar_id);
             }
@@ -238,6 +248,7 @@ public class SettingActivity extends BaseActivity {
     }
 
     public void httpGetBitmap(String urlString, final boolean isDelete) {
+
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(urlString).build();
         Call call = client.newCall(request);
@@ -267,8 +278,7 @@ public class SettingActivity extends BaseActivity {
                                 mIconImageView.setImageBitmap(bm);
                             }
                         });
-
-                        writeJson(gravatarJsonPath, gravatarFileName, true, "", isDelete);
+                        writeJson(gravatarJsonPath, gravatarFileName, true, "", "", isDelete);
                     } catch (Exception e){
                         runOnUiThread(new Runnable() {
                             @Override
@@ -413,7 +423,7 @@ public class SettingActivity extends BaseActivity {
                 mIconImageView.setImageBitmap(userIcon);
                 popupWindow.dismiss();
                 FileUtil.saveImage(gravatarImgPath, userIcon);
-                writeJson(gravatarJsonPath, gravatarFileName, false, "", true);
+                writeJson(gravatarJsonPath, gravatarFileName, false, "", "", true);
                 uploadImg();
             }
         } catch (JSONException e) {
@@ -458,7 +468,7 @@ public class SettingActivity extends BaseActivity {
                     if (response.code() == 201) {
                         try {
                             JSONObject json = new JSONObject(response.body().string());
-                            writeJson(gravatarJsonPath, gravatarFileName, true, json.getString(kGravatarId), false);
+                            writeJson(gravatarJsonPath, gravatarFileName, true, json.getString("gravatar_url"), json.getString(kGravatarId), false);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {

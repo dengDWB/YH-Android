@@ -69,6 +69,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /*
+         * 判断当前设备版本，5.0 以上 Android 系统使用才 enableSlowWholeDocumentDraw();
+         */
         int sysVersion = Build.VERSION.SDK_INT;
         if (sysVersion > 20) {
             enableSlowWholeDocumentDraw();
@@ -436,7 +439,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         canvas.drawBitmap(imgBmp, 0, iHeight, paint);
         mWebView.draw(canvas);
         FileUtil.saveImage(filePath,imgBmp);
-
         File file = new File(filePath);
         if (file.exists()) {
             UMImage image = new UMImage(SubjectActivity.this, file);
