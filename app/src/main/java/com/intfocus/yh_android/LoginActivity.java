@@ -88,6 +88,10 @@ public class LoginActivity extends BaseActivity {
         super.onResume();
     }
 
+    public void refresh() {
+        onCreate(null);
+    }
+
     protected void onDestroy() {
         mContext = null;
         mWebView = null;
