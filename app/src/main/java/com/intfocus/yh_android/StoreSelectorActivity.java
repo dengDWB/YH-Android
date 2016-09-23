@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.intfocus.yh_android.util.FileUtil;
+import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 
@@ -23,8 +24,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by lijunjie on 16/8/15.
@@ -45,7 +50,7 @@ public class StoreSelectorActivity extends BaseActivity {
     setContentView(R.layout.activity_store_selector);
 
     try {
-      cachedPath = FileUtil.dirPath(mContext,  URLs.CACHED_DIRNAME, URLs.BARCODE_RESULT_FILENAME);
+      cachedPath = FileUtil.dirPath(mContext, K.kCachedDirName, K.kBarCodeResultFileName);
       cachedJSON = FileUtil.readConfigFile(cachedPath);
       currentStore = cachedJSON.getJSONObject(URLs.kStore);
 
@@ -60,22 +65,24 @@ public class StoreSelectorActivity extends BaseActivity {
       e.printStackTrace();
     }
 
-//
-//    /**
-//     *  筛选项列表按字母排序，以便于用户查找
-//     */
-//    Collections.sort(dataList, new Comparator<JSONObject>() {
-//      @Override public int compare(JSONObject one, JSONObject two) {
-//        String one_name = "", two_name = "";
-//        try {
-//          one_name = one.getString("name");
-//          two_name = two.getString("name");
-//        } catch (JSONException e) {
-//          e.printStackTrace();
-//        }
-//        return Collator.getInstance(Locale.CHINESE).compare(one_name, two_name);
-//      }
-//    });
+
+    /**
+     *  筛选项列表按字母排序，以便于用户查找
+     */
+    Collections.sort(dataList, new Comparator<JSONObject>() {
+      @Override public int compare(JSONObject one, JSONObject two) {
+        String one_name = "", two_name = "";
+        try {
+          one_name = one.getString("name");
+          two_name = two.getString("name");
+        } catch (JSONException e) {
+          e.printStackTrace();
+        }
+        return Collator.getInstance(Locale.CHINESE).compare(one_name, two_name);
+      }
+    });
+
+    Collections.sort(storeNameList,Collator.getInstance(Locale.CHINESE));
 
     mListView = (ListView) findViewById(R.id.listStores);
     ListArrayAdapter mArrayAdapter = new ListArrayAdapter(this, R.layout.list_item_report_selector, storeNameList);
@@ -100,7 +107,7 @@ public class StoreSelectorActivity extends BaseActivity {
     });
   }
 
-  protected void onResume() {
+    protected void onResume() {
     mMyApp.setCurrentActivity(this);
     super.onResume();
   }

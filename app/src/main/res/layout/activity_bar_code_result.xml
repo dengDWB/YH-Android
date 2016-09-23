@@ -27,16 +27,12 @@
             style="@style/BannerTitle" />
 
         <ImageView
-            android:id="@+id/bannerSearch"
-            android:src="@drawable/banner_search"
-            style="@style/BannerButton"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:paddingTop="16dp"
-            android:layout_marginLeft="-10dp"
+            android:id="@+id/bannerSetting"
+            style="@style/BannerRightButton"
             android:layout_alignBottom="@+id/colorViewLayout"
-            android:layout_alignParentRight="true"
-            android:onClick="actionLaunchStoreSelectorActivity" />
+            android:layout_marginTop="0dp"
+            android:onClick="launchDropMenuActivity"
+            android:src="@drawable/banner_setting"/>
 
         <RelativeLayout
             android:id="@+id/colorViewLayout"
@@ -69,6 +65,7 @@
     <android.webkit.WebView
         android:id="@+id/browser"
         android:visibility="visible"
+        android:layerType="software"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/actionBar" />

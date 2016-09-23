@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="fill_parent"
+              android:background="@drawable/banner_popup_background"
+              android:orientation="vertical">
+
+    <ListView
+        android:id="@+id/list_dropmenu"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+    </ListView>
+
+    <!--ListView 不支持 wrap_content 自适配宽度-->
+    <!--所以使用一个 TextView 用来灵活固定-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:text="固定List下拉菜单的宽"
+        android:textSize="15sp"/>
+</LinearLayout>

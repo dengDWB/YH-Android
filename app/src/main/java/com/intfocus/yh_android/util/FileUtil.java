@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,7 +34,7 @@ public class FileUtil {
 
     public static boolean checkIsLocked(Context context) {
         try {
-            String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), URLs.USER_CONFIG_FILENAME);
+            String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), K.kUserConfigFileName);
             if ((new File(userConfigPath)).exists()) {
                 JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
                 if (!userJSON.has(URLs.kUseGesturePassword)) {
@@ -66,7 +68,7 @@ public class FileUtil {
     private static String userspace(Context context) {
         String spacePath = "";
         try {
-            String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), URLs.USER_CONFIG_FILENAME);
+            String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), K.kUserConfigFileName);
             JSONObject json = FileUtil.readConfigFile(userConfigPath);
 
             spacePath = String.format("%s/User-%d", FileUtil.basePath(context), json.getInt("user_id"));
@@ -163,7 +165,7 @@ public class FileUtil {
      *  3. 登录缓存页面
      */
     public static String sharedPath(Context context) {
-        String pathName = FileUtil.basePath(context) + "/" + URLs.SHARED_DIRNAME;
+        String pathName = FileUtil.basePath(context) + "/" +K.kSharedDirName;
         FileUtil.makeSureFolderExist(pathName);
 
         return pathName;
@@ -317,7 +319,7 @@ public class FileUtil {
             String md5String = FileUtil.MD5(zipStream);
             String keyName = String.format("local_%s_md5", fileName);
 
-            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), URLs.USER_CONFIG_FILENAME);
+            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
             boolean isShouldUnZip = true;
             JSONObject userJSON = new JSONObject();
             if ((new File(userConfigPath)).exists()) {
@@ -444,7 +446,7 @@ public class FileUtil {
      */
     public static String reportJavaScriptDataPath(Context context, String groupID, String templateID, String reportID) {
         String assetsPath = FileUtil.sharedPath(context);
-        String fileName = String.format(URLs.REPORT_DATA_FILENAME, groupID, templateID, reportID);
+        String fileName = String.format(K.kReportDataFileName, groupID, templateID, reportID);
         return String.format("%s/assets/javascripts/%s", assetsPath, fileName);
     }
 
@@ -501,22 +503,23 @@ public class FileUtil {
 	 * 保存截屏文件
 	 *
 	 */
-    public static void saveImage(String filePath,Bitmap bmp) {
-        // 如果有目标文件，删除它
-        File file = new File(filePath);
-        if (file.exists()) {
-            file.delete();
-        }
-        // 声明输出流
-        FileOutputStream outStream = null;
+	public static void saveImage(String filePath, Bitmap bmp) {
+		// 如果有目标文件，删除它
+		File file = new File(filePath);
+		if (file.exists()) {
+			file.delete();
+		}
+		// 声明输出流
+		FileOutputStream outStream = null;
 
-        try {
-            // 获得输出流，写入文件
-            outStream = new FileOutputStream(file);
-            bmp.compress(Bitmap.CompressFormat.JPEG, 90, outStream);
-            outStream.close();
-        } catch (IOException e) {
-            Log.e("snapshot", e.toString());
-        }
-    }
+		try {
+			// 获得输出流，写入文件
+			outStream = new FileOutputStream(file);
+			bmp.compress(Bitmap.CompressFormat.JPEG, 90, outStream);
+			outStream.close();
+		} catch (IOException e) {
+			Log.e("snapshot", e.toString());
+		}
+	}
+
 }
