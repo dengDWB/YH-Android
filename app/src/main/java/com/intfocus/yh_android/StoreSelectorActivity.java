@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.intfocus.yh_android.util.FileUtil;
@@ -35,8 +37,9 @@ import java.util.Locale;
  * Created by lijunjie on 16/8/15.
  */
 public class StoreSelectorActivity extends BaseActivity {
-
   private ListView mListView;
+  private TextView mSelectedItem;
+  private SearchView mSearchView;
   private String cachedPath;
   private ArrayList<JSONObject> dataList = new ArrayList<>();
   private ArrayList<String> storeNameList = new ArrayList<>();
@@ -49,10 +52,15 @@ public class StoreSelectorActivity extends BaseActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_store_selector);
 
+    final LinearLayout mListHead = (LinearLayout)findViewById(R.id.store_list_head);
+    mSelectedItem = (TextView)findViewById(R.id.store_item_select); // 已选项
+
     try {
       cachedPath = FileUtil.dirPath(mContext, K.kCachedDirName, K.kBarCodeResultFileName);
       cachedJSON = FileUtil.readConfigFile(cachedPath);
       currentStore = cachedJSON.getJSONObject(URLs.kStore);
+
+      mSelectedItem.setText(currentStore.getString("name")); // 已选项显示当前门店
 
       if (user.has(URLs.kStoreIds) && user.getJSONArray(URLs.kStoreIds).length() > 0) {
         JSONArray stores = user.getJSONArray(URLs.kStoreIds);
@@ -64,7 +72,6 @@ public class StoreSelectorActivity extends BaseActivity {
     } catch (JSONException e) {
       e.printStackTrace();
     }
-
 
     /**
      *  筛选项列表按字母排序，以便于用户查找
@@ -84,28 +91,77 @@ public class StoreSelectorActivity extends BaseActivity {
 
     Collections.sort(storeNameList,Collator.getInstance(Locale.CHINESE));
 
+    /*
+     * 搜索框初始化
+     */
+    mSearchView = (SearchView)findViewById(R.id.storeSearchView);
+    int searchEditId = mSearchView.getContext().getResources().getIdentifier("android:id/search_src_text",null,null);
+    TextView mSearchEdit = (TextView)findViewById(searchEditId);
+    mSearchEdit.setTextSize(14);
+    mSearchEdit.setPadding(0,30,0,0);
+
+    /*
+     * ListView 初始化
+     */
     mListView = (ListView) findViewById(R.id.listStores);
     ListArrayAdapter mArrayAdapter = new ListArrayAdapter(this, R.layout.list_item_report_selector, storeNameList);
     mListView.setAdapter(mArrayAdapter);
+    mListView.setTextFilterEnabled(true);
+
+
+        /*
+     * 搜索框事件监听
+     */
+    mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+      // 当点击搜索按钮时触发该方法
+      @Override
+      public boolean onQueryTextSubmit(String query) {
+        return false;
+      }
+
+      // 当搜索内容改变时触发该方法
+      @Override
+      public boolean onQueryTextChange(String newText) {
+        if (!TextUtils.isEmpty(newText)){
+          mListHead.setVisibility(View.GONE);
+          mListView.setFilterText(newText);
+        }else{
+          mListHead.setVisibility(View.VISIBLE);
+          mListView.clearTextFilter();
+        }
+        return true;
+      }
+    });
 
     /**
      *  用户点击项写入本地缓存文件
      */
-    mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-        try {
-          cachedJSON.put(URLs.kStore, dataList.get(arg2));
-          FileUtil.writeFile(cachedPath, cachedJSON.toString());
-
-          dismissActivity(null);
-        }catch (Exception e){
-          e.printStackTrace();
-        }
-        dismissActivity(null);
-      }
-    });
+    mListView.setOnItemClickListener(mItemClickListener);
   }
+
+  /*
+   * listview 点击事件
+   */
+  private AdapterView.OnItemClickListener mItemClickListener = new AdapterView.OnItemClickListener() {
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+      try {
+        TextView mSelector = (TextView) view.findViewById(R.id.reportSelectorItem);
+        String selectedItem = mSelector.getText().toString();
+        for (int i = 0;i < dataList.size();i++) {
+          if (dataList.get(i).getString("name").equals(selectedItem)) {
+            cachedJSON.put(URLs.kStore, dataList.get(i));
+            FileUtil.writeFile(cachedPath, cachedJSON.toString());
+          }
+        }
+
+        dismissActivity(null);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      dismissActivity(null);
+    }
+  };
 
     protected void onResume() {
     mMyApp.setCurrentActivity(this);
@@ -136,20 +192,7 @@ public class StoreSelectorActivity extends BaseActivity {
       vi.inflate(resourceId, listItem, true);
       TextView viewItem = (TextView) listItem.findViewById(R.id.reportSelectorItem);
       viewItem.setText(item);
-
-      /**
-       *  上次选中项显示选中状态
-       */
-      String currentStoreName = "";
-      try {
-        currentStoreName = currentStore.getString(URLs.kName);
-      } catch (JSONException e) {
-        e.printStackTrace();
-      }
-
-      boolean isSelected = (item != null && item.compareTo(currentStoreName) == 0);
-      LogUtil.d("getView", String.format("%s %s %s", item, currentStoreName, isSelected ? "==" : "!="));
-      viewItem.setBackgroundColor(isSelected ? Color.GREEN : Color.WHITE);
+      viewItem.setBackgroundColor(Color.WHITE);
 
       return listItem;
     }

@@ -336,10 +336,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
              *  初次加载时，判断筛选功能的条件还未生效
              *  此处仅在第二次及以后才会生效
              */
-                isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
-                if(isSupportSearch) {
-                    displayBannerTitleAndSearchIcon();
-                }
+             isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
+             if(isSupportSearch) {
+                 displayBannerTitleAndSearchIcon();
+             }
 
             new Thread(new Runnable() {
                 @Override
