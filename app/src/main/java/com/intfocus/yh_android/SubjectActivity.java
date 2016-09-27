@@ -427,8 +427,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
         mWebView.measure(View.MeasureSpec.makeMeasureSpec(
                 View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-        mWebView.layout(0, 0, mWebView.getMeasuredWidth(),
-                mWebView.getMeasuredHeight());
         mWebView.setDrawingCacheEnabled(true);
         mWebView.buildDrawingCache();
         Bitmap imgBmp = Bitmap.createBitmap(mWebView.getMeasuredWidth(),
