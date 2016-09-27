@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -34,6 +35,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import static android.webkit.WebView.enableSlowWholeDocumentDraw;
+
 /**
  * Created by lijunjie on 16/6/10.
  */
@@ -47,9 +50,16 @@ public class BarCodeResultActivity extends BaseActivity {
   @Override
   public void onCreate(Bundle state) {
     super.onCreate(state);
+    /*
+     * 判断当前设备版本，5.0 以上 Android 系统使用才 enableSlowWholeDocumentDraw();
+     */
+    int sysVersion = Build.VERSION.SDK_INT;
+    if (sysVersion > 20) {
+      enableSlowWholeDocumentDraw();
+    }
     setContentView(R.layout.activity_bar_code_result);
 
-    mWebView = (WebView) findViewById(R.id.browser);
+    mWebView = (WebView) findViewById(R.id.barcode_browser);
     WebSettings webSettings = mWebView.getSettings();
     webSettings.setJavaScriptEnabled(true);
     webSettings.setDefaultTextEncodingName("utf-8");
@@ -105,65 +115,6 @@ public class BarCodeResultActivity extends BaseActivity {
     }
   }
 
-  /*
- * 初始化标题栏下拉菜单
- */
-  private void initDropMenuItem() {
-    String[] itemName = {"筛选","分享"};
-    int[] itemImage = {R.drawable.banner_search,R.drawable.banner_share};
-    for (int i = 0;i < itemName.length; i++) {
-      HashMap<String, Object> map = new HashMap<String, Object>();
-      map.put("ItemImage",itemImage[i]);
-      map.put("ItemText", itemName[i]);
-      listItem.add(map);
-    }
-
-    SimpleAdapter mSimpleAdapter = new SimpleAdapter(this, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
-    initDropMenu(mSimpleAdapter,mDropMenuListener);
-  }
-
-  /*
- 	 * 标题栏设置按钮下拉菜单点击响应事件
- 	 */
-  private final AdapterView.OnItemClickListener mDropMenuListener = new AdapterView.OnItemClickListener() {
-    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-                            long arg3) {
-      popupWindow.dismiss();
-
-      switch (listItem.get(arg2).get("ItemText").toString()) {
-        case "筛选":
-          actionLaunchStoreSelectorActivity();
-          break;
-
-        case "分享":
-          actionShare2Weixin();
-          break;
-
-        default:
-          break;
-      }
-    }
-  };
-
-  /*
- * 标题栏点击设置按钮显示下拉菜单
- */
-  public void launchDropMenuActivity(View v) {
-    ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
-    popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
-
-		/*
-		 * 用户行为记录, 单独异常处理，不可影响用户体验
-		 */
-    try {
-      logParams = new JSONObject();
-      logParams.put("action", "点击/报表/下拉菜单");
-      new Thread(mRunnableForLogger).start();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
   @Override
   public void onResume() {
     super.onResume();
@@ -207,30 +158,88 @@ public class BarCodeResultActivity extends BaseActivity {
   }
 
   /*
-     * 分享截图至微信
-     */
+ * 初始化标题栏下拉菜单
+ */
+  private void initDropMenuItem() {
+    String[] itemName = {"筛选","分享"};
+    int[] itemImage = {R.drawable.banner_search,R.drawable.banner_share};
+    for (int i = 0;i < itemName.length; i++) {
+      HashMap<String, Object> map = new HashMap<String, Object>();
+      map.put("ItemImage",itemImage[i]);
+      map.put("ItemText", itemName[i]);
+      listItem.add(map);
+    }
+
+    SimpleAdapter mSimpleAdapter = new SimpleAdapter(this, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
+    initDropMenu(mSimpleAdapter,mDropMenuListener);
+  }
+
+  /*
+ 	 * 标题栏设置按钮下拉菜单点击响应事件
+ 	 */
+  private final AdapterView.OnItemClickListener mDropMenuListener = new AdapterView.OnItemClickListener() {
+    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+                            long arg3) {
+      popupWindow.dismiss();
+
+      switch (listItem.get(arg2).get("ItemText").toString()) {
+        case "筛选":
+          actionLaunchStoreSelectorActivity();
+          break;
+
+        case "分享":
+          actionShare2Weixin();
+          break;
+
+        default:
+          break;
+      }
+    }
+  };
+
+  /*
+   * 标题栏点击设置按钮显示下拉菜单
+   */
+  public void launchDropMenuActivity(View v) {
+    ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
+    popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
+
+		/*
+		 * 用户行为记录, 单独异常处理，不可影响用户体验
+		 */
+    try {
+      logParams = new JSONObject();
+      logParams.put("action", "点击/报表/下拉菜单");
+      new Thread(mRunnableForLogger).start();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  /*
+   * 分享截图至微信
+   */
   public void actionShare2Weixin() {
     String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
 
     mWebView.measure(View.MeasureSpec.makeMeasureSpec(
             View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
             View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-    mWebView.layout(0, 0, mWebView.getMeasuredWidth(),
-            mWebView.getMeasuredHeight());
     mWebView.setDrawingCacheEnabled(true);
     mWebView.buildDrawingCache();
     Bitmap imgBmp = Bitmap.createBitmap(mWebView.getMeasuredWidth(),
             mWebView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-    Canvas bigcanvas = new Canvas(imgBmp);
+    if (imgBmp == null) { toast("截图失败"); }
+    Canvas canvas = new Canvas(imgBmp);
     Paint paint = new Paint();
     int iHeight = imgBmp.getHeight();
-    bigcanvas.drawBitmap(imgBmp, 0, iHeight, paint);
-    mWebView.draw(bigcanvas);
-
+    canvas.drawBitmap(imgBmp, 0, iHeight, paint);
+    mWebView.draw(canvas);
     FileUtil.saveImage(filePath,imgBmp);
+    imgBmp.recycle(); // 回收 bitmap 资源，避免内存浪费
 
     File file = new File(filePath);
-    if (file.exists()) {
+    if (file.exists() && file.length() > 0) {
       UMImage image = new UMImage(BarCodeResultActivity.this, file);
 
       new ShareAction(this)
@@ -240,9 +249,9 @@ public class BarCodeResultActivity extends BaseActivity {
               .setCallback(umShareListener)
               .withMedia(image)
               .open();
-    }
+    } 
     else {
-      Toast.makeText(BarCodeResultActivity.this,"截图失败啦", Toast.LENGTH_SHORT).show();
+      toast("截图失败,请尝试系统截图");
     }
   }
 
