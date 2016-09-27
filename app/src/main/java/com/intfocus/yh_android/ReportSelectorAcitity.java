@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +16,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.text.Collator;
@@ -32,6 +37,8 @@ import java.util.Locale;
  */
 public class ReportSelectorAcitity extends BaseActivity  {
   private ListView mListView;
+  private TextView mSelectedItem;
+  private SearchView mSearchView;
   private String selectedItem;
   private ArrayList<String> searchItems = new ArrayList<String>();
   private String templateID, reportID, bannerName;
@@ -50,6 +57,8 @@ public class ReportSelectorAcitity extends BaseActivity  {
     templateID = intent.getStringExtra("templateID");
 
     TextView mTitle = (TextView) findViewById(R.id.bannerTitle);
+    mSelectedItem = (TextView)findViewById(R.id.report_item_select);
+    final LinearLayout mListHead = (LinearLayout)findViewById(R.id.report_list_head);
     mTitle.setText(bannerName);
 
     /**
@@ -61,6 +70,7 @@ public class ReportSelectorAcitity extends BaseActivity  {
     if((selectedItem == null || selectedItem.length() == 0 ) && searchItems.size() > 0) {
       selectedItem = searchItems.get(0).toString().trim();
     }
+    mSelectedItem.setText(selectedItem);
 
     /**
      *  筛选项列表按字母排序，以便于用户查找
@@ -71,26 +81,51 @@ public class ReportSelectorAcitity extends BaseActivity  {
       }
     });
 
+    /*
+     * 搜索框初始化
+     */
+    mSearchView = (SearchView)findViewById(R.id.reportSearchView);
+    int searchEditId = mSearchView.getContext().getResources().getIdentifier("android:id/search_src_text",null,null);
+    TextView mSearchEdit = (TextView)findViewById(searchEditId);
+    mSearchEdit.setTextSize(14);
+    mSearchEdit.setPadding(0,30,0,0);
+
+    /*
+     * ListView列表初始化
+     */
     mListView = (ListView)findViewById(R.id.listSearchItems);
     ListArrayAdapter mArrayAdapter = new ListArrayAdapter(this, R.layout.list_item_report_selector, searchItems);
     mListView.setAdapter(mArrayAdapter);
+    mListView.setTextFilterEnabled(true);
+
+    /*
+     * 搜索框事件监听
+     */
+    mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+      // 当点击搜索按钮时触发该方法
+      @Override
+      public boolean onQueryTextSubmit(String query) {
+        return false;
+      }
+
+      // 当搜索内容改变时触发该方法
+      @Override
+      public boolean onQueryTextChange(String newText) {
+        if (!TextUtils.isEmpty(newText)){
+          mListHead.setVisibility(View.GONE);
+          mListView.setFilterText(newText);
+        }else{
+          mListHead.setVisibility(View.VISIBLE);
+          mListView.clearTextFilter();
+        }
+        return true;
+      }
+    });
 
     /**
      *  用户点击项写入本地缓存文件
      */
-    mListView.setOnItemClickListener(new OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-        try {
-          String selectedItemPath = String.format("%s.selected_item", FileUtil.reportJavaScriptDataPath(mContext, String.format("%d", groupID), templateID, reportID));
-          FileUtil.writeFile(selectedItemPath, searchItems.get(arg2));
-
-          dismissActivity(null);
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      }
-    });
+    mListView.setOnItemClickListener(mListItemListener);
 
     List<ImageView> colorViews = new ArrayList<>();
     colorViews.add((ImageView) findViewById(R.id.colorView0));
@@ -100,6 +135,21 @@ public class ReportSelectorAcitity extends BaseActivity  {
     colorViews.add((ImageView) findViewById(R.id.colorView4));
     initColorView(colorViews);
   }
+
+  private ListView.OnItemClickListener mListItemListener = new ListView.OnItemClickListener() {
+    @Override
+    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+      try {
+        TextView mSelector = (TextView) arg1.findViewById(R.id.reportSelectorItem);
+        String selectedItemPath = String.format("%s.selected_item", FileUtil.reportJavaScriptDataPath(mContext, String.format("%d", groupID), templateID, reportID));
+        FileUtil.writeFile(selectedItemPath, mSelector.getText().toString());
+
+        dismissActivity(null);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  };
 
   protected void onResume() {
     mMyApp.setCurrentActivity(this);
@@ -129,12 +179,7 @@ public class ReportSelectorAcitity extends BaseActivity  {
       vi.inflate(resourceId, listItem, true);
       TextView viewItem = (TextView) listItem.findViewById(R.id.reportSelectorItem);
       viewItem.setText(item);
-      /**
-       *  上次选中项显示选中状态
-       */
-      boolean isSelected = (item != null && selectedItem != null && item.compareTo(selectedItem) == 0);
-      LogUtil.d("getView", String.format("%s %s %s", item, selectedItem, isSelected ? "==" : "!="));
-      viewItem.setBackgroundColor(isSelected ? Color.GREEN : Color.WHITE);
+      viewItem.setBackgroundColor(Color.WHITE);
 
       return listItem;
     }

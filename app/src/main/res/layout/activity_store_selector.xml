@@ -57,13 +57,57 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:layout_below="@+id/actionBar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/actionBar">
+
+        <SearchView
+            android:id="@+id/storeSearchView"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginLeft="-15dp"
+            android:background="@color/white"
+            android:iconifiedByDefault="false"
+            android:queryHint="搜索"/>
+
+        <LinearLayout
+            android:id="@+id/store_list_head"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/storeSearchView"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/lightgray"
+                android:padding="5dp"
+                android:text="已选"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/store_item_select"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:onClick="dismissActivity"
+                android:padding="12dp"
+                android:textSize="18sp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/lightgray"
+                android:padding="5dp"
+                android:text="列表"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
         <ListView
             android:id="@+id/listStores"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+            android:layout_height="fill_parent"
+            android:layout_below="@id/store_list_head">
         </ListView>
     </RelativeLayout>
 
