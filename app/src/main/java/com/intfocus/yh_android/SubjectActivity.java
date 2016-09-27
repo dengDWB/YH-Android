@@ -453,7 +453,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                     .open();
         }
         else {
-            toast("截图失败啦");
+            toast("截图失败,请尝试系统截图");
         }
     }
 
