@@ -117,38 +117,35 @@ public class ApiHelper {
 
         String assetsPath = FileUtil.sharedPath(context);
         Map<String, String> headers = ApiHelper.checkResponseHeader(urlString, assetsPath);
-        Map<String, String> response = HttpUtil.httpGet(urlString, headers);
+        String jsFileName = String.format("group_%s_template_%s_report_%s.js", groupID, templateID, reportID);
+        String cachedZipPath = FileUtil.dirPath(context, K.kCachedDirName, String.format("%s.zip", jsFileName));
+        Map<String, String> response = HttpUtil.downloadZip(urlString, cachedZipPath, headers);
 
+        if (!response.get(URLs.kCode).equals("200") || !(new File(cachedZipPath)).exists()) {
+            return;
+        }
 
-        if (response.get(URLs.kCode).equals("200")) {
-            try {
-                ApiHelper.storeResponseHeader(urlString, assetsPath, response);
+        try {
+            ApiHelper.storeResponseHeader(urlString, assetsPath, response);
 
-                String jsFileName = String.format("group_%s_template_%s_report_%s.js", groupID, templateID, reportID);
-                String cachedZipPath = FileUtil.dirPath(context, K.kCachedDirName, String.format("%s.zip", jsFileName));
-                HttpUtil.downloadZip(urlString, cachedZipPath);
+            InputStream zipStream = new FileInputStream(cachedZipPath);
+            FileUtil.unZip(zipStream, FileUtil.dirPath(context, K.kCachedDirName), true);
+            zipStream.close();
 
-                InputStream zipStream = new FileInputStream(cachedZipPath);
-                FileUtil.unZip(zipStream, FileUtil.dirPath(context, K.kCachedDirName), true);
-                zipStream.close();
-
-                String jsFilePath = FileUtil.dirPath(context, K.kCachedDirName, jsFileName);
-                File jsFile = new File(jsFilePath);
-                if(jsFile.exists()) {
-                    FileUtil.copyFile(jsFilePath, javascriptPath);
-                    jsFile.delete();
-                }
-
-                String searchItemsPath = String.format("%s.search_items", javascriptPath);
-                File searchItemsFile = new File(searchItemsPath);
-                if(searchItemsFile.exists()) {
-                    searchItemsFile.delete();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+            String jsFilePath = FileUtil.dirPath(context, K.kCachedDirName, jsFileName);
+            File jsFile = new File(jsFilePath);
+            if(jsFile.exists()) {
+                FileUtil.copyFile(jsFilePath, javascriptPath);
+                jsFile.delete();
             }
-        } else {
-            Log.i("Code", response.get("code"));
+
+            String searchItemsPath = String.format("%s.search_items", javascriptPath);
+            File searchItemsFile = new File(searchItemsPath);
+            if(searchItemsFile.exists()) {
+                searchItemsFile.delete();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

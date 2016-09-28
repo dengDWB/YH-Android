@@ -56,8 +56,7 @@
             android:paddingRight="45dp"
             android:textSize="20sp"
             android:singleLine="true"
-            android:background="@null"
-            android:text="80666444"/>
+            android:background="@null"/>
     </LinearLayout>
 
     <View
@@ -93,8 +92,7 @@
             android:paddingRight="45dp"
             android:textSize="20sp"
             android:singleLine="true"
-            android:background="@null"
-            android:text="123456"/>
+            android:background="@null"/>
     </LinearLayout>
 
     <View
