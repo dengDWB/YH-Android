@@ -1,4 +1,4 @@
-package com.intfocus.yh_android;
+package com.intfocus.yh_android.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.intfocus.yh_android.R;
 import com.intfocus.yh_android.util.K;
 
 /**

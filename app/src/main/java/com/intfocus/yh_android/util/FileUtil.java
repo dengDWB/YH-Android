@@ -547,5 +547,4 @@ public class FileUtil {
 			Log.e("snapshot", e.toString());
 		}
 	}
-
 }

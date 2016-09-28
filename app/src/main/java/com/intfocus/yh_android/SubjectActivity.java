@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -49,6 +50,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static android.webkit.WebView.enableSlowWholeDocumentDraw;
 import static java.lang.String.format;
 
 public class SubjectActivity extends BaseActivity implements OnPageChangeListener, OnLoadCompleteListener, OnErrorOccurredListener {
@@ -67,7 +69,13 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        enableSlowWholeDocumentDraw();
+        /*
+         * 判断当前设备版本，5.0 以上 Android 系统使用才 enableSlowWholeDocumentDraw();
+         */
+        int sysVersion = Build.VERSION.SDK_INT;
+        if (sysVersion > 20) {
+            enableSlowWholeDocumentDraw();
+        }
         setContentView(R.layout.activity_subject);
         mMyApp.setCurrentActivity(this);
 
@@ -328,10 +336,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
              *  初次加载时，判断筛选功能的条件还未生效
              *  此处仅在第二次及以后才会生效
              */
-                isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
-                if(isSupportSearch) {
-                    displayBannerTitleAndSearchIcon();
-                }
+             isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
+             if(isSupportSearch) {
+                 displayBannerTitleAndSearchIcon();
+             }
 
             ApiHelper.reportData(mContext, String.format("%d", groupID), templateID, reportID, mRunnableForDetecting);
         } else {
@@ -407,7 +415,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
      * 分享截图至微信
      */
     public void actionShare2Weixin() {
-        toast(""+loadWebFinish);
         if (loadWebFinish) {
             String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
 
@@ -454,7 +461,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 
         @Override
         public void onError(SHARE_MEDIA platform, Throwable t) {
-            Toast.makeText(SubjectActivity.this,platform + " 分享失败啦", Toast.LENGTH_SHORT).show();
+            toast("分享失败啦");
             if(t!=null){
                 Log.d("throw","throw:"+t.getMessage());
             }
@@ -462,7 +469,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 
         @Override
         public void onCancel(SHARE_MEDIA platform) {
-            Toast.makeText(SubjectActivity.this,platform + " 分享取消了", Toast.LENGTH_SHORT).show();
+            // 取消分享
         }
     };
 

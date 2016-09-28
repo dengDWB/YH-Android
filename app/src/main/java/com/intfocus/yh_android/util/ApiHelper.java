@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +28,9 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.OpenUDID.OpenUDID_manager;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class ApiHelper {
     public final static String kAppVersion = "app_version";
@@ -155,10 +159,14 @@ public class ApiHelper {
                 connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
 
+                // expect HTTP 200 OK, so we don't mistakenly save error report
+                // instead of the file
                 if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                     return "Server returned HTTP " + connection.getResponseCode() + " " + connection.getResponseMessage();
                 }
 
+                // this will be useful to display download percentage
+                // might be -1: server did not report the length
                 int fileLength = connection.getContentLength();
                 input = connection.getInputStream();
                 output = new FileOutputStream(params[1]);
@@ -167,12 +175,14 @@ public class ApiHelper {
                 long total = 0;
                 int count;
                 while ((count = input.read(data)) != -1) {
+                    // allow canceling with back button
                     if (isCancelled()) {
                         input.close();
                         return null;
                     }
                     total += count;
-                    if (fileLength > 0)
+                    // publishing the progress....
+                    if (fileLength > 0) // only if total length is known
                         publishProgress((int) (total * 100 / fileLength));
                     output.write(data, 0, count);
                 }
