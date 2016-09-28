@@ -16,13 +16,11 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,14 +31,11 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.ILoadingLayout;
@@ -51,19 +46,16 @@ import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.HttpUtil;
 import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.LogUtil;
-import com.intfocus.yh_android.util.TypedObject;
 import com.intfocus.yh_android.util.URLs;
 import com.pgyersdk.javabean.AppBean;
 import com.pgyersdk.update.PgyUpdateManager;
 import com.pgyersdk.update.UpdateManagerListener;
-import com.readystatesoftware.viewbadger.BadgeView;
 import com.squareup.leakcanary.RefWatcher;
 import com.umeng.message.IUmengRegisterCallback;
 import com.umeng.message.PushAgent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -105,6 +97,8 @@ public class BaseActivity extends Activity {
     Context mContext;
     Activity currActivity;
     int displayDpi; //屏幕密度
+    boolean loadWebFinish = false;
+    int loadWebCount = 0;
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -254,14 +248,19 @@ public class BaseActivity extends Activity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-
+                if (mContext.toString().contains("SubjectActivity")) {
+                    if (loadWebCount > 0) {
+                        loadWebFinish = true;
+                    }
+                    loadWebCount++;
+                }
                 LogUtil.d("onPageFinished", String.format("%s - %s", URLs.timestamp(), url));
             }
 
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
                 LogUtil.d("onReceivedError",
-                    String.format("errorCode: %d, description: %s, url: %s", errorCode, description,
-                        failingUrl));
+                        String.format("errorCode: %d, description: %s, url: %s", errorCode, description,
+                                failingUrl));
             }
         });
 
@@ -299,16 +298,16 @@ public class BaseActivity extends Activity {
 
         // 刷新监听事件
         pullToRefreshWebView.setOnRefreshListener(
-            new PullToRefreshBase.OnRefreshListener<android.webkit.WebView>() {
-                @Override
-                public void onRefresh(PullToRefreshBase<android.webkit.WebView> refreshView) {
-                    new pullToRefreshTask().execute();
+                new PullToRefreshBase.OnRefreshListener<android.webkit.WebView>() {
+                    @Override
+                    public void onRefresh(PullToRefreshBase<android.webkit.WebView> refreshView) {
+                        new pullToRefreshTask().execute();
 
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    String label = simpleDateFormat.format(System.currentTimeMillis());
-                    refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
-                }
-            });
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        String label = simpleDateFormat.format(System.currentTimeMillis());
+                        refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+                    }
+                });
     }
 
 
@@ -360,7 +359,7 @@ public class BaseActivity extends Activity {
         @Override
         public void run() {
             Map<String, String> response = HttpUtil.httpGet(urlStringForDetecting,
-                new HashMap<String, String>());
+                    new HashMap<String, String>());
             int statusCode = Integer.parseInt(response.get(URLs.kCode));
             if (statusCode == 200 && !urlStringForDetecting.equals(K.kBaseUrl)) {
                 try {
@@ -423,34 +422,34 @@ public class BaseActivity extends Activity {
             alertDialog.setMessage("您被禁止在该设备使用本应用");
 
             alertDialog.setNegativeButton(
-                "知道了",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        try {
-                            JSONObject configJSON = new JSONObject();
-                            configJSON.put(URLs.kIsLogin, false);
+                    "知道了",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            try {
+                                JSONObject configJSON = new JSONObject();
+                                configJSON.put(URLs.kIsLogin, false);
 
-                            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
-                            JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
+                                String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
+                                JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
-                            userJSON = ApiHelper.merge(userJSON, configJSON);
-                            FileUtil.writeFile(userConfigPath, userJSON.toString());
+                                userJSON = ApiHelper.merge(userJSON, configJSON);
+                                FileUtil.writeFile(userConfigPath, userJSON.toString());
 
-                            String settingsConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kSettingConfigFileName);
-                            FileUtil.writeFile(settingsConfigPath, userJSON.toString());
-                        } catch (JSONException | IOException e) {
-                            e.printStackTrace();
+                                String settingsConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kSettingConfigFileName);
+                                FileUtil.writeFile(settingsConfigPath, userJSON.toString());
+                            } catch (JSONException | IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            Intent intent = new Intent();
+                            intent.setClass(mContext, LoginActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            mContext.startActivity(intent);
+
+                            dialog.dismiss();
                         }
-
-                        Intent intent = new Intent();
-                        intent.setClass(mContext, LoginActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        mContext.startActivity(intent);
-
-                        dialog.dismiss();
                     }
-                }
             );
             alertDialog.show();
         }
@@ -469,7 +468,7 @@ public class BaseActivity extends Activity {
                 message.obj = response.get(kPath);
 
                 LogUtil.d("mRunnableWithAPI",
-                    String.format("code: %s, path: %s", response.get(URLs.kCode), response.get(kPath)));
+                        String.format("code: %s, path: %s", response.get(URLs.kCode), response.get(kPath)));
                 mHandlerWithAPI.sendMessage(message);
                 Looper.loop();
             }
@@ -769,8 +768,8 @@ public class BaseActivity extends Activity {
 
             if (isUpgrade) {
                 LogUtil.d("VersionUpgrade",
-                    String.format("%s => %s remove %s/%s", localVersion, packageInfo.versionName,
-                        assetsPath, K.kCachedHeaderConfigFileName));
+                        String.format("%s => %s remove %s/%s", localVersion, packageInfo.versionName,
+                                assetsPath, K.kCachedHeaderConfigFileName));
 
                 /*
                  * 用户报表数据js文件存放在公共区域
@@ -814,10 +813,11 @@ public class BaseActivity extends Activity {
             String keyName = String.format("%s_md5", assetName);
             isShouldUpdateAssets = !isShouldUpdateAssets && !userJSON.getString(localKeyName).equals(userJSON.getString(keyName));
 
-            if (!isShouldUpdateAssets) return false;
+            if (!isShouldUpdateAssets) {
+                return false;
+            }
 
-            LogUtil.d("checkAssetUpdated",
-                String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName),
+            LogUtil.d("checkAssetUpdated", String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName),
                     userJSON.getString(keyName)));
             // execute this when the downloader must be fired
             final DownloadAssetsTask downloadTask = new DownloadAssetsTask(mContext, shouldReloadUIThread, assetName, isInAssets);

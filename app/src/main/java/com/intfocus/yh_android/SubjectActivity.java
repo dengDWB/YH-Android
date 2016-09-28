@@ -49,7 +49,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static android.webkit.WebView.enableSlowWholeDocumentDraw;
 import static java.lang.String.format;
 
 public class SubjectActivity extends BaseActivity implements OnPageChangeListener, OnLoadCompleteListener, OnErrorOccurredListener {
@@ -68,7 +67,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        enableSlowWholeDocumentDraw();
+//        enableSlowWholeDocumentDraw();
         setContentView(R.layout.activity_subject);
         mMyApp.setCurrentActivity(this);
 
@@ -137,8 +136,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
     }
 
     /*
-     * 标题栏点击设置按钮显示下拉菜单
-     */
+         * 标题栏点击设置按钮显示下拉菜单
+         */
     public void launchDropMenuActivity(View v) {
         ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
         popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
@@ -334,14 +333,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                     displayBannerTitleAndSearchIcon();
                 }
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    ApiHelper.reportData(mContext, String.format("%d", groupID), templateID, reportID);
-
-                    new Thread(mRunnableForDetecting).start();
-                }
-            }).start();
+            ApiHelper.reportData(mContext, String.format("%d", groupID), templateID, reportID, mRunnableForDetecting);
         } else {
             urlString = link;
             webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
@@ -415,37 +407,42 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
      * 分享截图至微信
      */
     public void actionShare2Weixin() {
-        String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
+        toast(""+loadWebFinish);
+        if (loadWebFinish) {
+            String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
 
-        mWebView.measure(View.MeasureSpec.makeMeasureSpec(
-                View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
-                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-        mWebView.layout(0, 0, mWebView.getMeasuredWidth(),
-                mWebView.getMeasuredHeight());
-        mWebView.setDrawingCacheEnabled(true);
-        mWebView.buildDrawingCache();
-        Bitmap imgBmp = Bitmap.createBitmap(mWebView.getMeasuredWidth(),
-                mWebView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(imgBmp);
-        Paint paint = new Paint();
-        int iHeight = imgBmp.getHeight();
-        canvas.drawBitmap(imgBmp, 0, iHeight, paint);
-        mWebView.draw(canvas);
-        FileUtil.saveImage(filePath,imgBmp);
-        File file = new File(filePath);
-        if (file.exists()) {
-            UMImage image = new UMImage(SubjectActivity.this, file);
+            mWebView.measure(View.MeasureSpec.makeMeasureSpec(
+                    View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            mWebView.layout(0, 0, mWebView.getMeasuredWidth(),
+                    mWebView.getMeasuredHeight());
+            mWebView.setDrawingCacheEnabled(true);
+            mWebView.buildDrawingCache();
+            Bitmap imgBmp = Bitmap.createBitmap(mWebView.getMeasuredWidth(),
+                    mWebView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(imgBmp);
+            Paint paint = new Paint();
+            int iHeight = imgBmp.getHeight();
+            canvas.drawBitmap(imgBmp, 0, iHeight, paint);
+            mWebView.draw(canvas);
+            FileUtil.saveImage(filePath,imgBmp);
+            File file = new File(filePath);
+            if (file.exists()) {
+                UMImage image = new UMImage(SubjectActivity.this, file);
 
-            new ShareAction(this)
-                    .withTitle("分享截图")
-                    .setPlatform(SHARE_MEDIA.WEIXIN)
-                    .setDisplayList(SHARE_MEDIA.WEIXIN)
-                    .setCallback(umShareListener)
-                    .withMedia(image)
-                    .open();
-        }
-        else {
-            Toast.makeText(SubjectActivity.this,"截图失败啦", Toast.LENGTH_SHORT).show();
+                new ShareAction(this)
+                        .withTitle("分享截图")
+                        .setPlatform(SHARE_MEDIA.WEIXIN)
+                        .setDisplayList(SHARE_MEDIA.WEIXIN)
+                        .setCallback(umShareListener)
+                        .withMedia(image)
+                        .open();
+            }
+            else {
+                Toast.makeText(SubjectActivity.this,"截图失败啦", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            toast("页面未加载完成，不能截图微信分享");
         }
     }
 
@@ -521,8 +518,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                 urlKey = String.format(K.kReportDataAPIPath, K.kBaseUrl, groupID, templateID, reportID);
                 ApiHelper.clearResponseHeader(urlKey, FileUtil.sharedPath(mContext));
 
-                ApiHelper.reportData(mContext, String.format("%d", groupID), templateID, reportID);
-                new Thread(mRunnableForDetecting).start();
+                ApiHelper.reportData(mContext, String.format("%d", groupID), templateID, reportID, mRunnableForDetecting);
                 /*
                  * 用户行为记录, 单独异常处理，不可影响用户体验
                  */
