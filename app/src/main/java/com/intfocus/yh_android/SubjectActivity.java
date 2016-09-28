@@ -57,6 +57,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	private Boolean isInnerLink, isSupportSearch;
 	private String templateID, reportID;
 	private PDFView mPDFView;
+	private ImageView mBannerComment,mBannerSetting;
 	private File pdfFile;
 	private String bannerName, link;
 	private int groupID, objectID, objectType;
@@ -91,22 +92,14 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			userNum = "not-set";
 		}
 
-		bannerView = (RelativeLayout) findViewById(R.id.actionBar);
-		TextView mTitle = (TextView) findViewById(R.id.bannerTitle);
-
-
-		mPDFView = (PDFView) findViewById(R.id.pdfview);
-		mPDFView.setVisibility(View.INVISIBLE);
-
 		pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
 		initWebView();
-		initDropMenuItem();
 
 		mWebView.requestFocus();
 		pullToRefreshWebView.setVisibility(View.VISIBLE);
 		mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);
 		mWebView.loadUrl(urlStringForLoading);
-
+		initActiongBar();
 		// 刷新监听事件
 		pullToRefreshWebView.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener<android.webkit.WebView>() {
 			@Override
@@ -121,19 +114,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			}
 		});
 
-        /*
-         * Intent Data || JSON Data
-         */
-		Intent intent = getIntent();
-		link = intent.getStringExtra(URLs.kLink);
-
-		bannerName = intent.getStringExtra(URLs.kBannerName);
-		objectID = intent.getIntExtra(URLs.kObjectId, -1);
-		objectType = intent.getIntExtra(URLs.kObjectType, -1);
-		isInnerLink = !(link.startsWith("http://") || link.startsWith("https://"));
-		mTitle.setText(bannerName);
-
-
 		List<ImageView> colorViews = new ArrayList<>();
 		colorViews.add((ImageView) findViewById(R.id.colorView0));
 		colorViews.add((ImageView) findViewById(R.id.colorView1));
@@ -141,6 +121,33 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		colorViews.add((ImageView) findViewById(R.id.colorView3));
 		colorViews.add((ImageView) findViewById(R.id.colorView4));
 		initColorView(colorViews);
+	}
+
+	private void initActiongBar(){
+		bannerView = (RelativeLayout) findViewById(R.id.actionBar);
+		mBannerComment = (ImageView) findViewById(R.id.bannerComment);
+		mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
+		TextView mTitle = (TextView) findViewById(R.id.bannerTitle);
+
+		/*
+         * Intent Data || JSON Data
+         */
+		Intent intent = getIntent();
+		link = intent.getStringExtra(URLs.kLink);
+		bannerName = intent.getStringExtra(URLs.kBannerName);
+		objectID = intent.getIntExtra(URLs.kObjectId, -1);
+		objectType = intent.getIntExtra(URLs.kObjectType, -1);
+		isInnerLink = !(link.startsWith("http://") || link.startsWith("https://"));
+		mTitle.setText(bannerName);
+
+		if (link.toLowerCase().endsWith(".pdf")) {
+			mBannerComment.setVisibility(View.VISIBLE);
+			mPDFView = (PDFView) findViewById(R.id.pdfview);
+			mPDFView.setVisibility(View.INVISIBLE);
+			return;
+		}
+		mBannerSetting.setVisibility(View.VISIBLE);
+		initDropMenuItem();
 	}
 
 	/*
@@ -189,15 +196,15 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 
 			switch (listItem.get(arg2).get("ItemText").toString()) {
 				case "筛选":
-					actionLaunchReportSelectorActivity();
+					actionLaunchReportSelectorActivity(arg1);
 					break;
 
 				case "分享":
-					actionShare2Weixin();
+					actionShare2Weixin(arg1);
 					break;
 
 				case "评论":
-					actionLaunchCommentActivity();
+					actionLaunchCommentActivity(arg1);
 					break;
 
 				default:
@@ -217,7 +224,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				if (!isShowSearchButton || !isInnerLink) {
+				if (!isShowSearchButton) {
 					HashMap<String, Object> map = new HashMap<>();
 					map.put("ItemImage", R.drawable.banner_search);
 					map.put("ItemText", "筛选");
@@ -411,8 +418,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	/*
 	 * 内部报表具有筛选功能时，调用筛选项界面
 	 */
-	public void actionLaunchReportSelectorActivity() {
-		Log.i("bugbug", "selector is run");
+	public void actionLaunchReportSelectorActivity(View v) {
 		Intent intent = new Intent(mContext, ReportSelectorAcitity.class);
 		intent.putExtra(URLs.kBannerName, bannerName);
 		intent.putExtra(URLs.kGroupId, groupID);
@@ -424,7 +430,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	/*
 	 * 分享截图至微信
 	 */
-	public void actionShare2Weixin() {
+	public void actionShare2Weixin(View v) {
 		String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
 		mWebView.measure(View.MeasureSpec.makeMeasureSpec(
 				View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
@@ -494,7 +500,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	/*
 	 * 评论
 	 */
-	public void actionLaunchCommentActivity() {
+	public void actionLaunchCommentActivity(View v) {
 		Intent intent = new Intent(mContext, CommentActivity.class);
 		intent.putExtra(URLs.kBannerName, bannerName);
 		intent.putExtra(URLs.kObjectId, objectID);
