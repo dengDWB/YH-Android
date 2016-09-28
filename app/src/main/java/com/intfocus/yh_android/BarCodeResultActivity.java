@@ -227,8 +227,8 @@ public class BarCodeResultActivity extends BaseActivity {
             View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
     mWebView.setDrawingCacheEnabled(true);
     mWebView.buildDrawingCache();
-    int imgMaxHight = displayMetrics.heightPixels * 3;
-    if (mWebView.getMeasuredHeight() > 0) {
+    int imgMaxHight = displayMetrics.heightPixels * 5;
+    if (mWebView.getMeasuredHeight() > imgMaxHight) {
       toast("截图失败,请尝试系统截图!");
       return;
     }
