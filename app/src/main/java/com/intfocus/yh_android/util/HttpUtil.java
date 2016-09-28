@@ -6,19 +6,20 @@ import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.net.URI;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -438,6 +439,8 @@ public class HttpUtil {
                 total += count;
                 output.write(data, 0, count);
             }
+            String responseHeader = getResponseHeader(connection);
+            Log.d("ZipInfo", responseHeader);
         } catch (Exception e) {
             LogUtil.d("Exception", e.toString());
             return e.toString();
@@ -454,5 +457,20 @@ public class HttpUtil {
                 connection.disconnect();
         }
         return null;
+    }
+
+    private static String getResponseHeader(HttpURLConnection conn) {
+        Map<String, List<String>> responseHeaderMap = conn.getHeaderFields();
+        int size = responseHeaderMap.size();
+        StringBuilder sbResponseHeader = new StringBuilder();
+        for(int i = 0; i < size; i++){
+            String responseHeaderKey = conn.getHeaderFieldKey(i);
+            String responseHeaderValue = conn.getHeaderField(i);
+            sbResponseHeader.append(responseHeaderKey);
+            sbResponseHeader.append(":");
+            sbResponseHeader.append(responseHeaderValue);
+            sbResponseHeader.append("\n");
+        }
+        return sbResponseHeader.toString();
     }
 }
