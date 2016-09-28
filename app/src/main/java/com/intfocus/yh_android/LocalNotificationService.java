@@ -93,7 +93,7 @@ public class LocalNotificationService extends Service {
         Log.i("bugbug","执行");
       }
     };
-    timer.schedule(timerTask, 0, 30 * 60 * 1000);
+    timer.schedule(timerTask, 10 * 1000, 30 * 60 * 1000);
   }
 
   /*
