@@ -521,6 +521,8 @@ public class FileUtil {
 			Log.e("snapshot", e.toString());
 		}
 	}
+
+
     public static void copyFile(String oldPath, String newPath) {
         try {
             int bytesum = 0;
