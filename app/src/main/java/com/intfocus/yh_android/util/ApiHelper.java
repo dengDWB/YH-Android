@@ -3,11 +3,9 @@ package com.intfocus.yh_android.util;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.OpenUDID.OpenUDID_manager;
 import org.json.JSONException;
@@ -15,22 +13,15 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import org.OpenUDID.OpenUDID_manager;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class ApiHelper {
     public final static String kAppVersion = "app_version";
@@ -122,121 +113,44 @@ public class ApiHelper {
     /*
      *  获取报表网页数据
      */
-    public static void reportData(Context context, String groupID, String templateID, String reportID, Runnable mRunnableForDetecting) {
+    public static void reportData(Context context, String groupID, String templateID, String reportID) {
         String urlString = String.format(K.kReportDataAPIPath, K.kBaseUrl, groupID, templateID, reportID);
         String javascriptPath = FileUtil.reportJavaScriptDataPath(context, groupID, templateID, reportID);
 
-        String javascriptZipName = String.format(K.kReportDataFileName, groupID, templateID, reportID)+".zip";
-        String javascriptZipPath = FileUtil.dirPath(context, K.kCachedDirName, javascriptZipName);
+        String assetsPath = FileUtil.sharedPath(context);
+        Map<String, String> headers = ApiHelper.checkResponseHeader(urlString, assetsPath);
+        Map<String, String> response = HttpUtil.httpGet(urlString, headers);
 
-        String unJavascriptZipPath = FileUtil.dirPath(context, K.kCachedDirName);
-        DownloadAssetsTask1 downloadTask = new DownloadAssetsTask1(context, unJavascriptZipPath, javascriptZipPath, javascriptPath, mRunnableForDetecting);
-        downloadTask.execute(urlString, javascriptZipPath);
-    }
 
-   static class DownloadAssetsTask1 extends AsyncTask<String, Integer, String> {
-        private final Context context;
-        private final String unJavascriptZipPath;
-        private final String javascriptZipPath;
-        private final String javascriptPath;
-        private final Runnable mRunnableForDetecting;
-
-        public DownloadAssetsTask1(Context context, String unJavascriptZipPath, String javascriptZipPath, String javascriptPath, Runnable mRunnableForDetecting) {
-            this.context = context;
-            this.unJavascriptZipPath = unJavascriptZipPath;
-            this.javascriptZipPath = javascriptZipPath;
-            this.javascriptPath = javascriptPath;
-            this.mRunnableForDetecting = mRunnableForDetecting;
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            InputStream input = null;
-            OutputStream output = null;
-            HttpURLConnection connection = null;
+        if (response.get(URLs.kCode).equals("200")) {
             try {
-                URL url = new URL(params[0]);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.connect();
+                ApiHelper.storeResponseHeader(urlString, assetsPath, response);
 
-                // expect HTTP 200 OK, so we don't mistakenly save error report
-                // instead of the file
-                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                    return "Server returned HTTP " + connection.getResponseCode() + " " + connection.getResponseMessage();
+                String jsFileName = String.format("group_%s_template_%s_report_%s.js", groupID, templateID, reportID);
+                String cachedZipPath = FileUtil.dirPath(context, K.kCachedDirName, String.format("%s.zip", jsFileName));
+                HttpUtil.downloadZip(urlString, cachedZipPath);
+
+                InputStream zipStream = new FileInputStream(cachedZipPath);
+                FileUtil.unZip(zipStream, FileUtil.dirPath(context, K.kCachedDirName), true);
+                zipStream.close();
+
+                String jsFilePath = FileUtil.dirPath(context, K.kCachedDirName, jsFileName);
+                File jsFile = new File(jsFilePath);
+                if(jsFile.exists()) {
+                    FileUtil.copyFile(jsFilePath, javascriptPath);
+                    jsFile.delete();
                 }
 
-                // this will be useful to display download percentage
-                // might be -1: server did not report the length
-                int fileLength = connection.getContentLength();
-                input = connection.getInputStream();
-                output = new FileOutputStream(params[1]);
-
-                byte data[] = new byte[4096];
-                long total = 0;
-                int count;
-                while ((count = input.read(data)) != -1) {
-                    // allow canceling with back button
-                    if (isCancelled()) {
-                        input.close();
-                        return null;
-                    }
-                    total += count;
-                    // publishing the progress....
-                    if (fileLength > 0) // only if total length is known
-                        publishProgress((int) (total * 100 / fileLength));
-                    output.write(data, 0, count);
+                String searchItemsPath = String.format("%s.search_items", javascriptPath);
+                File searchItemsFile = new File(searchItemsPath);
+                if(searchItemsFile.exists()) {
+                    searchItemsFile.delete();
                 }
-            } catch (Exception e) {
-                LogUtil.d("Exception", e.toString());
-                return e.toString();
-            } finally {
-                try {
-                    if (output != null)
-                        output.close();
-                    if (input != null)
-                        input.close();
-                } catch (IOException ignored) {
-                }
-
-                if (connection != null)
-                    connection.disconnect();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... progress) {
-            super.onProgressUpdate(progress);
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-
-            if (result != null) {
-                Toast.makeText(context, String.format("报表JS下载失败(%s)", result), Toast.LENGTH_LONG).show();
-            } else {
-                try {
-                    InputStream zipStream = new FileInputStream(javascriptZipPath);
-                    FileUtil.unZip(zipStream, unJavascriptZipPath, true);
-
-                    if (new File(javascriptPath).exists()) {
-                        new File(javascriptPath).delete();
-                    }
-                    FileUtil.copyFile(javascriptZipPath.replace(".zip",""), javascriptPath);
-                    new File(javascriptZipPath.replace(".zip","")).delete();
-                    new File(javascriptZipPath).delete();
-                    new Thread(mRunnableForDetecting).start();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        } else {
+            Log.i("Code", response.get("code"));
         }
     }
 

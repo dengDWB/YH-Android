@@ -22,7 +22,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
@@ -132,9 +131,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		/*
          * Intent Data || JSON Data
          */
-        ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
-        popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
-
 		Intent intent = getIntent();
 		link = intent.getStringExtra(URLs.kLink);
 		bannerName = intent.getStringExtra(URLs.kBannerName);
@@ -356,9 +352,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					ApiHelper.reportData(mContext, String.format("%d", groupID), templateID, reportID, mRunnableForDetecting);
-//
-//					new Thread(mRunnableForDetecting).start();
+					ApiHelper.reportData(mContext, String.format("%d", groupID), templateID, reportID);
+
+					new Thread(mRunnableForDetecting).start();
 				}
 			}).start();
 		} else {
@@ -434,8 +430,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	 * 分享截图至微信
 	 */
 	public void actionShare2Weixin(View v) {
-        if (!loadWebFinish) {
-			toast("页面未加载完成，不能截图微信分享");
+		if (!loadWebFinish) {
+			toast("页面未加载完成，请稍后截图分享");
 			return;
 		}
 		String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
@@ -550,8 +546,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 				urlKey = String.format(K.kReportDataAPIPath, K.kBaseUrl, groupID, templateID, reportID);
 				ApiHelper.clearResponseHeader(urlKey, FileUtil.sharedPath(mContext));
 
-				ApiHelper.reportData(mContext, String.format("%d", groupID), templateID, reportID, mRunnableForDetecting);
-//				new Thread(mRunnableForDetecting).start();
+				ApiHelper.reportData(mContext, String.format("%d", groupID), templateID, reportID);
+				new Thread(mRunnableForDetecting).start();
                 /*
                  * 用户行为记录, 单独异常处理，不可影响用户体验
                  */
