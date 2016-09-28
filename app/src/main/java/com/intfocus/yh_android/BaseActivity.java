@@ -37,6 +37,7 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
+
 import com.handmark.pulltorefresh.library.ILoadingLayout;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
@@ -55,6 +56,7 @@ import com.umeng.message.PushAgent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -68,8 +70,6 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by lijunjie on 16/1/14.
@@ -86,6 +86,7 @@ public class BaseActivity extends Activity {
     protected ProgressDialog mProgressDialog;
     protected YHApplication mMyApp;
     protected PopupWindow popupWindow;
+    protected DisplayMetrics displayMetrics;
     PullToRefreshWebView pullToRefreshWebView;
     android.webkit.WebView mWebView;
     JSONObject user;
@@ -106,8 +107,8 @@ public class BaseActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         //获取当前设备屏幕密度
-        DisplayMetrics dm = getResources().getDisplayMetrics();
-        displayDpi = dm.densityDpi;
+        displayMetrics = getResources().getDisplayMetrics();
+        displayDpi = displayMetrics.densityDpi;
 
         mMyApp = (YHApplication)this.getApplicationContext();
         mContext = BaseActivity.this;
