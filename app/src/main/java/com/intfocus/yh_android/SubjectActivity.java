@@ -429,6 +429,11 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
         mWebView.setDrawingCacheEnabled(true);
         mWebView.buildDrawingCache();
+        int imgMaxHight = displayMetrics.heightPixels * 3;
+        if (mWebView.getMeasuredHeight() > 0) {
+            toast("截图失败,请尝试系统截图!");
+            return;
+        }
         Bitmap imgBmp = Bitmap.createBitmap(mWebView.getMeasuredWidth(),
                 mWebView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
         if (imgBmp == null) { toast("截图失败"); }

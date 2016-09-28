@@ -94,6 +94,7 @@ public class BaseActivity extends Activity {
     protected ProgressDialog mProgressDialog;
     protected YHApplication mMyApp;
     protected PopupWindow popupWindow;
+    protected DisplayMetrics displayMetrics;
     PullToRefreshWebView pullToRefreshWebView;
     android.webkit.WebView mWebView;
     JSONObject user;
@@ -112,8 +113,8 @@ public class BaseActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         //获取当前设备屏幕密度
-        DisplayMetrics dm = getResources().getDisplayMetrics();
-        displayDpi = dm.densityDpi;
+        displayMetrics = getResources().getDisplayMetrics();
+        displayDpi = displayMetrics.densityDpi;
 
         mMyApp = (YHApplication)this.getApplicationContext();
         mContext = BaseActivity.this;
