@@ -16,13 +16,11 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,16 +31,12 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import com.handmark.pulltorefresh.library.ILoadingLayout;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
@@ -51,20 +45,13 @@ import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.HttpUtil;
 import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.LogUtil;
-import com.intfocus.yh_android.util.TypedObject;
 import com.intfocus.yh_android.util.URLs;
 import com.pgyersdk.javabean.AppBean;
 import com.pgyersdk.update.PgyUpdateManager;
 import com.pgyersdk.update.UpdateManagerListener;
-import com.readystatesoftware.viewbadger.BadgeView;
 import com.squareup.leakcanary.RefWatcher;
 import com.umeng.message.IUmengRegisterCallback;
 import com.umeng.message.PushAgent;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Text;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -78,6 +65,8 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by lijunjie on 16/1/14.
@@ -815,10 +804,11 @@ public class BaseActivity extends Activity {
             String keyName = String.format("%s_md5", assetName);
             isShouldUpdateAssets = !isShouldUpdateAssets && !userJSON.getString(localKeyName).equals(userJSON.getString(keyName));
 
-            if (!isShouldUpdateAssets) return false;
+            if (!isShouldUpdateAssets) {
+                return false;
+            }
 
-            LogUtil.d("checkAssetUpdated",
-                String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName),
+            LogUtil.d("checkAssetUpdated", String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName),
                     userJSON.getString(keyName)));
             // execute this when the downloader must be fired
             final DownloadAssetsTask downloadTask = new DownloadAssetsTask(mContext, shouldReloadUIThread, assetName, isInAssets);
