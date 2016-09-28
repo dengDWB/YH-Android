@@ -32,7 +32,15 @@
             android:layout_alignBottom="@+id/colorViewLayout"
             android:layout_marginTop="0dp"
             android:onClick="launchDropMenuActivity"
-            android:src="@drawable/banner_setting"/>
+            android:src="@drawable/banner_setting"
+            android:visibility="gone"/>
+
+        <ImageView
+            android:id="@+id/bannerComment"
+            style="@style/BannerRightButton"
+            android:src="@drawable/banner_comment"
+            android:onClick="actionLaunchCommentActivity"
+            android:visibility="gone"/>
 
         <RelativeLayout
             android:id="@+id/colorViewLayout"
