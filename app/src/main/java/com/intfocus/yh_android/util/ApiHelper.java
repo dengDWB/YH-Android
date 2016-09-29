@@ -119,10 +119,13 @@ public class ApiHelper {
 
         String assetsPath = FileUtil.sharedPath(context);
         Map<String, String> headers = ApiHelper.checkResponseHeader(urlString, assetsPath);
+        Log.i("reportData", headers.toString());
         String jsFileName = String.format("group_%s_template_%s_report_%s.js", groupID, templateID, reportID);
         String cachedZipPath = FileUtil.dirPath(context, K.kCachedDirName, String.format("%s.zip", jsFileName));
         Map<String, String> response = HttpUtil.downloadZip(urlString, cachedZipPath, headers);
 
+        Log.i("reportData", response.get("code"));
+        Log.i("reportData", response.toString());
         if (!response.get(URLs.kCode).equals("200") || !(new File(cachedZipPath)).exists()) {
             return;
         }
@@ -140,7 +143,9 @@ public class ApiHelper {
                 FileUtil.copyFile(jsFilePath, javascriptPath);
                 jsFile.delete();
             }
-
+            if (new File(cachedZipPath).exists()) {
+                new File(cachedZipPath).delete();
+            }
             String searchItemsPath = String.format("%s.search_items", javascriptPath);
             File searchItemsFile = new File(searchItemsPath);
             if(searchItemsFile.exists()) {
