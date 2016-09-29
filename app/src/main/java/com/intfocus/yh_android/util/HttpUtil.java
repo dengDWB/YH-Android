@@ -6,9 +6,6 @@ import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,13 +19,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import static u.aly.dn.i;
 
 public class HttpUtil {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -411,19 +411,37 @@ public class HttpUtil {
         }
     }
 
-    public static String downloadZip(String urlString, String outputPath) {
+    public static Map<String, String> downloadZip(String urlString, String outputPath, Map<String, String> headers) {
+        Map<String, String> response = new HashMap<>();
         InputStream input = null;
         OutputStream output = null;
         HttpURLConnection connection = null;
         try {
             URL url = new URL(urlString);
             connection = (HttpURLConnection) url.openConnection();
+
+            connection.setRequestProperty("accept", "*/*");
+            connection.setRequestProperty("connection", "Keep-Alive");
+            connection.setRequestProperty("user-agent", HttpUtil.webViewUserAgent());
+            if (headers.containsKey(URLs.kETag)) {
+                connection.setRequestProperty("IF-None-Match", headers.get(URLs.kETag));
+            }
+            if (headers.containsKey(URLs.kLastModified)) {
+                connection.setRequestProperty("If-Modified-Since", headers.get(URLs.kLastModified));
+            }
+
             connection.connect();
+            response.put(URLs.kCode, String.format("%d", connection.getResponseCode()));
+            Map<String, List<String>> map = connection.getHeaderFields();
+            for (Map.Entry<String, List<String>> entry : map.entrySet()) {
+                response.put(entry.getKey(), entry.getValue().get(0));
+            }
+            Log.i("DownloadZIP", String.format("%d - %s - %s", connection.getResponseCode(), urlString, response.toString()));
 
             // expect HTTP 200 OK, so we don't mistakenly save error report
             // instead of the file
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                return "Server returned HTTP " + connection.getResponseCode() + " " + connection.getResponseMessage();
+                return response;
             }
 
             // this will be useful to display download percentage
@@ -439,12 +457,12 @@ public class HttpUtil {
                 total += count;
                 output.write(data, 0, count);
             }
-            String responseHeader = getResponseHeader(connection);
-            Log.d("ZipInfo", responseHeader);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             LogUtil.d("Exception", e.toString());
-            return e.toString();
-        } finally {
+            return response;
+        }
+        finally {
             try {
                 if (output != null)
                     output.close();
@@ -456,21 +474,6 @@ public class HttpUtil {
             if (connection != null)
                 connection.disconnect();
         }
-        return null;
-    }
-
-    private static String getResponseHeader(HttpURLConnection conn) {
-        Map<String, List<String>> responseHeaderMap = conn.getHeaderFields();
-        int size = responseHeaderMap.size();
-        StringBuilder sbResponseHeader = new StringBuilder();
-        for(int i = 0; i < size; i++){
-            String responseHeaderKey = conn.getHeaderFieldKey(i);
-            String responseHeaderValue = conn.getHeaderField(i);
-            sbResponseHeader.append(responseHeaderKey);
-            sbResponseHeader.append(":");
-            sbResponseHeader.append(responseHeaderValue);
-            sbResponseHeader.append("\n");
-        }
-        return sbResponseHeader.toString();
+        return response;
     }
 }

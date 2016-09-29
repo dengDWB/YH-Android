@@ -253,27 +253,6 @@ public class FileUtil {
         return hashFile(file);
     }
 
-    private static String MD5(InputStream inputStream) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("MD5");
-
-            byte[] bytesBuffer = new byte[1024];
-            int bytesRead;
-
-            while ((bytesRead = inputStream.read(bytesBuffer)) != -1) {
-                digest.update(bytesBuffer, 0, bytesRead);
-            }
-
-            byte[] hashedBytes = digest.digest();
-            return convertByteArrayToHexString(hashedBytes);
-        } catch (IOException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-
-        return "MD5 - exception catched";
-    }
-
-
     /**
      * 解压assets的zip压缩文件到指定目录
      *
@@ -321,6 +300,27 @@ public class FileUtil {
             zipEntry = zipInputStream.getNextEntry();
         }
         zipInputStream.close();
+    }
+
+
+    private static String MD5(InputStream inputStream) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+
+            byte[] bytesBuffer = new byte[1024];
+            int bytesRead;
+
+            while ((bytesRead = inputStream.read(bytesBuffer)) != -1) {
+                digest.update(bytesBuffer, 0, bytesRead);
+            }
+
+            byte[] hashedBytes = digest.digest();
+            return convertByteArrayToHexString(hashedBytes);
+        } catch (IOException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        return "MD5 - exception catched";
     }
 
     /**

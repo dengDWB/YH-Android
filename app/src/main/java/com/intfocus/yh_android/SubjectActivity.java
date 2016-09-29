@@ -38,16 +38,14 @@ import com.umeng.socialize.UMShareAPI;
 import com.umeng.socialize.UMShareListener;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.media.UMImage;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import static android.webkit.WebView.enableSlowWholeDocumentDraw;
 import static java.lang.String.format;
@@ -238,7 +236,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 					ArrayList<String> items = FileUtil.reportSearchItems(mContext, String.format("%d", groupID), templateID, reportID);
 					if (items.size() > 0) {
 						selectedItem = items.get(0);
-					} else {
+					}
+					else {
 						selectedItem = String.format("%s(NONE)", bannerName);
 					}
 				}
@@ -309,7 +308,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			lp.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
 			getWindow().setAttributes(lp);
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-		} else {
+		}
+		else {
 			WindowManager.LayoutParams attr = getWindow().getAttributes();
 			attr.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			getWindow().setAttributes(attr);
