@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
@@ -429,6 +430,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	 * 分享截图至微信
 	 */
 	public void actionShare2Weixin(View v) {
+		if (!loadWebFinish) {
+			toast("页面未加载完成，请稍后截图分享");
+			return;
+		}
 		String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
 		mWebView.measure(View.MeasureSpec.makeMeasureSpec(
 				View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
