@@ -430,10 +430,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	 * 分享截图至微信
 	 */
 	public void actionShare2Weixin(View v) {
-		if (!loadWebFinish) {
-			toast("页面未加载完成，请稍后截图分享");
-			return;
-		}
 		String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
 		mWebView.measure(View.MeasureSpec.makeMeasureSpec(
 				View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),

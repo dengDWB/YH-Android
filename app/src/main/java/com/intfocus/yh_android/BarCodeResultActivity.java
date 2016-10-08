@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -19,7 +18,6 @@ import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
-import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.K;
