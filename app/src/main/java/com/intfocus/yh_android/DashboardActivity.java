@@ -6,6 +6,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,6 +20,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -35,6 +37,7 @@ import com.intfocus.yh_android.util.URLs;
 import com.intfocus.yh_android.view.RedPointView;
 import com.intfocus.yh_android.view.TabView;
 import com.readystatesoftware.viewbadger.BadgeView;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -63,6 +66,7 @@ public class DashboardActivity extends BaseActivity {
 	private WebView browserAd;
 	private int mAnimationTime;
 	private MenuAdapter mSimpleAdapter;
+
 
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
@@ -97,6 +101,8 @@ public class DashboardActivity extends BaseActivity {
 
 		checkUserModifiedInitPassword();
 	}
+
+
 
 	private void initDropMenuItem() {
 		listItem = new ArrayList<HashMap<String, Object>>();
@@ -300,7 +306,7 @@ public class DashboardActivity extends BaseActivity {
 		setPullToRefreshWebView(true);
 		mWebView.requestFocus();
 		mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);
-		mWebView.loadUrl(urlStringForLoading);
+		animLoading.setVisibility(View.VISIBLE);
 
 
 		browserAd = (WebView) findViewById(R.id.browserAd);
@@ -442,7 +448,7 @@ public class DashboardActivity extends BaseActivity {
 			mCurrentTab = (TabView) v;
 			mCurrentTab.setActive(true);
 
-			mWebView.loadUrl(loadingPath("loading"));
+			animLoading.setVisibility(View.VISIBLE);
 			String currentUIVersion = URLs.currentUIVersion(mContext);
 
 			displayAdOrNot(false);

@@ -3,6 +3,7 @@ package com.intfocus.yh_android;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,6 +26,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -33,8 +35,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
@@ -53,6 +57,7 @@ import com.pgyersdk.update.UpdateManagerListener;
 import com.squareup.leakcanary.RefWatcher;
 import com.umeng.message.IUmengRegisterCallback;
 import com.umeng.message.PushAgent;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -90,6 +95,7 @@ public class BaseActivity extends Activity {
     PullToRefreshWebView pullToRefreshWebView;
     android.webkit.WebView mWebView;
     JSONObject user;
+    RelativeLayout animLoading;
     int userID = 0;
     String urlString;
     String assetsPath;
@@ -97,6 +103,7 @@ public class BaseActivity extends Activity {
     JSONObject logParams = new JSONObject();
     Context mContext;
     Activity currActivity;
+    Dialog loadDialog;
     int displayDpi; //屏幕密度
     boolean loadWebFinish = false;
     int loadWebCount = 0;
@@ -222,8 +229,8 @@ public class BaseActivity extends Activity {
     }
 
     android.webkit.WebView initWebView() {
+        animLoading = (RelativeLayout) findViewById(R.id.anim_loading);
         pullToRefreshWebView.setMode(PullToRefreshBase.Mode.PULL_FROM_START);
-
         mWebView = pullToRefreshWebView.getRefreshableView();
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -242,13 +249,13 @@ public class BaseActivity extends Activity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-
                 LogUtil.d("onPageStarted", String.format("%s - %s", URLs.timestamp(), url));
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                animLoading.setVisibility(View.GONE);
                 if (mContext.toString().contains("SubjectActivity")) {
                     if (loadWebCount > 0) {
                         loadWebFinish = true;
