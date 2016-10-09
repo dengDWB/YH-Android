@@ -381,8 +381,8 @@ public class SettingActivity extends BaseActivity {
                 cropPhoto(intent.getData());
                 break;
             case CODE_CAMERA_REQUEST:
-                    File tempFile = new File(Environment.getExternalStorageDirectory(),"icon.jpg");
-                    cropPhoto(Uri.fromFile(tempFile));
+                File tempFile = new File(Environment.getExternalStorageDirectory(),"icon.jpg");
+                cropPhoto(Uri.fromFile(tempFile));
                 break;
             default:
                 if (intent != null) {
@@ -398,7 +398,12 @@ public class SettingActivity extends BaseActivity {
      */
     public void cropPhoto(Uri uri) {
         Intent intent = new Intent("com.android.camera.action.CROP");
-        intent.setDataAndType(uri, "image/*");
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            String url=FileUtil.getBitmapUrlPath(this, uri);
+            intent.setDataAndType(Uri.fromFile(new File(url)), "image/*");
+        }else{
+            intent.setDataAndType(uri, "image/*");
+        }
         intent.putExtra("crop", "true");
         // aspectX aspectY 是宽高的比例
         intent.putExtra("aspectX", 1);
@@ -777,4 +782,5 @@ public class SettingActivity extends BaseActivity {
         }
 
     }
+
 }
