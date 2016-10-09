@@ -72,6 +72,14 @@ public class BarCodeScannerActivity extends BaseActivity implements ZBarScannerV
           }, 2000);
       }
       else {
+          if (URLs.kIsQRCode) {
+              if (rawResult.getBarcodeFormat().getName().equals("QRCODE")) {
+                  mScannerView.resumeCameraPreview(BarCodeScannerActivity.this);
+                  toast("本应用现只支持条形码扫描");
+                  return;
+              }
+          }
+
         Intent intent = new Intent(mContext, BarCodeResultActivity.class);
         intent.putExtra(URLs.kCodeInfo, rawResult.getContents());
         intent.putExtra(URLs.kCodeType, rawResult.getBarcodeFormat().getName());

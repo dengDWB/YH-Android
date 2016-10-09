@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.intfocus.yh_android.screen_lock.InitPassCodeActivity;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
+import com.intfocus.yh_android.util.HttpUtil;
 import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.PrivateURLs;
 import com.intfocus.yh_android.util.URLs;
@@ -136,6 +137,7 @@ public class SettingActivity extends BaseActivity {
         initIconMenu();
         initializeUI();
         setSettingViewControlBadges();
+        HttpUtil.verifyStoragePermissions(this);
     }
 
     @Override
@@ -381,8 +383,8 @@ public class SettingActivity extends BaseActivity {
                 cropPhoto(intent.getData());
                 break;
             case CODE_CAMERA_REQUEST:
-                    File tempFile = new File(Environment.getExternalStorageDirectory(),"icon.jpg");
-                    cropPhoto(Uri.fromFile(tempFile));
+                File tempFile = new File(Environment.getExternalStorageDirectory(),"icon.jpg");
+                cropPhoto(Uri.fromFile(tempFile));
                 break;
             default:
                 if (intent != null) {
