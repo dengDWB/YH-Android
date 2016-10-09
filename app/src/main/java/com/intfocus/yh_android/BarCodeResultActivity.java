@@ -8,16 +8,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.K;
+import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.umeng.socialize.ShareAction;
 import com.umeng.socialize.UMShareAPI;
@@ -59,11 +63,21 @@ public class BarCodeResultActivity extends BaseActivity {
     }
     setContentView(R.layout.activity_bar_code_result);
 
+    animLoading = (RelativeLayout) findViewById(R.id.anim_loading);
     mWebView = (WebView) findViewById(R.id.barcode_browser);
     WebSettings webSettings = mWebView.getSettings();
     webSettings.setJavaScriptEnabled(true);
     webSettings.setDefaultTextEncodingName("utf-8");
     webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+    mWebView.setWebChromeClient(new WebChromeClient());
+    mWebView.setWebViewClient(new WebViewClient() {
+      @Override
+      public void onPageFinished(WebView view, String url) {
+        super.onPageFinished(view, url);
+        animLoading.setVisibility(View.GONE);
+        LogUtil.d("onPageFinished", String.format("%s - %s", URLs.timestamp(), url));
+      }
+    });
 
     initDropMenuItem();
 
@@ -119,7 +133,8 @@ public class BarCodeResultActivity extends BaseActivity {
   public void onResume() {
     super.onResume();
 
-    mWebView.loadUrl(loadingPath("loading"));
+//    mWebView.loadUrl(loadingPath("loading"));
+    animLoading.setVisibility(View.VISIBLE);
     new Thread(new Runnable() {
       @Override public void run() {
         ApiHelper.barCodeScan(mContext, groupID, roleID, userNum, storeID, codeInfo, codeType);
@@ -175,8 +190,8 @@ public class BarCodeResultActivity extends BaseActivity {
   }
 
   /*
- 	 * 标题栏设置按钮下拉菜单点击响应事件
- 	 */
+   * 标题栏设置按钮下拉菜单点击响应事件
+   */
   private final AdapterView.OnItemClickListener mDropMenuListener = new AdapterView.OnItemClickListener() {
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
                             long arg3) {

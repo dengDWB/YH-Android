@@ -1,17 +1,22 @@
 package com.intfocus.yh_android;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -322,7 +327,13 @@ public class SettingActivity extends BaseActivity {
         btnTakePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getCameraCapture();
+                    int cameraPermission = ContextCompat.checkSelfPermission(mContext,Manifest.permission.CAMERA);
+                    if(cameraPermission != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(SettingActivity.this,new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},CODE_CAMERA_REQUEST);
+                        return;
+                    }else{
+                        getCameraCapture();
+                    }
             }
         });
 
@@ -339,6 +350,22 @@ public class SettingActivity extends BaseActivity {
                 popupWindow.dismiss();
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case CODE_CAMERA_REQUEST:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getCameraCapture();
+                } else {
+                    Toast.makeText(SettingActivity.this, "相机权限获取失败，请重试", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     /*

@@ -25,6 +25,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
@@ -64,6 +65,7 @@ public class DashboardActivity extends BaseActivity {
 	private int mAnimationTime;
 	private MenuAdapter mSimpleAdapter;
 
+
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
 	protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +99,8 @@ public class DashboardActivity extends BaseActivity {
 
 		checkUserModifiedInitPassword();
 	}
+
+
 
 	private void initDropMenuItem() {
 		listItem = new ArrayList<HashMap<String, Object>>();
@@ -149,6 +153,25 @@ public class DashboardActivity extends BaseActivity {
 		}
 	};
 
+	/*
+	 * 权限获取
+	 */
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		switch (requestCode) {
+			case ZBAR_CAMERA_PERMISSION:
+				if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					Intent barCodeScannerIntent = new Intent(mContext, BarCodeScannerActivity.class);
+					mContext.startActivity(barCodeScannerIntent);
+				} else {
+					Toast.makeText(DashboardActivity.this, "相机权限获取失败，请重试", Toast.LENGTH_SHORT)
+							.show();
+				}
+				break;
+			default:
+				super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		}
+	}
 
 	protected void onResume() {
 		mMyApp.setCurrentActivity(this);
@@ -300,7 +323,7 @@ public class DashboardActivity extends BaseActivity {
 		setPullToRefreshWebView(true);
 		mWebView.requestFocus();
 		mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);
-		mWebView.loadUrl(urlStringForLoading);
+		animLoading.setVisibility(View.VISIBLE);
 
 
 		browserAd = (WebView) findViewById(R.id.browserAd);
@@ -442,7 +465,7 @@ public class DashboardActivity extends BaseActivity {
 			mCurrentTab = (TabView) v;
 			mCurrentTab.setActive(true);
 
-			mWebView.loadUrl(loadingPath("loading"));
+			animLoading.setVisibility(View.VISIBLE);
 			String currentUIVersion = URLs.currentUIVersion(mContext);
 
 			displayAdOrNot(false);

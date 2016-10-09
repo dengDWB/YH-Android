@@ -35,6 +35,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
@@ -90,6 +91,7 @@ public class BaseActivity extends Activity {
     PullToRefreshWebView pullToRefreshWebView;
     android.webkit.WebView mWebView;
     JSONObject user;
+    RelativeLayout animLoading;
     int userID = 0;
     String urlString;
     String assetsPath;
@@ -98,8 +100,6 @@ public class BaseActivity extends Activity {
     Context mContext;
     Activity currActivity;
     int displayDpi; //屏幕密度
-    boolean loadWebFinish = false;
-    int loadWebCount = 0;
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -222,8 +222,8 @@ public class BaseActivity extends Activity {
     }
 
     android.webkit.WebView initWebView() {
+        animLoading = (RelativeLayout) findViewById(R.id.anim_loading);
         pullToRefreshWebView.setMode(PullToRefreshBase.Mode.PULL_FROM_START);
-
         mWebView = pullToRefreshWebView.getRefreshableView();
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -243,19 +243,13 @@ public class BaseActivity extends Activity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-
                 LogUtil.d("onPageStarted", String.format("%s - %s", URLs.timestamp(), url));
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                if (mContext.toString().contains("SubjectActivity")) {
-                    if (loadWebCount > 0) {
-                        loadWebFinish = true;
-                    }
-                    loadWebCount++;
-                }
+                animLoading.setVisibility(View.GONE);
                 LogUtil.d("onPageFinished", String.format("%s - %s", URLs.timestamp(), url));
             }
 

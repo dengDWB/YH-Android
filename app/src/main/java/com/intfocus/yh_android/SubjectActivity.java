@@ -97,7 +97,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		mWebView.requestFocus();
 		pullToRefreshWebView.setVisibility(View.VISIBLE);
 		mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);
-		mWebView.loadUrl(urlStringForLoading);
+		animLoading.setVisibility(View.VISIBLE);
 		initActiongBar();
 		// 刷新监听事件
 		pullToRefreshWebView.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener<android.webkit.WebView>() {
@@ -432,10 +432,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	 * 分享截图至微信
 	 */
 	public void actionShare2Weixin(View v) {
-		if (!loadWebFinish) {
-			toast("页面未加载完成，请稍后截图分享");
-			return;
-		}
 		Bitmap imgBmp;
 		String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
 		if (URLs.kIsFullScreen){
