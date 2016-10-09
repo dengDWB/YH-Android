@@ -190,8 +190,8 @@ public class BarCodeResultActivity extends BaseActivity {
   }
 
   /*
- 	 * 标题栏设置按钮下拉菜单点击响应事件
- 	 */
+   * 标题栏设置按钮下拉菜单点击响应事件
+   */
   private final AdapterView.OnItemClickListener mDropMenuListener = new AdapterView.OnItemClickListener() {
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
                             long arg3) {
