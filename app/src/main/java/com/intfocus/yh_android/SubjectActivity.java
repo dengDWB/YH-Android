@@ -436,27 +436,33 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			toast("页面未加载完成，请稍后截图分享");
 			return;
 		}
+		Bitmap imgBmp;
 		String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
-		mWebView.measure(View.MeasureSpec.makeMeasureSpec(
-				View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
-				View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-		mWebView.setDrawingCacheEnabled(true);
-		mWebView.buildDrawingCache();
-		int imgMaxHight = displayMetrics.heightPixels * 5;
-		if (mWebView.getMeasuredHeight() > imgMaxHight) {
-			toast("截图失败,请尝试系统截图!");
-			return;
+		if (URLs.kIsFullScreen){
+			imgBmp = mWebView.getDrawingCache();
+		}else {
+			mWebView.measure(View.MeasureSpec.makeMeasureSpec(
+					View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
+					View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+			mWebView.setDrawingCacheEnabled(true);
+			mWebView.buildDrawingCache();
+			int imgMaxHight = displayMetrics.heightPixels * 5;
+			if (mWebView.getMeasuredHeight() > imgMaxHight) {
+				toast("截图失败,请尝试系统截图!");
+				return;
+			}
+			imgBmp = Bitmap.createBitmap(mWebView.getMeasuredWidth(),
+					mWebView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+			if (imgBmp == null) {
+				toast("截图失败");
+			}
+			Canvas canvas = new Canvas(imgBmp);
+			Paint paint = new Paint();
+			int iHeight = imgBmp.getHeight();
+			canvas.drawBitmap(imgBmp, 0, iHeight, paint);
+			mWebView.draw(canvas);
 		}
-		Bitmap imgBmp = Bitmap.createBitmap(mWebView.getMeasuredWidth(),
-				mWebView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-		if (imgBmp == null) {
-			toast("截图失败");
-		}
-		Canvas canvas = new Canvas(imgBmp);
-		Paint paint = new Paint();
-		int iHeight = imgBmp.getHeight();
-		canvas.drawBitmap(imgBmp, 0, iHeight, paint);
-		mWebView.draw(canvas);
+
 		FileUtil.saveImage(filePath, imgBmp);
 		imgBmp.recycle(); // 回收 bitmap 资源，避免内存浪费
 
