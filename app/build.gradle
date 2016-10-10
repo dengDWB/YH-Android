@@ -2,12 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     signingConfigs {
-        config {
-            keyAlias 'yh-test'
-            keyPassword '123456'
-            storeFile file('D:/intfocus/YH-Android/key-store/yh-test.jks')
-            storePassword '123456'
-        }
     }
     compileSdkVersion 24
     buildToolsVersion '24.0.1'
@@ -31,7 +25,6 @@ android {
             proguardFiles 'proguard-rules.pro' //getDefaultProguardFile('proguard-android.txt'),
             if (System.getenv().containsKey("KEYSTORE"))
                 signingConfig signingConfigs.release
-            signingConfig signingConfigs.config
         }
     }
     lintOptions {
