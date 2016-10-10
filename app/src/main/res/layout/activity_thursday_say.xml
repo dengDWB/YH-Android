@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <RelativeLayout
@@ -52,10 +54,40 @@
 
     </RelativeLayout>
 
-    <com.handmark.pulltorefresh.library.PullToRefreshWebView
-        android:id="@+id/browser"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/actionBar" />
+        android:layout_above="@id/toolBar"
+        android:layout_below="@id/actionBar">
+
+        <WebView
+            android:id="@+id/browserAd"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:layerType="software"
+            android:scrollbars="none"
+            android:visibility="gone"/>
+
+        <com.handmark.pulltorefresh.library.PullToRefreshWebView
+            android:id="@+id/browser"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <RelativeLayout
+            android:id="@+id/anim_loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white">
+
+            <com.wang.avi.AVLoadingIndicatorView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="visible"
+                app:indicatorColor="@color/actionBar"
+                app:indicatorName="BallPulseIndicator"
+                />
+        </RelativeLayout>
+    </FrameLayout>
 
 </RelativeLayout>
