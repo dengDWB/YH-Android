@@ -231,6 +231,7 @@ public class BaseActivity extends Activity {
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         mWebView.setWebChromeClient(new WebChromeClient());
+        mWebView.setDrawingCacheEnabled(true);
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(android.webkit.WebView view, String url) {

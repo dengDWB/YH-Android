@@ -1,8 +1,12 @@
 package com.intfocus.yh_android.util;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 

@@ -38,14 +38,16 @@ import com.umeng.socialize.UMShareAPI;
 import com.umeng.socialize.UMShareListener;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.media.UMImage;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import static android.webkit.WebView.enableSlowWholeDocumentDraw;
 import static java.lang.String.format;
@@ -430,27 +432,33 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	 * 分享截图至微信
 	 */
 	public void actionShare2Weixin(View v) {
+		Bitmap imgBmp;
 		String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
-		mWebView.measure(View.MeasureSpec.makeMeasureSpec(
-				View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
-				View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-		mWebView.setDrawingCacheEnabled(true);
-		mWebView.buildDrawingCache();
-		int imgMaxHight = displayMetrics.heightPixels * 5;
-		if (mWebView.getMeasuredHeight() > imgMaxHight) {
-			toast("截图失败,请尝试系统截图!");
-			return;
+		if (URLs.kIsFullScreen){
+			imgBmp = mWebView.getDrawingCache();
+		}else {
+			mWebView.measure(View.MeasureSpec.makeMeasureSpec(
+					View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
+					View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+			mWebView.setDrawingCacheEnabled(true);
+			mWebView.buildDrawingCache();
+			int imgMaxHight = displayMetrics.heightPixels * 5;
+			if (mWebView.getMeasuredHeight() > imgMaxHight) {
+				toast("截图失败,请尝试系统截图!");
+				return;
+			}
+			imgBmp = Bitmap.createBitmap(mWebView.getMeasuredWidth(),
+					mWebView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+			if (imgBmp == null) {
+				toast("截图失败");
+			}
+			Canvas canvas = new Canvas(imgBmp);
+			Paint paint = new Paint();
+			int iHeight = imgBmp.getHeight();
+			canvas.drawBitmap(imgBmp, 0, iHeight, paint);
+			mWebView.draw(canvas);
 		}
-		Bitmap imgBmp = Bitmap.createBitmap(mWebView.getMeasuredWidth(),
-				mWebView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-		if (imgBmp == null) {
-			toast("截图失败");
-		}
-		Canvas canvas = new Canvas(imgBmp);
-		Paint paint = new Paint();
-		int iHeight = imgBmp.getHeight();
-		canvas.drawBitmap(imgBmp, 0, iHeight, paint);
-		mWebView.draw(canvas);
+
 		FileUtil.saveImage(filePath, imgBmp);
 		imgBmp.recycle(); // 回收 bitmap 资源，避免内存浪费
 
