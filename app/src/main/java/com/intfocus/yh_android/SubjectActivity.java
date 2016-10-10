@@ -70,8 +70,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		/*
-         * 判断当前设备版本，5.0 以上 Android 系统使用才 enableSlowWholeDocumentDraw();
-         */
+		 * 判断当前设备版本，5.0 以上 Android 系统使用才 enableSlowWholeDocumentDraw();
+		 */
 		int sysVersion = Build.VERSION.SDK_INT;
 		if (sysVersion > 20) {
 			enableSlowWholeDocumentDraw();
@@ -79,9 +79,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		setContentView(R.layout.activity_subject);
 		mMyApp.setCurrentActivity(this);
 
-        /*
-         * JSON Data
-         */
+		/*
+		 * JSON Data
+		 */
 		try {
 			groupID = user.getInt(URLs.kGroupId);
 			userNum = user.getString(URLs.kUserNum);
