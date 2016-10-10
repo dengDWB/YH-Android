@@ -3,9 +3,11 @@ package com.intfocus.yh_android;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.intfocus.yh_android.util.URLs;
 
@@ -14,6 +16,8 @@ import java.util.List;
 
 import me.dm7.barcodescanner.zbar.Result;
 import me.dm7.barcodescanner.zbar.ZBarScannerView;
+
+import static me.dm7.barcodescanner.zbar.BarcodeFormat.QRCODE;
 
 /**
  * Created by lijunjie on 16/6/10.
@@ -75,11 +79,15 @@ public class BarCodeScannerActivity extends BaseActivity implements ZBarScannerV
           if (URLs.kIsQRCode) {
               if (rawResult.getBarcodeFormat().getName().equals("QRCODE")) {
                   mScannerView.resumeCameraPreview(BarCodeScannerActivity.this);
-                  toast("本应用现只支持条形码扫描");
+                  BarCodeScannerActivity.this.runOnUiThread(new Runnable() {
+                      @Override
+                      public void run() {
+                          toast("本应用现只支持条形码扫描");
+                      }
+                  });
                   return;
               }
           }
-
         Intent intent = new Intent(mContext, BarCodeResultActivity.class);
         intent.putExtra(URLs.kCodeInfo, rawResult.getContents());
         intent.putExtra(URLs.kCodeType, rawResult.getBarcodeFormat().getName());
