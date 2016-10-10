@@ -298,13 +298,20 @@ public class SettingActivity extends BaseActivity {
 
     private static String getApplicationName(Context context) {
         int stringId = context.getApplicationInfo().labelRes;
+        Log.i("getactivity",context.getString(stringId));
         return context.getString(stringId);
     }
 
     private final View.OnClickListener mIconImageViewListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            popupWindow.showAtLocation(mIconImageView, Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
+            int cameraPermission = ContextCompat.checkSelfPermission(mContext,Manifest.permission.CAMERA);
+            if(cameraPermission != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(SettingActivity.this,new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},CODE_CAMERA_REQUEST);
+                return;
+            }else{
+                popupWindow.showAtLocation(mIconImageView, Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
+            }
         }
     };
 
@@ -326,13 +333,7 @@ public class SettingActivity extends BaseActivity {
         btnTakePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    int cameraPermission = ContextCompat.checkSelfPermission(mContext,Manifest.permission.CAMERA);
-                    if(cameraPermission != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(SettingActivity.this,new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},CODE_CAMERA_REQUEST);
-                        return;
-                    }else{
-                        getCameraCapture();
-                    }
+                getCameraCapture();
             }
         });
 
@@ -351,14 +352,17 @@ public class SettingActivity extends BaseActivity {
         });
     }
 
+    /*
+	 * 权限获取反馈
+	 */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case CODE_CAMERA_REQUEST:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getCameraCapture();
+                    popupWindow.showAtLocation(mIconImageView, Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
                 } else {
-                    Toast.makeText(SettingActivity.this, "相机权限获取失败，请重试", Toast.LENGTH_SHORT)
+                    Toast.makeText(SettingActivity.this, "权限获取失败，请重试", Toast.LENGTH_SHORT)
                             .show();
                 }
                 break;
