@@ -154,7 +154,7 @@ public class DashboardActivity extends BaseActivity {
 	};
 
 	/*
-	 * 权限获取
+	 * 权限获取反馈
 	 */
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
