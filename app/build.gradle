@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId 'com.intfocus.yonghuitest'
         minSdkVersion 14
-        targetSdkVersion 24
+        targetSdkVersion 23
     }
 
     if(System.getenv().containsKey("KEYSTORE"))
