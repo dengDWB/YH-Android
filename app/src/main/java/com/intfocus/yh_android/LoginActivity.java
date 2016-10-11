@@ -112,7 +112,7 @@ public class LoginActivity extends BaseActivity {
                 }
                 break;
             case CODE_READ_PHONE_STATE_REQUEST:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                     break;
                 } else {
                     Toast.makeText(LoginActivity.this, "设备信息权限获取失败，可能影响使用哦", Toast.LENGTH_SHORT)
@@ -130,7 +130,7 @@ public class LoginActivity extends BaseActivity {
         if(mProgressDialog != null)  {
             mProgressDialog.dismiss();
         }
-//        getAuthority();
+        getAuthority();
         super.onResume();
     }
 
