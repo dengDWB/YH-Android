@@ -18,7 +18,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />  <!-- 获取设备信息 --> <!-- 6.0 及以上系统需要在代码中动态注册 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 读写sdcard，storage等等 --> <!-- 6.0 及以上系统需要在代码中动态注册 -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- 允许程序录制音频 -->
-    <uses-permission android:name="android.permission.GET_TASKS" /> <!-- 得到当前运行的activity名字 -->
+    <uses-permission android:name="android.permission.GET_TASKS" /> <!-- 得到当前运行的activity名字 --> <!-- 5.0 及以上系统不可使用 -->
     <!-- 可选-->
     <uses-permission android:name="android.permission.READ_LOGS" /> <!-- 获取logcat日志 -->
 

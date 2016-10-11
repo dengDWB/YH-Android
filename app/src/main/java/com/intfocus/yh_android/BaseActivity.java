@@ -170,18 +170,18 @@ public class BaseActivity extends Activity {
     }
 
     protected void onDestroy() {
-        clearReferences();
+//        clearReferences();
         fixInputMethodManager(BaseActivity.this);
         mMyApp = null;
         super.onDestroy();
     }
 
-    private void clearReferences(){
-        currActivity = mMyApp.getCurrentActivity();
-        if (this.equals(currActivity)) {
-            mMyApp.setCurrentActivity(null);
-        }
-    }
+//    private void clearReferences(){
+//        currActivity = mMyApp.getCurrentActivity();
+//        if (this.equals(currActivity)) {
+//            mMyApp.setCurrentActivity(null);
+//        }
+//    }
 
     private void fixInputMethodManager(Context context) {
         if (context == null) {

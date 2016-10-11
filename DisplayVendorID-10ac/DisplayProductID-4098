@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>DisplayProductName</key>
+  <string>DELL P2314H - forced RGB mode (EDID override)</string>
+  <key>IODisplayEDID</key>
+  <data>AP///////wAQrJhAQjEwOTEZAQSlMx14IuWVplZSnScQUFSlSwBxT4GAqcDR
+wAEBAQEBAQEBAjqAGHE4LUBYLEUA/R4RAAAeAAAA/wBITUoxVjVDMTkwMUIK
+AAAA/ABERUxMIFAyMzE0SAogAAAA/QA4TB5TEQEKICAgICAgAD0=
+</data>
+  <key>DisplayVendorID</key>
+  <integer>4268</integer>
+  <key>DisplayProductID</key>
+  <integer>16536</integer>
+</dict>
+</plist>
