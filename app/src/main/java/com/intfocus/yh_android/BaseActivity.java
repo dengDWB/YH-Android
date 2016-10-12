@@ -21,6 +21,7 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -169,18 +170,18 @@ public class BaseActivity extends Activity {
     }
 
     protected void onDestroy() {
-        clearReferences();
+//        clearReferences();
         fixInputMethodManager(BaseActivity.this);
         mMyApp = null;
         super.onDestroy();
     }
 
-    private void clearReferences(){
-        currActivity = mMyApp.getCurrentActivity();
-        if (this.equals(currActivity)) {
-            mMyApp.setCurrentActivity(null);
-        }
-    }
+//    private void clearReferences(){
+//        currActivity = mMyApp.getCurrentActivity();
+//        if (this.equals(currActivity)) {
+//            mMyApp.setCurrentActivity(null);
+//        }
+//    }
 
     private void fixInputMethodManager(Context context) {
         if (context == null) {
@@ -562,9 +563,9 @@ public class BaseActivity extends Activity {
                 if(action == null) {
                     return;
                 }
-                if (!action.contains("登录") && !action.equals("解屏") && !action.equals("点击/主页面/浏览器")) {
-                    return;
-                }
+//                if (!action.contains("登录") && !action.equals("解屏") && !action.equals("点击/主页面/浏览器")) {
+//                    return;
+//                }
 
                 ApiHelper.actionLog(mContext, logParams);
             } catch (JSONException e) {
