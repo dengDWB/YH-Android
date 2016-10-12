@@ -98,7 +98,6 @@ public class DashboardActivity extends BaseActivity {
 		initNotificationService();
 
 		dealSendMessage();
-
 		new Thread(mRunnableForDetecting).start();
 
 		checkUserModifiedInitPassword();
@@ -146,7 +145,6 @@ public class DashboardActivity extends BaseActivity {
 			}
 		}
 	}
-
 	public void jumpTab(TabView tabView) {
 		mCurrentTab.setActive(false);
 		mCurrentTab = tabView;
