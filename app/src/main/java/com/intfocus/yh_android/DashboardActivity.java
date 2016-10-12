@@ -65,7 +65,6 @@ public class DashboardActivity extends BaseActivity {
     private int mAnimationTime;
     private MenuAdapter mSimpleAdapter;
 
-
     @Override
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
