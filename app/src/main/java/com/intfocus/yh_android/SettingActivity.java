@@ -365,6 +365,14 @@ public class SettingActivity extends BaseActivity {
                 } else {
                     Toast.makeText(SettingActivity.this, "权限获取失败，请重试", Toast.LENGTH_SHORT)
                             .show();
+                    try {
+                        logParams = new JSONObject();
+                        logParams.put("action", "头像/拍照");
+                        logParams.put("obj_title", "功能: \"头像上传，拍照\",报错: \"相机权限获取失败\"");
+                        new Thread(mRunnableForLogger).start();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
             default:
@@ -394,6 +402,16 @@ public class SettingActivity extends BaseActivity {
         if (hasSdcard()) {
             intentFromCapture.putExtra(MediaStore.EXTRA_OUTPUT, Uri.
                     fromFile(new File(Environment.getExternalStorageDirectory(),"icon.jpg")));
+        }
+        else {
+            try {
+                logParams = new JSONObject();
+                logParams.put("action", "头像/拍照");
+                logParams.put("obj_title", "功能: \"头像上传，拍照\",报错: \"not find SdCard\"");
+                new Thread(mRunnableForLogger).start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         startActivityForResult(intentFromCapture,CODE_CAMERA_REQUEST);
