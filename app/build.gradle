@@ -1,16 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+    }
     compileSdkVersion 24
     buildToolsVersion '24.0.1'
-
     defaultConfig {
         applicationId 'com.intfocus.yonghuitest'
         minSdkVersion 14
         targetSdkVersion 23
     }
-
-    if(System.getenv().containsKey("KEYSTORE"))
+    if (System.getenv().containsKey("KEYSTORE"))
         signingConfigs {
             release {
                 storeFile file(System.getenv("KEYSTORE"))
@@ -19,17 +19,14 @@ android {
                 keyPassword System.getenv("KEY_PASSWORD")
             }
         }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles 'proguard-rules.pro' //getDefaultProguardFile('proguard-android.txt'),
-
-            if(System.getenv().containsKey("KEYSTORE"))
+            if (System.getenv().containsKey("KEYSTORE"))
                 signingConfig signingConfigs.release
         }
     }
-
     lintOptions {
         abortOnError false
         checkReleaseBuilds false

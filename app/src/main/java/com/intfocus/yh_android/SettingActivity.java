@@ -74,7 +74,7 @@ public class SettingActivity extends BaseActivity {
     private TextView mPushState;
     private TextView mApiDomain;
     private Switch mLockSwitch;
-    private Switch mUISwitch;
+    private Switch mLongCatSwitch;
     private String screenLockInfo;
     private TextView mPygerLink;
     private TextView mChangePWD;
@@ -122,8 +122,8 @@ public class SettingActivity extends BaseActivity {
         screenLockInfo = "取消锁屏成功";
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));
         mCheckAssets.setOnClickListener(mCheckAssetsListener);
-        mUISwitch = (Switch) findViewById(R.id.ui_switch);
-        mUISwitch.setChecked(URLs.currentUIVersion(mContext).equals("v1"));
+        mLongCatSwitch = (Switch) findViewById(R.id.longcat_switch);
+        mLongCatSwitch.setChecked(URLs.kIsFullScreen);
 
         bvCheckUpgrade = new BadgeView(this, mCheckUpgrade);
         bvChangePWD = new BadgeView(this, mChangePWD);
@@ -134,7 +134,7 @@ public class SettingActivity extends BaseActivity {
         mLogout.setOnClickListener(mLogoutListener);
         mCheckUpgrade.setOnClickListener(mCheckUpgradeListener);
         mLockSwitch.setOnCheckedChangeListener(mSwitchLockListener);
-        mUISwitch.setOnCheckedChangeListener(mSwitchUIListener);
+        mLongCatSwitch.setOnCheckedChangeListener(mSwitchLongCatListener);
         mPygerLink.setOnClickListener(mPgyerLinkListener);
         mIconImageView.setOnClickListener(mIconImageViewListener);
 
@@ -738,7 +738,7 @@ public class SettingActivity extends BaseActivity {
     /*
      * 切换UI
      */
-    private final CompoundButton.OnCheckedChangeListener mSwitchUIListener = new CompoundButton.OnCheckedChangeListener() {
+    private final CompoundButton.OnCheckedChangeListener mSwitchLongCatListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             // TODO Auto-generated method stub
@@ -748,7 +748,9 @@ public class SettingActivity extends BaseActivity {
                 if(new File(betaConfigPath).exists()) {
                     betaJSON = FileUtil.readConfigFile(betaConfigPath);
                 }
-                betaJSON.put("old_ui", isChecked);
+                URLs.kIsFullScreen = isChecked;
+
+                betaJSON.put("longCat", isChecked);
                 FileUtil.writeFile(betaConfigPath, betaJSON.toString());
             } catch (JSONException | IOException e) {
                 e.printStackTrace();

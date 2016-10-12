@@ -70,7 +70,7 @@ public class URLs implements Serializable {
     public final static String kETag                     = "ETag";
     public final static String kLastModified             = "Last_Modified";
     public final static boolean kIsQRCode                = true;
-    public final static boolean kIsFullScreen            = true;
+    public static boolean kIsFullScreen                  = false;
 
     public static String storage_base(Context context) {
         //    String path = "";

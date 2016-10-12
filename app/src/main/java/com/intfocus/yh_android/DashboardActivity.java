@@ -75,6 +75,7 @@ public class DashboardActivity extends BaseActivity {
 		initUrlStrings();
 		initDropMenuItem();
 		initTab();
+		readBehaviorFile();
 		initUserIDColorView();
 		loadWebView();
 		displayAdOrNot(true);
@@ -105,7 +106,7 @@ public class DashboardActivity extends BaseActivity {
 	private void initDropMenuItem() {
 		listItem = new ArrayList<HashMap<String, Object>>();
 		int[] imgID = {R.drawable.icon_scan, R.drawable.icon_voice, R.drawable.icon_search, R.drawable.icon_user};
-		String[] itemName = {"扫一扫", "语音播报", "搜索", "个人信息"};
+		String[] itemName = {" 扫一扫 ", " 语音播报 ", " 搜索 ", " 个人信息 "};
 		for (int i = 0; i < itemName.length; i++) {
 			HashMap<String, Object> map = new HashMap<>();
 			map.put("ItemImage", imgID[i]);
@@ -125,12 +126,12 @@ public class DashboardActivity extends BaseActivity {
 								long arg3) {
 			popupWindow.dismiss();
 			switch (listItem.get(arg2).get("ItemText").toString()) {
-				case "个人信息":
+				case " 个人信息 ":
 					Intent settingIntent = new Intent(mContext, SettingActivity.class);
 					mContext.startActivity(settingIntent);
 					break;
 
-				case "扫一扫":
+				case " 扫一扫 ":
 					if (ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.CAMERA)
 							!= PackageManager.PERMISSION_GRANTED) {
 						ActivityCompat.requestPermissions(DashboardActivity.this, new String[]{Manifest.permission.CAMERA}, ZBAR_CAMERA_PERMISSION);
@@ -140,12 +141,12 @@ public class DashboardActivity extends BaseActivity {
 					}
 					break;
 
-				case "语音播报":
-					toast("功能开发中，敬请期待");
+				case " 语音播报 ":
+					toast(" 功能开发中，敬请期待 ");
 					break;
 
-				case "搜索":
-					toast("功能开发中，敬请期待");
+				case " 搜索 ":
+					toast(" 功能开发中，敬请期待 ");
 					break;
 				default:
 					break;
@@ -164,7 +165,7 @@ public class DashboardActivity extends BaseActivity {
 					Intent barCodeScannerIntent = new Intent(mContext, BarCodeScannerActivity.class);
 					mContext.startActivity(barCodeScannerIntent);
 				} else {
-					Toast.makeText(DashboardActivity.this, "相机权限获取失败，请重试", Toast.LENGTH_SHORT)
+					Toast.makeText(DashboardActivity.this, " 相机权限获取失败，请重试 ", Toast.LENGTH_SHORT)
 							.show();
 				}
 				break;
@@ -202,18 +203,18 @@ public class DashboardActivity extends BaseActivity {
 	@Override
 	public void onBackPressed() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("温馨提示")
-				.setMessage(String.format("确认退出【%s】？", getResources().getString(R.string.app_name)))
-				.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+		builder.setTitle(" 温馨提示 ")
+				.setMessage(String.format(" 确认退出【%s】？", getResources().getString(R.string.app_name)))
+				.setPositiveButton(" 确认 ", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						finish();
 					}
 				})
-				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+				.setNegativeButton(" 取消 ", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						// 返回DashboardActivity
+						// 返回 DashboardActivity
 					}
 				});
 		builder.show();
@@ -264,7 +265,7 @@ public class DashboardActivity extends BaseActivity {
 		notificationBroadcastReceiver = new NotificationBroadcastReceiver();
 		registerReceiver(notificationBroadcastReceiver, filter);
 		/*
-		 * 打开通知服务,用于发送通知
+		 * 打开通知服务, 用于发送通知
          */
 		Intent startService = new Intent(this, LocalNotificationService.class);
 		startService(startService);
@@ -356,7 +357,7 @@ public class DashboardActivity extends BaseActivity {
 						JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
 						String info = ApiHelper.authentication(mContext, userJSON.getString("user_num"), userJSON.getString(URLs.kPassword));
-						if (!info.isEmpty() && (info.contains("用户") || info.contains("密码"))) {
+						if (!info.isEmpty() && (info.contains(" 用户 ") || info.contains(" 密码 "))) {
 							userJSON.put("is_login", false);
 							FileUtil.writeFile(userConfigPath, userJSON.toString());
 						}
@@ -380,10 +381,10 @@ public class DashboardActivity extends BaseActivity {
 			}
 
 			AlertDialog.Builder alertDialog = new AlertDialog.Builder(DashboardActivity.this);
-			alertDialog.setTitle("温馨提示");
-			alertDialog.setMessage("安全起见，请在【设置】-【个人信息】-【修改登录密码】页面修改初始密码");
+			alertDialog.setTitle(" 温馨提示 ");
+			alertDialog.setMessage(" 安全起见，请在【设置】-【个人信息】-【修改登录密码】页面修改初始密码 ");
 
-			alertDialog.setNegativeButton("知道了", new DialogInterface.OnClickListener() {
+			alertDialog.setNegativeButton(" 知道了 ", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							dialog.dismiss();
@@ -434,8 +435,8 @@ public class DashboardActivity extends BaseActivity {
 		mTabAPP.setOnClickListener(mTabChangeListener);
 		mTabMessage.setOnClickListener(mTabChangeListener);
 
-		mCurrentTab = mTabKPI;
-		mCurrentTab.setActive(true);
+//		mCurrentTab = mTabKPI;
+//		mCurrentTab.setActive(true);
 
 		bvKpi = new BadgeView(this, mTabKPI);
 		bvAnalyse = new BadgeView(this, mTabAnalyse);
@@ -477,6 +478,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvKpi.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabKpi, 0);
+						writeBehaviorFile(0);
 						break;
 					case R.id.tabAnalyse:
 						objectType = 2;
@@ -484,6 +486,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvAnalyse.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabAnalyse, 0);
+						writeBehaviorFile(1);
 						break;
 					case R.id.tabApp:
 						objectType = 3;
@@ -491,6 +494,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvApp.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabApp, 0);
+						writeBehaviorFile(2);
 						break;
 					case R.id.tabMessage:
 						objectType = 5;
@@ -498,6 +502,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvMessage.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabMessage, 0);
+						writeBehaviorFile(3);
 						break;
 					default:
 						objectType = 1;
@@ -505,6 +510,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvKpi.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabKpi, 0);
+						writeBehaviorFile(0);
 						break;
 				}
 
@@ -521,7 +527,7 @@ public class DashboardActivity extends BaseActivity {
 			 */
 			try {
 				logParams = new JSONObject();
-				logParams.put(URLs.kAction, "点击/主页面/标签栏");
+				logParams.put(URLs.kAction, " 点击 / 主页面 / 标签栏 ");
 				logParams.put(URLs.kObjType, objectType);
 				new Thread(mRunnableForLogger).start();
 			} catch (Exception e) {
@@ -530,6 +536,82 @@ public class DashboardActivity extends BaseActivity {
 		}
 	};
 
+	public void writeBehaviorFile(int tabIndex) {
+		String behaviorPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBehaviorConfigFileName);
+		try {
+			if (urlString.equals("") || urlString.equals(null)) {
+				return;
+			}else {
+				if (new File(behaviorPath).exists()) {
+					JSONObject dashboardJson = FileUtil.readConfigFile(behaviorPath);
+					JSONObject behaviorJson = new JSONObject(dashboardJson.getString("dashboard"));
+					behaviorJson.put("tab_index", tabIndex);
+					dashboardJson.put("dashboard", behaviorJson.toString());
+					FileUtil.writeFile(behaviorPath,dashboardJson.toString());
+				}else {
+					JSONObject dashboardJson = new JSONObject();
+					JSONObject behaviorJson = new JSONObject();
+					behaviorJson.put("tab_index", tabIndex);
+					dashboardJson.put("dashboard",behaviorJson.toString());
+					FileUtil.writeFile(behaviorPath,dashboardJson.toString());
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void readBehaviorFile() {
+		try {
+			String behaviorPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBehaviorConfigFileName);
+			if (new File(behaviorPath).exists()) {
+				JSONObject dashboardJson = FileUtil.readConfigFile(behaviorPath);
+				if (dashboardJson.has("dashboard")) {
+					JSONObject behaviorJson = new JSONObject(dashboardJson.getString("dashboard"));
+					int tabIndex = behaviorJson.getInt("tab_index");
+					switch (tabIndex){
+						case 0:
+							mCurrentTab = mTabKPI;
+							mCurrentTab.setActive(true);
+							objectType = 1;
+							break;
+						case 1:
+							mCurrentTab = mTabAnalyse;
+							mCurrentTab.setActive(true);
+							objectType = 2;
+							break;
+						case 2:
+							mCurrentTab = mTabAPP;
+							mCurrentTab.setActive(true);
+							objectType = 3;
+							break;
+						case 3:
+							mCurrentTab = mTabMessage;
+							mCurrentTab.setActive(true);
+							objectType = 5;
+							break;
+					}
+					urlString = urlStrings.get(tabIndex);
+				}else {
+					mCurrentTab = mTabKPI;
+					mCurrentTab.setActive(true);
+					objectType = 1;
+					urlString = urlStrings.get(0);
+				}
+			}
+			else {
+				mCurrentTab = mTabKPI;
+				mCurrentTab.setActive(true);
+				objectType = 1;
+				urlString = urlStrings.get(0);
+			}
+
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
 	/*
 	 * 标题栏点击设置按钮显示下拉菜单
 	 */
@@ -542,7 +624,7 @@ public class DashboardActivity extends BaseActivity {
 		 */
 		try {
 			logParams = new JSONObject();
-			logParams.put("action", "点击/主页面/下拉菜单");
+			logParams.put("action", " 点击 / 主页面 / 下拉菜单 ");
 			new Thread(mRunnableForLogger).start();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -554,7 +636,7 @@ public class DashboardActivity extends BaseActivity {
 	 */
 	private class JavaScriptInterface extends JavaScriptBase {
 		/*
-		 * JS 接口，暴露给JS的方法使用@JavascriptInterface装饰
+		 * JS 接口，暴露给 JS 的方法使用 @JavascriptInterface 装饰
 		 */
 		@JavascriptInterface
 		public void pageLink(final String bannerName, final String link, final int objectID) {
@@ -580,7 +662,7 @@ public class DashboardActivity extends BaseActivity {
 			 */
 			try {
 				logParams = new JSONObject();
-				logParams.put(URLs.kAction, "点击/主页面/浏览器");
+				logParams.put(URLs.kAction, " 点击 / 主页面 / 浏览器 ");
 				logParams.put("obj_id", objectID);
 				logParams.put(URLs.kObjType, objectType);
 				logParams.put(URLs.kObjTitle, bannerName);
@@ -599,7 +681,7 @@ public class DashboardActivity extends BaseActivity {
 					switch (openType) {
 						case "browser":
 							if (openLink == null) {
-								toast("无效链接");
+								toast(" 无效链接 ");
 								break;
 							}
 							Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -626,7 +708,7 @@ public class DashboardActivity extends BaseActivity {
 							String[] reportValue = {openLink, ObjeckID, objectType, objectTitle};
 							for (String value : reportValue) {
 								if (value == null || value.equals("")) {
-									toast("页面跳转失败");
+									toast(" 页面跳转失败 ");
 									return;
 								}
 							}
@@ -653,16 +735,17 @@ public class DashboardActivity extends BaseActivity {
 		@JavascriptInterface
 		public void storeTabIndex(final String pageName, final int tabIndex) {
 			try {
-				String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kTabIndexConfigFileName);
+				String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBehaviorConfigFileName);
 
-				JSONObject config = new JSONObject();
 				if ((new File(filePath).exists())) {
 					String fileContent = FileUtil.readFile(filePath);
-					config = new JSONObject(fileContent);
-				}
-				config.put(pageName, tabIndex);
+					JSONObject jsonObject = new JSONObject(fileContent);
+					JSONObject config = new JSONObject(jsonObject.getString("dashboard"));
+					config.put(pageName, tabIndex);
+					jsonObject.put("dashboard",config.toString());
 
-				FileUtil.writeFile(filePath, config.toString());
+					FileUtil.writeFile(filePath, jsonObject.toString());
+				}
 			} catch (JSONException | IOException e) {
 				e.printStackTrace();
 			}
@@ -672,17 +755,20 @@ public class DashboardActivity extends BaseActivity {
 		public int restoreTabIndex(final String pageName) {
 			int tabIndex = 0;
 			try {
-				String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kTabIndexConfigFileName);
+				String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBehaviorConfigFileName);
 
-				JSONObject config = new JSONObject();
 				if ((new File(filePath).exists())) {
 					String fileContent = FileUtil.readFile(filePath);
-					config = new JSONObject(fileContent);
+					JSONObject jsonObject = new JSONObject(fileContent);
+					JSONObject config = new JSONObject(jsonObject.getString("dashboard"));
+					if (config.has(pageName)){
+						tabIndex = config.getInt(pageName);
+					}
+					Log.d("Tab", tabIndex+"");
 				}
-				tabIndex = config.getInt(pageName);
 
 			} catch (JSONException e) {
-				// e.printStackTrace();
+				e.printStackTrace();
 			}
 
 			return tabIndex < 0 ? 0 : tabIndex;
@@ -702,9 +788,9 @@ public class DashboardActivity extends BaseActivity {
 			 */
 			try {
 				logParams = new JSONObject();
-				logParams.put(URLs.kAction, "JS异常");
+				logParams.put(URLs.kAction, "JS 异常 ");
 				logParams.put(URLs.kObjType, objectType);
-				logParams.put(URLs.kObjTitle, String.format("主页面/%s", ex));
+				logParams.put(URLs.kObjTitle, String.format(" 主页面 /%s", ex));
 				new Thread(mRunnableForLogger).start();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -719,7 +805,7 @@ public class DashboardActivity extends BaseActivity {
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				mAnimationTime = getResources().getInteger(android.R.integer.config_mediumAnimTime);//动画效果时间
+				mAnimationTime = getResources().getInteger(android.R.integer.config_mediumAnimTime);// 动画效果时间
 				final ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
 				ValueAnimator valueAnimator = ValueAnimator.ofInt(startHeight, endHeight);
 				valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -778,8 +864,8 @@ public class DashboardActivity extends BaseActivity {
 		/*
 		 * 默认标签栏选中【仪表盘】
 		 */
-		objectType = 1;
-		urlString = urlStrings.get(0);
+//		objectType = 1;
+//		urlString = urlStrings.get(0);
 	}
 
 	/**
