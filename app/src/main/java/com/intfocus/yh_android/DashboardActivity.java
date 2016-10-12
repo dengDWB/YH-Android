@@ -64,6 +64,7 @@ public class DashboardActivity extends BaseActivity {
 	private WebView browserAd;
 	private int mAnimationTime;
 	private MenuAdapter mSimpleAdapter;
+	private String currentUIVersion = "";
 
 
 	@Override
@@ -96,12 +97,61 @@ public class DashboardActivity extends BaseActivity {
 		initLocalNotifications();
 		initNotificationService();
 
+		dealSendMessage();
+
 		new Thread(mRunnableForDetecting).start();
 
 		checkUserModifiedInitPassword();
 	}
 
+	public void dealSendMessage() {
+		currentUIVersion = URLs.currentUIVersion(mContext);
+		String pushMsgConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushMessageConfigFileName);
+		if (new File(pushMsgConfigPath).exists()) {
+			try {
+				JSONObject pushMsgConfigJson = new JSONObject(FileUtil.readFile(pushMsgConfigPath));
+				if (!pushMsgConfigJson.getBoolean("state")) {
+					pushMsgConfigJson.put("state", true);
+					FileUtil.writeFile(pushMsgConfigPath, pushMsgConfigJson.toString());
+					JSONObject pushMsgJson = new JSONObject(pushMsgConfigJson.getString("push_message"));
+					String type = pushMsgJson.getString("type");
+					switch (type){
+						case "report":
+							Intent subjectIntent = new Intent(this, SubjectActivity.class);
+							subjectIntent.putExtra("link", pushMsgJson.getString("link"));
+							subjectIntent.putExtra("bannerName", pushMsgJson.getString("title"));
+							startActivity(subjectIntent);
+							break;
+						case "analyse":
+							jumpTab(mTabAnalyse);
+							urlString = String.format(K.kAnalyseMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+							break;
+						case "app":
+							jumpTab(mTabAPP);
+							urlString = String.format(K.kAppMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+							break;
+						case "message":
+							jumpTab(mTabMessage);
+							urlString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
+							break;
+						case "thursday_say":
+							Intent blogLinkIntent = new Intent(DashboardActivity.this,ThursdaySayActivity.class);
+							startActivity(blogLinkIntent);
+					}
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
+	public void jumpTab(TabView tabView) {
+		mCurrentTab.setActive(false);
+		mCurrentTab = tabView;
+		mCurrentTab.setActive(true);
+	}
 
 	private void initDropMenuItem() {
 		listItem = new ArrayList<HashMap<String, Object>>();
@@ -844,7 +894,6 @@ public class DashboardActivity extends BaseActivity {
 	private void initUrlStrings() {
 		urlStrings = new ArrayList<String>();
 
-		String currentUIVersion = URLs.currentUIVersion(mContext);
 		String tmpString;
 		try {
 			tmpString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
