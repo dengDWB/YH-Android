@@ -420,8 +420,9 @@ public class ApiHelper {
             userParams.put("user_pass", userJSON.getString(URLs.kPassword));
             params.put("user", userParams);
 
+            Log.i("logger",params.toString());
             String urlString = String.format(K.kActionLogAPIPath, K.kBaseUrl);
-            HttpUtil.httpPost(urlString, params);
+//            HttpUtil.httpPost(urlString, params);
         } catch (JSONException | PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }

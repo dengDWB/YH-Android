@@ -563,9 +563,9 @@ public class BaseActivity extends Activity {
                 if(action == null) {
                     return;
                 }
-                if (!action.contains("登录") && !action.equals("解屏") && !action.equals("点击/主页面/浏览器")) {
-                    return;
-                }
+//                if (!action.contains("登录") && !action.equals("解屏") && !action.equals("点击/主页面/浏览器")) {
+//                    return;
+//                }
 
                 ApiHelper.actionLog(mContext, logParams);
             } catch (JSONException e) {

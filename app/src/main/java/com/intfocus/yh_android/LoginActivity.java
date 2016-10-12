@@ -28,8 +28,7 @@ public class LoginActivity extends BaseActivity {
     private EditText usernameEditText, passwordEditText;
     private String usernameString, passwordString;
     private TextView versionTv;
-    private final static int CODE_WRITE_EXTERNAL_STORAGE_REQUEST = 0;
-    private final static int CODE_READ_PHONE_STATE_REQUEST = 1;
+    private final static int CODE_AUTHORITY_REQUEST = 0;
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -87,10 +86,9 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void getAuthority() {
-        int cameraPermission = ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA);
-        if(cameraPermission != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(LoginActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},CODE_WRITE_EXTERNAL_STORAGE_REQUEST);
-            ActivityCompat.requestPermissions(LoginActivity.this,new String[]{Manifest.permission.READ_PHONE_STATE},CODE_READ_PHONE_STATE_REQUEST);
+        int writePermission = ContextCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if(writePermission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(LoginActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE},CODE_AUTHORITY_REQUEST);
             return;
         }else{
             return;
@@ -103,7 +101,7 @@ public class LoginActivity extends BaseActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
-            case CODE_WRITE_EXTERNAL_STORAGE_REQUEST:
+            case CODE_AUTHORITY_REQUEST:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     break;
                 } else {
@@ -111,15 +109,6 @@ public class LoginActivity extends BaseActivity {
                             .show();
                 }
                 break;
-            case CODE_READ_PHONE_STATE_REQUEST:
-                if (grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                    break;
-                } else {
-                    Toast.makeText(LoginActivity.this, "设备信息权限获取失败，可能影响使用哦", Toast.LENGTH_SHORT)
-                            .show();
-                }
-                break;
-
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
@@ -180,6 +169,8 @@ public class LoginActivity extends BaseActivity {
                             Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             LoginActivity.this.startActivity(intent);
+
+
 
                             if (mProgressDialog != null) {
                                 mProgressDialog.dismiss();
