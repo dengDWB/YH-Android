@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.K;
-import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 
 import org.json.JSONArray;

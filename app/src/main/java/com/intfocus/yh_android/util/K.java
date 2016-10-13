@@ -48,6 +48,7 @@ public class K extends PrivateURLs implements Serializable {
   public final static String kReportDataFileName       = "group_%s_template_%s_report_%s.js";
   public final static String kUserConfigFileName       = "user.json";
   public final static String kPushConfigFileName       = "push_message.json";
+  public final static String kPushMessageConfigFileName="push_message.config";
   public final static String kSettingConfigFileName    = "setting.json";
   public final static String kTabIndexConfigFileName   = "page_tab_index.json";
   public final static String kGesturePwdConfigFileName = "gesture_password.json";
@@ -59,4 +60,5 @@ public class K extends PrivateURLs implements Serializable {
   public final static String kBarCodeResultFileName    = "barcode_result.json";
   public final static String kScanBarCodeHTMLName      = "scan_bar_code.html";
   public final static String kCurrentVersionFileName   = "current_version.txt";
+  public final static String kBehaviorConfigFileName   = "behavior.json";
 }

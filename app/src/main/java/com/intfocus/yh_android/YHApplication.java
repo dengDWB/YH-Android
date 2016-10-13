@@ -12,18 +12,26 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Handler;
 import android.util.Log;
 
 import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.K;
+import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.pgyersdk.crash.PgyCrashManager;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
+import com.umeng.message.IUmengRegisterCallback;
+import com.umeng.message.PushAgent;
+import com.umeng.message.UmengNotificationClickHandler;
+import com.umeng.message.entity.UMessage;
 import com.umeng.socialize.PlatformConfig;
 
 import org.OpenUDID.OpenUDID_manager;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,40 +43,6 @@ import java.util.List;
 public class YHApplication extends Application {
     private Context mContext;
     private RefWatcher refWatcher;
-
-    /*
-     *  手机待机再激活时发送解屏广播
-     */
-    private final BroadcastReceiver broadcastScreenOnAndOff = new BroadcastReceiver() {
-
-        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(!intent.getAction().equals(Intent.ACTION_SCREEN_ON) || isBackground(mContext)) return;
-            Log.i("BroadcastReceiver", "Screen On");
-
-            String currentActivityName = null;
-            Activity currentActivity = ((YHApplication)context.getApplicationContext()).getCurrentActivity();
-            if(currentActivity != null) {
-                try {
-                    currentActivityName = currentActivity.getClass().getSimpleName();
-                    Log.i("currentActivityName", currentActivityName.trim().equals("ConfirmPassCodeActivity") ? "YES" : "NO");
-                }
-                catch(NoSuchMethodError e) {
-                    e.printStackTrace();
-                }
-            }
-            Log.i("currentActivityName", "[" + currentActivityName + "]");
-            if (// 当前活动的Activity非解锁界面
-                FileUtil.checkIsLocked(mContext)) { // 应用处于登录状态，并且开启了密码锁
-
-                intent = new Intent(mContext, ConfirmPassCodeActivity.class);
-                intent.putExtra("is_from_login", true);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                mContext.startActivity(intent);
-            }
-        }
-    };
 
     @Override
     public void onCreate() {
@@ -117,7 +91,7 @@ public class YHApplication extends Application {
         FileUtil.checkAssets(mContext, URLs.kStylesheets, true);
         FileUtil.checkAssets(mContext, URLs.kJavaScripts, true);
         FileUtil.checkAssets(mContext, URLs.kBarCodeScan, false);
-        FileUtil.checkAssets(mContext, URLs.kAdvertisement, false);
+//        FileUtil.checkAssets(mContext, URLs.kAdvertisement, false);
 
         /*
          *  手机待机再激活时发送开屏广播
@@ -128,6 +102,38 @@ public class YHApplication extends Application {
          *  监测内存泄漏
          */
         refWatcher = LeakCanary.install(this);
+        PushAgent mPushAgent = PushAgent.getInstance(mContext);
+        //开启推送并设置注册的回调处理
+        mPushAgent.enable(new IUmengRegisterCallback() {
+            @Override
+            public void onRegistered(final String registrationId) {
+                new Handler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            if(mContext == null) {
+                                LogUtil.d("PushAgent", "mContext is null");
+                                return;
+                            }
+                            // onRegistered方法的参数registrationId即是device_token
+                            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushMessageConfigFileName );
+                            JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
+                            pushJSON.put("push_valid", false);
+                            pushJSON.put("push_device_token", registrationId);
+                            FileUtil.writeFile(pushConfigPath, pushJSON.toString());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+        mPushAgent.onAppStart();
+
+        mPushAgent.setNotificationClickHandler(handler);
+
     }
 
     @Override
@@ -180,6 +186,42 @@ public class YHApplication extends Application {
         }
     }
 
+    /*
+     *  手机待机再激活时接收解屏广播,进入解锁密码页
+     */
+    private final BroadcastReceiver broadcastScreenOnAndOff = new BroadcastReceiver() {
+
+        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(!intent.getAction().equals(Intent.ACTION_SCREEN_ON) || isBackground(mContext)) return;
+            Log.i("BroadcastReceiver", "Screen On");
+
+
+            String currentActivityName = null;
+            Activity currentActivity = ((YHApplication)context.getApplicationContext()).getCurrentActivity();
+            if(currentActivity != null) {
+                try {
+                    currentActivityName = currentActivity.getClass().getSimpleName();
+                    Log.i("currentActivityName", currentActivityName.trim().equals("ConfirmPassCodeActivity") ? "YES" : "NO");
+                }
+                catch(NoSuchMethodError e) {
+                    e.printStackTrace();
+                }
+            }
+            Log.i("currentActivityName", "[" + currentActivityName + "]");
+            if ((currentActivityName != null && !currentActivityName.trim().equals("ConfirmPassCodeActivity")) && // 当前活动的Activity非解锁界面
+                    FileUtil.checkIsLocked(mContext)) { // 应用处于登录状态，并且开启了密码锁
+
+                intent = new Intent(mContext, ConfirmPassCodeActivity.class);
+                intent.putExtra("is_from_login", true);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                mContext.startActivity(intent);
+            }
+        }
+    };
+
+//    获取 Activity 名方法, 若 16/11/30 前,未出现该段代码造成的错误,删除
     private Activity mCurrentActivity = null;
     public Activity getCurrentActivity(){
         return mCurrentActivity;
@@ -191,6 +233,7 @@ public class YHApplication extends Application {
 
     /*
      * 判断应用当前是否处于后台
+     * Android 4.4 以上版本 不适用 getRunningTasks() 方法
      */
     private boolean isBackground(Context context) {
         boolean isBackground = true;
@@ -216,5 +259,41 @@ public class YHApplication extends Application {
 
         return isBackground;
     }
+
+    UmengNotificationClickHandler handler = new UmengNotificationClickHandler() {
+        @Override
+        public void dealWithCustomAction(Context context, UMessage uMessage) {
+            super.dealWithCustomAction(context, uMessage);
+            try {
+                String pushMessageConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushMessageConfigFileName);
+                JSONObject jsonObject = new JSONObject(uMessage.custom);
+                FileUtil.writeFile(pushMessageConfigPath, jsonObject.toString());
+                Intent intent;
+                if ((mCurrentActivity == null)) {
+                    intent = new Intent (mContext, LoginActivity.class);
+                }
+                else {
+                    String activityName = mCurrentActivity.getClass().getSimpleName();
+                    intent = new Intent (mContext,DashboardActivity.class);
+                    if (activityName.equals("LoginActivity")) {
+                        return;
+                    }
+                    ActivityCollector.finishAll();
+                    if (activityName.equals("GuideActivity")) {
+                        intent = new Intent (mContext,LoginActivity.class);
+                    }
+                    else if (activityName.equals("DashboardActivity")) {
+                        mCurrentActivity.finish();
+                    }
+                }
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    };
 
 }
