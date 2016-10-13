@@ -285,6 +285,14 @@ public class BarCodeResultActivity extends BaseActivity {
     public void onError(SHARE_MEDIA platform, Throwable t) {
       Toast.makeText(BarCodeResultActivity.this,platform + " 分享失败啦", Toast.LENGTH_SHORT).show();
       if(t!=null){
+        try {
+          logParams = new JSONObject();
+          logParams.put("action", "扫码/拍照");
+          logParams.put("obj_title", "功能: \"头像上传，拍照\",报错: \"not find SdCard\"");
+          new Thread(mRunnableForLogger).start();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
         Log.d("throw","throw:"+t.getMessage());
       }
     }

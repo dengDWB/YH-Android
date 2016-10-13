@@ -71,7 +71,7 @@ public class InitPassCodeActivity extends Activity {
     }
 
     protected void onResume() {
-        ((YHApplication)this.getApplicationContext()).setCurrentActivity(this);
+//        ((YHApplication)this.getApplicationContext()).setCurrentActivity(this);
 
         super.onResume();
     }

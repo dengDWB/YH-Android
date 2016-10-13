@@ -44,40 +44,6 @@ public class YHApplication extends Application {
     private Context mContext;
     private RefWatcher refWatcher;
 
-    /*
-     *  手机待机再激活时发送解屏广播
-     */
-    private final BroadcastReceiver broadcastScreenOnAndOff = new BroadcastReceiver() {
-
-        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(!intent.getAction().equals(Intent.ACTION_SCREEN_ON) || isBackground(mContext)) return;
-            Log.i("BroadcastReceiver", "Screen On");
-
-            String currentActivityName = null;
-            Activity currentActivity = ((YHApplication)context.getApplicationContext()).getCurrentActivity();
-            if(currentActivity != null) {
-                try {
-                    currentActivityName = currentActivity.getClass().getSimpleName();
-                    Log.i("currentActivityName", currentActivityName.trim().equals("ConfirmPassCodeActivity") ? "YES" : "NO");
-                }
-                catch(NoSuchMethodError e) {
-                    e.printStackTrace();
-                }
-            }
-            Log.i("currentActivityName", "[" + currentActivityName + "]");
-            if (// 当前活动的Activity非解锁界面
-                FileUtil.checkIsLocked(mContext)) { // 应用处于登录状态，并且开启了密码锁
-
-                intent = new Intent(mContext, ConfirmPassCodeActivity.class);
-                intent.putExtra("is_from_login", true);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                mContext.startActivity(intent);
-            }
-        }
-    };
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -125,7 +91,7 @@ public class YHApplication extends Application {
         FileUtil.checkAssets(mContext, URLs.kStylesheets, true);
         FileUtil.checkAssets(mContext, URLs.kJavaScripts, true);
         FileUtil.checkAssets(mContext, URLs.kBarCodeScan, false);
-        FileUtil.checkAssets(mContext, URLs.kAdvertisement, false);
+//        FileUtil.checkAssets(mContext, URLs.kAdvertisement, false);
 
         /*
          *  手机待机再激活时发送开屏广播
@@ -220,6 +186,42 @@ public class YHApplication extends Application {
         }
     }
 
+    /*
+     *  手机待机再激活时接收解屏广播,进入解锁密码页
+     */
+    private final BroadcastReceiver broadcastScreenOnAndOff = new BroadcastReceiver() {
+
+        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(!intent.getAction().equals(Intent.ACTION_SCREEN_ON) || isBackground(mContext)) return;
+            Log.i("BroadcastReceiver", "Screen On");
+
+
+            String currentActivityName = null;
+            Activity currentActivity = ((YHApplication)context.getApplicationContext()).getCurrentActivity();
+            if(currentActivity != null) {
+                try {
+                    currentActivityName = currentActivity.getClass().getSimpleName();
+                    Log.i("currentActivityName", currentActivityName.trim().equals("ConfirmPassCodeActivity") ? "YES" : "NO");
+                }
+                catch(NoSuchMethodError e) {
+                    e.printStackTrace();
+                }
+            }
+            Log.i("currentActivityName", "[" + currentActivityName + "]");
+            if ((currentActivityName != null && !currentActivityName.trim().equals("ConfirmPassCodeActivity")) && // 当前活动的Activity非解锁界面
+                    FileUtil.checkIsLocked(mContext)) { // 应用处于登录状态，并且开启了密码锁
+
+                intent = new Intent(mContext, ConfirmPassCodeActivity.class);
+                intent.putExtra("is_from_login", true);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                mContext.startActivity(intent);
+            }
+        }
+    };
+
+//    获取 Activity 名方法, 若 16/11/30 前,未出现该段代码造成的错误,删除
     private Activity mCurrentActivity = null;
     public Activity getCurrentActivity(){
         return mCurrentActivity;
@@ -231,6 +233,7 @@ public class YHApplication extends Application {
 
     /*
      * 判断应用当前是否处于后台
+     * Android 4.4 以上版本 不适用 getRunningTasks() 方法
      */
     private boolean isBackground(Context context) {
         boolean isBackground = true;
