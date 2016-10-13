@@ -435,12 +435,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		Bitmap imgBmp;
 		String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
 		if (URLs.kIsFullScreen){
-			imgBmp = mWebView.getDrawingCache();
-		}else {
 			mWebView.measure(View.MeasureSpec.makeMeasureSpec(
 					View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
 					View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-			mWebView.setDrawingCacheEnabled(true);
 			mWebView.buildDrawingCache();
 			int imgMaxHight = displayMetrics.heightPixels * 5;
 			if (mWebView.getMeasuredHeight() > imgMaxHight) {
@@ -457,6 +454,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			int iHeight = imgBmp.getHeight();
 			canvas.drawBitmap(imgBmp, 0, iHeight, paint);
 			mWebView.draw(canvas);
+		}else {
+			imgBmp = mWebView.getDrawingCache();
 		}
 
 		FileUtil.saveImage(filePath, imgBmp);

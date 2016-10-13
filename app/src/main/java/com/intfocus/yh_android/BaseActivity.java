@@ -167,6 +167,7 @@ public class BaseActivity extends Activity {
             }
         });
         mPushAgent.onAppStart();
+        ActivityCollector.addActivity(this);
     }
 
     protected void onDestroy() {
@@ -174,6 +175,7 @@ public class BaseActivity extends Activity {
         fixInputMethodManager(BaseActivity.this);
         mMyApp = null;
         super.onDestroy();
+        ActivityCollector.removeActivity(this);
     }
 
 //    private void clearReferences(){

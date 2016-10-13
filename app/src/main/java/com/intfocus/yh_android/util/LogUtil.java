@@ -1,7 +1,6 @@
 package com.intfocus.yh_android.util;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import com.intfocus.yh_android.BuildConfig;
 

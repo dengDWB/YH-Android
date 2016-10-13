@@ -12,18 +12,26 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Handler;
 import android.util.Log;
 
 import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.K;
+import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.pgyersdk.crash.PgyCrashManager;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
+import com.umeng.message.IUmengRegisterCallback;
+import com.umeng.message.PushAgent;
+import com.umeng.message.UmengNotificationClickHandler;
+import com.umeng.message.entity.UMessage;
 import com.umeng.socialize.PlatformConfig;
 
 import org.OpenUDID.OpenUDID_manager;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -128,6 +136,38 @@ public class YHApplication extends Application {
          *  监测内存泄漏
          */
         refWatcher = LeakCanary.install(this);
+        PushAgent mPushAgent = PushAgent.getInstance(mContext);
+        //开启推送并设置注册的回调处理
+        mPushAgent.enable(new IUmengRegisterCallback() {
+            @Override
+            public void onRegistered(final String registrationId) {
+                new Handler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            if(mContext == null) {
+                                LogUtil.d("PushAgent", "mContext is null");
+                                return;
+                            }
+                            // onRegistered方法的参数registrationId即是device_token
+                            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushMessageConfigFileName );
+                            JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
+                            pushJSON.put("push_valid", false);
+                            pushJSON.put("push_device_token", registrationId);
+                            FileUtil.writeFile(pushConfigPath, pushJSON.toString());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+        mPushAgent.onAppStart();
+
+        mPushAgent.setNotificationClickHandler(handler);
+
     }
 
     @Override
@@ -216,5 +256,41 @@ public class YHApplication extends Application {
 
         return isBackground;
     }
+
+    UmengNotificationClickHandler handler = new UmengNotificationClickHandler() {
+        @Override
+        public void dealWithCustomAction(Context context, UMessage uMessage) {
+            super.dealWithCustomAction(context, uMessage);
+            try {
+                String pushMessageConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushMessageConfigFileName);
+                JSONObject jsonObject = new JSONObject(uMessage.custom);
+                FileUtil.writeFile(pushMessageConfigPath, jsonObject.toString());
+                Intent intent;
+                if ((mCurrentActivity == null)) {
+                    intent = new Intent (mContext, LoginActivity.class);
+                }
+                else {
+                    String activityName = mCurrentActivity.getClass().getSimpleName();
+                    intent = new Intent (mContext,DashboardActivity.class);
+                    if (activityName.equals("LoginActivity")) {
+                        return;
+                    }
+                    ActivityCollector.finishAll();
+                    if (activityName.equals("GuideActivity")) {
+                        intent = new Intent (mContext,LoginActivity.class);
+                    }
+                    else if (activityName.equals("DashboardActivity")) {
+                        mCurrentActivity.finish();
+                    }
+                }
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    };
 
 }

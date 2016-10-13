@@ -104,7 +104,7 @@
             android:theme="@style/Theme.UMDefault"
             android:excludeFromRecents="true"/>
         <activity
-            android:name=".ThursdaySayActivity"
+            android:name="com.intfocus.yh_android.ThursdaySayActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
@@ -115,7 +115,7 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <!-- Services -->
-        <service android:name=".LocalNotificationService"></service>
+        <service android:name="com.intfocus.yh_android.LocalNotificationService"></service>
 
         <!-- 蒲公英 必选-->
         <meta-data
