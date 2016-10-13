@@ -98,8 +98,8 @@ public class LoginActivity extends BaseActivity {
     }
 
     /*
- * 权限获取反馈
- */
+     * 权限获取反馈
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
@@ -117,7 +117,6 @@ public class LoginActivity extends BaseActivity {
     }
 
     protected void onResume() {
-        mMyApp.setCurrentActivity(this);
         if(mProgressDialog != null)  {
             mProgressDialog.dismiss();
         }

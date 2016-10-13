@@ -172,7 +172,6 @@ public class DashboardActivity extends BaseActivity {
     }
 
     protected void onResume() {
-        mMyApp.setCurrentActivity(this);
 		/*
 		 * 启动 Activity 时也需要判断小红点是否显示
 		 */
