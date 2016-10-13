@@ -116,7 +116,7 @@ public class YHApplication extends Application {
                                 return;
                             }
                             // onRegistered方法的参数registrationId即是device_token
-                            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushMessageConfigFileName );
+                            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushConfigFileName );
                             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
                             pushJSON.put("push_valid", false);
                             pushJSON.put("push_device_token", registrationId);
@@ -132,8 +132,7 @@ public class YHApplication extends Application {
         });
         mPushAgent.onAppStart();
 
-        mPushAgent.setNotificationClickHandler(handler);
-
+        mPushAgent.setNotificationClickHandler(pushMessageHandler);
     }
 
     @Override
@@ -260,14 +259,16 @@ public class YHApplication extends Application {
         return isBackground;
     }
 
-    UmengNotificationClickHandler handler = new UmengNotificationClickHandler() {
+    UmengNotificationClickHandler pushMessageHandler = new UmengNotificationClickHandler() {
         @Override
         public void dealWithCustomAction(Context context, UMessage uMessage) {
             super.dealWithCustomAction(context, uMessage);
             try {
-                String pushMessageConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushMessageConfigFileName);
-                JSONObject jsonObject = new JSONObject(uMessage.custom);
-                FileUtil.writeFile(pushMessageConfigPath, jsonObject.toString());
+                String pushMessagePath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushMessageFileName);
+                JSONObject pushMessageJSON = new JSONObject(uMessage.custom);
+
+                pushMessageJSON.put("state", false);
+                FileUtil.writeFile(pushMessagePath, pushMessageJSON.toString());
                 Intent intent;
                 if ((mCurrentActivity == null)) {
                     intent = new Intent (mContext, LoginActivity.class);

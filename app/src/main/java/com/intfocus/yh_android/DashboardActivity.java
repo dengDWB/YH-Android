@@ -81,12 +81,12 @@ public class DashboardActivity extends BaseActivity {
 
 		/*
 		 * 通过解屏进入界面后，进行用户验证
-     	 */
+     */
 		checkWhetherFromScreenLockActivity();
 
 		/*
 		 * 检测服务器静态资源是否更新，并下载
-     	 */
+     */
 		checkAssetsUpdated(true);
 
 		/*
@@ -250,7 +250,8 @@ public class DashboardActivity extends BaseActivity {
 		boolean isShouldDisplayAd = mCurrentTab == mTabKPI && new File(adIndexPath).exists();
 		if (isShouldDisplayAd) {
 			viewAnimation(browserAd, true, 0, dip2px(DashboardActivity.this, 140));
-		} else {
+		}
+    else {
 			viewAnimation(browserAd, false, dip2px(DashboardActivity.this, 140), 0);
 		}
 	}
@@ -265,7 +266,7 @@ public class DashboardActivity extends BaseActivity {
 		registerReceiver(notificationBroadcastReceiver, filter);
 		/*
 		 * 打开通知服务,用于发送通知
-         */
+     */
 		Intent startService = new Intent(this, LocalNotificationService.class);
 		startService(startService);
 	}
@@ -591,8 +592,7 @@ public class DashboardActivity extends BaseActivity {
 		}
 
 		@JavascriptInterface
-		public void adLink(final String openType, final String openLink, final String ObjeckID, final String objectType
-				, final String objectTitle) {
+		public void adLink(final String openType, final String openLink, final String ObjeckID, final String objectType, final String objectTitle) {
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
