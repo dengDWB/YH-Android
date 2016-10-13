@@ -101,7 +101,6 @@ public class DashboardActivity extends BaseActivity {
 	}
 
 
-
 	private void initDropMenuItem() {
 		listItem = new ArrayList<HashMap<String, Object>>();
 		int[] imgID = {R.drawable.icon_scan, R.drawable.icon_voice, R.drawable.icon_search, R.drawable.icon_user};
@@ -134,7 +133,8 @@ public class DashboardActivity extends BaseActivity {
 					if (ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.CAMERA)
 							!= PackageManager.PERMISSION_GRANTED) {
 						ActivityCompat.requestPermissions(DashboardActivity.this, new String[]{Manifest.permission.CAMERA}, ZBAR_CAMERA_PERMISSION);
-					} else {
+					}
+				    else {
 						Intent barCodeScannerIntent = new Intent(mContext, BarCodeScannerActivity.class);
 						mContext.startActivity(barCodeScannerIntent);
 					}
@@ -163,9 +163,9 @@ public class DashboardActivity extends BaseActivity {
 				if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					Intent barCodeScannerIntent = new Intent(mContext, BarCodeScannerActivity.class);
 					mContext.startActivity(barCodeScannerIntent);
-				} else {
-					Toast.makeText(DashboardActivity.this, "相机权限获取失败，请重试", Toast.LENGTH_SHORT)
-							.show();
+				}
+				else {
+					Toast.makeText(DashboardActivity.this, "相机权限获取失败，请重试", Toast.LENGTH_SHORT).show();
 				}
 				break;
 			default:
@@ -236,10 +236,12 @@ public class DashboardActivity extends BaseActivity {
 
 			try {
 				FileUtil.writeFile(adIndexWithTimestampPath, htmlContent);
-			} catch (IOException e) {
+			}
+      		catch (IOException e) {
 				e.printStackTrace();
 			}
-		} else {
+		}
+    	else {
 			isShouldLoadHtml = false;
 		}
 
@@ -251,7 +253,7 @@ public class DashboardActivity extends BaseActivity {
 		if (isShouldDisplayAd) {
 			viewAnimation(browserAd, true, 0, dip2px(DashboardActivity.this, 140));
 		}
-    else {
+    	else {
 			viewAnimation(browserAd, false, dip2px(DashboardActivity.this, 140), 0);
 		}
 	}
@@ -266,7 +268,7 @@ public class DashboardActivity extends BaseActivity {
 		registerReceiver(notificationBroadcastReceiver, filter);
 		/*
 		 * 打开通知服务,用于发送通知
-     */
+     	*/
 		Intent startService = new Intent(this, LocalNotificationService.class);
 		startService(startService);
 	}
