@@ -82,7 +82,7 @@ public class YHApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        mContext = YHApplication.this;
+        mContext = this;
         String sharedPath = FileUtil.sharedPath(mContext), basePath = FileUtil.basePath(mContext);
 
         /*
@@ -262,10 +262,12 @@ public class YHApplication extends Application {
         public void dealWithCustomAction(Context context, UMessage uMessage) {
             super.dealWithCustomAction(context, uMessage);
             try {
+                Log.d("message1",mCurrentActivity.getClass().getSimpleName());
                 String pushMessageConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushMessageConfigFileName);
                 JSONObject jsonObject = new JSONObject(uMessage.custom);
                 FileUtil.writeFile(pushMessageConfigPath, jsonObject.toString());
                 Intent intent;
+
                 if ((mCurrentActivity == null)) {
                     intent = new Intent (mContext, LoginActivity.class);
                 }
