@@ -54,7 +54,7 @@ public class BarCodeScannerActivity extends BaseActivity implements ZBarScannerV
 
     @Override
     public void handleResult(Result rawResult) {
-      if (rawResult.getContents() == null || rawResult.getContents().isEmpty()) {
+        if (rawResult.getContents() == null || rawResult.getContents().isEmpty()) {
         /*
          * Note:
          * Wait 2 seconds to resume the preview.
@@ -70,10 +70,10 @@ public class BarCodeScannerActivity extends BaseActivity implements ZBarScannerV
               mScannerView.resumeCameraPreview(BarCodeScannerActivity.this);
             }
           }, 2000);
-      }
-      else {
-          if (URLs.kIsQRCode) {
-              if (rawResult.getBarcodeFormat().getName().equals("QRCODE")) {
+        }
+        else {
+            if (URLs.kIsQRCode) {
+                if (rawResult.getBarcodeFormat().getName().equals("QRCODE")) {
                   mScannerView.resumeCameraPreview(BarCodeScannerActivity.this);
                   toast("本应用现只支持条形码扫描");
                   return;
