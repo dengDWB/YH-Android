@@ -9,8 +9,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 
-import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.PrivateURLs;

@@ -48,7 +48,7 @@ public class YHApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        mContext = YHApplication.this;
+        mContext = this;
         String sharedPath = FileUtil.sharedPath(mContext), basePath = FileUtil.basePath(mContext);
 
         /*
@@ -266,29 +266,29 @@ public class YHApplication extends Application {
             try {
                 String pushMessagePath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushMessageFileName);
                 JSONObject pushMessageJSON = new JSONObject(uMessage.custom);
-
                 pushMessageJSON.put("state", false);
                 FileUtil.writeFile(pushMessagePath, pushMessageJSON.toString());
-                Intent intent;
-                if ((mCurrentActivity == null)) {
-                    intent = new Intent (mContext, LoginActivity.class);
-                }
-                else {
-                    String activityName = mCurrentActivity.getClass().getSimpleName();
-                    intent = new Intent (mContext,DashboardActivity.class);
-                    if (activityName.equals("LoginActivity")) {
-                        return;
-                    }
-                    ActivityCollector.finishAll();
-                    if (activityName.equals("GuideActivity")) {
-                        intent = new Intent (mContext,LoginActivity.class);
-                    }
-                    else if (activityName.equals("DashboardActivity")) {
-                        mCurrentActivity.finish();
-                    }
-                }
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+
+                //Intent intent;
+                //if ((mCurrentActivity == null)) {
+                //    intent = new Intent (mContext, LoginActivity.class);
+                //}
+                //else {
+                //    String activityName = mCurrentActivity.getClass().getSimpleName();
+                //    intent = new Intent (mContext,DashboardActivity.class);
+                //    if (activityName.equals("LoginActivity")) {
+                //        return;
+                //    }
+                //    ActivityCollector.finishAll();
+                //    if (activityName.equals("GuideActivity")) {
+                //        intent = new Intent (mContext,LoginActivity.class);
+                //    }
+                //    else if (activityName.equals("DashboardActivity")) {
+                //        mCurrentActivity.finish();
+                //    }
+                //}
+                //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                //startActivity(intent);
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (IOException e) {

@@ -77,7 +77,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			enableSlowWholeDocumentDraw();
 		}
 		setContentView(R.layout.activity_subject);
-//		mMyApp.setCurrentActivity(this);
 
 		/*
 		 * JSON Data
