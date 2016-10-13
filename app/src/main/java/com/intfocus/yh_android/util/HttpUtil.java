@@ -1,12 +1,8 @@
 package com.intfocus.yh_android.util;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -31,8 +27,6 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import static u.aly.dn.i;
 
 public class HttpUtil {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");

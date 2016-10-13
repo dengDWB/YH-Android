@@ -254,16 +254,16 @@
 
                 <TextView
                     style="@style/SettingTitle"
-                    android:text="配色主题"/>
+                    android:text="分享功能"/>
 
                 <RelativeLayout style="@style/SettingGroup">
 
                     <TextView
                         style="@style/SettingKey"
-                        android:text="旧版UI"/>
+                        android:text="截取长图"/>
 
                     <Switch
-                        android:id="@+id/ui_switch"
+                        android:id="@+id/longcat_switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"/>

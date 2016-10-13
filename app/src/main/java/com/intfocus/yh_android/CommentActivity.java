@@ -64,6 +64,7 @@ public class CommentActivity extends BaseActivity {
     }
 
     protected void onResume() {
+        mMyApp.setCurrentActivity(this);
         super.onResume();
     }
 
