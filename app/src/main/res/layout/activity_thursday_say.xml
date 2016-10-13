@@ -60,18 +60,11 @@
         android:layout_above="@id/toolBar"
         android:layout_below="@id/actionBar">
 
-        <WebView
-            android:id="@+id/browserAd"
-            android:layout_width="match_parent"
-            android:layout_height="140dp"
-            android:layerType="software"
-            android:scrollbars="none"
-            android:visibility="gone"/>
-
-        <com.handmark.pulltorefresh.library.PullToRefreshWebView
+        <android.webkit.WebView
             android:id="@+id/browser"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:layout_below="@id/actionBar" />
 
         <RelativeLayout
             android:id="@+id/anim_loading"

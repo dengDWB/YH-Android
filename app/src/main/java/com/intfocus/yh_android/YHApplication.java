@@ -67,13 +67,13 @@ public class YHApplication extends Application {
                 }
             }
             Log.i("currentActivityName", "[" + currentActivityName + "]");
-            if ((currentActivityName != null && !currentActivityName.trim().equals("ConfirmPassCodeActivity")) && // 当前活动的Activity非解锁界面
+            if (// 当前活动的Activity非解锁界面
                 FileUtil.checkIsLocked(mContext)) { // 应用处于登录状态，并且开启了密码锁
 
-                Intent i = new Intent(getApplicationContext(), ConfirmPassCodeActivity.class);
-                i.putExtra("is_from_login", false);
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(i);
+                intent = new Intent(mContext, ConfirmPassCodeActivity.class);
+                intent.putExtra("is_from_login", true);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                mContext.startActivity(intent);
             }
         }
     };
