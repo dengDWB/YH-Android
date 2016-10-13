@@ -272,8 +272,8 @@ public class DashboardActivity extends BaseActivity {
 				.setPositiveButton("确认", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						ActivityCollector.finishAll();
-						//                        finish();
+						// ActivityCollector.finishAll();
+						finish();
 					}
 				})
 				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
