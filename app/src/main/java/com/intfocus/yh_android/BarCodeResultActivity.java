@@ -167,7 +167,7 @@ public class BarCodeResultActivity extends BaseActivity {
                 String responseString = response.get(URLs.kBody);
                 updateHtmlContentTimetamp();
 
-                if (!responseCode.equals("200")) {
+                if (!responseCode.equals("200") || null == responseString) {
                     showWebViewForWithoutNetwork();
                 }
                 else {
