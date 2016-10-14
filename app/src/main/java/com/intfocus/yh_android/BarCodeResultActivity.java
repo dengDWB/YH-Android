@@ -154,11 +154,11 @@ public class BarCodeResultActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-        animLoading.setVisibility(View.VISIBLE);
         loadBarCodeResult();
     }
 
     private void loadBarCodeResult() {
+        animLoading.setVisibility(View.VISIBLE);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -167,8 +167,11 @@ public class BarCodeResultActivity extends BaseActivity {
                 String responseString = response.get(URLs.kBody);
                 updateHtmlContentTimetamp();
 
-                if (!responseCode.equals("200") || null == responseString) {
+                if (!responseCode.equals("200") || responseString.equals("")) {
                     showWebViewForWithoutNetwork();
+                    if (responseString.equals("")) {
+                        toast("Js 获取为空");
+                    }
                 }
                 else {
                     FileUtil.barCodeScanResult(mContext, responseString);
@@ -355,13 +358,18 @@ public class BarCodeResultActivity extends BaseActivity {
         });
     }
 
-    private class JavaScriptInterface extends JavaScriptBase {
+    private class JavaScriptInterface{
         /*
          * JS 接口，暴露给JS的方法使用@JavascriptInterface装饰
          */
         @JavascriptInterface
         public void refreshBrowser() {
-            loadBarCodeResult();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    loadBarCodeResult();
+                }
+            });
         }
     }
 }

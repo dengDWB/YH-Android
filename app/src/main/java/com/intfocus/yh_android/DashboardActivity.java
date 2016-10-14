@@ -94,8 +94,8 @@ public class DashboardActivity extends BaseActivity {
 		/*
          * 动态注册广播用于接收通知
 		 */
-		initLocalNotifications();
 		initNotificationService();
+
 		dealSendMessage();
 		checkFullScreen();
 
@@ -167,6 +167,9 @@ public class DashboardActivity extends BaseActivity {
 		mCurrentTab.setActive(true);
 	}
 
+	/*
+	 * 初始化下拉菜单按钮
+	 */
 	private void initDropMenuItem() {
 		listItem = new ArrayList<HashMap<String, Object>>();
 		int[] imgID = {R.drawable.icon_scan, R.drawable.icon_voice, R.drawable.icon_search, R.drawable.icon_user};
@@ -260,7 +263,6 @@ public class DashboardActivity extends BaseActivity {
 		user = null;
 		popupWindow.dismiss();
 		unregisterReceiver(notificationBroadcastReceiver);
-
 		super.onDestroy();
 	}
 
@@ -334,7 +336,6 @@ public class DashboardActivity extends BaseActivity {
 		/*
 		 * 打开通知服务, 用于发送通知
          */
-
 		Intent startService = new Intent(this, LocalNotificationService.class);
 		startService(startService);
 	}
@@ -542,7 +543,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvKpi.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabKpi, 0);
-						writeBehaviorFile(0);
+						FileUtil.writeBehaviorFile(mContext,urlString,0);
 						break;
 					case R.id.tabAnalyse:
 						objectType = 2;
@@ -550,7 +551,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvAnalyse.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabAnalyse, 0);
-						writeBehaviorFile(1);
+						FileUtil.writeBehaviorFile(mContext,urlString,1);
 						break;
 					case R.id.tabApp:
 						objectType = 3;
@@ -558,7 +559,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvApp.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabApp, 0);
-						writeBehaviorFile(2);
+						FileUtil.writeBehaviorFile(mContext,urlString,2);
 						break;
 					case R.id.tabMessage:
 						objectType = 5;
@@ -566,7 +567,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvMessage.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabMessage, 0);
-						writeBehaviorFile(3);
+						FileUtil.writeBehaviorFile(mContext,urlString,3);
 						break;
 					default:
 						objectType = 1;
@@ -574,7 +575,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvKpi.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabKpi, 0);
-						writeBehaviorFile(0);
+						FileUtil.writeBehaviorFile(mContext,urlString,0);
 						break;
 				}
 
@@ -585,7 +586,6 @@ public class DashboardActivity extends BaseActivity {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
 
 			/*
 			 * 用户行为记录, 单独异常处理，不可影响用户体验
@@ -601,33 +601,9 @@ public class DashboardActivity extends BaseActivity {
 		}
 	};
 
-	public void writeBehaviorFile(int tabIndex) {
-		String behaviorPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBehaviorConfigFileName);
-		try {
-			if (urlString.equals("") || urlString.equals(null)) {
-				return;
-			}else {
-				if (new File(behaviorPath).exists()) {
-					JSONObject dashboardJson = FileUtil.readConfigFile(behaviorPath);
-					JSONObject behaviorJson = new JSONObject(dashboardJson.getString("dashboard"));
-					behaviorJson.put("tab_index", tabIndex);
-					dashboardJson.put("dashboard", behaviorJson.toString());
-					FileUtil.writeFile(behaviorPath,dashboardJson.toString());
-				}else {
-					JSONObject dashboardJson = new JSONObject();
-					JSONObject behaviorJson = new JSONObject();
-					behaviorJson.put("tab_index", tabIndex);
-					dashboardJson.put("dashboard",behaviorJson.toString());
-					FileUtil.writeFile(behaviorPath,dashboardJson.toString());
-				}
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
+	/*
+	 * 读取用户习惯记录,即用户上次退出时所在 Tab 页面
+	 */
 	public void readBehaviorFile() {
 		try {
 			String behaviorPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBehaviorConfigFileName);
@@ -677,6 +653,7 @@ public class DashboardActivity extends BaseActivity {
 			e.printStackTrace();
 		}
 	}
+
 	/*
 	 * 标题栏点击设置按钮显示下拉菜单
 	 */
@@ -695,6 +672,71 @@ public class DashboardActivity extends BaseActivity {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/*
+     * view 缩放动画
+     */
+	public void viewAnimation(final View view, final Boolean isShow, final int startHeight, final int endHeight) {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				mAnimationTime = getResources().getInteger(android.R.integer.config_mediumAnimTime);//动画效果时间
+				final ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+				ValueAnimator valueAnimator = ValueAnimator.ofInt(startHeight, endHeight);
+				valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+					@Override
+					public void onAnimationUpdate(ValueAnimator animation) {
+						int adHeight = (int) animation.getAnimatedValue();
+						layoutParams.height = adHeight;
+						view.setLayoutParams(layoutParams);
+						view.requestLayout();
+					}
+				});
+
+				valueAnimator.addListener(new AnimatorListenerAdapter() {
+					@Override
+					public void onAnimationStart(Animator animation) {
+						super.onAnimationStart(animation);
+						if (isShow) {
+							view.setVisibility(View.VISIBLE);
+						}
+					}
+
+					@Override
+					public void onAnimationEnd(Animator animation) {
+						super.onAnimationEnd(animation);
+						if (!isShow) {
+							view.setVisibility(View.GONE);
+						}
+					}
+				});
+				valueAnimator.setDuration(mAnimationTime);
+				valueAnimator.start();
+			}
+		});
+	}
+
+	private void initUrlStrings() {
+		urlStrings = new ArrayList<String>();
+
+		String currentUIVersion = URLs.currentUIVersion(mContext);
+		String tmpString;
+		try {
+			tmpString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
+			urlStrings.add(tmpString);
+			tmpString = String.format(K.kAnalyseMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+			urlStrings.add(tmpString);
+			tmpString = String.format(K.kAppMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+			urlStrings.add(tmpString);
+			tmpString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
+			urlStrings.add(tmpString);
+			tmpString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
+			urlStrings.add(tmpString);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	/*
@@ -861,132 +903,6 @@ public class DashboardActivity extends BaseActivity {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
-	}
-
-	/*
-     * view 缩放动画
-     */
-	public void viewAnimation(final View view, final Boolean isShow, final int startHeight, final int endHeight) {
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				mAnimationTime = getResources().getInteger(android.R.integer.config_mediumAnimTime);//动画效果时间
-				final ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-				ValueAnimator valueAnimator = ValueAnimator.ofInt(startHeight, endHeight);
-				valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-					@Override
-					public void onAnimationUpdate(ValueAnimator animation) {
-						int adHeight = (int) animation.getAnimatedValue();
-						layoutParams.height = adHeight;
-						view.setLayoutParams(layoutParams);
-						view.requestLayout();
-					}
-				});
-
-				valueAnimator.addListener(new AnimatorListenerAdapter() {
-					@Override
-					public void onAnimationStart(Animator animation) {
-						super.onAnimationStart(animation);
-						if (isShow) {
-							view.setVisibility(View.VISIBLE);
-						}
-					}
-
-					@Override
-					public void onAnimationEnd(Animator animation) {
-						super.onAnimationEnd(animation);
-						if (!isShow) {
-							view.setVisibility(View.GONE);
-						}
-					}
-				});
-				valueAnimator.setDuration(mAnimationTime);
-				valueAnimator.start();
-			}
-		});
-	}
-
-	private void initUrlStrings() {
-		urlStrings = new ArrayList<String>();
-
-		String currentUIVersion = URLs.currentUIVersion(mContext);
-		String tmpString;
-		try {
-			tmpString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
-			urlStrings.add(tmpString);
-			tmpString = String.format(K.kAnalyseMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
-			urlStrings.add(tmpString);
-			tmpString = String.format(K.kAppMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
-			urlStrings.add(tmpString);
-			tmpString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
-			urlStrings.add(tmpString);
-			tmpString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
-			urlStrings.add(tmpString);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	/**
-	 * 初始化本地通知
-	 */
-	private void initLocalNotifications() {
-		try {
-			String noticePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
-			notificationJSON = FileUtil.readConfigFile(noticePath);
-			/*
-			 * 版本迭代的问题：
-			 * 1. 动态添加新字段
-			 * 2. 不可影响已存在字段存放的数据
-			 */
-			if (!notificationJSON.has("app")) {
-				notificationJSON.put("app", -1);
-			}
-			if (!notificationJSON.has(URLs.kTabKpi)) {
-				notificationJSON.put(URLs.kTabKpi, -1);
-			}
-			if (!notificationJSON.has("tab_kpi_last")) {
-				notificationJSON.put("tab_kpi_last", -1);
-			}
-			if (!notificationJSON.has(URLs.kTabAnalyse)) {
-				notificationJSON.put(URLs.kTabAnalyse, -1);
-			}
-			if (!notificationJSON.has("tab_analyse_last")) {
-				notificationJSON.put("tab_analyse_last", -1);
-			}
-			if (!notificationJSON.has(URLs.kTabApp)) {
-				notificationJSON.put(URLs.kTabApp, -1);
-			}
-			if (!notificationJSON.has("tab_app_last")) {
-				notificationJSON.put("tab_app_last", -1);
-			}
-			if (!notificationJSON.has(URLs.kTabMessage)) {
-				notificationJSON.put(URLs.kTabMessage, -1);
-			}
-			if (!notificationJSON.has("tab_message_last")) {
-				notificationJSON.put("tab_message_last", -1);
-			}
-			if (!notificationJSON.has(URLs.kSetting)) {
-				notificationJSON.put(URLs.kSetting, -1);
-			}
-			if (!notificationJSON.has(URLs.kSettingPgyer)) {
-				notificationJSON.put(URLs.kSettingPgyer, -1);
-			}
-			if (!notificationJSON.has(URLs.kSettingPassword)) {
-				notificationJSON.put(URLs.kSettingPassword, -1);
-			}
-			if (!notificationJSON.has(URLs.kSettingThursdaySay)) {
-				notificationJSON.put(URLs.kSettingThursdaySay, -1);
-			}
-			if (!notificationJSON.has("setting_thursday_say_last")) {
-				notificationJSON.put("setting_thursday_say_last", -1);
-			}
-
-			FileUtil.writeFile(noticePath, notificationJSON.toString());
-		} catch (JSONException | IOException e) {
-			e.printStackTrace();
 		}
 	}
 }

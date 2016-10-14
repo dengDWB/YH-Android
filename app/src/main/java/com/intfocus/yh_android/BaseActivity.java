@@ -99,6 +99,7 @@ public class BaseActivity extends Activity {
     JSONObject logParams = new JSONObject();
     Context mContext;
     Activity currActivity;
+    Toast toast;
     int displayDpi; //屏幕密度
 
     @Override
@@ -829,9 +830,14 @@ public class BaseActivity extends Activity {
 
     protected void toast(String info) {
         try {
-            Toast.makeText(mContext, info, Toast.LENGTH_SHORT).show();
-        }
-        catch(Exception e) {
+            if (null == toast) {
+                toast = toast.makeText(mContext, info, Toast.LENGTH_SHORT);
+            }
+            else {
+                toast.setText(info); //若当前已有 Toast 在显示,则直接修改当前 Toast 显示的内容
+            }
+            toast.show();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -436,7 +436,7 @@ public class FileUtil {
 
     /**
      * 更新服务器商品条形码信息
-     * @param  服务器响应内容
+     * @param  responseString 服务器响应内容
      * @return
      */
     public static void barCodeScanResult(Context mContext, String responseString) {
@@ -556,10 +556,98 @@ public class FileUtil {
 		}
 	}
 
+    /*
+     * 用户习惯记录
+     */
+    public static void writeBehaviorFile(Context mContext,String urlString,int tabIndex) {
+        String behaviorPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBehaviorConfigFileName);
+        try {
+            if (urlString.equals("") || urlString.equals(null)) {
+                return;
+            }else {
+                if (new File(behaviorPath).exists()) {
+                    JSONObject dashboardJson = FileUtil.readConfigFile(behaviorPath);
+                    JSONObject behaviorJson = new JSONObject(dashboardJson.getString("dashboard"));
+                    behaviorJson.put("tab_index", tabIndex);
+                    dashboardJson.put("dashboard", behaviorJson.toString());
+                    FileUtil.writeFile(behaviorPath,dashboardJson.toString());
+                }else {
+                    JSONObject dashboardJson = new JSONObject();
+                    JSONObject behaviorJson = new JSONObject();
+                    behaviorJson.put("tab_index", tabIndex);
+                    dashboardJson.put("dashboard",behaviorJson.toString());
+                    FileUtil.writeFile(behaviorPath,dashboardJson.toString());
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void initLocalNotifications(Context mContext) {
+        try {
+            String noticePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
+            JSONObject notificationJSON = FileUtil.readConfigFile(noticePath);
+			/*
+			 * 版本迭代的问题：
+			 * 1. 动态添加新字段
+			 * 2. 不可影响已存在字段存放的数据
+			 */
+            if (!notificationJSON.has("app")) {
+                notificationJSON.put("app", -1);
+            }
+            if (!notificationJSON.has(URLs.kTabKpi)) {
+                notificationJSON.put(URLs.kTabKpi, -1);
+            }
+            if (!notificationJSON.has("tab_kpi_last")) {
+                notificationJSON.put("tab_kpi_last", -1);
+            }
+            if (!notificationJSON.has(URLs.kTabAnalyse)) {
+                notificationJSON.put(URLs.kTabAnalyse, -1);
+            }
+            if (!notificationJSON.has("tab_analyse_last")) {
+                notificationJSON.put("tab_analyse_last", -1);
+            }
+            if (!notificationJSON.has(URLs.kTabApp)) {
+                notificationJSON.put(URLs.kTabApp, -1);
+            }
+            if (!notificationJSON.has("tab_app_last")) {
+                notificationJSON.put("tab_app_last", -1);
+            }
+            if (!notificationJSON.has(URLs.kTabMessage)) {
+                notificationJSON.put(URLs.kTabMessage, -1);
+            }
+            if (!notificationJSON.has("tab_message_last")) {
+                notificationJSON.put("tab_message_last", -1);
+            }
+            if (!notificationJSON.has(URLs.kSetting)) {
+                notificationJSON.put(URLs.kSetting, -1);
+            }
+            if (!notificationJSON.has(URLs.kSettingPgyer)) {
+                notificationJSON.put(URLs.kSettingPgyer, -1);
+            }
+            if (!notificationJSON.has(URLs.kSettingPassword)) {
+                notificationJSON.put(URLs.kSettingPassword, -1);
+            }
+            if (!notificationJSON.has(URLs.kSettingThursdaySay)) {
+                notificationJSON.put(URLs.kSettingThursdaySay, -1);
+            }
+            if (!notificationJSON.has("setting_thursday_say_last")) {
+                notificationJSON.put("setting_thursday_say_last", -1);
+            }
+
+            FileUtil.writeFile(noticePath, notificationJSON.toString());
+        } catch (JSONException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     //以下代码，原本uri返回的是file:///...，由于android4.4返回的是content:///... 需要转化格式
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public static String getBitmapUrlPath(final Context context, final Uri uri) {
-        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+        final boolean isKitKat = Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT;
 
         if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
             if (isExternalStorageDocument(uri)) {
