@@ -4,7 +4,7 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context="com.intfocus.yonghuitest.BarCodeResultActivity">
+                tools:context="com.intfocus.yh_android.BarCodeResultActivity">
 
     <RelativeLayout
         android:id="@+id/actionBar"
