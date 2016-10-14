@@ -1,11 +1,6 @@
 package com.intfocus.yh_android.util;
 
 import android.content.Context;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.File;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -91,17 +86,17 @@ public class URLs implements Serializable {
      * UI 版本
      */
     public static String currentUIVersion(Context mContext) {
-        try {
-            String betaConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBetaConfigFileName);
-            JSONObject betaJSON = new JSONObject();
-            if (new File(betaConfigPath).exists()) {
-                betaJSON = FileUtil.readConfigFile(betaConfigPath);
-            }
-
-            return betaJSON.has("old_ui") && betaJSON.getBoolean("old_ui") ? "v1" : "v2";
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        //try {
+        //    String betaConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBetaConfigFileName);
+        //    JSONObject betaJSON = new JSONObject();
+        //    if (new File(betaConfigPath).exists()) {
+        //        betaJSON = FileUtil.readConfigFile(betaConfigPath);
+        //    }
+        //
+        //    return betaJSON.has("old_ui") && betaJSON.getBoolean("old_ui") ? "v1" : "v2";
+        //} catch (JSONException e) {
+        //    e.printStackTrace();
+        //}
         return "v2";
     }
     /**

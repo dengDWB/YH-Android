@@ -48,7 +48,7 @@ public class YHApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        mContext = YHApplication.this;
+        mContext = this;
         String sharedPath = FileUtil.sharedPath(mContext), basePath = FileUtil.basePath(mContext);
 
         /*
@@ -116,7 +116,7 @@ public class YHApplication extends Application {
                                 return;
                             }
                             // onRegistered方法的参数registrationId即是device_token
-                            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushMessageConfigFileName );
+                            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushConfigFileName );
                             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
                             pushJSON.put("push_valid", false);
                             pushJSON.put("push_device_token", registrationId);
@@ -132,8 +132,7 @@ public class YHApplication extends Application {
         });
         mPushAgent.onAppStart();
 
-        mPushAgent.setNotificationClickHandler(handler);
-
+        mPushAgent.setNotificationClickHandler(pushMessageHandler);
     }
 
     @Override
@@ -260,34 +259,36 @@ public class YHApplication extends Application {
         return isBackground;
     }
 
-    UmengNotificationClickHandler handler = new UmengNotificationClickHandler() {
+    UmengNotificationClickHandler pushMessageHandler = new UmengNotificationClickHandler() {
         @Override
         public void dealWithCustomAction(Context context, UMessage uMessage) {
             super.dealWithCustomAction(context, uMessage);
             try {
-                String pushMessageConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushMessageConfigFileName);
-                JSONObject jsonObject = new JSONObject(uMessage.custom);
-                FileUtil.writeFile(pushMessageConfigPath, jsonObject.toString());
-                Intent intent;
-                if ((mCurrentActivity == null)) {
-                    intent = new Intent (mContext, LoginActivity.class);
-                }
-                else {
-                    String activityName = mCurrentActivity.getClass().getSimpleName();
-                    intent = new Intent (mContext,DashboardActivity.class);
-                    if (activityName.equals("LoginActivity")) {
-                        return;
-                    }
-                    ActivityCollector.finishAll();
-                    if (activityName.equals("GuideActivity")) {
-                        intent = new Intent (mContext,LoginActivity.class);
-                    }
-                    else if (activityName.equals("DashboardActivity")) {
-                        mCurrentActivity.finish();
-                    }
-                }
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+                String pushMessagePath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushMessageFileName);
+                JSONObject pushMessageJSON = new JSONObject(uMessage.custom);
+                pushMessageJSON.put("state", false);
+                FileUtil.writeFile(pushMessagePath, pushMessageJSON.toString());
+
+                //Intent intent;
+                //if ((mCurrentActivity == null)) {
+                //    intent = new Intent (mContext, LoginActivity.class);
+                //}
+                //else {
+                //    String activityName = mCurrentActivity.getClass().getSimpleName();
+                //    intent = new Intent (mContext,DashboardActivity.class);
+                //    if (activityName.equals("LoginActivity")) {
+                //        return;
+                //    }
+                //    ActivityCollector.finishAll();
+                //    if (activityName.equals("GuideActivity")) {
+                //        intent = new Intent (mContext,LoginActivity.class);
+                //    }
+                //    else if (activityName.equals("DashboardActivity")) {
+                //        mCurrentActivity.finish();
+                //    }
+                //}
+                //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                //startActivity(intent);
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (IOException e) {

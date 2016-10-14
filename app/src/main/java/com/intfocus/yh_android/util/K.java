@@ -40,18 +40,18 @@ public class K extends PrivateURLs implements Serializable {
   /**
    *  Config#Application
    */
-  public final static String kConfigDirName            = "Configs";
-  public final static String kSharedDirName            = "Shared";
-  public final static String kCachedDirName            = "Cached";
-  public final static String kHTMLDirName              = "HTML";
-  public final static String kAssetsDirName            = "Assets";
-  public final static String kReportDataFileName       = "group_%s_template_%s_report_%s.js";
-  public final static String kUserConfigFileName       = "user.json";
-  public final static String kPushConfigFileName       = "push_message.json";
-  public final static String kPushMessageConfigFileName="push_message.config";
-  public final static String kSettingConfigFileName    = "setting.json";
-  public final static String kTabIndexConfigFileName   = "page_tab_index.json";
-  public final static String kGesturePwdConfigFileName = "gesture_password.json";
+  public final static String kConfigDirName             = "Configs";
+  public final static String kSharedDirName             = "Shared";
+  public final static String kCachedDirName             = "Cached";
+  public final static String kHTMLDirName               = "HTML";
+  public final static String kAssetsDirName             = "Assets";
+  public final static String kReportDataFileName        = "group_%s_template_%s_report_%s.js";
+  public final static String kUserConfigFileName        = "user.json";
+  public final static String kPushMessageFileName       = "push_message.json";
+  public final static String kPushConfigFileName        = "push_message_config.json";
+  public final static String kSettingConfigFileName     = "setting.json";
+  public final static String kTabIndexConfigFileName    = "page_tab_index.json";
+  public final static String kGesturePwdConfigFileName  = "gesture_password.json";
   public final static String kLocalNotificationConfigFileName = "local_notification.json";
   public final static String kCachedHeaderConfigFileName      = "cached_header.json";
   public final static String kPgyerVersionConfigFileName      = "pgyer_version.json";

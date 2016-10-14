@@ -64,7 +64,7 @@ public class DashboardActivity extends BaseActivity {
 	private WebView browserAd;
 	private int mAnimationTime;
 	private MenuAdapter mSimpleAdapter;
-
+	private String currentUIVersion = "";
 
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
@@ -75,32 +75,97 @@ public class DashboardActivity extends BaseActivity {
 		initUrlStrings();
 		initDropMenuItem();
 		initTab();
+		readBehaviorFile();
 		initUserIDColorView();
 		loadWebView();
 		displayAdOrNot(true);
 
+
 		/*
-		 * 通过解屏进入界面后，进行用户验证
+         * 通过解屏进入界面后，进行用户验证
      	 */
 		checkWhetherFromScreenLockActivity();
 
 		/*
-		 * 检测服务器静态资源是否更新，并下载
+         * 检测服务器静态资源是否更新，并下载
      	 */
 		checkAssetsUpdated(true);
 
 		/*
-		 * 动态注册广播用于接收通知
+         * 动态注册广播用于接收通知
 		 */
 		initLocalNotifications();
 		initNotificationService();
+		dealSendMessage();
+		checkFullScreen();
 
 		new Thread(mRunnableForDetecting).start();
 
 		checkUserModifiedInitPassword();
 	}
 
+	public void checkFullScreen(){
+		String betaConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBetaConfigFileName);
+		try {
+			if(new File(betaConfigPath).exists()) {
+				JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
+				if (betaJSON.has("longCat")) {
+					URLs.kIsFullScreen = betaJSON.getBoolean("longCat");
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
 
+	public void dealSendMessage() {
+		currentUIVersion = URLs.currentUIVersion(mContext);
+		String pushMessagePath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushMessageFileName);
+		JSONObject pushMessageJSON = FileUtil.readConfigFile(pushMessagePath);
+		try {
+			if (pushMessageJSON.has("state") && pushMessageJSON.getBoolean("state")) {
+				return;
+			}
+			String type = pushMessageJSON.getString("type");
+			switch (type){
+				case "report":
+					Intent subjectIntent = new Intent(this, SubjectActivity.class);
+					subjectIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+					subjectIntent.putExtra(URLs.kLink, pushMessageJSON.getString("url"));
+					subjectIntent.putExtra(URLs.kBannerName, pushMessageJSON.getString("title"));
+					subjectIntent.putExtra(URLs.kObjectId, pushMessageJSON.getInt("object_id"));
+					subjectIntent.putExtra(URLs.kObjectType, pushMessageJSON.getInt("object_type"));
+					startActivity(subjectIntent);
+					break;
+				case "analyse":
+					jumpTab(mTabAnalyse);
+					urlString = String.format(K.kAnalyseMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+					break;
+				case "app":
+					jumpTab(mTabAPP);
+					urlString = String.format(K.kAppMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+					break;
+				case "message":
+					jumpTab(mTabMessage);
+					urlString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
+					break;
+				case "thursday_say":
+					Intent blogLinkIntent = new Intent(DashboardActivity.this,ThursdaySayActivity.class);
+					startActivity(blogLinkIntent);
+			}
+			pushMessageJSON.put("state", true);
+			FileUtil.writeFile(pushMessagePath, pushMessageJSON.toString());
+		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	public void jumpTab(TabView tabView) {
+		mCurrentTab.setActive(false);
+		mCurrentTab = tabView;
+		mCurrentTab.setActive(true);
+	}
 
 	private void initDropMenuItem() {
 		listItem = new ArrayList<HashMap<String, Object>>();
@@ -118,11 +183,11 @@ public class DashboardActivity extends BaseActivity {
 	}
 
 	/*
- 	 * 标题栏设置按钮下拉菜单点击响应事件
- 	 */
+	 * 标题栏设置按钮下拉菜单点击响应事件
+	 */
 	private final AdapterView.OnItemClickListener mDropMenuListener = new AdapterView.OnItemClickListener() {
 		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-								long arg3) {
+				long arg3) {
 			popupWindow.dismiss();
 			switch (listItem.get(arg2).get("ItemText").toString()) {
 				case "个人信息":
@@ -154,8 +219,8 @@ public class DashboardActivity extends BaseActivity {
 	};
 
 	/*
-	 * 权限获取反馈
-	 */
+     * 权限获取反馈
+     */
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 		switch (requestCode) {
@@ -207,6 +272,7 @@ public class DashboardActivity extends BaseActivity {
 				.setPositiveButton("确认", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
+						// ActivityCollector.finishAll();
 						finish();
 					}
 				})
@@ -220,13 +286,15 @@ public class DashboardActivity extends BaseActivity {
 	}
 
 	/*
-	 * 仪表盘界面可以显示广告
-	 */
+     * 仪表盘界面可以显示广告
+     */
 	private void displayAdOrNot(boolean isShouldLoadHtml) {
 		/*
 		 * 隐藏广告位
 		 */
-		if (!K.kDashboardAd) { return; }
+		if (!K.kDashboardAd) {
+			return;
+		}
 		String adIndexBasePath = FileUtil.sharedPath(this) + "/advertisement/index_android";
 		String adIndexPath = adIndexBasePath + ".html";
 		String adIndexWithTimestampPath = adIndexBasePath + ".timestamp.html";
@@ -256,23 +324,24 @@ public class DashboardActivity extends BaseActivity {
 	}
 
 	/*
-	 * 动态注册广播用于接收通知
-	 */
+     * 动态注册广播用于接收通知
+     */
 	private void initNotificationService() {
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(ACTION_UPDATENOTIFITION);
 		notificationBroadcastReceiver = new NotificationBroadcastReceiver();
 		registerReceiver(notificationBroadcastReceiver, filter);
 		/*
-		 * 打开通知服务,用于发送通知
+		 * 打开通知服务, 用于发送通知
          */
+
 		Intent startService = new Intent(this, LocalNotificationService.class);
 		startService(startService);
 	}
 
 	/*
-	 * 定义广播接收器（内部类），接收到后调用是否显示通知的判断逻辑
-	 */
+     * 定义广播接收器（内部类），接收到后调用是否显示通知的判断逻辑
+     */
 	private class NotificationBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -281,8 +350,8 @@ public class DashboardActivity extends BaseActivity {
 	}
 
 	/*
-	 * 通知显示判断逻辑，在 Activity 显示和接收到广播时都会调用
-	 */
+     * 通知显示判断逻辑，在 Activity 显示和接收到广播时都会调用
+     */
 	private void receiveNotification() {
 		try {
 			String noticePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
@@ -293,7 +362,7 @@ public class DashboardActivity extends BaseActivity {
 			messageNotifition = notificationJSON.getInt(URLs.kTabMessage);
 
 			if (kpiNotifition > 0 && objectType != 1) {
-				RedPointView.showRedPoint(mContext,kTab, bvKpi);
+				RedPointView.showRedPoint(mContext, kTab, bvKpi);
 			}
 			if (analyseNotifition > 0 && objectType != 2) {
 				RedPointView.showRedPoint(mContext, kTab, bvAnalyse);
@@ -315,8 +384,8 @@ public class DashboardActivity extends BaseActivity {
 	}
 
 	/*
-	 * 配置 mWebView
-	 */
+     * 配置 mWebView
+     */
 	public void loadWebView() {
 		pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
 		initWebView();
@@ -340,8 +409,8 @@ public class DashboardActivity extends BaseActivity {
 	}
 
 	/*
-	 * 通过解屏进入界面后，进行用户验证
-	 */
+     * 通过解屏进入界面后，进行用户验证
+     */
 	public void checkWhetherFromScreenLockActivity() {
 		Intent intent = getIntent();
 		if (intent.hasExtra("from_activity")) {
@@ -371,8 +440,8 @@ public class DashboardActivity extends BaseActivity {
 	}
 
 	/*
-	 * 用户编号
-	 */
+     * 用户编号
+     */
 	public void checkUserModifiedInitPassword() {
 		try {
 			if (!user.getString(URLs.kPassword).equals(URLs.MD5(K.kInitPassword))) {
@@ -397,8 +466,8 @@ public class DashboardActivity extends BaseActivity {
 	}
 
 	/*
-	 * 用户编号
-	 */
+     * 用户编号
+     */
 	public void initUserIDColorView() {
 		List<ImageView> colorViews = new ArrayList<>();
 		colorViews.add((ImageView) findViewById(R.id.colorView0));
@@ -423,8 +492,7 @@ public class DashboardActivity extends BaseActivity {
 			mTabAnalyse.setVisibility(K.kTabBarAnalyse ? View.VISIBLE : View.GONE);
 			mTabAPP.setVisibility(K.kTabBarApp ? View.VISIBLE : View.GONE);
 			mTabMessage.setVisibility(K.kTabBarMessage ? View.VISIBLE : View.GONE);
-		}
-		else {
+		} else {
 
 			findViewById(R.id.toolBar).setVisibility(View.GONE);
 		}
@@ -434,9 +502,6 @@ public class DashboardActivity extends BaseActivity {
 		mTabAPP.setOnClickListener(mTabChangeListener);
 		mTabMessage.setOnClickListener(mTabChangeListener);
 
-		mCurrentTab = mTabKPI;
-		mCurrentTab.setActive(true);
-
 		bvKpi = new BadgeView(this, mTabKPI);
 		bvAnalyse = new BadgeView(this, mTabAnalyse);
 		bvApp = new BadgeView(this, mTabAPP);
@@ -445,14 +510,14 @@ public class DashboardActivity extends BaseActivity {
 	}
 
 	/*
-	 * 标签栏点击响应事件
-	 *
-	 * OBJ_TYPE_KPI = 1
-	 * OBJ_TYPE_ANALYSE = 2
-	 * OBJ_TYPE_APP = 3
-	 * OBJ_TYPE_REPORT = 4
-	 * OBJ_TYPE_MESSAGE = 5
-	 */
+     * 标签栏点击响应事件
+     *
+     * OBJ_TYPE_KPI = 1
+     * OBJ_TYPE_ANALYSE = 2
+     * OBJ_TYPE_APP = 3
+     * OBJ_TYPE_REPORT = 4
+     * OBJ_TYPE_MESSAGE = 5
+     */
 	@SuppressLint("SetJavaScriptEnabled")
 	private final View.OnClickListener mTabChangeListener = new View.OnClickListener() {
 		@Override
@@ -477,6 +542,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvKpi.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabKpi, 0);
+						writeBehaviorFile(0);
 						break;
 					case R.id.tabAnalyse:
 						objectType = 2;
@@ -484,6 +550,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvAnalyse.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabAnalyse, 0);
+						writeBehaviorFile(1);
 						break;
 					case R.id.tabApp:
 						objectType = 3;
@@ -491,6 +558,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvApp.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabApp, 0);
+						writeBehaviorFile(2);
 						break;
 					case R.id.tabMessage:
 						objectType = 5;
@@ -498,6 +566,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvMessage.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabMessage, 0);
+						writeBehaviorFile(3);
 						break;
 					default:
 						objectType = 1;
@@ -505,6 +574,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvKpi.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabKpi, 0);
+						writeBehaviorFile(0);
 						break;
 				}
 
@@ -516,12 +586,13 @@ public class DashboardActivity extends BaseActivity {
 				e.printStackTrace();
 			}
 
+
 			/*
 			 * 用户行为记录, 单独异常处理，不可影响用户体验
 			 */
 			try {
 				logParams = new JSONObject();
-				logParams.put(URLs.kAction, "点击/主页面/标签栏");
+				logParams.put(URLs.kAction, " 点击 / 主页面 / 标签栏 ");
 				logParams.put(URLs.kObjType, objectType);
 				new Thread(mRunnableForLogger).start();
 			} catch (Exception e) {
@@ -530,12 +601,89 @@ public class DashboardActivity extends BaseActivity {
 		}
 	};
 
+	public void writeBehaviorFile(int tabIndex) {
+		String behaviorPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBehaviorConfigFileName);
+		try {
+			if (urlString.equals("") || urlString.equals(null)) {
+				return;
+			}else {
+				if (new File(behaviorPath).exists()) {
+					JSONObject dashboardJson = FileUtil.readConfigFile(behaviorPath);
+					JSONObject behaviorJson = new JSONObject(dashboardJson.getString("dashboard"));
+					behaviorJson.put("tab_index", tabIndex);
+					dashboardJson.put("dashboard", behaviorJson.toString());
+					FileUtil.writeFile(behaviorPath,dashboardJson.toString());
+				}else {
+					JSONObject dashboardJson = new JSONObject();
+					JSONObject behaviorJson = new JSONObject();
+					behaviorJson.put("tab_index", tabIndex);
+					dashboardJson.put("dashboard",behaviorJson.toString());
+					FileUtil.writeFile(behaviorPath,dashboardJson.toString());
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void readBehaviorFile() {
+		try {
+			String behaviorPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBehaviorConfigFileName);
+			if (new File(behaviorPath).exists()) {
+				JSONObject dashboardJson = FileUtil.readConfigFile(behaviorPath);
+				if (dashboardJson.has("dashboard")) {
+					JSONObject behaviorJson = new JSONObject(dashboardJson.getString("dashboard"));
+					int tabIndex = behaviorJson.getInt("tab_index");
+					switch (tabIndex){
+						case 0:
+							mCurrentTab = mTabKPI;
+							mCurrentTab.setActive(true);
+							objectType = 1;
+							break;
+						case 1:
+							mCurrentTab = mTabAnalyse;
+							mCurrentTab.setActive(true);
+							objectType = 2;
+							break;
+						case 2:
+							mCurrentTab = mTabAPP;
+							mCurrentTab.setActive(true);
+							objectType = 3;
+							break;
+						case 3:
+							mCurrentTab = mTabMessage;
+							mCurrentTab.setActive(true);
+							objectType = 5;
+							break;
+					}
+					urlString = urlStrings.get(tabIndex);
+				}else {
+					mCurrentTab = mTabKPI;
+					mCurrentTab.setActive(true);
+					objectType = 1;
+					urlString = urlStrings.get(0);
+				}
+			}
+			else {
+				mCurrentTab = mTabKPI;
+				mCurrentTab.setActive(true);
+				objectType = 1;
+				urlString = urlStrings.get(0);
+			}
+
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
 	/*
 	 * 标题栏点击设置按钮显示下拉菜单
 	 */
 	public void launchDropMenuActivity(View v) {
 		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 		popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
+
 
 		/*
 		 * 用户行为记录, 单独异常处理，不可影响用户体验
@@ -550,12 +698,12 @@ public class DashboardActivity extends BaseActivity {
 	}
 
 	/*
-	 * javascript & native 交互
-	 */
+     * javascript & native 交互
+     */
 	private class JavaScriptInterface extends JavaScriptBase {
 		/*
-		 * JS 接口，暴露给JS的方法使用@JavascriptInterface装饰
-		 */
+         * JS 接口，暴露给JS的方法使用@JavascriptInterface装饰
+         */
 		@JavascriptInterface
 		public void pageLink(final String bannerName, final String link, final int objectID) {
 
@@ -653,16 +801,17 @@ public class DashboardActivity extends BaseActivity {
 		@JavascriptInterface
 		public void storeTabIndex(final String pageName, final int tabIndex) {
 			try {
-				String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kTabIndexConfigFileName);
+				String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBehaviorConfigFileName);
 
-				JSONObject config = new JSONObject();
 				if ((new File(filePath).exists())) {
 					String fileContent = FileUtil.readFile(filePath);
-					config = new JSONObject(fileContent);
-				}
-				config.put(pageName, tabIndex);
+					JSONObject jsonObject = new JSONObject(fileContent);
+					JSONObject config = new JSONObject(jsonObject.getString("dashboard"));
+					config.put(pageName, tabIndex);
+					jsonObject.put("dashboard",config.toString());
 
-				FileUtil.writeFile(filePath, config.toString());
+					FileUtil.writeFile(filePath, jsonObject.toString());
+				}
 			} catch (JSONException | IOException e) {
 				e.printStackTrace();
 			}
@@ -672,17 +821,20 @@ public class DashboardActivity extends BaseActivity {
 		public int restoreTabIndex(final String pageName) {
 			int tabIndex = 0;
 			try {
-				String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kTabIndexConfigFileName);
+				String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBehaviorConfigFileName);
 
-				JSONObject config = new JSONObject();
 				if ((new File(filePath).exists())) {
 					String fileContent = FileUtil.readFile(filePath);
-					config = new JSONObject(fileContent);
+					JSONObject jsonObject = new JSONObject(fileContent);
+					JSONObject config = new JSONObject(jsonObject.getString("dashboard"));
+					if (config.has(pageName)){
+						tabIndex = config.getInt(pageName);
+					}
+					Log.d("Tab", tabIndex+"");
 				}
-				tabIndex = config.getInt(pageName);
 
 			} catch (JSONException e) {
-				// e.printStackTrace();
+				e.printStackTrace();
 			}
 
 			return tabIndex < 0 ? 0 : tabIndex;
@@ -713,8 +865,8 @@ public class DashboardActivity extends BaseActivity {
 	}
 
 	/*
-	 * view 缩放动画
-	 */
+     * view 缩放动画
+     */
 	public void viewAnimation(final View view, final Boolean isShow, final int startHeight, final int endHeight) {
 		runOnUiThread(new Runnable() {
 			@Override
@@ -775,11 +927,6 @@ public class DashboardActivity extends BaseActivity {
 			e.printStackTrace();
 		}
 
-		/*
-		 * 默认标签栏选中【仪表盘】
-		 */
-		objectType = 1;
-		urlString = urlStrings.get(0);
 	}
 
 	/**
@@ -794,20 +941,48 @@ public class DashboardActivity extends BaseActivity {
 			 * 1. 动态添加新字段
 			 * 2. 不可影响已存在字段存放的数据
 			 */
-			if (!notificationJSON.has("app")) { notificationJSON.put("app", -1); }
-			if (!notificationJSON.has(URLs.kTabKpi)) { notificationJSON.put(URLs.kTabKpi, -1); }
-			if (!notificationJSON.has("tab_kpi_last")) { notificationJSON.put("tab_kpi_last", -1); }
-			if (!notificationJSON.has(URLs.kTabAnalyse)) { notificationJSON.put(URLs.kTabAnalyse, -1); }
-			if (!notificationJSON.has("tab_analyse_last")) { notificationJSON.put("tab_analyse_last", -1); }
-			if (!notificationJSON.has(URLs.kTabApp)) { notificationJSON.put(URLs.kTabApp, -1); }
-			if (!notificationJSON.has("tab_app_last")) { notificationJSON.put("tab_app_last", -1); }
-			if (!notificationJSON.has(URLs.kTabMessage)) { notificationJSON.put(URLs.kTabMessage, -1); }
-			if (!notificationJSON.has("tab_message_last")) { notificationJSON.put("tab_message_last", -1); }
-			if (!notificationJSON.has(URLs.kSetting)) { notificationJSON.put(URLs.kSetting, -1); }
-			if (!notificationJSON.has(URLs.kSettingPgyer)) { notificationJSON.put(URLs.kSettingPgyer, -1); }
-			if (!notificationJSON.has(URLs.kSettingPassword)) { notificationJSON.put(URLs.kSettingPassword, -1); }
-			if (!notificationJSON.has(URLs.kSettingThursdaySay)) { notificationJSON.put(URLs.kSettingThursdaySay, -1); }
-			if (!notificationJSON.has("setting_thursday_say_last")) { notificationJSON.put("setting_thursday_say_last", -1); }
+			if (!notificationJSON.has("app")) {
+				notificationJSON.put("app", -1);
+			}
+			if (!notificationJSON.has(URLs.kTabKpi)) {
+				notificationJSON.put(URLs.kTabKpi, -1);
+			}
+			if (!notificationJSON.has("tab_kpi_last")) {
+				notificationJSON.put("tab_kpi_last", -1);
+			}
+			if (!notificationJSON.has(URLs.kTabAnalyse)) {
+				notificationJSON.put(URLs.kTabAnalyse, -1);
+			}
+			if (!notificationJSON.has("tab_analyse_last")) {
+				notificationJSON.put("tab_analyse_last", -1);
+			}
+			if (!notificationJSON.has(URLs.kTabApp)) {
+				notificationJSON.put(URLs.kTabApp, -1);
+			}
+			if (!notificationJSON.has("tab_app_last")) {
+				notificationJSON.put("tab_app_last", -1);
+			}
+			if (!notificationJSON.has(URLs.kTabMessage)) {
+				notificationJSON.put(URLs.kTabMessage, -1);
+			}
+			if (!notificationJSON.has("tab_message_last")) {
+				notificationJSON.put("tab_message_last", -1);
+			}
+			if (!notificationJSON.has(URLs.kSetting)) {
+				notificationJSON.put(URLs.kSetting, -1);
+			}
+			if (!notificationJSON.has(URLs.kSettingPgyer)) {
+				notificationJSON.put(URLs.kSettingPgyer, -1);
+			}
+			if (!notificationJSON.has(URLs.kSettingPassword)) {
+				notificationJSON.put(URLs.kSettingPassword, -1);
+			}
+			if (!notificationJSON.has(URLs.kSettingThursdaySay)) {
+				notificationJSON.put(URLs.kSettingThursdaySay, -1);
+			}
+			if (!notificationJSON.has("setting_thursday_say_last")) {
+				notificationJSON.put("setting_thursday_say_last", -1);
+			}
 
 			FileUtil.writeFile(noticePath, notificationJSON.toString());
 		} catch (JSONException | IOException e) {
