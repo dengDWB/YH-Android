@@ -21,6 +21,8 @@ import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.URLs;
 
+import org.json.JSONObject;
+
 public class LoginActivity extends BaseActivity {
     public final static String kFromActivity = "from_activity";
     public final static String kSuccess      = "success";
@@ -169,7 +171,16 @@ public class LoginActivity extends BaseActivity {
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             LoginActivity.this.startActivity(intent);
 
-
+                            /*
+                             * 用户行为记录, 单独异常处理，不可影响用户体验
+                             */
+                            try {
+                                logParams = new JSONObject();
+                                logParams.put("action", "登录");
+                                new Thread(mRunnableForLogger).start();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
 
                             if (mProgressDialog != null) {
                                 mProgressDialog.dismiss();

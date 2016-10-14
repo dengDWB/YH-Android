@@ -17,7 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.intfocus.yh_android.R;
-import com.intfocus.yh_android.YHApplication;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.K;
@@ -71,7 +70,7 @@ public class InitPassCodeActivity extends Activity {
     }
 
     protected void onResume() {
-        ((YHApplication)this.getApplicationContext()).setCurrentActivity(this);
+//        ((YHApplication)this.getApplicationContext()).setCurrentActivity(this);
 
         super.onResume();
     }

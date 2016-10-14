@@ -115,7 +115,7 @@ public class YHApplication extends Application {
                                 LogUtil.d("PushAgent", "mContext is null");
                                 return;
                             }
-                            // onRegistered 方法的参数 registrationId 即是 device_token
+                            // onRegistered方法的参数registrationId即是device_token
                             String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushConfigFileName );
                             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
                             pushJSON.put("push_valid", false);
@@ -186,7 +186,7 @@ public class YHApplication extends Application {
     }
 
     /*
-     *  手机待机再激活时接收解屏广播, 进入解锁密码页
+     *  手机待机再激活时接收解屏广播,进入解锁密码页
      */
     private final BroadcastReceiver broadcastScreenOnAndOff = new BroadcastReceiver() {
 
@@ -209,7 +209,7 @@ public class YHApplication extends Application {
                 }
             }
             Log.i("currentActivityName", "[" + currentActivityName + "]");
-            if ((currentActivityName != null && !currentActivityName.trim().equals("ConfirmPassCodeActivity")) && // 当前活动的 Activity 非解锁界面
+            if ((currentActivityName != null && !currentActivityName.trim().equals("ConfirmPassCodeActivity")) && // 当前活动的Activity非解锁界面
                     FileUtil.checkIsLocked(mContext)) { // 应用处于登录状态，并且开启了密码锁
 
                 intent = new Intent(mContext, ConfirmPassCodeActivity.class);

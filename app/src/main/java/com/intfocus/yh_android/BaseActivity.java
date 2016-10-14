@@ -134,53 +134,22 @@ public class BaseActivity extends Activity {
         RefWatcher refWatcher = YHApplication.getRefWatcher(mContext);
         refWatcher.watch(this);
 
-         /*
-          * 友盟消息推送
-          */
-//        PushAgent mPushAgent = PushAgent.getInstance(mContext);
-//        //开启推送并设置注册的回调处理
-//        mPushAgent.enable(new IUmengRegisterCallback() {
-//            @Override
-//            public void onRegistered(final String registrationId) {
-//                new Handler().post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        try {
-//                            if(mContext == null) {
-//                                LogUtil.d("PushAgent", "mContext is null");
-//                                return;
-//                            }
-//                            // onRegistered方法的参数registrationId即是device_token
-//                            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushConfigFileName);
-//                            JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
-//                            pushJSON.put("push_valid", false);
-//                            pushJSON.put(URLs.kPushDeviceToken, registrationId);
-//                            FileUtil.writeFile(pushConfigPath, pushJSON.toString());
-//                        } catch (JSONException | IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                });
-//            }
-//        });
-//        mPushAgent.onAppStart();
         ActivityCollector.addActivity(this);
     }
 
     protected void onDestroy() {
-//        clearReferences();
+        clearReferences();
         fixInputMethodManager(BaseActivity.this);
         mMyApp = null;
         super.onDestroy();
-        ActivityCollector.removeActivity(this);
     }
 
-//    private void clearReferences(){
-//        currActivity = mMyApp.getCurrentActivity();
-//        if (this.equals(currActivity)) {
-//            mMyApp.setCurrentActivity(null);
-//        }
-//    }
+    private void clearReferences(){
+        currActivity = mMyApp.getCurrentActivity();
+        if (this.equals(currActivity)) {
+            mMyApp.setCurrentActivity(null);
+        }
+    }
 
     private void fixInputMethodManager(Context context) {
         if (context == null) {
@@ -562,9 +531,9 @@ public class BaseActivity extends Activity {
                 if(action == null) {
                     return;
                 }
-//                if (!action.contains("登录") && !action.equals("解屏") && !action.equals("点击/主页面/浏览器")) {
-//                    return;
-//                }
+                if (!action.contains("登录") && !action.equals("解屏") && !action.equals("点击/主页面/浏览器")) {
+                    return;
+                }
 
                 ApiHelper.actionLog(mContext, logParams);
             } catch (JSONException e) {

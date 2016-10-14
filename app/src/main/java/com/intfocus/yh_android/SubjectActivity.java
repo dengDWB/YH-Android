@@ -77,7 +77,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			enableSlowWholeDocumentDraw();
 		}
 		setContentView(R.layout.activity_subject);
-		mMyApp.setCurrentActivity(this);
 
 		/*
 		 * JSON Data
@@ -215,7 +214,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	protected void onResume() {
 		checkInterfaceOrientation(this.getResources().getConfiguration());
 
-		mMyApp.setCurrentActivity(this);
+//		mMyApp.setCurrentActivity(this);
 		super.onResume();
 	}
 
@@ -486,6 +485,14 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		@Override
 		public void onError(SHARE_MEDIA platform, Throwable t) {
 			toast("分享失败啦");
+			try {
+				logParams = new JSONObject();
+				logParams.put("action", "扫码/截图");
+				logParams.put("obj_title", "功能: \"扫码/截图\",报错:" + t.getMessage());
+				new Thread(mRunnableForLogger).start();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			if (t != null) {
 				Log.d("throw", "throw:" + t.getMessage());
 			}
