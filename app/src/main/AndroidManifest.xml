@@ -55,11 +55,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.intfocus.yh_android.DashboardActivity"
+            android:name="com.intfocus.yh_android.SettingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yh_android.SettingActivity"
+            android:name="com.intfocus.yh_android.DashboardActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity

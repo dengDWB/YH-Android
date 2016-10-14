@@ -62,7 +62,7 @@ public class YHApplication extends Application {
         PgyCrashManager.register(this);
 
         /*
-         *  初始化OpenUDID, 设备唯一化
+         *  初始化 OpenUDID, 设备唯一化
          */
         OpenUDID_manager.sync(getApplicationContext());
 
@@ -76,13 +76,13 @@ public class YHApplication extends Application {
          *  新安装、或升级后，把代码包中的静态资源重新拷贝覆盖一下
          *  避免再从服务器下载更新，浪费用户流量
          */
-         copyAssetFiles(basePath, sharedPath);
+        copyAssetFiles(basePath, sharedPath);
 
         /*
          *  校正静态资源
          *
-         *  sharedPath/filename.zip md5值 <=> user.plist中filename_md5
-         *  不一致时，则删除原解压后文件夹，重新解压zip
+         *  sharedPath/filename.zip md5 值 <=> user.plist 中 filename_md5
+         *  不一致时，则删除原解压后文件夹，重新解压 zip
          */
         FileUtil.checkAssets(mContext, URLs.kAssets, false);
         FileUtil.checkAssets(mContext, URLs.kLoding, false);
@@ -103,7 +103,7 @@ public class YHApplication extends Application {
          */
         refWatcher = LeakCanary.install(this);
         PushAgent mPushAgent = PushAgent.getInstance(mContext);
-        //开启推送并设置注册的回调处理
+        // 开启推送并设置注册的回调处理
         mPushAgent.enable(new IUmengRegisterCallback() {
             @Override
             public void onRegistered(final String registrationId) {
@@ -175,7 +175,7 @@ public class YHApplication extends Application {
             for (String string : assetsName) {
                 assetZipPath = String.format("%s/%s.zip", sharedPath, string);
                 assetZipFile = new File(assetZipPath);
-                if (!assetZipFile.exists()) { assetZipFile.delete(); }
+                if (!assetZipFile.exists()) { assetZipFile.delete();}
                 FileUtil.copyAssetFile(mContext, String.format("%s.zip",string), assetZipPath);
             }
             FileUtil.writeFile(versionConfigPath, packageInfo.versionName);
@@ -220,7 +220,7 @@ public class YHApplication extends Application {
         }
     };
 
-//    获取 Activity 名方法, 若 16/11/30 前,未出现该段代码造成的错误,删除
+    //    获取 Activity 名方法, 若 16/11/30 前, 未出现该段代码造成的错误, 删除
     private Activity mCurrentActivity = null;
     public Activity getCurrentActivity(){
         return mCurrentActivity;
@@ -269,26 +269,30 @@ public class YHApplication extends Application {
                 pushMessageJSON.put("state", false);
                 FileUtil.writeFile(pushMessagePath, pushMessageJSON.toString());
 
-                //Intent intent;
-                //if ((mCurrentActivity == null)) {
-                //    intent = new Intent (mContext, LoginActivity.class);
-                //}
-                //else {
-                //    String activityName = mCurrentActivity.getClass().getSimpleName();
-                //    intent = new Intent (mContext,DashboardActivity.class);
-                //    if (activityName.equals("LoginActivity")) {
-                //        return;
-                //    }
-                //    ActivityCollector.finishAll();
-                //    if (activityName.equals("GuideActivity")) {
-                //        intent = new Intent (mContext,LoginActivity.class);
-                //    }
-                //    else if (activityName.equals("DashboardActivity")) {
-                //        mCurrentActivity.finish();
-                //    }
-                //}
-                //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                //startActivity(intent);
+                Intent intent;
+
+                if ((mCurrentActivity == null)) {
+                    intent = new Intent (mContext, LoginActivity.class);
+                }
+                else {
+                    String activityName = mCurrentActivity.getClass().getSimpleName();
+                    intent = new Intent (mContext,DashboardActivity.class);
+                    if (activityName.equals("LoginActivity")) {
+                        return;
+                    }
+                    if (activityName.equals("ConfirmPassCodeActivity")) {
+                        intent = new Intent(mContext,ConfirmPassCodeActivity.class);
+                    }
+                    ActivityCollector.finishAll();
+                    if (activityName.equals("GuideActivity")) {
+                        intent = new Intent (mContext,LoginActivity.class);
+                    }
+                    else if (activityName.equals("DashboardActivity")) {
+                        mCurrentActivity.finish();
+                    }
+                }
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -298,3 +302,5 @@ public class YHApplication extends Application {
     };
 
 }
+
+

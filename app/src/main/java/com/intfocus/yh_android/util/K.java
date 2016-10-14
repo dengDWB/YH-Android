@@ -3,7 +3,7 @@ package com.intfocus.yh_android.util;
 import java.io.Serializable;
 
 /**
- * api链接，宏
+ * api 链接，宏
  *
  * @author jay
  * @version 1.0
