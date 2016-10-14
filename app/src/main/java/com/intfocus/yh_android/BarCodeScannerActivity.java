@@ -75,7 +75,7 @@ public class BarCodeScannerActivity extends BaseActivity implements ZBarScannerV
             if (URLs.kIsQRCode) {
                 if (rawResult.getBarcodeFormat().getName().equals("QRCODE")) {
                   mScannerView.resumeCameraPreview(BarCodeScannerActivity.this);
-                  BarCodeScannerActivity.this.runOnUiThread(new Runnable() {
+                  runOnUiThread(new Runnable() {
                       @Override
                       public void run() {
                           toast("本应用现只支持条形码扫描");
