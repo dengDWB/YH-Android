@@ -16,7 +16,7 @@ public class LogUtil {
     int maxLength = 2000;
     str = str.trim();
     Log.d(tag, str.substring(0, str.length() > maxLength ? maxLength : str.length()));
-    if(str.length() > maxLength && limit < 4) {
+    if (str.length() > maxLength && limit < 4) {
       str = str.substring(maxLength, str.length());
       LogUtil.d(tag, str, limit);
     }
@@ -26,12 +26,13 @@ public class LogUtil {
    * Log.d(tag, str)
    */
   public static void d(String tag, String str) {
+    /*
+     * 若应用不处于 DEBUG 模式，则不打印输出信息
+     */
     if (!BuildConfig.DEBUG) {
-      /*
-       * 若应用不处于 DEBUG 模式，则不打印输出信息
-       */
       return;
     }
+
      LogUtil.d(tag, str, 0);
   }
 }
