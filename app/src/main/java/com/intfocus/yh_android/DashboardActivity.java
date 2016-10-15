@@ -389,7 +389,7 @@ public class DashboardActivity extends BaseActivity {
      */
 	public void loadWebView() {
 		pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
-		initWebView();
+		initPullWebView();
 		setPullToRefreshWebView(true);
 		mWebView.requestFocus();
 		mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);

@@ -191,7 +191,7 @@ public class BaseActivity extends Activity {
         return String.format("file:///%s/loading/%s.html", sharedPath, htmlName);
     }
 
-    android.webkit.WebView initWebView() {
+    android.webkit.WebView initPullWebView() {
         animLoading = (RelativeLayout) findViewById(R.id.anim_loading);
         pullToRefreshWebView.setMode(PullToRefreshBase.Mode.PULL_FROM_START);
         mWebView = pullToRefreshWebView.getRefreshableView();
@@ -239,6 +239,52 @@ public class BaseActivity extends Activity {
 
         initIndicator(pullToRefreshWebView);
 
+        return mWebView;
+    }
+
+    android.webkit.WebView initSubWebView() {
+        animLoading = (RelativeLayout) findViewById(R.id.anim_loading);
+        WebSettings webSettings = mWebView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setDefaultTextEncodingName("utf-8");
+        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+
+        mWebView.setWebChromeClient(new WebChromeClient());
+        mWebView.setDrawingCacheEnabled(true);
+        mWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(android.webkit.WebView view, String url) {
+                //返回值是true的时候控制去WebView打开，为false调用系统浏览器或第三方浏览器
+                view.loadUrl(url);
+                return true;
+            }
+
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                super.onPageStarted(view, url, favicon);
+                LogUtil.d("onPageStarted", String.format("%s - %s", URLs.timestamp(), url));
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                animLoading.setVisibility(View.GONE);
+                LogUtil.d("onPageFinished", String.format("%s - %s", URLs.timestamp(), url));
+            }
+
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                LogUtil.d("onReceivedError",
+                        String.format("errorCode: %d, description: %s, url: %s", errorCode, description,
+                                failingUrl));
+            }
+        });
+
+        mWebView.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                return false;
+            }
+        });
         return mWebView;
     }
 

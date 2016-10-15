@@ -141,7 +141,13 @@ public class LoginActivity extends BaseActivity {
             usernameString = usernameEditText.getText().toString();
             passwordString = passwordEditText.getText().toString();
             if (usernameString.isEmpty() || passwordString.isEmpty()) {
-                toast("请输入用户名与密码");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        toast("请输入用户名与密码");
+                    }
+                });
+
                 return;
             }
 

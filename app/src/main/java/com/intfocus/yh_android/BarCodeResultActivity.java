@@ -213,8 +213,8 @@ public class BarCodeResultActivity extends BaseActivity {
    * 初始化标题栏下拉菜单
    */
     private void initDropMenuItem() {
-        String[] itemName = {"筛选", "分享"};
-        int[] itemImage = {R.drawable.banner_search, R.drawable.banner_share};
+        String[] itemName = {"筛选", "分享","刷新"};
+        int[] itemImage = {R.drawable.banner_search, R.drawable.banner_share,R.drawable.btn_refresh};
         for (int i = 0; i < itemName.length; i++) {
             HashMap<String, Object> map = new HashMap<String, Object>();
             map.put("ItemImage", itemImage[i]);
@@ -243,11 +243,24 @@ public class BarCodeResultActivity extends BaseActivity {
                     actionShare2Weixin();
                     break;
 
+                case "刷新":
+                    refresh();
+                    break;
+
                 default:
                     break;
             }
         }
     };
+
+    public void refresh() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                loadBarCodeResult();
+            }
+        });
+    }
 
     /*
      * 标题栏点击设置按钮显示下拉菜单
