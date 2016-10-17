@@ -11,6 +11,9 @@ import java.io.Serializable;
  * Created by lijunjie on 16/9/22.
  */
 public class K extends PrivateURLs implements Serializable {
+
+  public final static Integer kTimerInterval = 30;
+
   /**
    *  API#paths
    */
