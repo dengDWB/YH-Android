@@ -21,6 +21,7 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -96,7 +97,6 @@ public class BaseActivity extends Activity {
     String urlStringForLoading;
     JSONObject logParams = new JSONObject();
     Context mContext;
-    Activity currActivity;
     Toast toast;
     int displayDpi; //屏幕密度
 
@@ -146,7 +146,7 @@ public class BaseActivity extends Activity {
     }
 
     private void clearReferences(){
-        currActivity = mMyApp.getCurrentActivity();
+        String currActivity = mMyApp.getCurrentActivity();
         if (this.equals(currActivity)) {
             mMyApp.setCurrentActivity(null);
         }

@@ -42,6 +42,7 @@ public class BarCodeScannerActivity extends BaseActivity implements ZBarScannerV
     @Override
     public void onResume() {
       super.onResume();
+      mMyApp.setCurrentActivity(this);
       mScannerView.setResultHandler(this);
       mScannerView.startCamera();
     }

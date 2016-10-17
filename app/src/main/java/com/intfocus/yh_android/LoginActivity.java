@@ -211,9 +211,6 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        Log.i("message","message");
-        ActivityCollector.printActivity();
         finish();
-        ActivityCollector.printActivity();
     }
 }

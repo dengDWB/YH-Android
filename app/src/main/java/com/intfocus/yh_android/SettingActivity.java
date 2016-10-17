@@ -145,7 +145,6 @@ public class SettingActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-
         mMyApp.setCurrentActivity(this);
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));
     }
