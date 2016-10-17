@@ -156,8 +156,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	 * 初始化标题栏下拉菜单
 	 */
 	private void initDropMenuItem() {
-		String[] itemName = {"分享", "评论"};
-		int[] itemImage = {R.drawable.banner_share, R.drawable.banner_comment};
+		String[] itemName = {"刷新","分享", "评论"};
+		int[] itemImage = {R.drawable.btn_refresh,R.drawable.banner_share, R.drawable.banner_comment};
 		for (int i = 0; i < itemName.length; i++) {
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			map.put("ItemImage", itemImage[i]);
@@ -211,14 +211,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			@Override
 			public void run() {
 				if (!isShowSearchButton) {
-					String[] itemName = {"筛选", "刷新"};
-					int[] itemImage = {R.drawable.banner_search, R.drawable.btn_refresh};
-					for (int i = 0; i < itemName.length; i++) {
 						HashMap<String, Object> map = new HashMap<String, Object>();
-						map.put("ItemImage", itemImage[i]);
-						map.put("ItemText", itemName[i]);
+						map.put("ItemImage",R.drawable.banner_search);
+						map.put("ItemText","筛选");
 						listItem.add(map);
-					}
 					SimpleAdapter mSimpleAdapter = new SimpleAdapter(mContext, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
 					initDropMenu(mSimpleAdapter, mDropMenuListener);
 					isShowSearchButton = true;
