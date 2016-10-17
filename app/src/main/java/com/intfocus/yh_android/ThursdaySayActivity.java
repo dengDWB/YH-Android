@@ -32,7 +32,7 @@ public class ThursdaySayActivity extends BaseActivity {
     }
 
     @Override
-    public void onResume() {
+    protected void onResume() {
         super.onResume();
         mMyApp.setCurrentActivity(this);
     }

@@ -32,6 +32,10 @@ public class ActivityCollector {
         activityStack.add(activity);
     }
 
+    public static void removeActivity(Activity activity) {
+        activityStack.remove(activity);
+    }
+
     /*
      * 结束所有 Activity
      */

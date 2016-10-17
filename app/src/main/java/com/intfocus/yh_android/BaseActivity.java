@@ -141,6 +141,7 @@ public class BaseActivity extends Activity {
     protected void onDestroy() {
         clearReferences();
         fixInputMethodManager(BaseActivity.this);
+        ActivityCollector.removeActivity(this);
         mMyApp = null;
         super.onDestroy();
     }
