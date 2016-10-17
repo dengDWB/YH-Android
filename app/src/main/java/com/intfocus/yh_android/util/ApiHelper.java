@@ -248,7 +248,7 @@ public class ApiHelper {
      * @param urlKey 链接
      * @param assetsPath 缓存头文件相对文件夹
      */
-    private static Map<String, String> checkResponseHeader(String urlKey, String assetsPath) {
+    public static Map<String, String> checkResponseHeader(String urlKey, String assetsPath) {
         Map<String, String> headers = new HashMap<>();
 
         try {
