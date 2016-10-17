@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.intfocus.yh_android.R;
+import com.intfocus.yh_android.YHApplication;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.K;
@@ -33,7 +34,7 @@ import java.io.File;
 public class InitPassCodeActivity extends Activity {
 
     private Context mContext;
-
+    protected YHApplication mMyApp;
     private final String TEXT_MAIN_CONFIRM = "确认密码";
     private final String TEXT_SUB_CONFIRM = "请再次输入密码";
 
@@ -62,6 +63,7 @@ public class InitPassCodeActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_input_passcode);
 
+        mMyApp = (YHApplication)this.getApplicationContext();
         mContext = InitPassCodeActivity.this;
         stringBuilder = new StringBuilder();
 
@@ -70,8 +72,7 @@ public class InitPassCodeActivity extends Activity {
     }
 
     protected void onResume() {
-//        ((YHApplication)this.getApplicationContext()).setCurrentActivity(this);
-
+        mMyApp.setCurrentActivity(this);
         super.onResume();
     }
 

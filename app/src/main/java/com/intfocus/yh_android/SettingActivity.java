@@ -97,7 +97,6 @@ public class SettingActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
-//        mMyApp.setCurrentActivity(this);
 
         mUserID = (TextView) findViewById(R.id.user_id);
         mRoleID = (TextView) findViewById(R.id.role_id);
@@ -147,7 +146,6 @@ public class SettingActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-
         mMyApp.setCurrentActivity(this);
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));
     }

@@ -75,7 +75,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			enableSlowWholeDocumentDraw();
 		}
 		setContentView(R.layout.activity_subject);
-		mMyApp.setCurrentActivity(this);
 
 		/*
 		 * JSON Data
@@ -203,7 +202,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 
 	public void onResume() {
 		checkInterfaceOrientation(this.getResources().getConfiguration());
-
 		mMyApp.setCurrentActivity(this);
 		super.onResume();
 	}

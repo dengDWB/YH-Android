@@ -248,7 +248,7 @@ public class ApiHelper {
      * @param urlKey 链接
      * @param assetsPath 缓存头文件相对文件夹
      */
-    private static Map<String, String> checkResponseHeader(String urlKey, String assetsPath) {
+    public static Map<String, String> checkResponseHeader(String urlKey, String assetsPath) {
         Map<String, String> headers = new HashMap<>();
 
         try {
@@ -284,7 +284,7 @@ public class ApiHelper {
      * @param assetsPath 缓存头文件相对文件夹
      * @param response 服务器响应的ETag/Last-Modifiede
      */
-    private static void storeResponseHeader(String urlKey, String assetsPath, Map<String, String> response) {
+    public static void storeResponseHeader(String urlKey, String assetsPath, Map<String, String> response) {
         try {
             JSONObject headersJSON = new JSONObject();
 
