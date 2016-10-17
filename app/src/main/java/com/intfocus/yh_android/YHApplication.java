@@ -20,6 +20,7 @@ import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.pgyersdk.crash.PgyCrashManager;
+import com.pgyersdk.update.PgyUpdateManager;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 import com.umeng.message.IUmengRegisterCallback;
@@ -134,8 +135,13 @@ public class YHApplication extends Application {
         mPushAgent.setNotificationClickHandler(pushMessageHandler);
     }
 
+    /*
+     * 程序终止时会执行以下代码
+     */
     @Override
     public void onTerminate() {
+        PgyCrashManager.unregister(); // 解除注册蒲公英异常信息上传
+        ActivityCollector.finishAll();
         super.onTerminate();
     }
 
@@ -211,6 +217,10 @@ public class YHApplication extends Application {
     }
 
     public void setCurrentActivity(Context context) {
+        if (context == null) {
+            mCurrentActivity = null;
+            return;
+        }
         String mActivity = context.toString();
         String mActivityName = mActivity.substring(mActivity.lastIndexOf(".") + 1, mActivity.indexOf("@"));
         Log.i("activityName",mActivityName);

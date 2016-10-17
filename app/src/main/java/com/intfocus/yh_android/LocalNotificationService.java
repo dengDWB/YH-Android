@@ -6,7 +6,10 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
+
+import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.HttpUtil;
 import com.intfocus.yh_android.util.K;
@@ -38,6 +41,8 @@ public class LocalNotificationService extends Service {
   private int kpiCount, analyseCount, appCount, messageCount, updataCount, passwordCount, thursdaySayCount;
   private Context mContext;
   private Intent sendIntent;
+  private String mAssetsPath;
+  private String mRelativeAssetsPath;
 
   @Override
   public IBinder onBind(Intent intent) {
@@ -49,6 +54,8 @@ public class LocalNotificationService extends Service {
     super.onCreate();
     mContext = this;
 
+    mAssetsPath = FileUtil.dirPath(mContext, K.kHTMLDirName);
+    mRelativeAssetsPath = "../../Shared/assets";
     notificationPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
     userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
     pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPgyerVersionConfigFileName);
@@ -144,7 +151,8 @@ public class LocalNotificationService extends Service {
    */
   private int getDataCount(String keyName, String urlString) throws JSONException, IOException {
     // 1. 本地头文件信息
-    Map<String, String> response = HttpUtil.httpGet(urlString, new HashMap<String, String>());
+    Map<String, String> headers = ApiHelper.checkResponseHeader(urlString, mAssetsPath);
+    Map<String, String> response = HttpUtil.httpGet(urlString, headers);
     String keyLastName = keyName + "_last";
     if(!notificationJSON.has(keyName)) { notificationJSON.put(keyName, -1); }
     if(!notificationJSON.has(keyLastName)) { notificationJSON.put(keyLastName, -1); }
@@ -154,13 +162,21 @@ public class LocalNotificationService extends Service {
     if (response.get(URLs.kCode).equals("200")) {
       // 1. 缓存头文件信息
       // 2. 服务器响应信息写入本地
-      // ApiHelper.storeResponseHeader(urlString.split("?")[0], "", response);
+      String htmlName = HttpUtil.UrlToFileName(urlString);
+      String htmlPath = String.format("%s/%s", mAssetsPath, htmlName);
+      String urlKey = urlString.contains("?") ? TextUtils.split(urlString, "?")[0] : urlString;
+      ApiHelper.storeResponseHeader(urlKey, mAssetsPath, response);
+      String htmlContent = response.get(URLs.kBody);
+      htmlContent = htmlContent.replace("/javascripts/", String.format("%s/javascripts/", mRelativeAssetsPath));
+      htmlContent = htmlContent.replace("/stylesheets/", String.format("%s/stylesheets/", mRelativeAssetsPath));
+      htmlContent = htmlContent.replace("/images/", String.format("%s/images/", mRelativeAssetsPath));
+      FileUtil.writeFile(htmlPath, htmlContent);
 
       String strRegex = "\\bMobileBridge.setDashboardDataCount.+";
       String countRegex = "\\d+";
       Pattern patternString = Pattern.compile(strRegex);
       Pattern patternCount = Pattern.compile(countRegex);
-      Matcher matcherString = patternString.matcher(response.get(URLs.kBody));
+      Matcher matcherString = patternString.matcher(htmlContent);
       matcherString.find();
       String str = matcherString.group();
       Matcher matcherCount = patternCount.matcher(str);
