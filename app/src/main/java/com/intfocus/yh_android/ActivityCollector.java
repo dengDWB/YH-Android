@@ -1,12 +1,7 @@
 package com.intfocus.yh_android;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.Context;
-import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 /**

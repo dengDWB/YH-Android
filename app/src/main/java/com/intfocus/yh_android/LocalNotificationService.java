@@ -16,7 +16,6 @@ import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.URLs;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;

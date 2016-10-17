@@ -278,7 +278,8 @@
                     android:text="开发者选项"
                     android:textColor="#000000"
                     android:clickable="true"
-                    android:onClick="launchDeveloperActivity"/>
+                    android:onClick="launchDeveloperActivity"
+                    android:textSize="18sp"/>
 
                 <View style="@style/Divider"/>
 
