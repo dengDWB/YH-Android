@@ -13,14 +13,13 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
-
+import android.widget.Toast;
 import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.pgyersdk.crash.PgyCrashManager;
-import com.pgyersdk.update.PgyUpdateManager;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 import com.umeng.message.IUmengRegisterCallback;
@@ -28,14 +27,12 @@ import com.umeng.message.PushAgent;
 import com.umeng.message.UmengNotificationClickHandler;
 import com.umeng.message.entity.UMessage;
 import com.umeng.socialize.PlatformConfig;
-
-import org.OpenUDID.OpenUDID_manager;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import org.OpenUDID.OpenUDID_manager;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by lijunjie on 16/1/15.
@@ -91,7 +88,7 @@ public class YHApplication extends Application {
         FileUtil.checkAssets(mContext, URLs.kStylesheets, true);
         FileUtil.checkAssets(mContext, URLs.kJavaScripts, true);
         FileUtil.checkAssets(mContext, URLs.kBarCodeScan, false);
-//        FileUtil.checkAssets(mContext, URLs.kAdvertisement, false);
+        // FileUtil.checkAssets(mContext, URLs.kAdvertisement, false);
 
         /*
          *  手机待机再激活时发送开屏广播
@@ -261,6 +258,10 @@ public class YHApplication extends Application {
         public void dealWithCustomAction(Context context, UMessage uMessage) {
             super.dealWithCustomAction(context, uMessage);
             try {
+                if (uMessage.custom.equals(null) ||uMessage.custom.equals("")) {
+                    Toast.makeText(mContext,"推送没有携带消息",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 String pushMessagePath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushMessageFileName);
                 JSONObject pushMessageJSON = new JSONObject(uMessage.custom);
                 pushMessageJSON.put("state", false);
@@ -272,7 +273,6 @@ public class YHApplication extends Application {
                 }
                 else {
                     String activityName = mCurrentActivity.getClass().getSimpleName();
-
                     if (activityName.equals("LoginActivity") || activityName.equals("ConfirmPassCodeActivity")) {
                         return;
                     }
