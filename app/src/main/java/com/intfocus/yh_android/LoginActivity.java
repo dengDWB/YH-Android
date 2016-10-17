@@ -81,24 +81,29 @@ public class LoginActivity extends BaseActivity {
         }
 
         /*
+         * 初始化本地通知
+         */
+        FileUtil.initLocalNotifications(mContext);
+
+        /*
          * 检测登录界面，版本是否升级
          */
         checkVersionUpgrade(assetsPath);
     }
 
     private void getAuthority() {
-        int writePermission = ContextCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if(writePermission != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(LoginActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE},CODE_AUTHORITY_REQUEST);
-            return;
-        }else{
+            int writePermission = ContextCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            if(writePermission != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(LoginActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE},CODE_AUTHORITY_REQUEST);
+                return;
+            }else{
             return;
         }
     }
 
     /*
- * 权限获取反馈
- */
+     * 权限获取反馈
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
@@ -136,7 +141,13 @@ public class LoginActivity extends BaseActivity {
             usernameString = usernameEditText.getText().toString();
             passwordString = passwordEditText.getText().toString();
             if (usernameString.isEmpty() || passwordString.isEmpty()) {
-                toast("请输入用户名与密码");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        toast("请输入用户名与密码");
+                    }
+                });
+
                 return;
             }
 

@@ -37,7 +37,7 @@ public class CommentActivity extends BaseActivity {
 
         TextView mTitle = (TextView) findViewById(R.id.bannerTitle);
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
-        initWebView();
+        initPullWebView();
         setPullToRefreshWebView(true);
 
         mWebView.requestFocus();

@@ -30,10 +30,10 @@ public class ResetPasswordActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reset_password);
-//        mMyApp.setCurrentActivity(this);
+        mMyApp.setCurrentActivity(this);
 
         pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
-        initWebView();
+        initPullWebView();
         setPullToRefreshWebView(false);
 
         mWebView.requestFocus();
