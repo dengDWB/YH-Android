@@ -14,7 +14,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.K;
@@ -28,14 +27,12 @@ import com.umeng.message.PushAgent;
 import com.umeng.message.UmengNotificationClickHandler;
 import com.umeng.message.entity.UMessage;
 import com.umeng.socialize.PlatformConfig;
-
-import org.OpenUDID.OpenUDID_manager;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import org.OpenUDID.OpenUDID_manager;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by lijunjie on 16/1/15.
@@ -91,7 +88,7 @@ public class YHApplication extends Application {
         FileUtil.checkAssets(mContext, URLs.kStylesheets, true);
         FileUtil.checkAssets(mContext, URLs.kJavaScripts, true);
         FileUtil.checkAssets(mContext, URLs.kBarCodeScan, false);
-//        FileUtil.checkAssets(mContext, URLs.kAdvertisement, false);
+        // FileUtil.checkAssets(mContext, URLs.kAdvertisement, false);
 
         /*
          *  手机待机再激活时发送开屏广播

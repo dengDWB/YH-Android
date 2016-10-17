@@ -6,11 +6,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
-
-import org.OpenUDID.OpenUDID_manager;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -22,20 +17,17 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.OpenUDID.OpenUDID_manager;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import static com.intfocus.yh_android.util.K.kAppVersion;
+import static com.intfocus.yh_android.util.K.kFontsMd5;
+import static com.intfocus.yh_android.util.K.kImagesMd5;
+import static com.intfocus.yh_android.util.K.kInfo;
+import static com.intfocus.yh_android.util.K.kUserName;
 
 public class ApiHelper {
-    public final static String kAppVersion = "app_version";
-    public final static String kFontsMd5 = "fonts_md5";
-    public final static String kImagesMd5 = "images_md5";
-    public final static String kStylesheetsMd5 = "stylesheets_md5";
-    public final static String kJavaScriptsMd5 = "javascripts_md5";
-    public final static String kInfo = "info";
-    public final static String kPushValid = "push_valid";
-    public final static String kValid = "valid";
-    public final static String kUserId = "user_id";
-    public final static String kUserName = "user_name";
-    public final static String kUserDeviceId = "user_device_id";
-
     /*
      * 用户登录验证
      * params: {device: {name, platform, os, os_version, uuid}}
@@ -53,7 +45,7 @@ public class ApiHelper {
             JSONObject params = new JSONObject();
             params.put("device", device);
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            params.put(kAppVersion, String.format("a%s", packageInfo.versionName));
+            params.put(K.kAppVersion, String.format("a%s", packageInfo.versionName));
             Log.i("DeviceParams", params.toString());
 
             Map<String, String> response = HttpUtil.httpPost(urlString, params);
@@ -89,8 +81,8 @@ public class ApiHelper {
             JSONObject assetsJSON = userJSON.getJSONObject(URLs.kAssets);
             userJSON.put(kFontsMd5, assetsJSON.getString(kFontsMd5));
             userJSON.put(kImagesMd5, assetsJSON.getString(kImagesMd5));
-            userJSON.put(kStylesheetsMd5, assetsJSON.getString(kStylesheetsMd5));
-            userJSON.put(kJavaScriptsMd5, assetsJSON.getString(kJavaScriptsMd5));
+            userJSON.put(K.kStylesheetsMd5, assetsJSON.getString(K.kStylesheetsMd5));
+            userJSON.put(K.kJavaScriptsMd5, assetsJSON.getString(K.kJavaScriptsMd5));
 
             FileUtil.writeFile(userConfigPath, userJSON.toString());
 
@@ -405,9 +397,9 @@ public class ApiHelper {
             String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), K.kUserConfigFileName);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
-            param.put(kUserId, userJSON.getInt(kUserId));
-            param.put(kUserName, userJSON.getString(kUserName));
-            param.put(kUserDeviceId, userJSON.getInt(kUserDeviceId));
+            param.put(K.kUserId, userJSON.getInt(K.kUserId));
+            param.put(kUserName, userJSON.getString(K.kUserName));
+            param.put(K.kUserDeviceId, userJSON.getInt(K.kUserDeviceId));
 
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             param.put(kAppVersion, String.format("a%s", packageInfo.versionName));
@@ -440,7 +432,7 @@ public class ApiHelper {
             String pushConfigPath = String.format("%s/%s", FileUtil.basePath(context), K.kPushConfigFileName);
             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
 
-            if(pushJSON.has(kPushValid) && pushJSON.getBoolean(kPushValid) && pushJSON.has(URLs.kPushDeviceToken) && pushJSON
+            if(pushJSON.has(K.kPushValid) && pushJSON.getBoolean(K.kPushValid) && pushJSON.has(URLs.kPushDeviceToken) && pushJSON
                 .getString(URLs.kPushDeviceToken).length() == 44) return true;
             if(pushJSON.has(URLs.kPushDeviceToken) && pushJSON.getString(URLs.kPushDeviceToken).length() != 44) return false;
 
@@ -449,11 +441,11 @@ public class ApiHelper {
                 Map<String, String> response = HttpUtil.httpPost(urlString, new JSONObject());
                 JSONObject responseJSON = new JSONObject(response.get(URLs.kBody));
 
-                pushJSON.put(kPushValid,
-                    responseJSON.has(kValid) && responseJSON.getBoolean(kValid));
+                pushJSON.put(K.kPushValid,
+                    responseJSON.has(K.kValid) && responseJSON.getBoolean(K.kValid));
                 FileUtil.writeFile(pushConfigPath, pushJSON.toString());
 
-                return pushJSON.has(kPushValid) && pushJSON.getBoolean(kPushValid);
+                return pushJSON.has(K.kPushValid) && pushJSON.getBoolean(K.kPushValid);
             } else {
                 return false;
             }
