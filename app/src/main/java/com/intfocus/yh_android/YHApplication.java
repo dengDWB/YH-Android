@@ -218,6 +218,10 @@ public class YHApplication extends Application {
     }
 
     public void setCurrentActivity(Context context) {
+        if (context == null) {
+            mCurrentActivity = null;
+            return;
+        }
         String mActivity = context.toString();
         String mActivityName = mActivity.substring(mActivity.lastIndexOf(".") + 1, mActivity.indexOf("@"));
         Log.i("activityName",mActivityName);

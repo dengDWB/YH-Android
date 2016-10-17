@@ -162,14 +162,21 @@ public class LocalNotificationService extends Service {
     if (response.get(URLs.kCode).equals("200")) {
       // 1. 缓存头文件信息
       // 2. 服务器响应信息写入本地
+      String htmlName = HttpUtil.UrlToFileName(urlString);
+      String htmlPath = String.format("%s/%s", mAssetsPath, htmlName);
       String urlKey = urlString.contains("?") ? TextUtils.split(urlString, "?")[0] : urlString;
       ApiHelper.storeResponseHeader(urlKey, mAssetsPath, response);
+      String htmlContent = response.get(URLs.kBody);
+      htmlContent = htmlContent.replace("/javascripts/", String.format("%s/javascripts/", mRelativeAssetsPath));
+      htmlContent = htmlContent.replace("/stylesheets/", String.format("%s/stylesheets/", mRelativeAssetsPath));
+      htmlContent = htmlContent.replace("/images/", String.format("%s/images/", mRelativeAssetsPath));
+      FileUtil.writeFile(htmlPath, htmlContent);
 
       String strRegex = "\\bMobileBridge.setDashboardDataCount.+";
       String countRegex = "\\d+";
       Pattern patternString = Pattern.compile(strRegex);
       Pattern patternCount = Pattern.compile(countRegex);
-      Matcher matcherString = patternString.matcher(response.get(URLs.kBody));
+      Matcher matcherString = patternString.matcher(htmlContent);
       matcherString.find();
       String str = matcherString.group();
       Matcher matcherCount = patternCount.matcher(str);
