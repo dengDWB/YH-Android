@@ -271,6 +271,17 @@
 
                 <View style="@style/Divider"/>
 
+                <TextView
+                    android:id="@+id/developerTv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="开发者选项"
+                    android:textColor="#000000"
+                    android:clickable="true"
+                    android:onClick="launchDeveloperActivity"/>
+
+                <View style="@style/Divider"/>
+
                 <Button
                     android:id="@+id/logout"
                     android:layout_width="match_parent"
