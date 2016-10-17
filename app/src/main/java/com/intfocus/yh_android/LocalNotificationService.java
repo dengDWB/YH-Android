@@ -7,15 +7,10 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.util.Log;
-
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.HttpUtil;
 import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.URLs;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -24,6 +19,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by lijunjie on 16/8/25.
@@ -93,7 +90,7 @@ public class LocalNotificationService extends Service {
         Log.i("bugbug","执行");
       }
     };
-    timer.schedule(timerTask, 10 * 1000, 30 * 60 * 1000);
+    timer.schedule(timerTask, 10 * 1000, K.kTimerInterval * 60 * 1000);
   }
 
   /*
@@ -107,9 +104,9 @@ public class LocalNotificationService extends Service {
       messageCount = getDataCount(URLs.kTabMessage, messageUrl);
       thursdaySayCount = getDataCount(URLs.kSettingThursdaySay, thursdaySayUrl);
 
-			/*
-			 * 遍历获取 Tab 栏上需要显示的通知数量 ("tab_*" 的值)
-			 */
+      /*
+       * 遍历获取 Tab 栏上需要显示的通知数量 ("tab_*" 的值)
+       */
       String[] typeString = {URLs.kTabKpi, URLs.kTabAnalyse, URLs.kTabApp, URLs.kTabMessage, URLs.kSettingThursdaySay};
       int[] typeCount = {kpiCount, analyseCount, appCount, messageCount, thursdaySayCount};
       for (int i = 0; i < typeString.length; i++) {
@@ -146,6 +143,7 @@ public class LocalNotificationService extends Service {
    * 正则获取当前 DataCount，未获取到值则返回原数值
    */
   private int getDataCount(String keyName, String urlString) throws JSONException, IOException {
+    // 1. 本地头文件信息
     Map<String, String> response = HttpUtil.httpGet(urlString, new HashMap<String, String>());
     String keyLastName = keyName + "_last";
     if(!notificationJSON.has(keyName)) { notificationJSON.put(keyName, -1); }
@@ -154,11 +152,15 @@ public class LocalNotificationService extends Service {
     int lastCount = notificationJSON.getInt(keyLastName);
 
     if (response.get(URLs.kCode).equals("200")) {
+      // 1. 缓存头文件信息
+      // 2. 服务器响应信息写入本地
+      // ApiHelper.storeResponseHeader(urlString.split("?")[0], "", response);
+
       String strRegex = "\\bMobileBridge.setDashboardDataCount.+";
       String countRegex = "\\d+";
       Pattern patternString = Pattern.compile(strRegex);
       Pattern patternCount = Pattern.compile(countRegex);
-      Matcher matcherString = patternString.matcher(response.get("body"));
+      Matcher matcherString = patternString.matcher(response.get(URLs.kBody));
       matcherString.find();
       String str = matcherString.group();
       Matcher matcherCount = patternCount.matcher(str);
