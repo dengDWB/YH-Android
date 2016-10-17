@@ -146,6 +146,7 @@ public class LocalNotificationService extends Service {
    * 正则获取当前 DataCount，未获取到值则返回原数值
    */
   private int getDataCount(String keyName, String urlString) throws JSONException, IOException {
+
     Map<String, String> response = HttpUtil.httpGet(urlString, new HashMap<String, String>());
     String keyLastName = keyName + "_last";
     if(!notificationJSON.has(keyName)) { notificationJSON.put(keyName, -1); }

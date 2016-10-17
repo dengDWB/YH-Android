@@ -142,6 +142,7 @@ public class BaseActivity extends Activity {
         clearReferences();
         fixInputMethodManager(BaseActivity.this);
         ActivityCollector.removeActivity(this);
+        PgyUpdateManager.unregister(); // 解除注册蒲公英版本更新检查
         mMyApp = null;
         super.onDestroy();
     }

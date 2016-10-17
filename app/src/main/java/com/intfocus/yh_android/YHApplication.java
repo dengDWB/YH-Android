@@ -21,6 +21,7 @@ import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.pgyersdk.crash.PgyCrashManager;
+import com.pgyersdk.update.PgyUpdateManager;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 import com.umeng.message.IUmengRegisterCallback;
@@ -135,8 +136,13 @@ public class YHApplication extends Application {
         mPushAgent.setNotificationClickHandler(pushMessageHandler);
     }
 
+    /*
+     * 程序终止时会执行以下代码
+     */
     @Override
     public void onTerminate() {
+        PgyCrashManager.unregister(); // 解除注册蒲公英异常信息上传
+        ActivityCollector.finishAll();
         super.onTerminate();
     }
 
