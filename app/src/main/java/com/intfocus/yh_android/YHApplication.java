@@ -195,23 +195,9 @@ public class YHApplication extends Application {
         public void onReceive(Context context, Intent intent) {
             if(!intent.getAction().equals(Intent.ACTION_SCREEN_ON) || isBackground(mContext)) return;
             Log.i("BroadcastReceiver", "Screen On");
-
-
-            String currentActivityName = null;
-            Activity currentActivity = ((YHApplication)context.getApplicationContext()).getCurrentActivity();
-            if(currentActivity != null) {
-                try {
-                    currentActivityName = currentActivity.getClass().getSimpleName();
-                    Log.i("currentActivityName", currentActivityName.trim().equals("ConfirmPassCodeActivity") ? "YES" : "NO");
-                }
-                catch(NoSuchMethodError e) {
-                    e.printStackTrace();
-                }
-            }
-            Log.i("currentActivityName", "[" + currentActivityName + "]");
+            String currentActivityName = ((YHApplication)context.getApplicationContext()).getCurrentActivity();
             if ((currentActivityName != null && !currentActivityName.trim().equals("ConfirmPassCodeActivity")) && // 当前活动的Activity非解锁界面
                     FileUtil.checkIsLocked(mContext)) { // 应用处于登录状态，并且开启了密码锁
-
                 intent = new Intent(mContext, ConfirmPassCodeActivity.class);
                 intent.putExtra("is_from_login", true);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -220,14 +206,16 @@ public class YHApplication extends Application {
         }
     };
 
-    //    获取 Activity 名方法, 若 16/11/30 前, 未出现该段代码造成的错误, 删除
-    private Activity mCurrentActivity = null;
-    public Activity getCurrentActivity(){
+    private String mCurrentActivity = null;
+    public String getCurrentActivity(){
         return mCurrentActivity;
     }
-    public void setCurrentActivity(Activity mCurrentActivity) {
-        Log.i("setCurrentActivity", mCurrentActivity == null ? "null" : mCurrentActivity.getClass().getSimpleName());
-        this.mCurrentActivity = mCurrentActivity;
+
+    public void setCurrentActivity(Context context) {
+        String mActivity = context.toString();
+        String mActivityName = mActivity.substring(mActivity.lastIndexOf(".") + 1, mActivity.indexOf("@"));
+        Log.i("activityName",mActivityName);
+        mCurrentActivity = mActivityName;
     }
 
     /*
@@ -270,26 +258,17 @@ public class YHApplication extends Application {
                 FileUtil.writeFile(pushMessagePath, pushMessageJSON.toString());
 
                 Intent intent;
-
                 if ((mCurrentActivity == null)) {
                     intent = new Intent (mContext, LoginActivity.class);
                 }
                 else {
                     String activityName = mCurrentActivity.getClass().getSimpleName();
-                    intent = new Intent (mContext,DashboardActivity.class);
-                    if (activityName.equals("LoginActivity")) {
+
+                    if (activityName.equals("LoginActivity") || activityName.equals("ConfirmPassCodeActivity")) {
                         return;
                     }
-                    if (activityName.equals("ConfirmPassCodeActivity")) {
-                        intent = new Intent(mContext,ConfirmPassCodeActivity.class);
-                    }
                     ActivityCollector.finishAll();
-                    if (activityName.equals("GuideActivity")) {
-                        intent = new Intent (mContext,LoginActivity.class);
-                    }
-                    else if (activityName.equals("DashboardActivity")) {
-                        mCurrentActivity.finish();
-                    }
+                    intent = new Intent (mContext,DashboardActivity.class);
                 }
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);

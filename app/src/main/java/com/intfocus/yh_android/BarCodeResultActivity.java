@@ -154,6 +154,7 @@ public class BarCodeResultActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
+        mMyApp.setCurrentActivity(this);
         loadBarCodeResult();
     }
 

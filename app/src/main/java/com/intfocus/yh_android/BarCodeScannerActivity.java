@@ -22,7 +22,7 @@ public class BarCodeScannerActivity extends BaseActivity implements ZBarScannerV
     private ZBarScannerView mScannerView;
 
     @Override
-    public void onCreate(Bundle state) {
+    protected void onCreate(Bundle state) {
       super.onCreate(state);
       setContentView(R.layout.activity_bar_code_scanner);
 
@@ -40,14 +40,15 @@ public class BarCodeScannerActivity extends BaseActivity implements ZBarScannerV
     }
 
     @Override
-    public void onResume() {
+    protected void onResume() {
       super.onResume();
+      mMyApp.setCurrentActivity(this);
       mScannerView.setResultHandler(this);
       mScannerView.startCamera();
     }
 
     @Override
-    public void onPause() {
+    protected void onPause() {
       super.onPause();
       mScannerView.stopCamera();
     }
