@@ -277,19 +277,10 @@ public class YHApplication extends Application {
                 else {
                     String activityName = mCurrentActivity.getClass().getSimpleName();
                     intent = new Intent (mContext,DashboardActivity.class);
-                    if (activityName.equals("LoginActivity")) {
+                    if (activityName.equals("LoginActivity") || activityName.equals("ConfirmPassCodeActivity")) {
                         return;
                     }
-                    if (activityName.equals("ConfirmPassCodeActivity")) {
-                        intent = new Intent(mContext,ConfirmPassCodeActivity.class);
-                    }
                     ActivityCollector.finishAll();
-                    if (activityName.equals("GuideActivity")) {
-                        intent = new Intent (mContext,LoginActivity.class);
-                    }
-                    else if (activityName.equals("DashboardActivity")) {
-                        mCurrentActivity.finish();
-                    }
                 }
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
