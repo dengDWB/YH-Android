@@ -212,8 +212,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			public void run() {
 				if (!isShowSearchButton) {
 						HashMap<String, Object> map = new HashMap<String, Object>();
-						map.put("ItemImage", "筛选");
-						map.put("ItemText", R.drawable.banner_search);
+						map.put("ItemImage",R.drawable.banner_search);
+						map.put("ItemText","筛选");
 						listItem.add(map);
 					SimpleAdapter mSimpleAdapter = new SimpleAdapter(mContext, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
 					initDropMenu(mSimpleAdapter, mDropMenuListener);
