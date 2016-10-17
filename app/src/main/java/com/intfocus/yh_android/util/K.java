@@ -60,8 +60,23 @@ public class K extends PrivateURLs implements Serializable {
   public final static String kPgyerVersionConfigFileName      = "pgyer_version.json";
   public final static String kGravatarConfigFileName          = "gravatar.json";
   public final static String kBetaConfigFileName              = "beta.json";;
-  public final static String kBarCodeResultFileName    = "barcode_result.json";
-  public final static String kScanBarCodeHTMLName      = "scan_bar_code.html";
-  public final static String kCurrentVersionFileName   = "current_version.txt";
-  public final static String kBehaviorConfigFileName   = "behavior.json";
+  public final static String kBarCodeResultFileName           = "barcode_result.json";
+  public final static String kScanBarCodeHTMLName             = "scan_bar_code.html";
+  public final static String kCurrentVersionFileName          = "current_version.txt";
+  public final static String kBehaviorConfigFileName          = "behavior.json";
+
+  /**
+   *  Config#User Model
+   */
+  public final static String kAppVersion = "app_version";
+  public final static String kFontsMd5 = "fonts_md5";
+  public final static String kImagesMd5 = "images_md5";
+  public final static String kStylesheetsMd5 = "stylesheets_md5";
+  public final static String kJavaScriptsMd5 = "javascripts_md5";
+  public final static String kInfo = "info";
+  public final static String kPushValid = "push_valid";
+  public final static String kValid = "valid";
+  public final static String kUserId = "user_id";
+  public final static String kUserName = "user_name";
+  public final static String kUserDeviceId = "user_device_id";
 }

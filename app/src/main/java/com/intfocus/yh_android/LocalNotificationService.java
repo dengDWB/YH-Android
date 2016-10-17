@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
-
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.HttpUtil;
@@ -16,7 +15,6 @@ import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.URLs;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -150,9 +148,17 @@ public class LocalNotificationService extends Service {
    * 正则获取当前 DataCount，未获取到值则返回原数值
    */
   private int getDataCount(String keyName, String urlString) throws JSONException, IOException {
-    // 1. 本地头文件信息
+      /*
+       * 1. 定时器链接添加标志 platform=android&auto_timer=30&user_device_id=#{user_device_id}
+       * 2. 读取本地缓存头文件
+       */
     Map<String, String> headers = ApiHelper.checkResponseHeader(urlString, mAssetsPath);
-    Map<String, String> response = HttpUtil.httpGet(urlString, headers);
+
+    String extraParams = String.format("platform=android&auto_timer=%d&user_device_id=%d", K.kTimerInterval, userJSON.getInt(K.kUserDeviceId));
+    String urlSplit = (urlString.contains("?") ? "&" : "?");
+    String urlStringWithExtraParams = String.format("%s%s%s", urlString, urlSplit, extraParams);
+    Map<String, String> response = HttpUtil.httpGet(urlStringWithExtraParams, headers);
+
     String keyLastName = keyName + "_last";
     if(!notificationJSON.has(keyName)) { notificationJSON.put(keyName, -1); }
     if(!notificationJSON.has(keyLastName)) { notificationJSON.put(keyLastName, -1); }
@@ -160,8 +166,10 @@ public class LocalNotificationService extends Service {
     int lastCount = notificationJSON.getInt(keyLastName);
 
     if (response.get(URLs.kCode).equals("200")) {
-      // 1. 缓存头文件信息
-      // 2. 服务器响应信息写入本地
+      /*
+       * 1. 缓存头文件信息
+       * 2. 服务器响应信息写入本地
+       */
       String htmlName = HttpUtil.UrlToFileName(urlString);
       String htmlPath = String.format("%s/%s", mAssetsPath, htmlName);
       String urlKey = urlString.contains("?") ? TextUtils.split(urlString, "?")[0] : urlString;
@@ -182,9 +190,9 @@ public class LocalNotificationService extends Service {
       Matcher matcherCount = patternCount.matcher(str);
       if (matcherCount.find()) {
         int dataCount = Integer.parseInt(matcherCount.group());
-				/*
-				 * 如果tab_*_last 的值为 -1,表示第一次加载
-				 */
+        /*
+         * 如果tab_*_last 的值为 -1,表示第一次加载
+         */
         if (lastCount == -1) {
           notificationJSON.put(keyLastName, dataCount);
           notificationJSON.put(keyName, 1);
