@@ -484,8 +484,6 @@ public class ApiHelper {
             // Map<String, String> response = HttpUtil.httpPost(urlString, params);
 
             return response;
-//            String responseString = response.get(URLs.kBody);
-//            FileUtil.barCodeScanResult(mContext, responseString);
         } catch(JSONException e) {
             e.printStackTrace();
             return null;

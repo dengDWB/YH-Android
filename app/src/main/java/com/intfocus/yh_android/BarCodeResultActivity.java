@@ -154,11 +154,11 @@ public class BarCodeResultActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-        animLoading.setVisibility(View.VISIBLE);
         loadBarCodeResult();
     }
 
     private void loadBarCodeResult() {
+        animLoading.setVisibility(View.VISIBLE);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -167,8 +167,11 @@ public class BarCodeResultActivity extends BaseActivity {
                 String responseString = response.get(URLs.kBody);
                 updateHtmlContentTimetamp();
 
-                if (!responseCode.equals("200") || null == responseString) {
+                if (!responseCode.equals("200") || responseString.equals("")) {
                     showWebViewForWithoutNetwork();
+                    if (responseString.equals("")) {
+                        toast("Js 获取为空");
+                    }
                 }
                 else {
                     FileUtil.barCodeScanResult(mContext, responseString);
@@ -210,8 +213,8 @@ public class BarCodeResultActivity extends BaseActivity {
    * 初始化标题栏下拉菜单
    */
     private void initDropMenuItem() {
-        String[] itemName = {"筛选", "分享"};
-        int[] itemImage = {R.drawable.banner_search, R.drawable.banner_share};
+        String[] itemName = {"筛选", "分享","刷新"};
+        int[] itemImage = {R.drawable.banner_search, R.drawable.banner_share,R.drawable.btn_refresh};
         for (int i = 0; i < itemName.length; i++) {
             HashMap<String, Object> map = new HashMap<String, Object>();
             map.put("ItemImage", itemImage[i]);
@@ -240,11 +243,24 @@ public class BarCodeResultActivity extends BaseActivity {
                     actionShare2Weixin();
                     break;
 
+                case "刷新":
+                    refresh();
+                    break;
+
                 default:
                     break;
             }
         }
     };
+
+    public void refresh() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                loadBarCodeResult();
+            }
+        });
+    }
 
     /*
      * 标题栏点击设置按钮显示下拉菜单
@@ -355,13 +371,18 @@ public class BarCodeResultActivity extends BaseActivity {
         });
     }
 
-    private class JavaScriptInterface extends JavaScriptBase {
+    private class JavaScriptInterface{
         /*
          * JS 接口，暴露给JS的方法使用@JavascriptInterface装饰
          */
         @JavascriptInterface
         public void refreshBrowser() {
-            loadBarCodeResult();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    loadBarCodeResult();
+                }
+            });
         }
     }
 }

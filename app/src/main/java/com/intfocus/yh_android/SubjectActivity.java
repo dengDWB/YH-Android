@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -77,7 +78,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			enableSlowWholeDocumentDraw();
 		}
 		setContentView(R.layout.activity_subject);
-//		mMyApp.setCurrentActivity(this);
+		mMyApp.setCurrentActivity(this);
 
 		/*
 		 * JSON Data
@@ -91,27 +92,14 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			userNum = "not-set";
 		}
 
-		pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
-		initWebView();
+		mWebView = (WebView) findViewById(R.id.browser);
+		initSubWebView();
 
 		mWebView.requestFocus();
-		pullToRefreshWebView.setVisibility(View.VISIBLE);
+		mWebView.setVisibility(View.VISIBLE);
 		mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);
 		animLoading.setVisibility(View.VISIBLE);
 		initActiongBar();
-		// 刷新监听事件
-		pullToRefreshWebView.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener<android.webkit.WebView>() {
-			@Override
-			public void onRefresh(PullToRefreshBase<android.webkit.WebView> refreshView) {
-				// 模拟加载任务
-				new pullToRefreshTask().execute();
-
-				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				String label = simpleDateFormat.format(System.currentTimeMillis());
-				// 显示最后更新的时间
-				refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
-			}
-		});
 
 		List<ImageView> colorViews = new ArrayList<>();
 		colorViews.add((ImageView) findViewById(R.id.colorView0));
@@ -206,16 +194,20 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 					actionLaunchCommentActivity(arg1);
 					break;
 
+				case "刷新":
+					refresh(arg1);
+					break;
+
 				default:
 					break;
 			}
 		}
 	};
 
-	protected void onResume() {
+	public void onResume() {
 		checkInterfaceOrientation(this.getResources().getConfiguration());
 
-//		mMyApp.setCurrentActivity(this);
+		mMyApp.setCurrentActivity(this);
 		super.onResume();
 	}
 
@@ -224,10 +216,14 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			@Override
 			public void run() {
 				if (!isShowSearchButton) {
-					HashMap<String, Object> map = new HashMap<>();
-					map.put("ItemImage", R.drawable.banner_search);
-					map.put("ItemText", "筛选");
-					listItem.add(map);
+					String[] itemName = {"筛选", "刷新"};
+					int[] itemImage = {R.drawable.banner_search, R.drawable.btn_refresh};
+					for (int i = 0; i < itemName.length; i++) {
+						HashMap<String, Object> map = new HashMap<String, Object>();
+						map.put("ItemImage", itemImage[i]);
+						map.put("ItemText", itemName[i]);
+						listItem.add(map);
+					}
 					SimpleAdapter mSimpleAdapter = new SimpleAdapter(mContext, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
 					initDropMenu(mSimpleAdapter, mDropMenuListener);
 					isShowSearchButton = true;
@@ -540,7 +536,12 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		SubjectActivity.this.onBackPressed();
 	}
 
-	private class pullToRefreshTask extends AsyncTask<Void, Void, Void> {
+	public void refresh(View v) {
+		animLoading.setVisibility(View.VISIBLE);
+		new refreshTask().execute();
+	}
+
+	private class refreshTask extends AsyncTask<Void, Void, Void> {
 		@Override
 		protected Void doInBackground(Void... params) {
 			// 如果这个地方不使用线程休息的话，刷新就不会显示在那个 PullToRefreshListView 的 UpdatedLabel 上面
@@ -578,9 +579,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		@Override
 		protected void onPostExecute(Void aVoid) {
 			super.onPostExecute(aVoid);
-
 			loadHtml();
-			pullToRefreshWebView.onRefreshComplete();
 		}
 	}
 
