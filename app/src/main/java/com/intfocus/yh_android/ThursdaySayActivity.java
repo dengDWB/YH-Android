@@ -1,16 +1,10 @@
 package com.intfocus.yh_android;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.RelativeLayout;
 
 import com.intfocus.yh_android.util.K;
-import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.PrivateURLs;
 import com.intfocus.yh_android.util.URLs;
 
