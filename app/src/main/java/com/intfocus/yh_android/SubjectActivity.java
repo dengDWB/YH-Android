@@ -527,6 +527,11 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		SubjectActivity.this.onBackPressed();
 	}
 
+	@Override
+	public void onBackPressed() {
+		finish();
+	}
+
 	public void refresh(View v) {
 		animLoading.setVisibility(View.VISIBLE);
 		new refreshTask().execute();
