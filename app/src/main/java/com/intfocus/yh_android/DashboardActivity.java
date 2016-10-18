@@ -35,6 +35,7 @@ import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.intfocus.yh_android.view.RedPointView;
 import com.intfocus.yh_android.view.TabView;
+import com.pgyersdk.update.PgyUpdateManager;
 import com.readystatesoftware.viewbadger.BadgeView;
 
 import org.json.JSONException;
@@ -262,6 +263,7 @@ public class DashboardActivity extends BaseActivity {
 		mWebView = null;
 		user = null;
 		popupWindow.dismiss();
+		PgyUpdateManager.unregister(); // 解除注册蒲公英版本更新检查
 		unregisterReceiver(notificationBroadcastReceiver);
 		super.onDestroy();
 	}
@@ -416,7 +418,7 @@ public class DashboardActivity extends BaseActivity {
 		Intent intent = getIntent();
 		if (intent.hasExtra("from_activity")) {
 			checkVersionUpgrade(assetsPath);
-			checkPgyerVersionUpgrade(false);
+			checkPgyerVersionUpgrade(DashboardActivity.this,false);
 
 			new Thread(new Runnable() {
 				@Override
@@ -762,7 +764,7 @@ public class DashboardActivity extends BaseActivity {
 					intent.putExtra(URLs.kLink, link);
 					intent.putExtra(URLs.kObjectId, objectID);
 					intent.putExtra(URLs.kObjectType, objectType);
-					mContext.startActivity(intent);
+					DashboardActivity.this.startActivity(intent);
 				}
 			});
 
