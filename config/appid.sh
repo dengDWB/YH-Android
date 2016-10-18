@@ -15,5 +15,6 @@ new_company_domain=${company_prefix}.${new_company_name}
 # mv ${current_company_path} ${new_company_path}
 # echo "mv ${current_company_path} ${new_company_path} $([[ $? -eq 0 ]] && echo 'successfully' || echo 'failed')"
 
-grep -rl "${current_company_domain}" app/src | xargs sed -i '' "s/${current_company_domain}/${new_company_domain}/g"
+grep -rl "${current_company_domain}" app/src #| xargs sed -i '' "s/${current_company_domain}/${new_company_domain}/g"
+echo "sed -i ${current_company_domain} ${new_company_domain} $([[ $? -eq 0 ]] && echo 'successfully' || echo 'failed')"
 

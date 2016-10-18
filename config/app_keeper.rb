@@ -7,7 +7,7 @@
 # 3. Gradle应用ID
 # 4. AndroidManifest 友盟、蒲公英配置
 # 5. PrivateURLs 服务器域名
-# 
+#
 # $ bundle exec ruby config/app_keeper.rb -h
 # usage: config/app_keeper.rb [options]
 #     -h, --help      print help info
@@ -107,14 +107,10 @@ if slop_opts[:gradle]
   gradle_lines = gradle_text.split(/\n/)
   application_id_line = gradle_lines.find { |line| line.include?('applicationId') }
   current_application_id = application_id_line.strip.scan(/applicationId\s+'(com\.intfocus\..*?)'/).flatten[0]
-  bash_command=%(grep -rl '#{current_application_id}' app/src | xargs sed -i '' 's/#{current_application_id}/#{Settings.application_id}/g')
-  puts bash_command
-  # new_application_id_line = application_id_line.sub(current_application_id, Settings.application_id)
-
-  # puts %(- done: applicationId: #{application_id} => #{Settings.application_id})
-  # File.open(gradle_path, 'w:utf-8') do |file|
-  #   file.puts gradle_text.sub(application_id_line, new_application_id_line)
-  # end
+  # bash_command=%(grep -rl '#{current_application_id}' app/src | xargs sed -i '' 's/#{current_application_id}/#{Settings.application_id}/g')
+  bash_command = %(sed -i '' "s/#{current_application_id}/#{Settings.application_id}/g" #{gradle_path} )
+  `#{bash_command}`
+  puts %(- done: applicationId: #{current_application_id} => #{Settings.application_id})
 end
 
 #
@@ -135,7 +131,7 @@ if slop_opts[:manifest]
 end
 
 #
-# blurred app/src/main/AndroidManifest.xml 
+# blurred app/src/main/AndroidManifest.xml
 #
 if slop_opts[:github]
   manifest_content = File.read(manifest_xml_path)
@@ -209,13 +205,13 @@ if slop_opts[:java]
         public final static String kBannerBgColor   = "#53a93f";
         public final static String kBannerTextColor = "#ffffff";
         public final static String kInitPassword    = "123456";
-        
+
         public final static String kBaseUrl      = "#{Settings.server}";
         public final static String kBaseUrl1     = "http://10.0.3.2:4567";
 
         public final static String kPgyerAppId   = "#{Settings.pgyer.android}";
         public final static String kPgyerUrl     = "http://www.pgyer.com/#{Settings.key_store.alias}-a";
-        
+
         public final static String kUMAppId      = "#{Settings.umeng.android.app_key}";
         public final static String kWXAppId      = "#{Settings.umeng_weixin.android.app_id}";
         public final static String kWXAppSecret  = "#{Settings.umeng_weixin.android.app_secret}";
@@ -225,13 +221,13 @@ if slop_opts[:java]
         public final static boolean kDropMenuSearch   = #{Settings.display_status.drop_menu_search == 1 ? 'true' : 'false'};
         public final static boolean kDropMenuVoice    = #{Settings.display_status.drop_menu_voice == 1 ? 'true' : 'false'};
         public final static boolean kDropMenuUserInfo = #{Settings.display_status.drop_menu_user_info == 1 ? 'true' : 'false'};
-        
+
         public final static boolean kTabBar        = #{Settings.display_status.tab_bar == 1 ? 'true' : 'false'};
         public final static boolean kTabBarKPI     = #{Settings.display_status.tab_bar_kpi == 1 ? 'true' : 'false'};
         public final static boolean kTabBarAnalyse = #{Settings.display_status.tab_bar_analyse == 1 ? 'true' : 'false'};
         public final static boolean kTabBarApp     = #{Settings.display_status.tab_bar_app == 1 ? 'true' : 'false'};
         public final static boolean kTabBarMessage = #{Settings.display_status.tab_bar_message == 1 ? 'true' : 'false'};
-        
+
         public final static boolean kSubjectComment = #{Settings.display_status.subject_comment == 1 ? 'true' : 'false'};
         public final static boolean kSubjectShare   = #{Settings.display_status.subject_share == 1 ? 'true' : 'false'};
       }
@@ -241,7 +237,7 @@ end
 
 #
 # gradlew generate apk
-# 
+#
 if slop_opts[:apk]
   apk_path = 'app/build/outputs/apk/app-release.apk'
   key_store_path = File.join(Dir.pwd, Settings.key_store.path)
