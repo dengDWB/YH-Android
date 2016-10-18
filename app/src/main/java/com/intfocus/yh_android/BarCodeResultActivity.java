@@ -177,13 +177,12 @@ public class BarCodeResultActivity extends BaseActivity {
                 }
             }
 
-            if (flag) {
-                bannerTitle.setText(storeName);
-            }else {
-                bannerTitle.setText(user.getJSONArray(URLs.kStoreIds).getJSONObject(0).getString("name"));
+            if (!flag) {
+                storeName = user.getJSONArray(URLs.kStoreIds).getJSONObject(0).getString("name");
                 cachedJSON.put(URLs.kStore, user.getJSONArray(URLs.kStoreIds).get(0));
                 FileUtil.writeFile(cachedPath, cachedJSON.toString());
             }
+            bannerTitle.setText(storeName);
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (IOException e) {
