@@ -12,5 +12,8 @@ new_company_name='yonghuitest'
 new_company_path=${company_folder}/${new_company_name}
 new_company_domain=${company_prefix}.${new_company_name}
 
-echo "mv ${current_company_path} ${new_company_path}"
-echo "sed -i ${current_company_domain} ${new_company_domain}"
+# mv ${current_company_path} ${new_company_path}
+# echo "mv ${current_company_path} ${new_company_path} $([[ $? -eq 0 ]] && echo 'successfully' || echo 'failed')"
+
+grep -rl "${current_company_domain}" app/src | xargs sed -i '' "s/${current_company_domain}/${new_company_domain}/g"
+
