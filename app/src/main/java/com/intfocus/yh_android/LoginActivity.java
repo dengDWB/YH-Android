@@ -189,7 +189,7 @@ public class LoginActivity extends BaseActivity {
 
                             // 跳转至主界面
                             Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             LoginActivity.this.startActivity(intent);
 
                             /*
