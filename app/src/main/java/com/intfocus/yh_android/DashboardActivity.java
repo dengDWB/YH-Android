@@ -81,7 +81,6 @@ public class DashboardActivity extends BaseActivity {
 		loadWebView();
 		displayAdOrNot(true);
 
-
 		/*
          * 通过解屏进入界面后，进行用户验证
      	 */
@@ -91,6 +90,11 @@ public class DashboardActivity extends BaseActivity {
          * 检测服务器静态资源是否更新，并下载
      	 */
 		checkAssetsUpdated(true);
+
+        /*
+         * 初始化本地通知
+         */
+		FileUtil.initLocalNotifications(mContext);
 
 		/*
          * 动态注册广播用于接收通知

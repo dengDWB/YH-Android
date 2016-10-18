@@ -59,9 +59,10 @@ public class BarCodeResultActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
-    /*
-     * 判断当前设备版本，5.0 以上 Android 系统使用才 enableSlowWholeDocumentDraw();
-     */
+
+        /*
+         * 判断当前设备版本，5.0 以上 Android 系统使用才 enableSlowWholeDocumentDraw();
+         */
         int sysVersion = Build.VERSION.SDK_INT;
         if (sysVersion > 20) {
             enableSlowWholeDocumentDraw();
@@ -99,9 +100,7 @@ public class BarCodeResultActivity extends BaseActivity {
             }
 
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                LogUtil.d("onReceivedError",
-                        String.format("errorCode: %d, description: %s, url: %s", errorCode, description,
-                                failingUrl));
+                LogUtil.d("onReceivedError", String.format("errorCode: %d, description: %s, url: %s", errorCode, description, failingUrl));
             }
         });
 
@@ -126,8 +125,7 @@ public class BarCodeResultActivity extends BaseActivity {
             codeType = intent.getStringExtra(URLs.kCodeType);
             groupID = user.getString(URLs.kGroupId);
             roleID = user.getString(URLs.kRoleId);
-            userNum = user.getString("user_num");
-
+            userNum = user.getString(URLs.kUserNum);
 
             /*
             * 商品条形码写入缓存
@@ -172,7 +170,8 @@ public class BarCodeResultActivity extends BaseActivity {
                     user.has(URLs.kStoreIds) && user.getJSONArray(URLs.kStoreIds).length() > 0) {
                 cachedJSON.put(URLs.kStore, user.getJSONArray(URLs.kStoreIds).get(0));
                 FileUtil.writeFile(cachedPath, cachedJSON.toString());
-            } else {
+            }
+            else {
                 storeName = cachedJSON.getJSONObject(URLs.kStore).getString("name");
                 for (int i = 0; i < user.getJSONArray(URLs.kStoreIds).length(); i++) {
                     if (user.getJSONArray(URLs.kStoreIds).getJSONObject(i).getString("name").equals(storeName)){
@@ -180,11 +179,11 @@ public class BarCodeResultActivity extends BaseActivity {
                     }
                 }
             }
-            if (flag) {
-                bannerTitle.setText(storeName);
-            }else {
-                bannerTitle.setText(user.getJSONArray(URLs.kStoreIds).getJSONObject(0).getString("name"));
+            if (!flag) {
+                storeName = user.getJSONArray(URLs.kStoreIds).getJSONObject(0).getString("name");
             }
+
+            bannerTitle.setText(storeName);
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (IOException e) {
