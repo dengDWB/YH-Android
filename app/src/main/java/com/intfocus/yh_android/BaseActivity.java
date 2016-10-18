@@ -790,7 +790,7 @@ public class BaseActivity extends Activity {
         checkAssetUpdated(shouldReloadUIThread, URLs.kStylesheets, true);
         checkAssetUpdated(shouldReloadUIThread, URLs.kJavaScripts, true);
         checkAssetUpdated(shouldReloadUIThread, URLs.kBarCodeScan, false);
-        checkAssetUpdated(shouldReloadUIThread, URLs.kAdvertisement, false);
+        // checkAssetUpdated(shouldReloadUIThread, URLs.kAdvertisement, false);
     }
 
     private boolean checkAssetUpdated(boolean shouldReloadUIThread, String assetName, boolean isInAssets) {

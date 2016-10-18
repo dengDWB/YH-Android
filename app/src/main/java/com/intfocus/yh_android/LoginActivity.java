@@ -2,9 +2,7 @@ package com.intfocus.yh_android;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -16,21 +14,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.URLs;
-import com.pgyersdk.javabean.AppBean;
 import com.pgyersdk.update.PgyUpdateManager;
-import com.pgyersdk.update.UpdateManagerListener;
-
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.File;
-import java.io.IOException;
 
 public class LoginActivity extends BaseActivity {
     public final static String kFromActivity = "from_activity";
@@ -88,11 +78,6 @@ public class LoginActivity extends BaseActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-
-        /*
-         * 初始化本地通知
-         */
-        FileUtil.initLocalNotifications(mContext);
 
         /*
          * 检测登录界面，版本是否升级

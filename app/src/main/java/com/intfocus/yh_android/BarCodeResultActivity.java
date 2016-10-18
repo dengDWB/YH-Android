@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.intfocus.yh_android.util.ApiHelper;
@@ -52,13 +53,16 @@ public class BarCodeResultActivity extends BaseActivity {
     private String codeInfo, codeType, groupID, roleID, userNum;
     private String storeID;
     private ArrayList<HashMap<String, Object>> listItem = new ArrayList<>();
+    private TextView bannerTitle;
+    private JSONObject cachedJSON;
 
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
-    /*
-     * 判断当前设备版本，5.0 以上 Android 系统使用才 enableSlowWholeDocumentDraw();
-     */
+
+        /*
+         * 判断当前设备版本，5.0 以上 Android 系统使用才 enableSlowWholeDocumentDraw();
+         */
         int sysVersion = Build.VERSION.SDK_INT;
         if (sysVersion > 20) {
             enableSlowWholeDocumentDraw();
@@ -66,6 +70,7 @@ public class BarCodeResultActivity extends BaseActivity {
         setContentView(R.layout.activity_bar_code_result);
 
         animLoading = (RelativeLayout) findViewById(R.id.anim_loading);
+        bannerTitle = (TextView) findViewById(R.id.bannerTitle);
         mWebView = (WebView) findViewById(R.id.barcode_browser);
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -95,9 +100,7 @@ public class BarCodeResultActivity extends BaseActivity {
             }
 
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                LogUtil.d("onReceivedError",
-                        String.format("errorCode: %d, description: %s, url: %s", errorCode, description,
-                                failingUrl));
+                LogUtil.d("onReceivedError", String.format("errorCode: %d, description: %s, url: %s", errorCode, description, failingUrl));
             }
         });
 
@@ -122,28 +125,18 @@ public class BarCodeResultActivity extends BaseActivity {
             codeType = intent.getStringExtra(URLs.kCodeType);
             groupID = user.getString(URLs.kGroupId);
             roleID = user.getString(URLs.kRoleId);
-            userNum = user.getString("user_num");
-
-            /*
-            * 初始化默认选中门店（第一家）
-            */
-            JSONObject cachedJSON = FileUtil.readConfigFile(cachedPath);
-            if ((!cachedJSON.has(URLs.kStore) || !cachedJSON.getJSONObject(URLs.kStore).has(kId)) &&
-                    user.has(URLs.kStoreIds) && user.getJSONArray(URLs.kStoreIds).length() > 0) {
-                cachedJSON.put(URLs.kStore, user.getJSONArray(URLs.kStoreIds).get(0));
-                FileUtil.writeFile(cachedPath, cachedJSON.toString());
-            }
+            userNum = user.getString(URLs.kUserNum);
 
             /*
             * 商品条形码写入缓存
             */
+            cachedJSON = FileUtil.readConfigFile(cachedPath);
             JSONObject cachedCodeJSON = new JSONObject();
             cachedCodeJSON.put(URLs.kCodeInfo, codeInfo);
             cachedCodeJSON.put(URLs.kCodeType, codeType);
             cachedJSON.put("barcode", cachedCodeJSON);
             FileUtil.writeFile(cachedPath, cachedJSON.toString());
 
-            storeID = cachedJSON.getJSONObject(URLs.kStore).getString(kId);
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -155,7 +148,47 @@ public class BarCodeResultActivity extends BaseActivity {
     public void onResume() {
         super.onResume();
         mMyApp.setCurrentActivity(this);
-        loadBarCodeResult();
+
+        try {
+            /*
+            * 初始化默认选中门店（第一家）
+            */
+            selectStore();
+            storeID = cachedJSON.getJSONObject(URLs.kStore).getString(kId);
+            loadBarCodeResult();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void selectStore() {
+        cachedJSON = FileUtil.readConfigFile(cachedPath);
+        boolean flag = false;
+        String storeName = "";
+        try {
+            if ((!cachedJSON.has(URLs.kStore) || !cachedJSON.getJSONObject(URLs.kStore).has(kId)) &&
+                    user.has(URLs.kStoreIds) && user.getJSONArray(URLs.kStoreIds).length() > 0) {
+                cachedJSON.put(URLs.kStore, user.getJSONArray(URLs.kStoreIds).get(0));
+                FileUtil.writeFile(cachedPath, cachedJSON.toString());
+            }
+            else {
+                storeName = cachedJSON.getJSONObject(URLs.kStore).getString("name");
+                for (int i = 0; i < user.getJSONArray(URLs.kStoreIds).length(); i++) {
+                    if (user.getJSONArray(URLs.kStoreIds).getJSONObject(i).getString("name").equals(storeName)){
+                        flag = true;
+                    }
+                }
+            }
+            if (!flag) {
+                storeName = user.getJSONArray(URLs.kStoreIds).getJSONObject(0).getString("name");
+            }
+
+            bannerTitle.setText(storeName);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void loadBarCodeResult() {

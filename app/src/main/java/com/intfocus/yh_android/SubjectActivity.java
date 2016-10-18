@@ -156,8 +156,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	 * 初始化标题栏下拉菜单
 	 */
 	private void initDropMenuItem() {
-		String[] itemName = {"刷新","分享", "评论"};
-		int[] itemImage = {R.drawable.btn_refresh,R.drawable.banner_share, R.drawable.banner_comment};
+		String[] itemName = {"分享", "评论", "刷新"};
+		int[] itemImage = {R.drawable.banner_share, R.drawable.banner_comment,R.drawable.btn_refresh};
 		for (int i = 0; i < itemName.length; i++) {
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			map.put("ItemImage", itemImage[i]);
