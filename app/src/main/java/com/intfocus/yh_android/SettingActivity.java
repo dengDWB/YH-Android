@@ -37,6 +37,7 @@ import com.intfocus.yh_android.util.PrivateURLs;
 import com.intfocus.yh_android.util.URLs;
 import com.intfocus.yh_android.view.CircleImageView;
 import com.intfocus.yh_android.view.RedPointView;
+import com.pgyersdk.update.PgyUpdateManager;
 import com.readystatesoftware.viewbadger.BadgeView;
 import com.umeng.message.PushAgent;
 import com.umeng.message.UmengRegistrar;
@@ -150,6 +151,11 @@ public class SettingActivity extends BaseActivity {
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));
     }
 
+    @Override
+    protected void onDestroy() {
+        PgyUpdateManager.unregister(); // 解除注册蒲公英版本更新检查
+        super.onDestroy();
+    }
     /*
      * 初始化界面内容
      */
@@ -302,6 +308,24 @@ public class SettingActivity extends BaseActivity {
         return context.getString(stringId);
     }
 
+    final View.OnClickListener mCheckUpgradeListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            checkPgyerVersionUpgrade(SettingActivity.this,true);
+
+            /*
+             * 用户行为记录, 单独异常处理，不可影响用户体验
+             */
+            try {
+                logParams = new JSONObject();
+                logParams.put(URLs.kAction, "点击/设置页面/检测更新");
+                new Thread(mRunnableForLogger).start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
     private final View.OnClickListener mIconImageViewListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -383,9 +407,8 @@ public class SettingActivity extends BaseActivity {
      * 获取相册图片
      */
     private void getGallery() {
-        Intent intentFromGallery = new Intent();
-        intentFromGallery.setType("image/*");
-        intentFromGallery.setAction(Intent.ACTION_GET_CONTENT);
+        Intent intentFromGallery = new Intent(Intent.ACTION_PICK,null);
+        intentFromGallery.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,"image/*");
         startActivityForResult(intentFromGallery,CODE_GALLERY_REQUEST);
     }
 
@@ -446,7 +469,7 @@ public class SettingActivity extends BaseActivity {
      */
     public void cropPhoto(Uri uri) {
         Intent intent = new Intent("com.android.camera.action.CROP");
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+        if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.KITKAT) {
             String url=FileUtil.getBitmapUrlPath(this, uri);
             intent.setDataAndType(Uri.fromFile(new File(url)), "image/*");
         }else{
@@ -459,7 +482,7 @@ public class SettingActivity extends BaseActivity {
         // outputX outputY 是裁剪图片宽高
         intent.putExtra("outputX", 150);
         intent.putExtra("outputY", 150);
-        intent.putExtra("return-data", true);
+        intent.putExtra("return-data",true);
         startActivityForResult(intent, CODE_RESULT_REQUEST);
     }
 
@@ -703,7 +726,7 @@ public class SettingActivity extends BaseActivity {
                                 FileUtil.checkAssets(mContext, URLs.kStylesheets, true);
                                 FileUtil.checkAssets(mContext, URLs.kJavaScripts, true);
                                 FileUtil.checkAssets(mContext, URLs.kBarCodeScan, false);
-                                FileUtil.checkAssets(mContext, URLs.kAdvertisement, false);
+                                // FileUtil.checkAssets(mContext, URLs.kAdvertisement, false);
 
                                 toast("校正完成");
                             }

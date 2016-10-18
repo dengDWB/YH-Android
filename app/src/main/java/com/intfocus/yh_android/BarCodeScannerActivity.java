@@ -23,72 +23,70 @@ public class BarCodeScannerActivity extends BaseActivity implements ZBarScannerV
 
     @Override
     protected void onCreate(Bundle state) {
-      super.onCreate(state);
-      setContentView(R.layout.activity_bar_code_scanner);
+        super.onCreate(state);
+        setContentView(R.layout.activity_bar_code_scanner);
 
-      ViewGroup contentFrame = (ViewGroup) findViewById(R.id.bar_code_scanner_frame);
-      mScannerView = new ZBarScannerView(this);
-      contentFrame.addView(mScannerView);
+        ViewGroup contentFrame = (ViewGroup) findViewById(R.id.bar_code_scanner_frame);
+        mScannerView = new ZBarScannerView(this);
+        contentFrame.addView(mScannerView);
 
-      List<ImageView> colorViews = new ArrayList<>();
-      colorViews.add((ImageView) findViewById(R.id.colorView0));
-      colorViews.add((ImageView) findViewById(R.id.colorView1));
-      colorViews.add((ImageView) findViewById(R.id.colorView2));
-      colorViews.add((ImageView) findViewById(R.id.colorView3));
-      colorViews.add((ImageView) findViewById(R.id.colorView4));
-      initColorView(colorViews);
+        List<ImageView> colorViews = new ArrayList<>();
+        colorViews.add((ImageView) findViewById(R.id.colorView0));
+        colorViews.add((ImageView) findViewById(R.id.colorView1));
+        colorViews.add((ImageView) findViewById(R.id.colorView2));
+        colorViews.add((ImageView) findViewById(R.id.colorView3));
+        colorViews.add((ImageView) findViewById(R.id.colorView4));
+        initColorView(colorViews);
     }
 
     @Override
     protected void onResume() {
-      super.onResume();
-      mMyApp.setCurrentActivity(this);
-      mScannerView.setResultHandler(this);
-      mScannerView.startCamera();
+        super.onResume();
+        mMyApp.setCurrentActivity(this);
+        mScannerView.setResultHandler(this);
+        mScannerView.startCamera();
     }
 
     @Override
     protected void onPause() {
-      super.onPause();
-      mScannerView.stopCamera();
+        super.onPause();
+        mScannerView.stopCamera();
     }
 
     @Override
     public void handleResult(Result rawResult) {
         if (rawResult.getContents() == null || rawResult.getContents().isEmpty()) {
-        /*
-         * Note:
-         * Wait 2 seconds to resume the preview.
-         *
-         * @BUG:
-         * On older devices continuously stopping and resuming camera preview can result in freezing the app.
-         * I don't know why this is the case but I don't have the time to figure out.
-         */
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-              mScannerView.resumeCameraPreview(BarCodeScannerActivity.this);
-            }
-          }, 2000);
+            /*
+             * Note:
+             * Wait 2 seconds to resume the preview.
+             *
+             * @BUG:
+             * On older devices continuously stopping and resuming camera preview can result in freezing the app.
+             * I don't know why this is the case but I don't have the time to figure out.
+             */
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                  mScannerView.resumeCameraPreview(BarCodeScannerActivity.this);
+                }
+              }, 2000);
         }
         else {
-            if (URLs.kIsQRCode) {
-                if (rawResult.getBarcodeFormat().getName().equals("QRCODE")) {
-                  mScannerView.resumeCameraPreview(BarCodeScannerActivity.this);
-                  runOnUiThread(new Runnable() {
-                      @Override
-                      public void run() {
-                          toast("本应用现只支持条形码扫描");
-                      }
-                  });
-                  return;
-              }
-          }
-        Intent intent = new Intent(mContext, BarCodeResultActivity.class);
-        intent.putExtra(URLs.kCodeInfo, rawResult.getContents());
-        intent.putExtra(URLs.kCodeType, rawResult.getBarcodeFormat().getName());
-        mContext.startActivity(intent);
+            if (URLs.kIsQRCode && rawResult.getBarcodeFormat().getName().equals("QRCODE")) {
+                mScannerView.resumeCameraPreview(BarCodeScannerActivity.this);
+                runOnUiThread(new Runnable() {
+                  @Override
+                  public void run() {
+                      toast("本应用现只支持条形码扫描");
+                  }
+                });
+                return;
+            }
+            Intent intent = new Intent(mContext, BarCodeResultActivity.class);
+            intent.putExtra(URLs.kCodeInfo, rawResult.getContents());
+            intent.putExtra(URLs.kCodeType, rawResult.getBarcodeFormat().getName());
+            mContext.startActivity(intent);
       }
     }
 

@@ -133,15 +133,11 @@ public class BaseActivity extends Activity {
 
         RefWatcher refWatcher = YHApplication.getRefWatcher(mContext);
         refWatcher.watch(this);
-
-        ActivityCollector.addActivity(this);
     }
 
     protected void onDestroy() {
         clearReferences();
         fixInputMethodManager(BaseActivity.this);
-        ActivityCollector.removeActivity(this);
-        PgyUpdateManager.unregister(); // 解除注册蒲公英版本更新检查
         mMyApp = null;
         super.onDestroy();
     }
@@ -636,23 +632,6 @@ public class BaseActivity extends Activity {
           }
         }
      */
-    final View.OnClickListener mCheckUpgradeListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            checkPgyerVersionUpgrade(true);
-
-            /*
-             * 用户行为记录, 单独异常处理，不可影响用户体验
-             */
-            try {
-                logParams = new JSONObject();
-                logParams.put(URLs.kAction, "点击/设置页面/检测更新");
-                new Thread(mRunnableForLogger).start();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    };
 
     /*
      * 托管在蒲公英平台，对比版本号检测是否版本更新
@@ -660,7 +639,7 @@ public class BaseActivity extends Activity {
      * 奇数: 测试版本，仅提示
      * 偶数: 正式版本，点击安装更新
      */
-    void checkPgyerVersionUpgrade(final boolean isShowToast) {
+    void checkPgyerVersionUpgrade(final Activity activity, final boolean isShowToast) {
         UpdateManagerListener updateManagerListener = new UpdateManagerListener() {
             @Override
             public void onUpdateAvailable(final String result) {
@@ -721,7 +700,7 @@ public class BaseActivity extends Activity {
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        startDownloadTask(BaseActivity.this, appBean.getDownloadURL());
+                                        startDownloadTask(activity, appBean.getDownloadURL());
                                     }
                                 })
                         .setNegativeButton("取消",
@@ -742,7 +721,7 @@ public class BaseActivity extends Activity {
             }
         };
 
-        PgyUpdateManager.register(BaseActivity.this, updateManagerListener);
+        PgyUpdateManager.register(activity, updateManagerListener);
     }
 
     /*
@@ -811,7 +790,7 @@ public class BaseActivity extends Activity {
         checkAssetUpdated(shouldReloadUIThread, URLs.kStylesheets, true);
         checkAssetUpdated(shouldReloadUIThread, URLs.kJavaScripts, true);
         checkAssetUpdated(shouldReloadUIThread, URLs.kBarCodeScan, false);
-        checkAssetUpdated(shouldReloadUIThread, URLs.kAdvertisement, false);
+        // checkAssetUpdated(shouldReloadUIThread, URLs.kAdvertisement, false);
     }
 
     private boolean checkAssetUpdated(boolean shouldReloadUIThread, String assetName, boolean isInAssets) {

@@ -138,7 +138,6 @@ public class YHApplication extends Application {
     @Override
     public void onTerminate() {
         PgyCrashManager.unregister(); // 解除注册蒲公英异常信息上传
-        ActivityCollector.finishAll();
         super.onTerminate();
     }
 
@@ -172,7 +171,7 @@ public class YHApplication extends Application {
 
             String assetZipPath;
             File assetZipFile;
-            String[] assetsName = {URLs.kAssets,URLs.kLoding,URLs.kFonts,URLs.kImages,URLs.kStylesheets,URLs.kJavaScripts,URLs.kBarCodeScan,URLs.kAdvertisement};
+            String[] assetsName = {URLs.kAssets,URLs.kLoding,URLs.kFonts,URLs.kImages,URLs.kStylesheets,URLs.kJavaScripts,URLs.kBarCodeScan}; // ,URLs.kAdvertisement
 
             for (String string : assetsName) {
                 assetZipPath = String.format("%s/%s.zip", sharedPath, string);
@@ -276,10 +275,9 @@ public class YHApplication extends Application {
                     if (activityName.equals("LoginActivity") || activityName.equals("ConfirmPassCodeActivity")) {
                         return;
                     }
-                    ActivityCollector.finishAll();
                     intent = new Intent (mContext,DashboardActivity.class);
                 }
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             } catch (JSONException e) {
                 e.printStackTrace();

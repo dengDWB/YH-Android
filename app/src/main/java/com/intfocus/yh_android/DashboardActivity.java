@@ -35,6 +35,7 @@ import com.intfocus.yh_android.util.LogUtil;
 import com.intfocus.yh_android.util.URLs;
 import com.intfocus.yh_android.view.RedPointView;
 import com.intfocus.yh_android.view.TabView;
+import com.pgyersdk.update.PgyUpdateManager;
 import com.readystatesoftware.viewbadger.BadgeView;
 
 import org.json.JSONException;
@@ -80,7 +81,6 @@ public class DashboardActivity extends BaseActivity {
 		loadWebView();
 		displayAdOrNot(true);
 
-
 		/*
          * 通过解屏进入界面后，进行用户验证
      	 */
@@ -90,6 +90,11 @@ public class DashboardActivity extends BaseActivity {
          * 检测服务器静态资源是否更新，并下载
      	 */
 		checkAssetsUpdated(true);
+
+        /*
+         * 初始化本地通知
+         */
+		FileUtil.initLocalNotifications(mContext);
 
 		/*
          * 动态注册广播用于接收通知
@@ -264,6 +269,7 @@ public class DashboardActivity extends BaseActivity {
 		mWebView = null;
 		user = null;
 		popupWindow.dismiss();
+		PgyUpdateManager.unregister(); // 解除注册蒲公英版本更新检查
 		unregisterReceiver(notificationBroadcastReceiver);
 		super.onDestroy();
 	}
@@ -418,7 +424,7 @@ public class DashboardActivity extends BaseActivity {
 		Intent intent = getIntent();
 		if (intent.hasExtra("from_activity")) {
 			checkVersionUpgrade(assetsPath);
-			checkPgyerVersionUpgrade(false);
+			checkPgyerVersionUpgrade(DashboardActivity.this,false);
 
 			new Thread(new Runnable() {
 				@Override
@@ -764,7 +770,7 @@ public class DashboardActivity extends BaseActivity {
 					intent.putExtra(URLs.kLink, link);
 					intent.putExtra(URLs.kObjectId, objectID);
 					intent.putExtra(URLs.kObjectType, objectType);
-					mContext.startActivity(intent);
+					DashboardActivity.this.startActivity(intent);
 				}
 			});
 

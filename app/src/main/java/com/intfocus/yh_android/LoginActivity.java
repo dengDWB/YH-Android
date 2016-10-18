@@ -14,13 +14,12 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
 import com.intfocus.yh_android.util.ApiHelper;
 import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.URLs;
-
+import com.pgyersdk.update.PgyUpdateManager;
 import org.json.JSONObject;
 
 public class LoginActivity extends BaseActivity {
@@ -65,7 +64,7 @@ public class LoginActivity extends BaseActivity {
              *    1. 与锁屏界面互斥；取消解屏时，返回登录界面，则不再检测版本更新；
              *    2. 原因：如果解屏成功，直接进入MainActivity,会在BaseActivity#finishLoginActivityWhenInMainAcitivty中结束LoginActivity,若此时有AlertDialog，会报错误:Activity has leaked window com.android.internal.policy.impl.PhoneWindow$DecorView@44f72ff0 that was originally added here
              */
-            checkPgyerVersionUpgrade(false);
+            checkPgyerVersionUpgrade(LoginActivity.this,false);
         }
 
         usernameEditText = (EditText) findViewById(R.id.etUsername);
@@ -79,11 +78,6 @@ public class LoginActivity extends BaseActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-
-        /*
-         * 初始化本地通知
-         */
-        FileUtil.initLocalNotifications(mContext);
 
         /*
          * 检测登录界面，版本是否升级
@@ -133,6 +127,7 @@ public class LoginActivity extends BaseActivity {
         mContext = null;
         mWebView = null;
         user = null;
+        PgyUpdateManager.unregister(); // 解除注册蒲公英版本更新检查
         super.onDestroy();
     }
 
@@ -179,7 +174,7 @@ public class LoginActivity extends BaseActivity {
 
                             // 跳转至主界面
                             Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             LoginActivity.this.startActivity(intent);
 
                             /*

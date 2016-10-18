@@ -59,9 +59,10 @@ public class BarCodeResultActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
-    /*
-     * 判断当前设备版本，5.0 以上 Android 系统使用才 enableSlowWholeDocumentDraw();
-     */
+
+        /*
+         * 判断当前设备版本，5.0 以上 Android 系统使用才 enableSlowWholeDocumentDraw();
+         */
         int sysVersion = Build.VERSION.SDK_INT;
         if (sysVersion > 20) {
             enableSlowWholeDocumentDraw();
@@ -99,9 +100,7 @@ public class BarCodeResultActivity extends BaseActivity {
             }
 
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                LogUtil.d("onReceivedError",
-                        String.format("errorCode: %d, description: %s, url: %s", errorCode, description,
-                                failingUrl));
+                LogUtil.d("onReceivedError", String.format("errorCode: %d, description: %s, url: %s", errorCode, description, failingUrl));
             }
         });
 
@@ -126,8 +125,7 @@ public class BarCodeResultActivity extends BaseActivity {
             codeType = intent.getStringExtra(URLs.kCodeType);
             groupID = user.getString(URLs.kGroupId);
             roleID = user.getString(URLs.kRoleId);
-            userNum = user.getString("user_num");
-
+            userNum = user.getString(URLs.kUserNum);
 
             /*
             * 商品条形码写入缓存
