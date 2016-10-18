@@ -131,32 +131,34 @@ public class DashboardActivity extends BaseActivity {
 			if (pushMessageJSON.has("state") && pushMessageJSON.getBoolean("state")) {
 				return;
 			}
-			String type = pushMessageJSON.getString("type");
-			switch (type){
-				case "report":
-					Intent subjectIntent = new Intent(this, SubjectActivity.class);
-					subjectIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-					subjectIntent.putExtra(URLs.kLink, pushMessageJSON.getString("url"));
-					subjectIntent.putExtra(URLs.kBannerName, pushMessageJSON.getString("title"));
-					subjectIntent.putExtra(URLs.kObjectId, pushMessageJSON.getInt("object_id"));
-					subjectIntent.putExtra(URLs.kObjectType, pushMessageJSON.getInt("object_type"));
-					startActivity(subjectIntent);
-					break;
-				case "analyse":
-					jumpTab(mTabAnalyse);
-					urlString = String.format(K.kAnalyseMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
-					break;
-				case "app":
-					jumpTab(mTabAPP);
-					urlString = String.format(K.kAppMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
-					break;
-				case "message":
-					jumpTab(mTabMessage);
-					urlString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
-					break;
-				case "thursday_say":
-					Intent blogLinkIntent = new Intent(DashboardActivity.this,ThursdaySayActivity.class);
-					startActivity(blogLinkIntent);
+			if (pushMessageJSON.has("type")) {
+				String type = pushMessageJSON.getString("type");
+				switch (type) {
+					case "report":
+						Intent subjectIntent = new Intent(this, SubjectActivity.class);
+						subjectIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+						subjectIntent.putExtra(URLs.kLink, pushMessageJSON.getString("url"));
+						subjectIntent.putExtra(URLs.kBannerName, pushMessageJSON.getString("title"));
+						subjectIntent.putExtra(URLs.kObjectId, pushMessageJSON.getInt("object_id"));
+						subjectIntent.putExtra(URLs.kObjectType, pushMessageJSON.getInt("object_type"));
+						startActivity(subjectIntent);
+						break;
+					case "analyse":
+						jumpTab(mTabAnalyse);
+						urlString = String.format(K.kAnalyseMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+						break;
+					case "app":
+						jumpTab(mTabAPP);
+						urlString = String.format(K.kAppMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+						break;
+					case "message":
+						jumpTab(mTabMessage);
+						urlString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
+						break;
+					case "thursday_say":
+						Intent blogLinkIntent = new Intent(DashboardActivity.this, ThursdaySayActivity.class);
+						startActivity(blogLinkIntent);
+				}
 			}
 			pushMessageJSON.put("state", true);
 			FileUtil.writeFile(pushMessagePath, pushMessageJSON.toString());
