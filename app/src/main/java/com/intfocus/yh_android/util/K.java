@@ -79,4 +79,10 @@ public class K extends PrivateURLs implements Serializable {
   public final static String kUserId = "user_id";
   public final static String kUserName = "user_name";
   public final static String kUserDeviceId = "user_device_id";
+
+  /**
+   * Config#User Device Info
+   */
+  public final static int kMinSdkVersion = 14;
+  public final static int kMaxSdkVersion = 23;
 }
