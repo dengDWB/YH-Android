@@ -167,7 +167,7 @@ public class SettingActivity extends BaseActivity {
             mGroupID.setText(user.getString("group_name"));
             mPushState.setText(PushAgent.getInstance(mContext).isEnabled() ? "开启" : "关闭");
             mAppName.setText(getApplicationName(SettingActivity.this));
-            String deviceInfo = String.format("%s(%s)",TextUtils.split(android.os.Build.MODEL, " - ")[0],Build.VERSION.RELEASE);
+            String deviceInfo = String.format("%s(Android %s)",TextUtils.split(android.os.Build.MODEL, " - ")[0],Build.VERSION.RELEASE);
             mDeviceID.setText(deviceInfo);
             mApiDomain.setText(K.kBaseUrl.replace("http://", "").replace("https://", ""));
 
