@@ -124,8 +124,15 @@ public class SettingActivity extends BaseActivity {
         screenLockInfo = "取消锁屏成功";
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));
         mCheckAssets.setOnClickListener(mCheckAssetsListener);
-        mLongCatSwitch = (Switch) findViewById(R.id.longcat_switch);
-        mLongCatSwitch.setChecked(!URLs.kIsFullScreen);
+
+        try {
+            String betaConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBetaConfigFileName);
+            JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
+            mLongCatSwitch = (Switch) findViewById(R.id.longcat_switch);
+            mLongCatSwitch.setChecked(betaJSON.has("image_within_screen") && betaJSON.getBoolean("image_within_screen"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         bvCheckUpgrade = new BadgeView(this, mCheckUpgrade);
         bvChangePWD = new BadgeView(this, mChangePWD);
@@ -789,16 +796,11 @@ public class SettingActivity extends BaseActivity {
     private final CompoundButton.OnCheckedChangeListener mSwitchLongCatListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            // TODO Auto-generated method stub
             try {
                 String betaConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBetaConfigFileName);
-                JSONObject betaJSON = new JSONObject();
-                if(new File(betaConfigPath).exists()) {
-                    betaJSON = FileUtil.readConfigFile(betaConfigPath);
-                }
-                URLs.kIsFullScreen = !isChecked;
+                JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
 
-                betaJSON.put("longCat", !isChecked);
+                betaJSON.put("image_within_screen", isChecked);
                 FileUtil.writeFile(betaConfigPath, betaJSON.toString());
             } catch (JSONException | IOException e) {
                 e.printStackTrace();
