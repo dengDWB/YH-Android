@@ -6,7 +6,7 @@ if defined? Encoding
   Encoding.default_internal = Encoding::UTF_8
 end
 
-ruby '2.3.0'
+# ruby '2.3.0'
 
 gem 'slop', '~>4.3.0'
 gem 'nokogiri', '~>1.6.8'

@@ -102,25 +102,10 @@ public class DashboardActivity extends BaseActivity {
 		initNotificationService();
 
 		dealSendMessage();
-		checkFullScreen();
 
 		new Thread(mRunnableForDetecting).start();
 
 		checkUserModifiedInitPassword();
-	}
-
-	public void checkFullScreen(){
-		String betaConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBetaConfigFileName);
-		try {
-			if(new File(betaConfigPath).exists()) {
-				JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
-				if (betaJSON.has("longCat")) {
-					URLs.kIsFullScreen = betaJSON.getBoolean("longCat");
-				}
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public void dealSendMessage() {

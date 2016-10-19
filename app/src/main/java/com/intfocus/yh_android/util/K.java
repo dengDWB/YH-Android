@@ -59,7 +59,7 @@ public class K extends PrivateURLs implements Serializable {
   public final static String kCachedHeaderConfigFileName      = "cached_header.json";
   public final static String kPgyerVersionConfigFileName      = "pgyer_version.json";
   public final static String kGravatarConfigFileName          = "gravatar.json";
-  public final static String kBetaConfigFileName              = "beta.json";;
+  public final static String kBetaConfigFileName              = "beta_v0.json";;
   public final static String kBarCodeResultFileName           = "barcode_result.json";
   public final static String kScanBarCodeHTMLName             = "scan_bar_code.html";
   public final static String kCurrentVersionFileName          = "current_version.txt";

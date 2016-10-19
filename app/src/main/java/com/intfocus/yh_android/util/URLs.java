@@ -65,7 +65,6 @@ public class URLs implements Serializable {
     public final static String kETag                     = "ETag";
     public final static String kLastModified             = "Last_Modified";
 
-    public static boolean kIsFullScreen                  = true;
     public final static boolean kIsQRCode                = false;
 
     public static String storage_base(Context context) {
