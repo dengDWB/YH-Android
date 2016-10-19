@@ -426,10 +426,11 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
 
 		try {
+			mWebView.setDrawingCacheEnabled(true);
 			if (betaJSON.has("image_within_screen") && betaJSON.getBoolean("image_within_screen")){
 				imgBmp = mWebView.getDrawingCache();
-            }
-            else {
+			}
+			else {
 				mWebView.measure(View.MeasureSpec.makeMeasureSpec(
 						View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
 						View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
@@ -449,8 +450,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 				int iHeight = imgBmp.getHeight();
 				canvas.drawBitmap(imgBmp, 0, iHeight, paint);
 				mWebView.draw(canvas);
-            }
+			}
 			FileUtil.saveImage(filePath, imgBmp);
+			mWebView.setDrawingCacheEnabled(false);
 			imgBmp.recycle(); // 回收 bitmap 资源，避免内存浪费
 		} catch (JSONException e) {
 			e.printStackTrace();

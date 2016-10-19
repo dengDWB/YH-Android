@@ -2,10 +2,13 @@ package com.intfocus.yh_android;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -79,10 +82,37 @@ public class LoginActivity extends BaseActivity {
             e.printStackTrace();
         }
 
+        if (Build.VERSION.SDK_INT > K.kMaxSdkVersion || Build.VERSION.SDK_INT < K.kMinSdkVersion){
+            /*
+             *  当用户系统不在我们支持范围内时,发出警告。
+             */
+            showVersionWarring();
+        }
+
         /*
          * 检测登录界面，版本是否升级
          */
         checkVersionUpgrade(assetsPath);
+    }
+
+    private void showVersionWarring() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("温馨提示")
+                .setMessage(String.format("本应用不支持当前系统版本【Android %s】,强制使用可能会出现异常喔,给您带来的不便深表歉意,我们会尽快适配的!", Build.VERSION.RELEASE))
+                .setPositiveButton("退出应用", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mMyApp.setCurrentActivity(null);
+                        finish();
+                    }
+                })
+                .setNegativeButton("继续运行", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 返回 LoginActivity
+                    }
+                });
+        builder.show();
     }
 
     private void getAuthority() {
