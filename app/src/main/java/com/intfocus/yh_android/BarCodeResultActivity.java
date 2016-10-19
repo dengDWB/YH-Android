@@ -48,11 +48,11 @@ import static android.webkit.WebView.enableSlowWholeDocumentDraw;
  * Created by lijunjie on 16/6/10.
  */
 public class BarCodeResultActivity extends BaseActivity {
-    public final static String kId = "id";
+    private final static String kId = "id";
     private String htmlContent, htmlPath, cachedPath;
     private String codeInfo, codeType, groupID, roleID, userNum;
     private String storeID;
-    private ArrayList<HashMap<String, Object>> listItem = new ArrayList<>();
+    private final ArrayList<HashMap<String, Object>> listItem = new ArrayList<>();
     private TextView bannerTitle;
     private JSONObject cachedJSON;
 
@@ -162,7 +162,7 @@ public class BarCodeResultActivity extends BaseActivity {
         }
     }
 
-    public void selectStore() {
+    private void selectStore() {
         cachedJSON = FileUtil.readConfigFile(cachedPath);
         boolean flag = false;
         String storeName = "";
@@ -226,7 +226,7 @@ public class BarCodeResultActivity extends BaseActivity {
         BarCodeResultActivity.this.onBackPressed();
     }
 
-    public void updateHtmlContentTimetamp() {
+    private void updateHtmlContentTimetamp() {
         try {
             String newHtmlContent = htmlContent.replaceAll("TIMESTAMP", String.format("%d", new Date().getTime()));
             Log.i("HtmlContentTimetamp", newHtmlContent);
@@ -236,7 +236,7 @@ public class BarCodeResultActivity extends BaseActivity {
         }
     }
 
-    public void actionLaunchStoreSelectorActivity() {
+    private void actionLaunchStoreSelectorActivity() {
         Intent intent = new Intent(mContext, StoreSelectorActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         mContext.startActivity(intent);
@@ -286,7 +286,7 @@ public class BarCodeResultActivity extends BaseActivity {
         }
     };
 
-    public void refresh() {
+    private void refresh() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -317,7 +317,7 @@ public class BarCodeResultActivity extends BaseActivity {
     /*
      * 分享截图至微信
      */
-    public void actionShare2Weixin() {
+    private void actionShare2Weixin() {
         Bitmap imgBmp;
         String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
 
@@ -373,7 +373,7 @@ public class BarCodeResultActivity extends BaseActivity {
         }
     }
 
-    private UMShareListener umShareListener = new UMShareListener() {
+    private final UMShareListener umShareListener = new UMShareListener() {
         @Override
         public void onResult(SHARE_MEDIA platform) {
             Log.d("plat", "platform" + platform);

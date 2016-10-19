@@ -49,8 +49,8 @@ import java.util.HashMap;
 import java.util.List;
 
 public class DashboardActivity extends BaseActivity {
-	public final static String kTab = "tab";
-	public final static String kUserId = "user_id";
+	private final static String kTab = "tab";
+	private final static String kUserId = "user_id";
 
 	public static final String ACTION_UPDATENOTIFITION = "action.updateNotifition";
 	private static final int ZBAR_CAMERA_PERMISSION = 1;
@@ -108,7 +108,7 @@ public class DashboardActivity extends BaseActivity {
 		checkUserModifiedInitPassword();
 	}
 
-	public void dealSendMessage() {
+	private void dealSendMessage() {
 		currentUIVersion = URLs.currentUIVersion(mContext);
 		String pushMessagePath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushMessageFileName);
 		JSONObject pushMessageJSON = FileUtil.readConfigFile(pushMessagePath);
@@ -681,8 +681,7 @@ public class DashboardActivity extends BaseActivity {
 				valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 					@Override
 					public void onAnimationUpdate(ValueAnimator animation) {
-						int adHeight = (int) animation.getAnimatedValue();
-						layoutParams.height = adHeight;
+						layoutParams.height = (int) animation.getAnimatedValue();
 						view.setLayoutParams(layoutParams);
 						view.requestLayout();
 					}

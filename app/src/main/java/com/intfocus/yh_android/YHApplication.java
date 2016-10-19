@@ -252,7 +252,7 @@ public class YHApplication extends Application {
         return isBackground;
     }
 
-    UmengNotificationClickHandler pushMessageHandler = new UmengNotificationClickHandler() {
+    final UmengNotificationClickHandler pushMessageHandler = new UmengNotificationClickHandler() {
         @Override
         public void dealWithCustomAction(Context context, UMessage uMessage) {
             super.dealWithCustomAction(context, uMessage);

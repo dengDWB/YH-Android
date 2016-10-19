@@ -166,7 +166,7 @@ public class BaseActivity extends Activity {
             String param = arr[i];
             try{
                 f = imm.getClass().getDeclaredField(param);
-                if (f.isAccessible() == false) {
+                if (!f.isAccessible()) {
                     f.setAccessible(true);
                 }
                 obj_get = f.get(imm);
@@ -390,7 +390,7 @@ public class BaseActivity extends Activity {
      */
     public static class HandlerForDetecting extends Handler {
         private final WeakReference<BaseActivity> weakActivity;
-        private Context mContext;
+        private final Context mContext;
         private WebView mWebView;
         private String mSharedPath;
         private String mUrlString;
@@ -825,7 +825,7 @@ public class BaseActivity extends Activity {
     protected void toast(String info) {
         try {
             if (null == toast) {
-                toast = toast.makeText(mContext, info, Toast.LENGTH_SHORT);
+                toast = Toast.makeText(mContext, info, Toast.LENGTH_SHORT);
             }
             else {
                 toast.setText(info); //若当前已有 Toast 在显示,则直接修改当前 Toast 显示的内容

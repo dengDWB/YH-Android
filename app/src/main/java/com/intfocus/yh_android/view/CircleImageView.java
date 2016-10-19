@@ -52,7 +52,7 @@ public class CircleImageView extends ImageView {
 				super.onDraw(canvas);
 			}
 		} catch (Exception e){
-			return;
+			//e
 		}
 	}
 

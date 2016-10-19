@@ -33,7 +33,7 @@ public class ConfirmPassCodeActivity extends Activity {
 
     private boolean is_from_login;
     private Context mContext;
-    protected YHApplication mMyApp;
+    private YHApplication mMyApp;
 
     private StringBuilder stringBuilder;
     private TextView text_main_pass;

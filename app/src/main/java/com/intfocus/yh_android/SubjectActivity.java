@@ -54,13 +54,12 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	private Boolean isInnerLink, isSupportSearch;
 	private String templateID, reportID;
 	private PDFView mPDFView;
-	private ImageView mBannerComment,mBannerSetting;
 	private File pdfFile;
 	private String bannerName, link;
 	private int groupID, objectID, objectType;
 	private String userNum;
 	private RelativeLayout bannerView;
-	private ArrayList<HashMap<String, Object>> listItem = new ArrayList<>();
+	private final ArrayList<HashMap<String, Object>> listItem = new ArrayList<>();
 	private Boolean isShowSearchButton = false;
 
 	@Override
@@ -108,8 +107,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 
 	private void initActiongBar(){
 		bannerView = (RelativeLayout) findViewById(R.id.actionBar);
-		mBannerComment = (ImageView) findViewById(R.id.bannerComment);
-		mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
+		ImageView mBannerComment = (ImageView) findViewById(R.id.bannerComment);
+		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 		TextView mTitle = (TextView) findViewById(R.id.bannerTitle);
 
 		/*
@@ -475,7 +474,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		}
 	}
 
-	private UMShareListener umShareListener = new UMShareListener() {
+	private final UMShareListener umShareListener = new UMShareListener() {
 		@Override
 		public void onResult(SHARE_MEDIA platform) {
 			Log.d("plat", "platform" + platform);

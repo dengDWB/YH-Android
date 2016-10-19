@@ -88,7 +88,6 @@ public class SettingActivity extends BaseActivity {
     private PopupWindow popupWindow;
     private String gravatarJsonPath, gravatarImgPath, gravatarFileName;
     private TextView mCheckThursdaySay;
-    private TextView developerTv;
 
     /* 请求识别码 */
     private static final int CODE_GALLERY_REQUEST = 0xa0;
@@ -119,7 +118,6 @@ public class SettingActivity extends BaseActivity {
         mLockSwitch = (Switch) findViewById(R.id.lock_switch);
         mIconImageView =(CircleImageView) findViewById(R.id.img_icon);
         mCheckThursdaySay = (TextView) findViewById(R.id.check_thursday_say);
-        developerTv = (TextView) findViewById(R.id.developerTv);
 
         screenLockInfo = "取消锁屏成功";
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));

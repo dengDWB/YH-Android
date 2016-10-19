@@ -427,7 +427,7 @@ public class ApiHelper {
      *
      *  @return 服务器是否更新成功
      */
-    public static boolean pushDeviceToken(Context context, String deviceUUID) {
+    private static boolean pushDeviceToken(Context context, String deviceUUID) {
         try {
             String pushConfigPath = String.format("%s/%s", FileUtil.basePath(context), K.kPushConfigFileName);
             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
@@ -472,10 +472,9 @@ public class ApiHelper {
             params.put(URLs.kCodeType, codeType);
 
             String urlString = String.format(K.kBarCodeScanAPIPath, K.kBaseUrl, groupID, roleID, userNum, storeID, codeInfo, codeType);
-            Map<String, String> response = HttpUtil.httpGet(urlString, new HashMap());
             // Map<String, String> response = HttpUtil.httpPost(urlString, params);
 
-            return response;
+            return (Map<String, String>) HttpUtil.httpGet(urlString, new HashMap());
         } catch(JSONException e) {
             e.printStackTrace();
             return null;

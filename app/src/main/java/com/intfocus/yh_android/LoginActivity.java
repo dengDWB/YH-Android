@@ -30,7 +30,6 @@ public class LoginActivity extends BaseActivity {
     public final static String kSuccess      = "success";
     private EditText usernameEditText, passwordEditText;
     private String usernameString, passwordString;
-    private TextView versionTv;
     private final static int CODE_AUTHORITY_REQUEST = 0;
 
     @Override
@@ -72,7 +71,7 @@ public class LoginActivity extends BaseActivity {
 
         usernameEditText = (EditText) findViewById(R.id.etUsername);
         passwordEditText = (EditText) findViewById(R.id.etPassword);
-        versionTv = (TextView) findViewById(R.id.versionTv);
+        TextView versionTv = (TextView) findViewById(R.id.versionTv);
         PackageInfo packageInfo = null;
         try {
             packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
