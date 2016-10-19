@@ -82,12 +82,16 @@ public class LoginActivity extends BaseActivity {
             e.printStackTrace();
         }
 
-        if (Build.VERSION.SDK_INT > )
+        if (Build.VERSION.SDK_INT > K.kMaxSdkVersion || Build.VERSION.SDK_INT < K.kMinSdkVersion){
+            /*
+             *  当用户系统不在我们支持范围内时,发出警告。
+             */
+            showVersionWarring();
+        }
 
         /*
          * 检测登录界面，版本是否升级
          */
-        showVersionWarring();
         checkVersionUpgrade(assetsPath);
     }
 
