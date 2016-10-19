@@ -55,7 +55,6 @@
             android:gravity="center"
             android:paddingRight="45dp"
             android:textSize="20sp"
-            android:singleLine="true"
             android:background="@null"/>
     </LinearLayout>
 
@@ -91,7 +90,6 @@
             android:gravity="center"
             android:paddingRight="45dp"
             android:textSize="20sp"
-            android:singleLine="true"
             android:background="@null"/>
     </LinearLayout>
 
