@@ -107,9 +107,8 @@ if slop_opts[:gradle]
   gradle_lines = gradle_text.split(/\n/)
   application_id_line = gradle_lines.find { |line| line.include?('applicationId') }
   current_application_id = application_id_line.strip.scan(/applicationId\s+'(com\.intfocus\..*?)'/).flatten[0]
-  # bash_command=%(grep -rl '#{current_application_id}' app/src | xargs sed -i '' 's/#{current_application_id}/#{Settings.application_id}/g')
-  bash_command = %(sed -i '' "s/#{current_application_id}/#{Settings.application_id}/g" #{gradle_path} )
-  `#{bash_command}`
+
+  `sed -i '' "s/#{current_application_id}/#{Settings.application_id}/g" #{gradle_path}`
   puts %(- done: applicationId: #{current_application_id} => #{Settings.application_id})
 end
 
