@@ -209,6 +209,7 @@ public class SettingActivity extends BaseActivity {
 
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             String versionInfo = String.format("%s(%d)", packageInfo.versionName, packageInfo.versionCode);
+            int currentVersionCode = packageInfo.versionCode;
             mAppVersion.setText(versionInfo);
             mAppIdentifier.setText(packageInfo.packageName);
 
@@ -218,7 +219,10 @@ public class SettingActivity extends BaseActivity {
                 JSONObject pgyerJSON = FileUtil.readConfigFile(pgyerVersionPath);
                 JSONObject responseData = pgyerJSON.getJSONObject(URLs.kData);
                 pgyerInfo = String.format("%s(%s)", responseData.getString("versionName"), responseData.getString("versionCode"));
-                betaLink = pgyerInfo.equals(versionInfo) ? "" : pgyerInfo;
+                int newVersionCode = responseData.getInt("versionCode");
+                if (newVersionCode > currentVersionCode) {
+                    betaLink = pgyerInfo;
+                }
             }
             mPygerLink.setText(betaLink.isEmpty() ? "已是最新版本" : String.format("有发布版本%s", pgyerInfo));
             mPygerLink.setTextColor(Color.parseColor(betaLink.isEmpty() ? "#808080" : "#0000ff"));
