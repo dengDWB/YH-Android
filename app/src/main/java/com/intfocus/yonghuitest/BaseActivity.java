@@ -110,6 +110,7 @@ public class BaseActivity extends Activity {
 
         mMyApp = (YHApplication)this.getApplicationContext();
         mContext = BaseActivity.this;
+
         sharedPath = FileUtil.sharedPath(mContext);
         assetsPath = sharedPath;
         urlStringForDetecting = K.kBaseUrl;
@@ -131,8 +132,8 @@ public class BaseActivity extends Activity {
             }
         }
 
-        RefWatcher refWatcher = YHApplication.getRefWatcher(mContext);
-        refWatcher.watch(this);
+//        RefWatcher refWatcher = YHApplication.getRefWatcher(mContext);
+//        refWatcher.watch(this);
     }
 
     protected void onDestroy() {
@@ -440,7 +441,7 @@ public class BaseActivity extends Activity {
                                 String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
                                 JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
-                                userJSON = ApiHelper.merge(userJSON, configJSON);
+                                userJSON = ApiHelper.mergeJson(userJSON, configJSON);
                                 FileUtil.writeFile(userConfigPath, userJSON.toString());
 
                                 String settingsConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kSettingConfigFileName);
@@ -604,7 +605,7 @@ public class BaseActivity extends Activity {
             String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
-            userJSON = ApiHelper.merge(userJSON, configJSON);
+            userJSON = ApiHelper.mergeJson(userJSON, configJSON);
             FileUtil.writeFile(userConfigPath, userJSON.toString());
 
             String settingsConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kSettingConfigFileName);

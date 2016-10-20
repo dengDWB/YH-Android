@@ -65,7 +65,7 @@ public class ApiHelper {
             }
             // FileUtil.dirPath 需要优先写入登录用户信息
             JSONObject responseJSON = new JSONObject(response.get(URLs.kBody));
-            userJSON = ApiHelper.merge(userJSON, responseJSON);
+            userJSON = ApiHelper.mergeJson(userJSON, responseJSON);
             FileUtil.writeFile(userConfigPath, userJSON.toString());
 
             String settingsConfigPath = FileUtil.dirPath(context, K.kConfigDirName, K.kSettingConfigFileName);
@@ -126,7 +126,6 @@ public class ApiHelper {
             InputStream zipStream = new FileInputStream(cachedZipPath);
             FileUtil.unZip(zipStream, FileUtil.dirPath(context, K.kCachedDirName), true);
             zipStream.close();
-
             String jsFilePath = FileUtil.dirPath(context, K.kCachedDirName, jsFileName);
             File jsFile = new File(jsFilePath);
             if(jsFile.exists()) {
@@ -308,7 +307,7 @@ public class ApiHelper {
      * @param other JSONObject
      * @return 合并后的JSONObject
      */
-    public static JSONObject merge(JSONObject obj, JSONObject other) {
+    public static JSONObject mergeJson(JSONObject obj, JSONObject other) {
         try {
             Iterator it = other.keys();
             while (it.hasNext()) {
