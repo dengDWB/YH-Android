@@ -110,6 +110,7 @@ public class BaseActivity extends Activity {
 
         mMyApp = (YHApplication)this.getApplicationContext();
         mContext = BaseActivity.this;
+
         sharedPath = FileUtil.sharedPath(mContext);
         assetsPath = sharedPath;
         urlStringForDetecting = K.kBaseUrl;
@@ -131,8 +132,8 @@ public class BaseActivity extends Activity {
             }
         }
 
-        RefWatcher refWatcher = YHApplication.getRefWatcher(mContext);
-        refWatcher.watch(this);
+//        RefWatcher refWatcher = YHApplication.getRefWatcher(mContext);
+//        refWatcher.watch(this);
     }
 
     protected void onDestroy() {
@@ -440,7 +441,7 @@ public class BaseActivity extends Activity {
                                 String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
                                 JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
-                                userJSON = ApiHelper.merge(userJSON, configJSON);
+                                userJSON = ApiHelper.mergeJson(userJSON, configJSON);
                                 FileUtil.writeFile(userConfigPath, userJSON.toString());
 
                                 String settingsConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kSettingConfigFileName);
@@ -604,7 +605,7 @@ public class BaseActivity extends Activity {
             String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
-            userJSON = ApiHelper.merge(userJSON, configJSON);
+            userJSON = ApiHelper.mergeJson(userJSON, configJSON);
             FileUtil.writeFile(userConfigPath, userJSON.toString());
 
             String settingsConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kSettingConfigFileName);
@@ -641,74 +642,59 @@ public class BaseActivity extends Activity {
         UpdateManagerListener updateManagerListener = new UpdateManagerListener() {
             @Override
             public void onUpdateAvailable(final String result) {
-                String message = "", versionCode = "-1", versionName = "-1", currentVersionCode = "-1";
-                String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPgyerVersionConfigFileName);
                 try {
-                    if(new File(pgyerVersionPath).exists()) {
-                        JSONObject currentVersionJSON = FileUtil.readConfigFile(pgyerVersionPath);
-                        message = currentVersionJSON.getString(kMessage);
-
-                        if (message.isEmpty()) {
-                            JSONObject responseData = currentVersionJSON.getJSONObject(URLs.kData);
-                            currentVersionCode = responseData.getString(kVersionCode);
-                        }
-                    }
+                    PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                    int currentVersionCode = packageInfo.versionCode;
 
                     JSONObject response = new JSONObject(result);
-                    message = response.getString(kMessage);
-                    if (message.isEmpty()) {
-                        JSONObject responseVersionJSON = response.getJSONObject(URLs.kData);
-                        message = responseVersionJSON.getString("releaseNote");
-                        versionCode = responseVersionJSON.getString(kVersionCode);
-                        versionName = responseVersionJSON.getString("versionName");
+                    String message = response.getString("message");
 
-                        FileUtil.writeFile(pgyerVersionPath, result);
+                    JSONObject responseVersionJSON = response.getJSONObject(URLs.kData);
+                    int newVersionCode = responseVersionJSON.getInt(kVersionCode);
+                    String newVersionName = responseVersionJSON.getString("versionName");
+
+                    if (currentVersionCode >= newVersionCode) {
+                        return;
                     }
+
+                    if (newVersionCode % 2 == 1) {
+                        if (isShowToast) {
+                            toast(String.format("有发布测试版本%s(%s)", newVersionName, newVersionCode));
+                        }
+
+                        return;
+                    }
+
+                    String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPgyerVersionConfigFileName);
+                    FileUtil.writeFile(pgyerVersionPath, result);
+
+                    final AppBean appBean = getAppBeanFromString(result);
+                    new AlertDialog.Builder(mContext)
+                            .setTitle("版本更新")
+                            .setMessage(message.isEmpty() ? "无升级简介" : message)
+                            .setPositiveButton(
+                                    "确定",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            startDownloadTask(activity, appBean.getDownloadURL());
+                                        }
+                                    })
+                            .setNegativeButton("取消",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    })
+                            .show();
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    message = e.getMessage();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-                int iCode = Integer.parseInt(versionCode);
-                int iCurrentCode = Integer.parseInt(currentVersionCode);
-
-                // 对比 build 值，只准正向安装提示
-                if(iCode <= iCurrentCode) {
-                    return;
-                }
-
-                // 偶数时为正式版本
-                if (iCode % 2 == 1) {
-                    if(isShowToast) {
-                        toast(String.format("有发布测试版本%s(%s)", versionName, versionCode));
-                    }
-
-                    return;
-                }
-
-                // 将新版本信息封装到AppBean中
-                final AppBean appBean = getAppBeanFromString(result);
-                new AlertDialog.Builder(mContext)
-                        .setTitle("版本更新")
-                        .setMessage(message.isEmpty() ? "无升级简介" : message)
-                        .setPositiveButton(
-                                "确定",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        startDownloadTask(activity, appBean.getDownloadURL());
-                                    }
-                                })
-                        .setNegativeButton("取消",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                })
-                        .show();
             }
 
             @Override
