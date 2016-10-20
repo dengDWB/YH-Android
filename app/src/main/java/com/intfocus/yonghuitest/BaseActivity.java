@@ -643,6 +643,10 @@ public class BaseActivity extends Activity {
             @Override
             public void onUpdateAvailable(final String result) {
                 try {
+                    if(result == null || result.isEmpty()) {
+                        return;
+                    }
+
                     PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                     int currentVersionCode = packageInfo.versionCode;
 
@@ -793,8 +797,7 @@ public class BaseActivity extends Activity {
                 return false;
             }
 
-            LogUtil.d("checkAssetUpdated", String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName),
-                    userJSON.getString(keyName)));
+            LogUtil.d("checkAssetUpdated", String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName), userJSON.getString(keyName)));
             // execute this when the downloader must be fired
             final DownloadAssetsTask downloadTask = new DownloadAssetsTask(mContext, shouldReloadUIThread, assetName, isInAssets);
             downloadTask.execute(String.format(K.kDownloadAssetsAPIPath, K.kBaseUrl, assetName), assetZipPath);
