@@ -48,6 +48,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.intfocus.yonghuitest.util.URLs.kGroupId;
+
 public class DashboardActivity extends BaseActivity {
 	public final static String kTab = "tab";
 	public final static String kUserId = "user_id";
@@ -138,7 +140,7 @@ public class DashboardActivity extends BaseActivity {
 						break;
 					case "message":
 						jumpTab(mTabMessage);
-						urlString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
+						urlString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(kGroupId), user.getString(kUserId));
 						break;
 					case "thursday_say":
 						Intent blogLinkIntent = new Intent(DashboardActivity.this, ThursdaySayActivity.class);
@@ -533,7 +535,8 @@ public class DashboardActivity extends BaseActivity {
 				switch (v.getId()) {
 					case R.id.tabKPI:
 						objectType = 1;
-						urlString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
+						urlString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(
+								kGroupId), user.getString(URLs.kRoleId));
 
 						bvKpi.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabKpi, 0);
@@ -557,7 +560,7 @@ public class DashboardActivity extends BaseActivity {
 						break;
 					case R.id.tabMessage:
 						objectType = 5;
-						urlString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
+						urlString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(kGroupId), user.getString(kUserId));
 
 						bvMessage.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabMessage, 0);
@@ -565,7 +568,8 @@ public class DashboardActivity extends BaseActivity {
 						break;
 					default:
 						objectType = 1;
-						urlString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
+						urlString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(
+								kGroupId), user.getString(URLs.kRoleId));
 
 						bvKpi.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabKpi, 0);
@@ -717,13 +721,15 @@ public class DashboardActivity extends BaseActivity {
 		String currentUIVersion = URLs.currentUIVersion(mContext);
 		String tmpString;
 		try {
-			tmpString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kGroupId), user.getString(URLs.kRoleId));
+			tmpString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(
+					kGroupId), user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
 			tmpString = String.format(K.kAnalyseMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
 			tmpString = String.format(K.kAppMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
-			tmpString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), user.getString(kUserId));
+			tmpString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(
+					kGroupId), user.getString(kUserId));
 			urlStrings.add(tmpString);
 			tmpString = String.format(K.kThursdaySayMobilePath, K.kBaseUrl, currentUIVersion);
 			urlStrings.add(tmpString);
