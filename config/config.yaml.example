@@ -1,7 +1,7 @@
 pgyer: &pgyer
   user_key: '-'
   api_key: '-'
-yonghui:
+yh_android:
   app_code: 'yonghui'
   slogan: '融合共享，成于至善'
   application_id: 'com.intfocus.-'
@@ -27,11 +27,11 @@ yonghui:
     ios: '-'
     android: '-'
     <<: *pgyer
-  umeng: 
-    ios: 
+  umeng:
+    ios:
       app_key: '-'
       app_master_secret: '-'
-    android: 
+    android:
       app_key: '-'
       umeng_message_secret: '-'
       app_master_secret: '-'
@@ -68,11 +68,11 @@ yonghuitest:
     ios: '-'
     android: '-'
     <<: *pgyer
-  umeng: 
-    ios: 
+  umeng:
+    ios:
       app_key: '-'
       app_master_secret: '-'
-    android: 
+    android:
       app_key: '-'
       umeng_message_secret: '-'
       app_master_secret: '-'
@@ -109,11 +109,11 @@ shengyiplus:
     ios: '-'
     android: '-'
     <<: *pgyer
-  umeng: 
-    ios: 
+  umeng:
+    ios:
       app_key: '-'
       app_master_secret: '-'
-    android: 
+    android:
       app_key: '-'
       umeng_message_secret: '-'
       app_master_secret: '-'
@@ -150,11 +150,11 @@ qiyoutong:
     ios: '-'
     android: '-'
     <<: *pgyer
-  umeng: 
-    ios: 
+  umeng:
+    ios:
       app_key: '-'
       app_master_secret: '-'
-    android: 
+    android:
       app_key: '-'
       umeng_message_secret: '-'
       app_master_secret: '-'
