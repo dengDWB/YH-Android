@@ -723,14 +723,13 @@ public class DashboardActivity extends BaseActivity {
 			urlStrings.add(tmpString);
 			tmpString = String.format(K.kAppMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
-			tmpString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), kUserId);
+			tmpString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(URLs.kGroupId), user.getString(kUserId));
 			urlStrings.add(tmpString);
 			tmpString = String.format(K.kThursdaySayMobilePath, K.kBaseUrl, currentUIVersion);
 			urlStrings.add(tmpString);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	/*
