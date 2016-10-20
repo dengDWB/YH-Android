@@ -421,32 +421,43 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	public void actionShare2Weixin(View v) {
 		Bitmap imgBmp;
 		String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
-		if (URLs.kIsFullScreen){
-			mWebView.measure(View.MeasureSpec.makeMeasureSpec(
-					View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
-					View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-			mWebView.buildDrawingCache();
-			int imgMaxHight = displayMetrics.heightPixels * 5;
-			if (mWebView.getMeasuredHeight() > imgMaxHight) {
-				toast("截图失败,请尝试系统截图!");
-				return;
+
+		String betaConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBetaConfigFileName);
+		JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
+
+		try {
+			mWebView.setDrawingCacheEnabled(true);
+			if (betaJSON.has("image_within_screen") && betaJSON.getBoolean("image_within_screen")){
+				imgBmp = mWebView.getDrawingCache();
 			}
-			imgBmp = Bitmap.createBitmap(mWebView.getMeasuredWidth(),
-					mWebView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-			if (imgBmp == null) {
-				toast("截图失败");
+			else {
+				mWebView.measure(View.MeasureSpec.makeMeasureSpec(
+						View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
+						View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+				mWebView.buildDrawingCache();
+				int imgMaxHight = displayMetrics.heightPixels * 5;
+				if (mWebView.getMeasuredHeight() > imgMaxHight) {
+					toast("截图失败,请尝试系统截图!");
+					return;
+				}
+				imgBmp = Bitmap.createBitmap(mWebView.getMeasuredWidth(),
+						mWebView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+				if (imgBmp == null) {
+					toast("截图失败");
+				}
+				Canvas canvas = new Canvas(imgBmp);
+				Paint paint = new Paint();
+				int iHeight = imgBmp.getHeight();
+				canvas.drawBitmap(imgBmp, 0, iHeight, paint);
+				mWebView.draw(canvas);
 			}
-			Canvas canvas = new Canvas(imgBmp);
-			Paint paint = new Paint();
-			int iHeight = imgBmp.getHeight();
-			canvas.drawBitmap(imgBmp, 0, iHeight, paint);
-			mWebView.draw(canvas);
-		}else {
-			imgBmp = mWebView.getDrawingCache();
+			FileUtil.saveImage(filePath, imgBmp);
+			mWebView.setDrawingCacheEnabled(false);
+			imgBmp.recycle(); // 回收 bitmap 资源，避免内存浪费
+		} catch (JSONException e) {
+			e.printStackTrace();
 		}
 
-		FileUtil.saveImage(filePath, imgBmp);
-		imgBmp.recycle(); // 回收 bitmap 资源，避免内存浪费
 
 		File file = new File(filePath);
 		if (file.exists() && file.length() > 0) {

@@ -65,15 +65,14 @@ public class URLs implements Serializable {
     public final static String kETag                     = "ETag";
     public final static String kLastModified             = "Last_Modified";
 
-    public static boolean kIsFullScreen                  = true;
     public final static boolean kIsQRCode                = false;
 
     public static String storage_base(Context context) {
         //    String path = "";
         //    if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-        //        path = String.format("%s/com.intfocus.yh_android", Environment.getExternalStorageDirectory().getAbsolutePath());
+        //        path = String.format("%s/com.intfocus.yonghuitest", Environment.getExternalStorageDirectory().getAbsolutePath());
         //    } else {
-        //        path =String.format("%s/com.intfocus.yh_android", context.getApplicationContext().getFilesDir());
+        //        path =String.format("%s/com.intfocus.yonghuitest", context.getApplicationContext().getFilesDir());
         //    }
         return context.getApplicationContext().getFilesDir().toString();
     }

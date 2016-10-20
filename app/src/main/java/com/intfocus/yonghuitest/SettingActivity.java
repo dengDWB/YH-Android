@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -123,8 +124,15 @@ public class SettingActivity extends BaseActivity {
         screenLockInfo = "取消锁屏成功";
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mContext));
         mCheckAssets.setOnClickListener(mCheckAssetsListener);
-        mLongCatSwitch = (Switch) findViewById(R.id.longcat_switch);
-        mLongCatSwitch.setChecked(URLs.kIsFullScreen);
+
+        try {
+            String betaConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBetaConfigFileName);
+            JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
+            mLongCatSwitch = (Switch) findViewById(R.id.longcat_switch);
+            mLongCatSwitch.setChecked(betaJSON.has("image_within_screen") && betaJSON.getBoolean("image_within_screen"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         bvCheckUpgrade = new BadgeView(this, mCheckUpgrade);
         bvChangePWD = new BadgeView(this, mChangePWD);
@@ -166,7 +174,8 @@ public class SettingActivity extends BaseActivity {
             mGroupID.setText(user.getString("group_name"));
             mPushState.setText(PushAgent.getInstance(mContext).isEnabled() ? "开启" : "关闭");
             mAppName.setText(getApplicationName(SettingActivity.this));
-            mDeviceID.setText(TextUtils.split(android.os.Build.MODEL, " - ")[0]);
+            String deviceInfo = String.format("%s(Android %s)",TextUtils.split(android.os.Build.MODEL, " - ")[0],Build.VERSION.RELEASE);
+            mDeviceID.setText(deviceInfo);
             mApiDomain.setText(K.kBaseUrl.replace("http://", "").replace("https://", ""));
 
             gravatarJsonPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kGravatarConfigFileName);
@@ -782,21 +791,16 @@ public class SettingActivity extends BaseActivity {
     };
 
     /*
-     * 切换UI
+     * 切换截屏
      */
     private final CompoundButton.OnCheckedChangeListener mSwitchLongCatListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            // TODO Auto-generated method stub
             try {
                 String betaConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBetaConfigFileName);
-                JSONObject betaJSON = new JSONObject();
-                if(new File(betaConfigPath).exists()) {
-                    betaJSON = FileUtil.readConfigFile(betaConfigPath);
-                }
-                URLs.kIsFullScreen = isChecked;
+                JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
 
-                betaJSON.put("longCat", isChecked);
+                betaJSON.put("image_within_screen", isChecked);
                 FileUtil.writeFile(betaConfigPath, betaJSON.toString());
             } catch (JSONException | IOException e) {
                 e.printStackTrace();

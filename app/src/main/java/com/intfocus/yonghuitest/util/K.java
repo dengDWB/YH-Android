@@ -59,7 +59,7 @@ public class K extends PrivateURLs implements Serializable {
   public final static String kCachedHeaderConfigFileName      = "cached_header.json";
   public final static String kPgyerVersionConfigFileName      = "pgyer_version.json";
   public final static String kGravatarConfigFileName          = "gravatar.json";
-  public final static String kBetaConfigFileName              = "beta.json";;
+  public final static String kBetaConfigFileName              = "beta_v0.json";;
   public final static String kBarCodeResultFileName           = "barcode_result.json";
   public final static String kScanBarCodeHTMLName             = "scan_bar_code.html";
   public final static String kCurrentVersionFileName          = "current_version.txt";
@@ -79,4 +79,10 @@ public class K extends PrivateURLs implements Serializable {
   public final static String kUserId = "user_id";
   public final static String kUserName = "user_name";
   public final static String kUserDeviceId = "user_device_id";
+
+  /**
+   * Config#User Device Info
+   */
+  public final static int kMinSdkVersion = 14;
+  public final static int kMaxSdkVersion = 23;
 }
