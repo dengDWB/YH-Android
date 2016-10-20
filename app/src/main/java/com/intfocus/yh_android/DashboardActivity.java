@@ -147,9 +147,7 @@ public class DashboardActivity extends BaseActivity {
 			}
 			pushMessageJSON.put("state", true);
 			FileUtil.writeFile(pushMessagePath, pushMessageJSON.toString());
-		} catch (JSONException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (JSONException | IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -163,7 +161,7 @@ public class DashboardActivity extends BaseActivity {
 	 * 初始化下拉菜单按钮
 	 */
 	private void initDropMenuItem() {
-		listItem = new ArrayList<HashMap<String, Object>>();
+		listItem = new ArrayList<>();
 		int[] imgID = {R.drawable.icon_scan, R.drawable.icon_voice, R.drawable.icon_search, R.drawable.icon_user};
 		String[] itemName = {"扫一扫", "语音播报", "搜索", "个人信息"};
 		for (int i = 0; i < itemName.length; i++) {
@@ -269,6 +267,7 @@ public class DashboardActivity extends BaseActivity {
 					public void onClick(DialogInterface dialog, int which) {
 						mMyApp.setCurrentActivity(null);
 						finish();
+						System.exit(0);
 					}
 				})
 				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -711,7 +710,7 @@ public class DashboardActivity extends BaseActivity {
 	}
 
 	private void initUrlStrings() {
-		urlStrings = new ArrayList<String>();
+		urlStrings = new ArrayList<>();
 
 		String currentUIVersion = URLs.currentUIVersion(mContext);
 		String tmpString;

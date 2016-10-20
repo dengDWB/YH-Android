@@ -494,7 +494,7 @@ public class FileUtil {
      *  @return 选项列表
      */
     public static ArrayList<String> reportSearchItems(Context context, String groupID, String templateID, String reportID) {
-        ArrayList<String> searchItems = new ArrayList<String>();
+        ArrayList<String> searchItems = new ArrayList<>();
         String searchItemsPath = String.format("%s.search_items", FileUtil.reportJavaScriptDataPath(context, groupID, templateID, reportID));
         if(new File(searchItemsPath).exists()) {
             String itemsString = FileUtil.readFile(searchItemsPath);
@@ -579,9 +579,7 @@ public class FileUtil {
                     FileUtil.writeFile(behaviorPath,dashboardJson.toString());
                 }
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (JSONException | IOException e) {
             e.printStackTrace();
         }
     }

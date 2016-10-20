@@ -103,6 +103,7 @@ public class LoginActivity extends BaseActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         mMyApp.setCurrentActivity(null);
                         finish();
+                        System.exit(0);
                     }
                 })
                 .setNegativeButton("继续运行", new DialogInterface.OnClickListener() {
@@ -236,5 +237,6 @@ public class LoginActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         finish();
+        System.exit(0);
     }
 }

@@ -162,9 +162,8 @@ public class BaseActivity extends Activity {
         String [] arr = new String[]{"mCurRootView", "mServedView", "mNextServedView"};
         Field f = null;
         Object obj_get = null;
-        for (int i = 0;i < arr.length;i ++) {
-            String param = arr[i];
-            try{
+        for (String param : arr) {
+            try {
                 f = imm.getClass().getDeclaredField(param);
                 if (!f.isAccessible()) {
                     f.setAccessible(true);
@@ -178,7 +177,7 @@ public class BaseActivity extends Activity {
                         break;
                     }
                 }
-            }catch(Throwable t){
+            } catch (Throwable t) {
                 t.printStackTrace();
             }
         }
@@ -398,7 +397,7 @@ public class BaseActivity extends Activity {
         private String mRelativeAssetsPath;
 
         public HandlerForDetecting(BaseActivity activity) {
-            weakActivity = new WeakReference<BaseActivity>(activity);
+            weakActivity = new WeakReference<>(activity);
             mContext = weakActivity.get();
         }
 
@@ -514,7 +513,7 @@ public class BaseActivity extends Activity {
         private String mSharedPath;
 
         public HandlerWithAPI(BaseActivity activity) {
-            weakActivity = new WeakReference<BaseActivity>(activity);
+            weakActivity = new WeakReference<>(activity);
         }
 
         public void setVariables(WebView webView, String sharedPath) {

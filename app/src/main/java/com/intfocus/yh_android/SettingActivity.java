@@ -257,9 +257,7 @@ public class SettingActivity extends BaseActivity {
             }
             FileUtil.writeFile(path, jsonObject.toString());
             Log.i("upload", FileUtil.readFile(path));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (JSONException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -602,9 +600,7 @@ public class SettingActivity extends BaseActivity {
             Intent blogLinkIntent = new Intent(SettingActivity.this,ThursdaySayActivity.class);
             blogLinkIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(blogLinkIntent);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (JSONException | IOException e) {
             e.printStackTrace();
         }
     }

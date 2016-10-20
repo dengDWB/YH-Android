@@ -137,8 +137,6 @@ public class BarCodeResultActivity extends BaseActivity {
             cachedJSON.put("barcode", cachedCodeJSON);
             FileUtil.writeFile(cachedPath, cachedJSON.toString());
 
-        } catch (JSONException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -183,9 +181,7 @@ public class BarCodeResultActivity extends BaseActivity {
                 FileUtil.writeFile(cachedPath, cachedJSON.toString());
             }
             bannerTitle.setText(storeName);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (JSONException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -249,7 +245,7 @@ public class BarCodeResultActivity extends BaseActivity {
         String[] itemName = {"筛选", "分享","刷新"};
         int[] itemImage = {R.drawable.banner_search, R.drawable.banner_share,R.drawable.btn_refresh};
         for (int i = 0; i < itemName.length; i++) {
-            HashMap<String, Object> map = new HashMap<String, Object>();
+            HashMap<String, Object> map = new HashMap<>();
             map.put("ItemImage", itemImage[i]);
             map.put("ItemText", itemName[i]);
             listItem.add(map);

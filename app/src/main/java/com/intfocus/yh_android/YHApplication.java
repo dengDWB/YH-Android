@@ -118,9 +118,7 @@ public class YHApplication extends Application {
                             pushJSON.put("push_valid", false);
                             pushJSON.put("push_device_token", registrationId);
                             FileUtil.writeFile(pushConfigPath, pushJSON.toString());
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
+                        } catch (JSONException | IOException e) {
                             e.printStackTrace();
                         }
                     }
@@ -279,9 +277,7 @@ public class YHApplication extends Application {
                 }
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (JSONException | IOException e) {
                 e.printStackTrace();
             }
         }

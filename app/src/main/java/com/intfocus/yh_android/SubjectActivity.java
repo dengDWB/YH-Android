@@ -158,7 +158,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		String[] itemName = {"分享", "评论", "刷新"};
 		int[] itemImage = {R.drawable.banner_share, R.drawable.banner_comment,R.drawable.btn_refresh};
 		for (int i = 0; i < itemName.length; i++) {
-			HashMap<String, Object> map = new HashMap<String, Object>();
+			HashMap<String, Object> map = new HashMap<>();
 			map.put("ItemImage", itemImage[i]);
 			map.put("ItemText", itemName[i]);
 			listItem.add(map);
@@ -210,7 +210,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			@Override
 			public void run() {
 				if (!isShowSearchButton) {
-						HashMap<String, Object> map = new HashMap<String, Object>();
+						HashMap<String, Object> map = new HashMap<>();
 						map.put("ItemImage",R.drawable.banner_search);
 						map.put("ItemText","筛选");
 						listItem.add(map);
