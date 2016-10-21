@@ -164,6 +164,17 @@ if slop_opts[:res]
 end
 
 #
+# reset res/mipmap-*
+#
+if slop_opts[:mipmap]
+  res_path = 'app/src/main/res'
+  `rm -fr #{res_path}/mipmap-*`
+  `cp -r config/Assets/mipmap-#{current_app}/mipmap-* #{res_path}`
+
+  puts %(- done: res/mipmap-*: #{current_app_name})
+end
+
+#
 # check manifest.xml, res/strings.xml
 #
 if slop_opts[:check]
@@ -239,12 +250,12 @@ end
 # gradlew generate apk
 #
 if slop_opts[:apk]
-  apk_path = 'app/build/outputs/apk/app-release.apk'
   key_store_path = File.join(Dir.pwd, Settings.key_store.path)
   exit_when !File.exist?(key_store_path) do
-    puts %(Abort: key store file not exist - #{apk_path})
+    puts %(Abort: key store file not exist - #{key_store_path})
   end
 
+  apk_path = 'app/build/outputs/apk/app-release.apk'
   `test -f #{apk_path} && rm -f #{apk_path}`
   `export KEYSTORE=#{key_store_path} KEYSTORE_PASSWORD=#{Settings.key_store.password} KEY_ALIAS=#{Settings.key_store.alias} KEY_PASSWORD=#{Settings.key_store.alias_password} && /bin/bash ./gradlew assembleRelease`
 
