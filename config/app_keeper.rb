@@ -170,6 +170,7 @@ if slop_opts[:mipmap]
   res_path = 'app/src/main/res'
   `rm -fr #{res_path}/mipmap-*`
   `cp -r config/Assets/mipmap-#{current_app}/mipmap-* #{res_path}`
+  `cp -f config/Assets/drawable-#{current_app}/*.png #{res_path}/drawable/`
 
   puts %(- done: res/mipmap-*: #{current_app_name})
 end
