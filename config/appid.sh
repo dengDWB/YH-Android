@@ -1,6 +1,11 @@
-# grep -rl '#{current_application_id}' app/src | xargs sed -i '' 's/#{current_application_id}/#{Settings.application_id}/g'
+#!/usr/bin/env bash
 
-[[ ! -f .android-studio-package ]] && (echo '.android-studio-package not exist' && exit)
+# 1. app/src/main get current package
+# 2. one more packages then match bundle.gradle
+# 3. current-package folder ancestor move name
+# 3. replace all deprecated package name
+#
+[[ ! -f .current-app ]] && (echo '.current-app not exist' && exit)
 
 company_folder='app/src/main/java/com/intfocus'
 company_prefix='com.intfocus'
@@ -11,7 +16,7 @@ current_company_name=$(ls ${company_folder} | head -n 1)
 current_company_domain=${company_prefix}.${current_company_name}
 current_company_path=${company_folder}/${current_company_name}
 
-new_company_name=$(cat .android-studio-package)
+new_company_name=$(cat .current-app)
 new_company_path=${company_folder}/${new_company_name}
 new_company_domain=${company_prefix}.${new_company_name}
 
