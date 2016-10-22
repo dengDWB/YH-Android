@@ -108,7 +108,7 @@ public class BaseActivity extends Activity {
         displayMetrics = getResources().getDisplayMetrics();
         displayDpi = displayMetrics.densityDpi;
 
-        mMyApp = (YHApplication)this.getApplicationContext();
+        mMyApp = (YHApplication)this.getApplication();
         mContext = BaseActivity.this;
 
         sharedPath = FileUtil.sharedPath(mContext);

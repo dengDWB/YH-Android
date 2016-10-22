@@ -122,12 +122,12 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		isInnerLink = !(link.startsWith("http://") || link.startsWith("https://"));
 		mTitle.setText(bannerName);
 
-		if (link.toLowerCase().endsWith(".pdf")) {
-			mBannerComment.setVisibility(View.VISIBLE);
+//		if (link.toLowerCase().endsWith(".pdf")) {
+//			mBannerComment.setVisibility(View.VISIBLE);
 			mPDFView = (PDFView) findViewById(R.id.pdfview);
 			mPDFView.setVisibility(View.INVISIBLE);
-			return;
-		}
+//			return;
+//		}
 		mBannerSetting.setVisibility(View.VISIBLE);
 		initDropMenuItem();
 	}
@@ -460,7 +460,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 
 		File file = new File(filePath);
 		if (file.exists() && file.length() > 0) {
-			UMImage image = new UMImage(SubjectActivity.this, file);
+				UMImage image = new UMImage(SubjectActivity.this, file);
 
 			new ShareAction(this)
 					.withTitle("分享截图")
