@@ -271,8 +271,7 @@ public class YHApplication extends Application {
                     intent = new Intent (mContext, LoginActivity.class);
                 }
                 else {
-                    String activityName = mCurrentActivity.getClass().getSimpleName();
-                    if (activityName.equals("LoginActivity") || activityName.equals("ConfirmPassCodeActivity")) {
+                    if (mCurrentActivity.equals("LoginActivity") || mCurrentActivity.equals("ConfirmPassCodeActivity")) {
                         return;
                     }
                     intent = new Intent (mContext,DashboardActivity.class);

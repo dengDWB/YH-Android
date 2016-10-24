@@ -236,6 +236,7 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
+        mMyApp.setCurrentActivity(null);
         finish();
     }
 }
