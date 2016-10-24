@@ -63,8 +63,7 @@ public class BarCodeResultActivity extends BaseActivity {
         /*
          * 判断当前设备版本，5.0 以上 Android 系统使用才 enableSlowWholeDocumentDraw();
          */
-        int sysVersion = Build.VERSION.SDK_INT;
-        if (sysVersion > 20) {
+        if (Build.VERSION.SDK_INT > 20) {
             enableSlowWholeDocumentDraw();
         }
         setContentView(R.layout.activity_bar_code_result);

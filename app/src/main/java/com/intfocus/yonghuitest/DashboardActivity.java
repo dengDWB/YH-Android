@@ -76,7 +76,6 @@ public class DashboardActivity extends BaseActivity {
 		setContentView(R.layout.activity_dashboard);
 
 		initUrlStrings();
-		initDropMenuItem();
 		initTab();
 		readBehaviorFile();
 		initUserIDColorView();
@@ -108,6 +107,54 @@ public class DashboardActivity extends BaseActivity {
 		new Thread(mRunnableForDetecting).start();
 
 		checkUserModifiedInitPassword();
+	}
+
+	protected void onResume() {
+		mMyApp.setCurrentActivity(this);
+		/*
+		 * 启动 Activity 时也需要判断小红点是否显示
+		 */
+		receiveNotification();
+		super.onResume();
+	}
+
+	@Override
+	protected void onStop() {
+		popupWindow.dismiss();
+
+		super.onStop();
+	}
+
+	protected void onDestroy() {
+		mContext = null;
+		mWebView = null;
+		user = null;
+		popupWindow.dismiss();
+		PgyUpdateManager.unregister(); // 解除注册蒲公英版本更新检查
+		unregisterReceiver(notificationBroadcastReceiver);
+		super.onDestroy();
+	}
+
+	@Override
+	public void onBackPressed() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("温馨提示")
+				.setMessage(String.format("确认退出【%s】？", getResources().getString(R.string.app_name)))
+				.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						mMyApp.setCurrentActivity(null);
+						finish();
+						System.exit(0);
+					}
+				})
+				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// 返回DashboardActivity
+					}
+				});
+		builder.show();
 	}
 
 	private void dealSendMessage() {
@@ -231,54 +278,6 @@ public class DashboardActivity extends BaseActivity {
 			default:
 				super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		}
-	}
-
-	protected void onResume() {
-		mMyApp.setCurrentActivity(this);
-		/*
-		 * 启动 Activity 时也需要判断小红点是否显示
-		 */
-		receiveNotification();
-		super.onResume();
-	}
-
-	@Override
-	protected void onStop() {
-		popupWindow.dismiss();
-
-		super.onStop();
-	}
-
-	protected void onDestroy() {
-		mContext = null;
-		mWebView = null;
-		user = null;
-		popupWindow.dismiss();
-		PgyUpdateManager.unregister(); // 解除注册蒲公英版本更新检查
-		unregisterReceiver(notificationBroadcastReceiver);
-		super.onDestroy();
-	}
-
-	@Override
-	public void onBackPressed() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("温馨提示")
-				.setMessage(String.format("确认退出【%s】？", getResources().getString(R.string.app_name)))
-				.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						mMyApp.setCurrentActivity(null);
-						finish();
-						System.exit(0);
-					}
-				})
-				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// 返回DashboardActivity
-					}
-				});
-		builder.show();
 	}
 
 	/*
@@ -655,6 +654,7 @@ public class DashboardActivity extends BaseActivity {
 	 * 标题栏点击设置按钮显示下拉菜单
 	 */
 	public void launchDropMenuActivity(View v) {
+		initDropMenuItem();
 		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 		popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
 

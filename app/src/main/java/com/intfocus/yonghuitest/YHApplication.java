@@ -217,8 +217,8 @@ public class YHApplication extends Application {
         }
         String mActivity = context.toString();
         String mActivityName = mActivity.substring(mActivity.lastIndexOf(".") + 1, mActivity.indexOf("@"));
-        Log.i("activityName",mActivityName);
         mCurrentActivity = mActivityName;
+        Log.i("activityName",mCurrentActivity);
     }
 
     /*
@@ -269,7 +269,7 @@ public class YHApplication extends Application {
                     intent = new Intent (applicationContext, LoginActivity.class);
                 }
                 else {
-                    String activityName = mCurrentActivity.getClass().getSimpleName();
+                    String activityName = mCurrentActivity;
                     if (activityName.equals("LoginActivity") || activityName.equals("ConfirmPassCodeActivity")) {
                         return;
                     }
