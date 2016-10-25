@@ -34,6 +34,7 @@ import com.umeng.socialize.media.UMImage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,6 +57,7 @@ public class BarCodeResultActivity extends BaseActivity {
     private final ArrayList<HashMap<String, Object>> listItem = new ArrayList<>();
     private TextView bannerTitle;
     private JSONObject cachedJSON;
+    private ImageView mBannerSetting;
 
     @Override
     public void onCreate(Bundle state) {
@@ -71,6 +73,8 @@ public class BarCodeResultActivity extends BaseActivity {
 
         animLoading = (RelativeLayout) findViewById(R.id.anim_loading);
         bannerTitle = (TextView) findViewById(R.id.bannerTitle);
+        mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
+
         mWebView = (WebView) findViewById(R.id.barcode_browser);
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -128,8 +132,8 @@ public class BarCodeResultActivity extends BaseActivity {
             userNum = user.getString(URLs.kUserNum);
 
             /*
-            * 商品条形码写入缓存
-            */
+             * 商品条形码写入缓存
+             */
             cachedJSON = FileUtil.readConfigFile(cachedPath);
             JSONObject cachedCodeJSON = new JSONObject();
             cachedCodeJSON.put(URLs.kCodeInfo, codeInfo);
@@ -146,25 +150,35 @@ public class BarCodeResultActivity extends BaseActivity {
     public void onResume() {
         super.onResume();
         mMyApp.setCurrentActivity(this);
+        /*
+         * 初始化默认选中门店（第一家）
+         */
+        showBarCodeResult();
+    }
 
+    private void showBarCodeResult() {
         try {
-            /*
-            * 初始化默认选中门店（第一家）
-            */
+            if (user.getJSONArray(URLs.kStoreIds).length() <= 0) {
+                // 若该数据为空,则该用户无门店权限
+                animLoading.setVisibility(View.GONE);
+                mWebView.setVisibility(View.GONE);
+                mBannerSetting.setVisibility(View.GONE);
+                TextView errorText = (TextView) findViewById(R.id.text_permission);
+                errorText.setVisibility(View.VISIBLE);
+                return;
+            }
+
             selectStore();
-            cachedJSON = FileUtil.readConfigFile(cachedPath);
-            storeID = cachedJSON.getJSONObject(URLs.kStore).getString(kId);
             loadBarCodeResult();
-        } catch (JSONException e) {
+        } catch (JSONException | IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void selectStore() {
+    private void selectStore() throws JSONException,IOException {
         cachedJSON = FileUtil.readConfigFile(cachedPath);
         boolean flag = false;
         String storeName = "";
-        try {
             if (cachedJSON.has(URLs.kStore) && cachedJSON.getJSONObject(URLs.kStore).has(kId) &&
                     user.has(URLs.kStoreIds) && user.getJSONArray(URLs.kStoreIds).length() > 0) {
                 storeName = cachedJSON.getJSONObject(URLs.kStore).getString("name");
@@ -181,9 +195,7 @@ public class BarCodeResultActivity extends BaseActivity {
                 FileUtil.writeFile(cachedPath, cachedJSON.toString());
             }
             bannerTitle.setText(storeName);
-        } catch (JSONException | IOException e) {
-            e.printStackTrace();
-        }
+            storeID = cachedJSON.getJSONObject(URLs.kStore).getString(kId);
     }
 
     private void loadBarCodeResult() {
@@ -239,8 +251,8 @@ public class BarCodeResultActivity extends BaseActivity {
     }
 
     /*
-   * 初始化标题栏下拉菜单
-   */
+     * 初始化标题栏下拉菜单
+     */
     private void initDropMenuItem() {
         String[] itemName = {"筛选", "分享","刷新"};
         int[] itemImage = {R.drawable.banner_search, R.drawable.banner_share,R.drawable.btn_refresh};
@@ -286,7 +298,7 @@ public class BarCodeResultActivity extends BaseActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                loadBarCodeResult();
+                showBarCodeResult();
             }
         });
     }
@@ -295,7 +307,6 @@ public class BarCodeResultActivity extends BaseActivity {
      * 标题栏点击设置按钮显示下拉菜单
      */
     public void launchDropMenuActivity(View v) {
-        ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
         popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
 
 		/*
@@ -423,7 +434,7 @@ public class BarCodeResultActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    loadBarCodeResult();
+                    showBarCodeResult();
                 }
             });
         }
