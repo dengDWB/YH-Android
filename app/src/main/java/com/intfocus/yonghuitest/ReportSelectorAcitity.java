@@ -57,8 +57,8 @@ public class ReportSelectorAcitity extends BaseActivity  {
      *  - 如果用户已设置筛选项，则 banner 显示该信息
      *  - 未设置时，默认显示第一个
      */
-    ArrayList<String> searchItems = FileUtil.reportSearchItems(mContext, String.format("%d", groupID), templateID, reportID);
-    String selectedItem = FileUtil.reportSelectedItem(mContext, String.format("%d", groupID), templateID, reportID);
+    ArrayList<String> searchItems = FileUtil.reportSearchItems(mAppContext, String.format("%d", groupID), templateID, reportID);
+    String selectedItem = FileUtil.reportSelectedItem(mAppContext, String.format("%d", groupID), templateID, reportID);
     if((selectedItem == null || selectedItem.length() == 0 ) && searchItems.size() > 0) {
       selectedItem = searchItems.get(0).toString().trim();
     }
@@ -128,12 +128,24 @@ public class ReportSelectorAcitity extends BaseActivity  {
     initColorView(colorViews);
   }
 
+  @Override
+  protected void onResume() {
+    mMyApp.setCurrentActivity(this);
+    super.onResume();
+  }
+
+  protected void onDestroy() {
+    mWebView = null;
+    user = null;
+    super.onDestroy();
+  }
+
   private ListView.OnItemClickListener mListItemListener = new ListView.OnItemClickListener() {
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
       try {
         TextView mSelector = (TextView) arg1.findViewById(R.id.reportSelectorItem);
-        String selectedItemPath = String.format("%s.selected_item", FileUtil.reportJavaScriptDataPath(mContext, String.format("%d", groupID), templateID, reportID));
+        String selectedItemPath = String.format("%s.selected_item", FileUtil.reportJavaScriptDataPath(mAppContext, String.format("%d", groupID), templateID, reportID));
         FileUtil.writeFile(selectedItemPath, mSelector.getText().toString());
 
         dismissActivity(null);
@@ -142,18 +154,6 @@ public class ReportSelectorAcitity extends BaseActivity  {
       }
     }
   };
-
-  protected void onResume() {
-    mMyApp.setCurrentActivity(this);
-    super.onResume();
-  }
-
-  protected void onDestroy() {
-    mContext = null;
-    mWebView = null;
-    user = null;
-    super.onDestroy();
-  }
 
   public class ListArrayAdapter extends ArrayAdapter<String> {
     private int resourceId;

@@ -53,7 +53,7 @@ public class StoreSelectorActivity extends BaseActivity {
     TextView mSelectedItem = (TextView) findViewById(R.id.store_item_select);
 
     try {
-      cachedPath = FileUtil.dirPath(mContext, K.kCachedDirName, K.kBarCodeResultFileName);
+      cachedPath = FileUtil.dirPath(mAppContext, K.kCachedDirName, K.kBarCodeResultFileName);
       cachedJSON = FileUtil.readConfigFile(cachedPath);
       JSONObject currentStore = cachedJSON.getJSONObject(URLs.kStore);
 
@@ -166,7 +166,6 @@ public class StoreSelectorActivity extends BaseActivity {
   }
 
   protected void onDestroy() {
-    mContext = null;
     mWebView = null;
     user = null;
     super.onDestroy();

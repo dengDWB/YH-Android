@@ -1,6 +1,5 @@
 package com.intfocus.yonghuitest;
 
-import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.BroadcastReceiver;
@@ -38,15 +37,15 @@ import org.json.JSONObject;
  * Created by lijunjie on 16/1/15.
  */
 public class YHApplication extends Application {
-    private Context applicationContext;
+    private Context appContext;
     private RefWatcher refWatcher;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        applicationContext = this;
-        String sharedPath = FileUtil.sharedPath(applicationContext), basePath = FileUtil.basePath(applicationContext);
+        appContext = getApplicationContext();
+        String sharedPath = FileUtil.sharedPath(appContext), basePath = FileUtil.basePath(appContext);
 
         /*
          * 微信平台验证
@@ -81,13 +80,13 @@ public class YHApplication extends Application {
          *  sharedPath/filename.zip md5 值 <=> user.plist 中 filename_md5
          *  不一致时，则删除原解压后文件夹，重新解压 zip
          */
-        FileUtil.checkAssets(applicationContext, URLs.kAssets, false);
-        FileUtil.checkAssets(applicationContext, URLs.kLoding, false);
-        FileUtil.checkAssets(applicationContext, URLs.kFonts, true);
-        FileUtil.checkAssets(applicationContext, URLs.kImages, true);
-        FileUtil.checkAssets(applicationContext, URLs.kStylesheets, true);
-        FileUtil.checkAssets(applicationContext, URLs.kJavaScripts, true);
-        FileUtil.checkAssets(applicationContext, URLs.kBarCodeScan, false);
+        FileUtil.checkAssets(appContext, URLs.kAssets, false);
+        FileUtil.checkAssets(appContext, URLs.kLoding, false);
+        FileUtil.checkAssets(appContext, URLs.kFonts, true);
+        FileUtil.checkAssets(appContext, URLs.kImages, true);
+        FileUtil.checkAssets(appContext, URLs.kStylesheets, true);
+        FileUtil.checkAssets(appContext, URLs.kJavaScripts, true);
+        FileUtil.checkAssets(appContext, URLs.kBarCodeScan, false);
         // FileUtil.checkAssets(mContext, URLs.kAdvertisement, false);
 
         /*
@@ -99,7 +98,7 @@ public class YHApplication extends Application {
          *  监测内存泄漏
          */
 //        refWatcher = LeakCanary.install(this);
-        PushAgent mPushAgent = PushAgent.getInstance(applicationContext);
+        PushAgent mPushAgent = PushAgent.getInstance(appContext);
         // 开启推送并设置注册的回调处理
         mPushAgent.enable(new IUmengRegisterCallback() {
             @Override
@@ -108,12 +107,12 @@ public class YHApplication extends Application {
                     @Override
                     public void run() {
                         try {
-                            if(applicationContext == null) {
+                            if(appContext == null) {
                                 LogUtil.d("PushAgent", "mContext is null");
                                 return;
                             }
                             // onRegistered方法的参数registrationId即是device_token
-                            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(applicationContext), K.kPushConfigFileName );
+                            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(appContext), K.kPushConfigFileName );
                             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
                             pushJSON.put("push_valid", false);
                             pushJSON.put("push_device_token", registrationId);
@@ -139,68 +138,42 @@ public class YHApplication extends Application {
         super.onTerminate();
     }
 
+    public Context getAppContext() {
+        return appContext;
+    }
+
+
     public static RefWatcher getRefWatcher(Context context) {
         YHApplication application = (YHApplication) context.getApplicationContext();
         return application.refWatcher;
     }
 
     private void makeSureFolderExist(String folderName) {
-        String cachedPath = String.format("%s/%s", FileUtil.basePath(applicationContext), folderName);
+        String cachedPath = String.format("%s/%s", FileUtil.basePath(appContext), folderName);
         FileUtil.makeSureFolderExist(cachedPath);
     }
 
-    /**
-     *  新安装、或升级后，把代码包中的静态资源重新拷贝覆盖一下
-     *  避免再从服务器下载更新，浪费用户流量
-     */
-    private void copyAssetFiles(String basePath, String sharedPath) {
-        try {
-            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            String versionConfigPath = String.format("%s/%s", basePath, K.kCurrentVersionFileName);
 
-            boolean isUpgrade = true;
-            String localVersion = "new-installer";
-            if ((new File(versionConfigPath)).exists()) {
-                localVersion = FileUtil.readFile(versionConfigPath);
-                isUpgrade = !localVersion.equals(packageInfo.versionName);
-            }
-            if (!isUpgrade) return;
-            Log.i("VersionUpgrade", String.format("%s => %s remove %s/%s", localVersion, packageInfo.versionName, basePath, K.kCachedHeaderConfigFileName));
-
-            String assetZipPath;
-            File assetZipFile;
-            String[] assetsName = {URLs.kAssets,URLs.kLoding,URLs.kFonts,URLs.kImages,URLs.kStylesheets,URLs.kJavaScripts,URLs.kBarCodeScan}; // ,URLs.kAdvertisement
-
-            for (String string : assetsName) {
-                assetZipPath = String.format("%s/%s.zip", sharedPath, string);
-                assetZipFile = new File(assetZipPath);
-                if (!assetZipFile.exists()) { assetZipFile.delete();}
-                FileUtil.copyAssetFile(applicationContext, String.format("%s.zip",string), assetZipPath);
-            }
-            FileUtil.writeFile(versionConfigPath, packageInfo.versionName);
-        }
-        catch (PackageManager.NameNotFoundException | IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     /*
      *  手机待机再激活时接收解屏广播,进入解锁密码页
      */
     private final BroadcastReceiver broadcastScreenOnAndOff = new BroadcastReceiver() {
-
-        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(!intent.getAction().equals(Intent.ACTION_SCREEN_ON) || isBackground(applicationContext)) return;
+            if(!intent.getAction().equals(Intent.ACTION_SCREEN_ON) || isBackground(appContext))
+            {
+                Log.i("BroadcastReceiver", "return" + isBackground(appContext));
+                return;
+            }
             Log.i("BroadcastReceiver", "Screen On");
             String currentActivityName = ((YHApplication)context.getApplicationContext()).getCurrentActivity();
             if ((currentActivityName != null && !currentActivityName.trim().equals("ConfirmPassCodeActivity")) && // 当前活动的Activity非解锁界面
-                    FileUtil.checkIsLocked(applicationContext)) { // 应用处于登录状态，并且开启了密码锁
-                intent = new Intent(applicationContext, ConfirmPassCodeActivity.class);
+                    FileUtil.checkIsLocked(appContext)) { //应用处于登录状态，并且开启了密码锁
+                intent = new Intent(appContext, ConfirmPassCodeActivity.class);
                 intent.putExtra("is_from_login", true);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                applicationContext.startActivity(intent);
+                appContext.startActivity(intent);
             }
         }
     };
@@ -256,24 +229,24 @@ public class YHApplication extends Application {
             super.dealWithCustomAction(context, uMessage);
             try {
                 if (uMessage.custom.equals(null) ||uMessage.custom.equals("")) {
-                    Toast.makeText(applicationContext,"推送没有携带消息",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(appContext,"推送没有携带消息",Toast.LENGTH_SHORT).show();
                     return;
                 }
-                String pushMessagePath = String.format("%s/%s", FileUtil.basePath(applicationContext), K.kPushMessageFileName);
+                String pushMessagePath = String.format("%s/%s", FileUtil.basePath(appContext), K.kPushMessageFileName);
                 JSONObject pushMessageJSON = new JSONObject(uMessage.custom);
                 pushMessageJSON.put("state", false);
                 FileUtil.writeFile(pushMessagePath, pushMessageJSON.toString());
 
                 Intent intent;
                 if ((mCurrentActivity == null)) {
-                    intent = new Intent (applicationContext, LoginActivity.class);
+                    intent = new Intent (appContext, LoginActivity.class);
                 }
                 else {
                     String activityName = mCurrentActivity;
                     if (activityName.equals("LoginActivity") || activityName.equals("ConfirmPassCodeActivity")) {
                         return;
                     }
-                    intent = new Intent (applicationContext,DashboardActivity.class);
+                    intent = new Intent (appContext,DashboardActivity.class);
                 }
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
@@ -283,6 +256,40 @@ public class YHApplication extends Application {
         }
     };
 
+    /**
+     *  新安装、或升级后，把代码包中的静态资源重新拷贝覆盖一下
+     *  避免再从服务器下载更新，浪费用户流量
+     */
+    private void copyAssetFiles(String basePath, String sharedPath) {
+        try {
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            String versionConfigPath = String.format("%s/%s", basePath, K.kCurrentVersionFileName);
+
+            boolean isUpgrade = true;
+            String localVersion = "new-installer";
+            if ((new File(versionConfigPath)).exists()) {
+                localVersion = FileUtil.readFile(versionConfigPath);
+                isUpgrade = !localVersion.equals(packageInfo.versionName);
+            }
+            if (!isUpgrade) return;
+            Log.i("VersionUpgrade", String.format("%s => %s remove %s/%s", localVersion, packageInfo.versionName, basePath, K.kCachedHeaderConfigFileName));
+
+            String assetZipPath;
+            File assetZipFile;
+            String[] assetsName = {URLs.kAssets,URLs.kLoding,URLs.kFonts,URLs.kImages,URLs.kStylesheets,URLs.kJavaScripts,URLs.kBarCodeScan}; // ,URLs.kAdvertisement
+
+            for (String string : assetsName) {
+                assetZipPath = String.format("%s/%s.zip", sharedPath, string);
+                assetZipFile = new File(assetZipPath);
+                if (!assetZipFile.exists()) { assetZipFile.delete();}
+                FileUtil.copyAssetFile(appContext, String.format("%s.zip",string), assetZipPath);
+            }
+            FileUtil.writeFile(versionConfigPath, packageInfo.versionName);
+        }
+        catch (PackageManager.NameNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
 
 

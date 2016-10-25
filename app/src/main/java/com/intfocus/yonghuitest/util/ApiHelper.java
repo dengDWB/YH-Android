@@ -464,7 +464,7 @@ public class ApiHelper {
      *  @param codeInfo   条形码信息
      *  @param codeType   条形码或二维码
      */
-    public static Map<String,String> barCodeScan(Context mContext, String groupID, String roleID, String userNum, String storeID, String codeInfo, String codeType) {
+    public static Map<String,String> barCodeScan(String groupID, String roleID, String userNum, String storeID, String codeInfo, String codeType) {
         try {
             JSONObject params = new JSONObject();
             params.put(URLs.kCodeInfo, codeInfo);

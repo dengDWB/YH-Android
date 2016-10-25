@@ -1,5 +1,6 @@
 package com.intfocus.yonghuitest;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -115,7 +116,7 @@ public class BarCodeResultActivity extends BaseActivity {
 
         String htmlOriginPath = String.format("%s/BarCodeScan/%s", sharedPath, K.kScanBarCodeHTMLName);
         htmlContent = FileUtil.readFile(htmlOriginPath);
-        cachedPath = FileUtil.dirPath(mContext, K.kCachedDirName, K.kBarCodeResultFileName);
+        cachedPath = FileUtil.dirPath(mAppContext, K.kCachedDirName, K.kBarCodeResultFileName);
         htmlPath = String.format("%s.tmp", htmlOriginPath);
 
         try {
@@ -190,7 +191,7 @@ public class BarCodeResultActivity extends BaseActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Map<String,String> response = ApiHelper.barCodeScan(mContext, groupID, roleID, userNum, storeID, codeInfo, codeType);
+                Map<String,String> response = ApiHelper.barCodeScan(groupID, roleID, userNum, storeID, codeInfo, codeType);
                 String responseCode = response.get(URLs.kCode);
                 String responseString = response.get(URLs.kBody);
                 updateHtmlContentTimetamp();
@@ -202,7 +203,7 @@ public class BarCodeResultActivity extends BaseActivity {
                     }
                 }
                 else {
-                    FileUtil.barCodeScanResult(mContext, responseString);
+                    FileUtil.barCodeScanResult(mAppContext, responseString);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -232,9 +233,9 @@ public class BarCodeResultActivity extends BaseActivity {
     }
 
     private void actionLaunchStoreSelectorActivity() {
-        Intent intent = new Intent(mContext, StoreSelectorActivity.class);
+        Intent intent = new Intent(this, StoreSelectorActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        mContext.startActivity(intent);
+        this.startActivity(intent);
     }
 
     /*
@@ -314,9 +315,9 @@ public class BarCodeResultActivity extends BaseActivity {
      */
     private void actionShare2Weixin() {
         Bitmap imgBmp;
-        String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
+        String filePath = FileUtil.basePath(mAppContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
 
-        String betaConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBetaConfigFileName);
+        String betaConfigPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kBetaConfigFileName);
         JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
 
         try {

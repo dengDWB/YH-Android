@@ -69,11 +69,15 @@ public class DashboardActivity extends BaseActivity {
 	private MenuAdapter mSimpleAdapter;
 	private String currentUIVersion = "";
 
+	private Context mContext;
+
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_dashboard);
+
+		mContext = this;
 
 		initUrlStrings();
 		initTab();
@@ -95,7 +99,7 @@ public class DashboardActivity extends BaseActivity {
         /*
          * 初始化本地通知
          */
-		FileUtil.initLocalNotifications(mContext);
+		FileUtil.initLocalNotifications(mAppContext);
 
 		/*
          * 动态注册广播用于接收通知
@@ -120,16 +124,15 @@ public class DashboardActivity extends BaseActivity {
 
 	@Override
 	protected void onStop() {
-		popupWindow.dismiss();
-
+		if (popupWindow != null) {
+			popupWindow.dismiss();
+		}
 		super.onStop();
 	}
 
 	protected void onDestroy() {
-		mContext = null;
 		mWebView = null;
 		user = null;
-		popupWindow.dismiss();
 		PgyUpdateManager.unregister(); // 解除注册蒲公英版本更新检查
 		unregisterReceiver(notificationBroadcastReceiver);
 		super.onDestroy();
@@ -158,8 +161,8 @@ public class DashboardActivity extends BaseActivity {
 	}
 
 	private void dealSendMessage() {
-		currentUIVersion = URLs.currentUIVersion(mContext);
-		String pushMessagePath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushMessageFileName);
+		currentUIVersion = URLs.currentUIVersion(mAppContext);
+		String pushMessagePath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPushMessageFileName);
 		JSONObject pushMessageJSON = FileUtil.readConfigFile(pushMessagePath);
 		try {
 			if (pushMessageJSON.has("state") && pushMessageJSON.getBoolean("state")) {
@@ -348,7 +351,7 @@ public class DashboardActivity extends BaseActivity {
      */
 	private void receiveNotification() {
 		try {
-			String noticePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
+			String noticePath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
 			notificationJSON = FileUtil.readConfigFile(noticePath);
 			kpiNotifition = notificationJSON.getInt(URLs.kTabKpi);
 			analyseNotifition = notificationJSON.getInt(URLs.kTabAnalyse);
@@ -356,19 +359,19 @@ public class DashboardActivity extends BaseActivity {
 			messageNotifition = notificationJSON.getInt(URLs.kTabMessage);
 
 			if (kpiNotifition > 0 && objectType != 1) {
-				RedPointView.showRedPoint(mContext, kTab, bvKpi);
+				RedPointView.showRedPoint(mAppContext, kTab, bvKpi);
 			}
 			if (analyseNotifition > 0 && objectType != 2) {
-				RedPointView.showRedPoint(mContext, kTab, bvAnalyse);
+				RedPointView.showRedPoint(mAppContext, kTab, bvAnalyse);
 			}
 			if (appNotifition > 0 && objectType != 3) {
-				RedPointView.showRedPoint(mContext, kTab, bvApp);
+				RedPointView.showRedPoint(mAppContext, kTab, bvApp);
 			}
 			if (messageNotifition > 0 && objectType != 5) {
-				RedPointView.showRedPoint(mContext, kTab, bvMessage);
+				RedPointView.showRedPoint(mAppContext, kTab, bvMessage);
 			}
 			if (notificationJSON.getInt(URLs.kSetting) > 0) {
-				RedPointView.showRedPoint(mContext, URLs.kSetting, bvBannerSetting);
+				RedPointView.showRedPoint(mAppContext, URLs.kSetting, bvBannerSetting);
 			} else {
 				bvBannerSetting.setVisibility(View.GONE);
 			}
@@ -415,10 +418,10 @@ public class DashboardActivity extends BaseActivity {
 				@Override
 				public synchronized void run() {
 					try {
-						String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
+						String userConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kUserConfigFileName);
 						JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
-						String info = ApiHelper.authentication(mContext, userJSON.getString("user_num"), userJSON.getString(URLs.kPassword));
+						String info = ApiHelper.authentication(mAppContext, userJSON.getString("user_num"), userJSON.getString(URLs.kPassword));
 						if (!info.isEmpty() && (info.contains("用户") || info.contains("密码"))) {
 							userJSON.put("is_login", false);
 							FileUtil.writeFile(userConfigPath, userJSON.toString());
@@ -526,7 +529,7 @@ public class DashboardActivity extends BaseActivity {
 			mCurrentTab.setActive(true);
 
 			animLoading.setVisibility(View.VISIBLE);
-			String currentUIVersion = URLs.currentUIVersion(mContext);
+			String currentUIVersion = URLs.currentUIVersion(mAppContext);
 
 			displayAdOrNot(false);
 			try {
@@ -538,7 +541,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvKpi.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabKpi, 0);
-						FileUtil.writeBehaviorFile(mContext,urlString,0);
+						FileUtil.writeBehaviorFile(mAppContext,urlString,0);
 						break;
 					case R.id.tabAnalyse:
 						objectType = 2;
@@ -546,7 +549,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvAnalyse.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabAnalyse, 0);
-						FileUtil.writeBehaviorFile(mContext,urlString,1);
+						FileUtil.writeBehaviorFile(mAppContext,urlString,1);
 						break;
 					case R.id.tabApp:
 						objectType = 3;
@@ -554,7 +557,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvApp.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabApp, 0);
-						FileUtil.writeBehaviorFile(mContext,urlString,2);
+						FileUtil.writeBehaviorFile(mAppContext,urlString,2);
 						break;
 					case R.id.tabMessage:
 						objectType = 5;
@@ -562,7 +565,7 @@ public class DashboardActivity extends BaseActivity {
 
 						bvMessage.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabMessage, 0);
-						FileUtil.writeBehaviorFile(mContext,urlString,3);
+						FileUtil.writeBehaviorFile(mAppContext,urlString,3);
 						break;
 					default:
 						objectType = 1;
@@ -571,11 +574,11 @@ public class DashboardActivity extends BaseActivity {
 
 						bvKpi.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabKpi, 0);
-						FileUtil.writeBehaviorFile(mContext,urlString,0);
+						FileUtil.writeBehaviorFile(mAppContext,urlString,0);
 						break;
 				}
 
-				String notificationPath = FileUtil.dirPath(mContext, K.kCachedDirName, K.kLocalNotificationConfigFileName);
+				String notificationPath = FileUtil.dirPath(mAppContext, K.kCachedDirName, K.kLocalNotificationConfigFileName);
 				FileUtil.writeFile(notificationPath, notificationJSON.toString());
 
 				new Thread(mRunnableForDetecting).start();
@@ -602,7 +605,7 @@ public class DashboardActivity extends BaseActivity {
 	 */
 	public void readBehaviorFile() {
 		try {
-			String behaviorPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBehaviorConfigFileName);
+			String behaviorPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kBehaviorConfigFileName);
 			if (new File(behaviorPath).exists()) {
 				JSONObject dashboardJson = FileUtil.readConfigFile(behaviorPath);
 				if (dashboardJson.has("dashboard")) {
@@ -716,7 +719,7 @@ public class DashboardActivity extends BaseActivity {
 	private void initUrlStrings() {
 		urlStrings = new ArrayList<>();
 
-		String currentUIVersion = URLs.currentUIVersion(mContext);
+		String currentUIVersion = URLs.currentUIVersion(mAppContext);
 		String tmpString;
 		try {
 			tmpString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(
@@ -841,7 +844,7 @@ public class DashboardActivity extends BaseActivity {
 		@JavascriptInterface
 		public void storeTabIndex(final String pageName, final int tabIndex) {
 			try {
-				String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBehaviorConfigFileName);
+				String filePath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kBehaviorConfigFileName);
 
 				if ((new File(filePath).exists())) {
 					String fileContent = FileUtil.readFile(filePath);
@@ -861,7 +864,7 @@ public class DashboardActivity extends BaseActivity {
 		public int restoreTabIndex(final String pageName) {
 			int tabIndex = 0;
 			try {
-				String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBehaviorConfigFileName);
+				String filePath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kBehaviorConfigFileName);
 
 				if ((new File(filePath).exists())) {
 					String fileContent = FileUtil.readFile(filePath);

@@ -1,6 +1,7 @@
 package com.intfocus.yonghuitest;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -61,6 +62,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	private RelativeLayout bannerView;
 	private final ArrayList<HashMap<String, Object>> listItem = new ArrayList<>();
 	private Boolean isShowSearchButton = false;
+	private Context mContext;
 
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
@@ -73,6 +75,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			enableSlowWholeDocumentDraw();
 		}
 		setContentView(R.layout.activity_subject);
+
+		mContext = this;
 
 		/*
 		 * JSON Data
@@ -121,12 +125,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		isInnerLink = !(link.startsWith("http://") || link.startsWith("https://"));
 		mTitle.setText(bannerName);
 
-//		if (link.toLowerCase().endsWith(".pdf")) {
-//			mBannerComment.setVisibility(View.VISIBLE);
+		if (link.toLowerCase().endsWith(".pdf")) {
 			mPDFView = (PDFView) findViewById(R.id.pdfview);
 			mPDFView.setVisibility(View.INVISIBLE);
-//			return;
-//		}
+		}
 		mBannerSetting.setVisibility(View.VISIBLE);
 		initDropMenuItem();
 	}
@@ -213,14 +215,14 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 						map.put("ItemImage",R.drawable.banner_search);
 						map.put("ItemText","筛选");
 						listItem.add(map);
-					SimpleAdapter mSimpleAdapter = new SimpleAdapter(mContext, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
+					SimpleAdapter mSimpleAdapter = new SimpleAdapter(mAppContext, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
 					initDropMenu(mSimpleAdapter, mDropMenuListener);
 					isShowSearchButton = true;
 				}
 
-				String selectedItem = FileUtil.reportSelectedItem(mContext, String.format("%d", groupID), templateID, reportID);
+				String selectedItem = FileUtil.reportSelectedItem(mAppContext, String.format("%d", groupID), templateID, reportID);
 				if (selectedItem == null || selectedItem.length() == 0) {
-					ArrayList<String> items = FileUtil.reportSearchItems(mContext, String.format("%d", groupID), templateID, reportID);
+					ArrayList<String> items = FileUtil.reportSearchItems(mAppContext, String.format("%d", groupID), templateID, reportID);
 					if (items.size() > 0) {
 						selectedItem = items.get(0);
 					}
@@ -331,7 +333,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			 *  初次加载时，判断筛选功能的条件还未生效
 			 *  此处仅在第二次及以后才会生效
 			 */
-			isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
+			isSupportSearch = FileUtil.reportIsSupportSearch(mAppContext, String.format("%d", groupID), templateID, reportID);
 			if (isSupportSearch) {
 				displayBannerTitleAndSearchIcon();
 			}
@@ -339,7 +341,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					ApiHelper.reportData(mContext, String.format("%d", groupID), templateID, reportID);
+					ApiHelper.reportData(mAppContext, String.format("%d", groupID), templateID, reportID);
 
 					new Thread(mRunnableForDetecting).start();
 				}
@@ -392,9 +394,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	private final Runnable mRunnableForPDF = new Runnable() {
 		@Override
 		public void run() {
-			String outputPath = String.format("%s/%s/%s.pdf", FileUtil.basePath(mContext), K.kCachedDirName, URLs.MD5(urlString));
+			String outputPath = String.format("%s/%s/%s.pdf", FileUtil.basePath(mAppContext), K.kCachedDirName, URLs.MD5(urlString));
 			pdfFile = new File(outputPath);
-			ApiHelper.downloadFile(mContext, urlString, pdfFile);
+			ApiHelper.downloadFile(mAppContext, urlString, pdfFile);
 
 			Message message = mHandlerForPDF.obtainMessage();
 			mHandlerForPDF.sendMessage(message);
@@ -417,10 +419,14 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	 * 分享截图至微信
 	 */
 	public void actionShare2Weixin(View v) {
+		if (link.toLowerCase().endsWith(".pdf")) {
+			toast("暂不支持 PDF 分享");
+			return;
+		}
 		Bitmap imgBmp;
-		String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
+		String filePath = FileUtil.basePath(mAppContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
 
-		String betaConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBetaConfigFileName);
+		String betaConfigPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kBetaConfigFileName);
 		JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
 
 		try {
@@ -561,9 +567,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 					ApiHelper.clearResponseHeader(urlKey, assetsPath);
 				}
 				urlKey = String.format(K.kReportDataAPIPath, K.kBaseUrl, groupID, templateID, reportID);
-				ApiHelper.clearResponseHeader(urlKey, FileUtil.sharedPath(mContext));
+				ApiHelper.clearResponseHeader(urlKey, FileUtil.sharedPath(mAppContext));
 
-				ApiHelper.reportData(mContext, String.format("%d", groupID), templateID, reportID);
+				ApiHelper.reportData(mAppContext, String.format("%d", groupID), templateID, reportID);
 				new Thread(mRunnableForDetecting).start();
                 /*
                  * 用户行为记录, 单独异常处理，不可影响用户体验
@@ -595,7 +601,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		@JavascriptInterface
 		public void storeTabIndex(final String pageName, final int tabIndex) {
 			try {
-				String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kTabIndexConfigFileName);
+				String filePath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kTabIndexConfigFileName);
 
 				JSONObject config = new JSONObject();
 				if ((new File(filePath).exists())) {
@@ -614,7 +620,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		public int restoreTabIndex(final String pageName) {
 			int tabIndex = 0;
 			try {
-				String filePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kTabIndexConfigFileName);
+				String filePath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kTabIndexConfigFileName);
 
 				JSONObject config = new JSONObject();
 				if ((new File(filePath).exists())) {
@@ -649,7 +655,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		@JavascriptInterface
 		public void reportSearchItems(final String arrayString) {
 			try {
-				String searchItemsPath = String.format("%s.search_items", FileUtil.reportJavaScriptDataPath(mContext, String.format("%d", groupID), templateID, reportID));
+				String searchItemsPath = String.format("%s.search_items", FileUtil.reportJavaScriptDataPath(mAppContext, String.format("%d", groupID), templateID, reportID));
 				if (!new File(searchItemsPath).exists()) {
 					FileUtil.writeFile(searchItemsPath, arrayString);
 
@@ -657,7 +663,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 					 *  判断筛选的条件: arrayString 数组不为空
 					 *  报表第一次加载时，此处为判断筛选功能的关键点
 					 */
-					isSupportSearch = FileUtil.reportIsSupportSearch(mContext, String.format("%d", groupID), templateID, reportID);
+					isSupportSearch = FileUtil.reportIsSupportSearch(mAppContext, String.format("%d", groupID), templateID, reportID);
 					if (isSupportSearch) {
 						displayBannerTitleAndSearchIcon();
 					}
@@ -670,7 +676,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		@JavascriptInterface
 		public String reportSelectedItem() {
 			String item = null;
-			String selectedItemPath = String.format("%s.selected_item", FileUtil.reportJavaScriptDataPath(mContext, String.format("%d", groupID), templateID, reportID));
+			String selectedItemPath = String.format("%s.selected_item", FileUtil.reportJavaScriptDataPath(mAppContext, String.format("%d", groupID), templateID, reportID));
 			if (new File(selectedItemPath).exists()) {
 				item = FileUtil.readFile(selectedItemPath);
 			}

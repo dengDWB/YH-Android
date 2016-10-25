@@ -40,6 +40,9 @@ public class FileUtil {
         return basePath;
     }
 
+    /*
+     * 判断用户是否处于登录状态并且设置了锁屏
+     */
     public static boolean checkIsLocked(Context context) {
         try {
             String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), K.kUserConfigFileName);
