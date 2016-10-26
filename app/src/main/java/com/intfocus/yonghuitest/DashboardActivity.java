@@ -332,8 +332,8 @@ public class DashboardActivity extends BaseActivity {
 		/*
 		 * 打开通知服务, 用于发送通知
          */
-		Intent startService = new Intent(this, LocalNotificationService.class);
-		startService(startService);
+		Intent intent = new Intent(this, LocalNotificationService.class);
+		startService(intent);
 	}
 
 	/*
