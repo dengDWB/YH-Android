@@ -65,7 +65,7 @@ public class ApiHelper {
             }
             // FileUtil.dirPath 需要优先写入登录用户信息
             JSONObject responseJSON = new JSONObject(response.get(URLs.kBody));
-            userJSON = ApiHelper.merge(userJSON, responseJSON);
+            userJSON = ApiHelper.mergeJson(userJSON, responseJSON);
             FileUtil.writeFile(userConfigPath, userJSON.toString());
 
             String settingsConfigPath = FileUtil.dirPath(context, K.kConfigDirName, K.kSettingConfigFileName);
@@ -126,7 +126,6 @@ public class ApiHelper {
             InputStream zipStream = new FileInputStream(cachedZipPath);
             FileUtil.unZip(zipStream, FileUtil.dirPath(context, K.kCachedDirName), true);
             zipStream.close();
-
             String jsFilePath = FileUtil.dirPath(context, K.kCachedDirName, jsFileName);
             File jsFile = new File(jsFilePath);
             if(jsFile.exists()) {
@@ -308,7 +307,7 @@ public class ApiHelper {
      * @param other JSONObject
      * @return 合并后的JSONObject
      */
-    public static JSONObject merge(JSONObject obj, JSONObject other) {
+    public static JSONObject mergeJson(JSONObject obj, JSONObject other) {
         try {
             Iterator it = other.keys();
             while (it.hasNext()) {
@@ -427,7 +426,7 @@ public class ApiHelper {
      *
      *  @return 服务器是否更新成功
      */
-    public static boolean pushDeviceToken(Context context, String deviceUUID) {
+    private static boolean pushDeviceToken(Context context, String deviceUUID) {
         try {
             String pushConfigPath = String.format("%s/%s", FileUtil.basePath(context), K.kPushConfigFileName);
             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
@@ -465,17 +464,16 @@ public class ApiHelper {
      *  @param codeInfo   条形码信息
      *  @param codeType   条形码或二维码
      */
-    public static Map<String,String> barCodeScan(Context mContext, String groupID, String roleID, String userNum, String storeID, String codeInfo, String codeType) {
+    public static Map<String,String> barCodeScan(String groupID, String roleID, String userNum, String storeID, String codeInfo, String codeType) {
         try {
             JSONObject params = new JSONObject();
             params.put(URLs.kCodeInfo, codeInfo);
             params.put(URLs.kCodeType, codeType);
 
             String urlString = String.format(K.kBarCodeScanAPIPath, K.kBaseUrl, groupID, roleID, userNum, storeID, codeInfo, codeType);
-            Map<String, String> response = HttpUtil.httpGet(urlString, new HashMap());
             // Map<String, String> response = HttpUtil.httpPost(urlString, params);
 
-            return response;
+            return (Map<String, String>) HttpUtil.httpGet(urlString, new HashMap());
         } catch(JSONException e) {
             e.printStackTrace();
             return null;

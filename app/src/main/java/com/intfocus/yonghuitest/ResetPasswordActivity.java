@@ -40,7 +40,7 @@ public class ResetPasswordActivity extends BaseActivity {
         mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);
         mWebView.loadUrl(urlStringForLoading);
 
-        urlString = String.format(K.kResetPwdMobilePath, K.kBaseUrl, URLs.currentUIVersion(mContext));
+        urlString = String.format(K.kResetPwdMobilePath, K.kBaseUrl, URLs.currentUIVersion(mAppContext));
         new Thread(mRunnableForDetecting).start();
     }
 

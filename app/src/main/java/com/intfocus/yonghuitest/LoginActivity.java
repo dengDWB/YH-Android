@@ -30,7 +30,6 @@ public class LoginActivity extends BaseActivity {
     public final static String kSuccess      = "success";
     private EditText usernameEditText, passwordEditText;
     private String usernameString, passwordString;
-    private TextView versionTv;
     private final static int CODE_AUTHORITY_REQUEST = 0;
 
     @Override
@@ -53,7 +52,7 @@ public class LoginActivity extends BaseActivity {
 
             finish();
         }
-        else if (FileUtil.checkIsLocked(mContext)) {
+        else if (FileUtil.checkIsLocked(mAppContext)) {
             intent = new Intent(this, ConfirmPassCodeActivity.class);
             intent.putExtra("is_from_login", true);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -72,7 +71,7 @@ public class LoginActivity extends BaseActivity {
 
         usernameEditText = (EditText) findViewById(R.id.etUsername);
         passwordEditText = (EditText) findViewById(R.id.etPassword);
-        versionTv = (TextView) findViewById(R.id.versionTv);
+        TextView versionTv = (TextView) findViewById(R.id.versionTv);
         PackageInfo packageInfo = null;
         try {
             packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -104,6 +103,7 @@ public class LoginActivity extends BaseActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         mMyApp.setCurrentActivity(null);
                         finish();
+                        System.exit(0);
                     }
                 })
                 .setNegativeButton("继续运行", new DialogInterface.OnClickListener() {
@@ -116,7 +116,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void getAuthority() {
-            int writePermission = ContextCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            int writePermission = ContextCompat.checkSelfPermission(mAppContext, Manifest.permission.WRITE_EXTERNAL_STORAGE);
             if(writePermission != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(LoginActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE},CODE_AUTHORITY_REQUEST);
                 return;
@@ -154,7 +154,6 @@ public class LoginActivity extends BaseActivity {
     }
 
     protected void onDestroy() {
-        mContext = null;
         mWebView = null;
         user = null;
         PgyUpdateManager.unregister(); // 解除注册蒲公英版本更新检查
@@ -186,7 +185,7 @@ public class LoginActivity extends BaseActivity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    final String info = ApiHelper.authentication(mContext, usernameString, URLs.MD5(passwordString));
+                    final String info = ApiHelper.authentication(mAppContext, usernameString, URLs.MD5(passwordString));
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -199,7 +198,7 @@ public class LoginActivity extends BaseActivity {
                             }
 
                             // 检测用户空间，版本是否升级
-                            assetsPath = FileUtil.dirPath(mContext, K.kHTMLDirName);
+                            assetsPath = FileUtil.dirPath(mAppContext, K.kHTMLDirName);
                             checkVersionUpgrade(assetsPath);
 
                             // 跳转至主界面
@@ -237,5 +236,6 @@ public class LoginActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         finish();
+        System.exit(0);
     }
 }

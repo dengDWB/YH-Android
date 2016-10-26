@@ -37,12 +37,10 @@ import java.util.Locale;
  */
 public class StoreSelectorActivity extends BaseActivity {
   private ListView mListView;
-  private TextView mSelectedItem;
-  private SearchView mSearchView;
   private String cachedPath;
   private ArrayList<JSONObject> dataList = new ArrayList<>();
   private ArrayList<String> storeNameList = new ArrayList<>();
-  private JSONObject cachedJSON, currentStore;
+  private JSONObject cachedJSON;
 
   @TargetApi(Build.VERSION_CODES.KITKAT)
   @Override
@@ -52,12 +50,12 @@ public class StoreSelectorActivity extends BaseActivity {
     setContentView(R.layout.activity_store_selector);
 
     final LinearLayout mListHead = (LinearLayout)findViewById(R.id.store_list_head);
-    mSelectedItem = (TextView)findViewById(R.id.store_item_select); // 已选项
+    TextView mSelectedItem = (TextView) findViewById(R.id.store_item_select);
 
     try {
-      cachedPath = FileUtil.dirPath(mContext, K.kCachedDirName, K.kBarCodeResultFileName);
+      cachedPath = FileUtil.dirPath(mAppContext, K.kCachedDirName, K.kBarCodeResultFileName);
       cachedJSON = FileUtil.readConfigFile(cachedPath);
-      currentStore = cachedJSON.getJSONObject(URLs.kStore);
+      JSONObject currentStore = cachedJSON.getJSONObject(URLs.kStore);
 
       mSelectedItem.setText(currentStore.getString("name")); // 已选项显示当前门店
 
@@ -93,7 +91,7 @@ public class StoreSelectorActivity extends BaseActivity {
     /*
      * 搜索框初始化
      */
-    mSearchView = (SearchView)findViewById(R.id.storeSearchView);
+    SearchView mSearchView = (SearchView) findViewById(R.id.storeSearchView);
     int searchEditId = mSearchView.getContext().getResources().getIdentifier("android:id/search_src_text",null,null);
     TextView mSearchEdit = (TextView)findViewById(searchEditId);
     mSearchEdit.setTextSize(14);
@@ -168,7 +166,6 @@ public class StoreSelectorActivity extends BaseActivity {
   }
 
   protected void onDestroy() {
-    mContext = null;
     mWebView = null;
     user = null;
     super.onDestroy();

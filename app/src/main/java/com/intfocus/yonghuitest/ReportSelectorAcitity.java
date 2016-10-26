@@ -32,11 +32,8 @@ import java.util.Locale;
  */
 public class ReportSelectorAcitity extends BaseActivity  {
   private ListView mListView;
-  private TextView mSelectedItem;
-  private SearchView mSearchView;
-  private String selectedItem;
-  private ArrayList<String> searchItems = new ArrayList<String>();
-  private String templateID, reportID, bannerName;
+  private String templateID;
+  private String reportID;
   private int groupID;
 
   @Override
@@ -47,12 +44,12 @@ public class ReportSelectorAcitity extends BaseActivity  {
 
     Intent intent = getIntent();
     groupID = intent.getIntExtra(URLs.kGroupId, 0);
-    bannerName = intent.getStringExtra(URLs.kBannerName);
+    String bannerName = intent.getStringExtra(URLs.kBannerName);
     reportID = intent.getStringExtra("reportID");
     templateID = intent.getStringExtra("templateID");
 
     TextView mTitle = (TextView) findViewById(R.id.bannerTitle);
-    mSelectedItem = (TextView)findViewById(R.id.report_item_select);
+    TextView mSelectedItem = (TextView) findViewById(R.id.report_item_select);
     final LinearLayout mListHead = (LinearLayout)findViewById(R.id.report_list_head);
     mTitle.setText(bannerName);
 
@@ -60,8 +57,8 @@ public class ReportSelectorAcitity extends BaseActivity  {
      *  - 如果用户已设置筛选项，则 banner 显示该信息
      *  - 未设置时，默认显示第一个
      */
-    searchItems = FileUtil.reportSearchItems(mContext, String.format("%d", groupID), templateID, reportID);
-    selectedItem = FileUtil.reportSelectedItem(mContext, String.format("%d", groupID), templateID, reportID);
+    ArrayList<String> searchItems = FileUtil.reportSearchItems(mAppContext, String.format("%d", groupID), templateID, reportID);
+    String selectedItem = FileUtil.reportSelectedItem(mAppContext, String.format("%d", groupID), templateID, reportID);
     if((selectedItem == null || selectedItem.length() == 0 ) && searchItems.size() > 0) {
       selectedItem = searchItems.get(0).toString().trim();
     }
@@ -79,7 +76,7 @@ public class ReportSelectorAcitity extends BaseActivity  {
     /*
      * 搜索框初始化
      */
-    mSearchView = (SearchView)findViewById(R.id.reportSearchView);
+    SearchView mSearchView = (SearchView) findViewById(R.id.reportSearchView);
     int searchEditId = mSearchView.getContext().getResources().getIdentifier("android:id/search_src_text",null,null);
     TextView mSearchEdit = (TextView)findViewById(searchEditId);
     mSearchEdit.setTextSize(14);
@@ -131,12 +128,24 @@ public class ReportSelectorAcitity extends BaseActivity  {
     initColorView(colorViews);
   }
 
+  @Override
+  protected void onResume() {
+    mMyApp.setCurrentActivity(this);
+    super.onResume();
+  }
+
+  protected void onDestroy() {
+    mWebView = null;
+    user = null;
+    super.onDestroy();
+  }
+
   private ListView.OnItemClickListener mListItemListener = new ListView.OnItemClickListener() {
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
       try {
         TextView mSelector = (TextView) arg1.findViewById(R.id.reportSelectorItem);
-        String selectedItemPath = String.format("%s.selected_item", FileUtil.reportJavaScriptDataPath(mContext, String.format("%d", groupID), templateID, reportID));
+        String selectedItemPath = String.format("%s.selected_item", FileUtil.reportJavaScriptDataPath(mAppContext, String.format("%d", groupID), templateID, reportID));
         FileUtil.writeFile(selectedItemPath, mSelector.getText().toString());
 
         dismissActivity(null);
@@ -145,18 +154,6 @@ public class ReportSelectorAcitity extends BaseActivity  {
       }
     }
   };
-
-  protected void onResume() {
-    mMyApp.setCurrentActivity(this);
-    super.onResume();
-  }
-
-  protected void onDestroy() {
-    mContext = null;
-    mWebView = null;
-    user = null;
-    super.onDestroy();
-  }
 
   public class ListArrayAdapter extends ArrayAdapter<String> {
     private int resourceId;
@@ -186,5 +183,5 @@ public class ReportSelectorAcitity extends BaseActivity  {
   public void dismissActivity(View v) {
       ReportSelectorAcitity.this.onBackPressed();
       finish();
-  };
+  }
 }

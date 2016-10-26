@@ -1,5 +1,6 @@
 package com.intfocus.yonghuitest;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -33,6 +34,7 @@ import com.umeng.socialize.media.UMImage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,13 +50,14 @@ import static android.webkit.WebView.enableSlowWholeDocumentDraw;
  * Created by lijunjie on 16/6/10.
  */
 public class BarCodeResultActivity extends BaseActivity {
-    public final static String kId = "id";
+    private final static String kId = "id";
     private String htmlContent, htmlPath, cachedPath;
     private String codeInfo, codeType, groupID, roleID, userNum;
     private String storeID;
-    private ArrayList<HashMap<String, Object>> listItem = new ArrayList<>();
+    private final ArrayList<HashMap<String, Object>> listItem = new ArrayList<>();
     private TextView bannerTitle;
     private JSONObject cachedJSON;
+    private ImageView mBannerSetting;
 
     @Override
     public void onCreate(Bundle state) {
@@ -63,14 +66,15 @@ public class BarCodeResultActivity extends BaseActivity {
         /*
          * 判断当前设备版本，5.0 以上 Android 系统使用才 enableSlowWholeDocumentDraw();
          */
-        int sysVersion = Build.VERSION.SDK_INT;
-        if (sysVersion > 20) {
+        if (Build.VERSION.SDK_INT > 20) {
             enableSlowWholeDocumentDraw();
         }
         setContentView(R.layout.activity_bar_code_result);
 
         animLoading = (RelativeLayout) findViewById(R.id.anim_loading);
         bannerTitle = (TextView) findViewById(R.id.bannerTitle);
+        mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
+
         mWebView = (WebView) findViewById(R.id.barcode_browser);
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -116,7 +120,7 @@ public class BarCodeResultActivity extends BaseActivity {
 
         String htmlOriginPath = String.format("%s/BarCodeScan/%s", sharedPath, K.kScanBarCodeHTMLName);
         htmlContent = FileUtil.readFile(htmlOriginPath);
-        cachedPath = FileUtil.dirPath(mContext, K.kCachedDirName, K.kBarCodeResultFileName);
+        cachedPath = FileUtil.dirPath(mAppContext, K.kCachedDirName, K.kBarCodeResultFileName);
         htmlPath = String.format("%s.tmp", htmlOriginPath);
 
         try {
@@ -128,8 +132,8 @@ public class BarCodeResultActivity extends BaseActivity {
             userNum = user.getString(URLs.kUserNum);
 
             /*
-            * 商品条形码写入缓存
-            */
+             * 商品条形码写入缓存
+             */
             cachedJSON = FileUtil.readConfigFile(cachedPath);
             JSONObject cachedCodeJSON = new JSONObject();
             cachedCodeJSON.put(URLs.kCodeInfo, codeInfo);
@@ -137,8 +141,6 @@ public class BarCodeResultActivity extends BaseActivity {
             cachedJSON.put("barcode", cachedCodeJSON);
             FileUtil.writeFile(cachedPath, cachedJSON.toString());
 
-        } catch (JSONException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -148,25 +150,35 @@ public class BarCodeResultActivity extends BaseActivity {
     public void onResume() {
         super.onResume();
         mMyApp.setCurrentActivity(this);
+        /*
+         * 初始化默认选中门店（第一家）
+         */
+        showBarCodeResult();
+    }
 
+    private void showBarCodeResult() {
         try {
-            /*
-            * 初始化默认选中门店（第一家）
-            */
+            if (user.getJSONArray(URLs.kStoreIds).length() <= 0) {
+                // 若该数据为空,则该用户无门店权限
+                animLoading.setVisibility(View.GONE);
+                mWebView.setVisibility(View.GONE);
+                mBannerSetting.setVisibility(View.GONE);
+                TextView errorText = (TextView) findViewById(R.id.text_permission);
+                errorText.setVisibility(View.VISIBLE);
+                return;
+            }
+
             selectStore();
-            cachedJSON = FileUtil.readConfigFile(cachedPath);
-            storeID = cachedJSON.getJSONObject(URLs.kStore).getString(kId);
             loadBarCodeResult();
-        } catch (JSONException e) {
+        } catch (JSONException | IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void selectStore() {
+    private void selectStore() throws JSONException,IOException {
         cachedJSON = FileUtil.readConfigFile(cachedPath);
         boolean flag = false;
         String storeName = "";
-        try {
             if (cachedJSON.has(URLs.kStore) && cachedJSON.getJSONObject(URLs.kStore).has(kId) &&
                     user.has(URLs.kStoreIds) && user.getJSONArray(URLs.kStoreIds).length() > 0) {
                 storeName = cachedJSON.getJSONObject(URLs.kStore).getString("name");
@@ -183,11 +195,7 @@ public class BarCodeResultActivity extends BaseActivity {
                 FileUtil.writeFile(cachedPath, cachedJSON.toString());
             }
             bannerTitle.setText(storeName);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            storeID = cachedJSON.getJSONObject(URLs.kStore).getString(kId);
     }
 
     private void loadBarCodeResult() {
@@ -195,7 +203,7 @@ public class BarCodeResultActivity extends BaseActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Map<String,String> response = ApiHelper.barCodeScan(mContext, groupID, roleID, userNum, storeID, codeInfo, codeType);
+                Map<String,String> response = ApiHelper.barCodeScan(groupID, roleID, userNum, storeID, codeInfo, codeType);
                 String responseCode = response.get(URLs.kCode);
                 String responseString = response.get(URLs.kBody);
                 updateHtmlContentTimetamp();
@@ -207,7 +215,7 @@ public class BarCodeResultActivity extends BaseActivity {
                     }
                 }
                 else {
-                    FileUtil.barCodeScanResult(mContext, responseString);
+                    FileUtil.barCodeScanResult(mAppContext, responseString);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -226,7 +234,7 @@ public class BarCodeResultActivity extends BaseActivity {
         BarCodeResultActivity.this.onBackPressed();
     }
 
-    public void updateHtmlContentTimetamp() {
+    private void updateHtmlContentTimetamp() {
         try {
             String newHtmlContent = htmlContent.replaceAll("TIMESTAMP", String.format("%d", new Date().getTime()));
             Log.i("HtmlContentTimetamp", newHtmlContent);
@@ -236,20 +244,20 @@ public class BarCodeResultActivity extends BaseActivity {
         }
     }
 
-    public void actionLaunchStoreSelectorActivity() {
-        Intent intent = new Intent(mContext, StoreSelectorActivity.class);
+    private void actionLaunchStoreSelectorActivity() {
+        Intent intent = new Intent(this, StoreSelectorActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        mContext.startActivity(intent);
+        this.startActivity(intent);
     }
 
     /*
-   * 初始化标题栏下拉菜单
-   */
+     * 初始化标题栏下拉菜单
+     */
     private void initDropMenuItem() {
         String[] itemName = {"筛选", "分享","刷新"};
         int[] itemImage = {R.drawable.banner_search, R.drawable.banner_share,R.drawable.btn_refresh};
         for (int i = 0; i < itemName.length; i++) {
-            HashMap<String, Object> map = new HashMap<String, Object>();
+            HashMap<String, Object> map = new HashMap<>();
             map.put("ItemImage", itemImage[i]);
             map.put("ItemText", itemName[i]);
             listItem.add(map);
@@ -286,11 +294,11 @@ public class BarCodeResultActivity extends BaseActivity {
         }
     };
 
-    public void refresh() {
+    private void refresh() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                loadBarCodeResult();
+                showBarCodeResult();
             }
         });
     }
@@ -299,7 +307,6 @@ public class BarCodeResultActivity extends BaseActivity {
      * 标题栏点击设置按钮显示下拉菜单
      */
     public void launchDropMenuActivity(View v) {
-        ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
         popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
 
 		/*
@@ -317,11 +324,11 @@ public class BarCodeResultActivity extends BaseActivity {
     /*
      * 分享截图至微信
      */
-    public void actionShare2Weixin() {
+    private void actionShare2Weixin() {
         Bitmap imgBmp;
-        String filePath = FileUtil.basePath(mContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
+        String filePath = FileUtil.basePath(mAppContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
 
-        String betaConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kBetaConfigFileName);
+        String betaConfigPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kBetaConfigFileName);
         JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
 
         try {
@@ -373,7 +380,7 @@ public class BarCodeResultActivity extends BaseActivity {
         }
     }
 
-    private UMShareListener umShareListener = new UMShareListener() {
+    private final UMShareListener umShareListener = new UMShareListener() {
         @Override
         public void onResult(SHARE_MEDIA platform) {
             Log.d("plat", "platform" + platform);
@@ -427,7 +434,7 @@ public class BarCodeResultActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    loadBarCodeResult();
+                    showBarCodeResult();
                 }
             });
         }

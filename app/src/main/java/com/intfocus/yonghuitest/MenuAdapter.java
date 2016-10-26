@@ -24,18 +24,13 @@ import java.util.Map;
  * Created by Liurl on 2016/9/20.
  */
 public class MenuAdapter extends SimpleAdapter {
-	private Context mContext;
-	private TextView itemName;
-	private ArrayList<HashMap<String, Object>> listItem;
-	private String noticePath;
-	private JSONObject notificationJSON;
-	private BadgeView bvUser;
+	private final Context mContext;
+	private final String noticePath;
 
 
 	public MenuAdapter(Context context, List<? extends Map<String, ?>> data,
 					   int resource, String[] from, int[] to) {
 		super(context, data, resource, from, to);
-		this.listItem = (ArrayList<HashMap<String, Object>>) data;
 		this.mContext = context;
 		noticePath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
 	}
@@ -47,12 +42,12 @@ public class MenuAdapter extends SimpleAdapter {
 			return v;
 		}
 
-		itemName = (TextView) v.findViewById(R.id.text_menu_item);
+		TextView itemName = (TextView) v.findViewById(R.id.text_menu_item);
 
 		if (itemName.getText().equals("个人信息")) {
-			notificationJSON = FileUtil.readConfigFile(noticePath);
+			JSONObject notificationJSON = FileUtil.readConfigFile(noticePath);
 			try {
-				bvUser = new BadgeView(mContext, itemName);
+				BadgeView bvUser = new BadgeView(mContext, itemName);
 				bvUser.setVisibility(View.GONE);
 
 				if (notificationJSON.getInt(URLs.kSetting) > 0) {

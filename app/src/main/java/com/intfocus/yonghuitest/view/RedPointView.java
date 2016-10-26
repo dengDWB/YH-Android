@@ -10,15 +10,14 @@ import com.readystatesoftware.viewbadger.BadgeView;
  * Created by Liurl on 2016/9/20.
  */
 public class RedPointView {
-	private static int displayDpi; //屏幕密度
 
-	  /*
-	   * 设置应用内通知小红点参数
-	   */
+	/*
+     * 设置应用内通知小红点参数
+     */
 	public static void showRedPoint(Context context,String type, BadgeView badgeView) {
 		//获取当前设备屏幕密度
 		DisplayMetrics dm = context.getResources().getDisplayMetrics();
-		displayDpi = dm.densityDpi;
+		int displayDpi = dm.densityDpi;
 
 		//根据不同屏幕显示密度设置小红点大小
 		if (displayDpi < 320) {

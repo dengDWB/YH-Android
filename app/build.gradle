@@ -38,12 +38,14 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
+def SUPPORT_VERSION = "24.2.1"
+
 dependencies {
     // compile 'com.makeramen:roundedimageview:2.2.1'
     // compile 'com.github.Todd-Davies:ProgressWheel:1.0'
     // compile 'com.joanzapata.pdfview:android-pdfview:1.0.4@aar'
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:support-v4:24.2.1'
+    compile 'com.android.support:appcompat-v7:' + SUPPORT_VERSION
+    compile 'com.android.support:support-v4:' + SUPPORT_VERSION
     compile 'com.pgyersdk:sdk:2.4.2'
     compile 'commons-io:commons-io:+'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
