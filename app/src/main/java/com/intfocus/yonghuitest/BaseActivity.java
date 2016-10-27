@@ -38,7 +38,6 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
-
 import com.handmark.pulltorefresh.library.ILoadingLayout;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
@@ -51,11 +50,6 @@ import com.intfocus.yonghuitest.util.URLs;
 import com.pgyersdk.javabean.AppBean;
 import com.pgyersdk.update.PgyUpdateManager;
 import com.pgyersdk.update.UpdateManagerListener;
-import com.squareup.leakcanary.RefWatcher;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -69,6 +63,8 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by lijunjie on 16/1/14.
@@ -657,6 +653,9 @@ public class BaseActivity extends Activity {
                         return;
                     }
 
+                    String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPgyerVersionConfigFileName);
+                    FileUtil.writeFile(pgyerVersionPath, result);
+
                     if (newVersionCode % 2 == 1) {
                         if (isShowToast) {
                             toast(String.format("有发布测试版本%s(%s)", newVersionName, newVersionCode));
@@ -664,9 +663,6 @@ public class BaseActivity extends Activity {
 
                         return;
                     }
-
-                    String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPgyerVersionConfigFileName);
-                    FileUtil.writeFile(pgyerVersionPath, result);
 
                     final AppBean appBean = getAppBeanFromString(result);
                     new AlertDialog.Builder(activity)
