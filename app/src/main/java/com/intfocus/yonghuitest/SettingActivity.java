@@ -791,6 +791,9 @@ public class SettingActivity extends BaseActivity {
         }
     };
 
+
+
+    
     /*
      * 切换截屏
      */
