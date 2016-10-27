@@ -30,13 +30,8 @@ public class LocalNotificationService extends Service {
   private JSONObject notificationJSON;
   private JSONObject userJSON;
   private JSONObject pgyerJSON;
-  private Timer timer;
-  private TimerTask timerTask;
-  private PackageInfo packageInfo;
   private String notificationPath, pgyerVersionPath, userConfigPath;
   private String kpiUrl, analyseUrl, appUrl, messageUrl, thursdaySayUrl;
-  private String pgyerCode, versionCode;
-  private int kpiCount, analyseCount, appCount, messageCount, updataCount, passwordCount, thursdaySayCount;
   private Context mContext;
   private Intent sendIntent;
   private String mAssetsPath;
@@ -86,13 +81,13 @@ public class LocalNotificationService extends Service {
    * 通知定时刷新任务,间隔 30 分钟发送一次广播
    */
   private void notifitionTask() {
-    timer = new Timer();
-    timerTask = new TimerTask() {
+    Timer timer = new Timer();
+    TimerTask timerTask = new TimerTask() {
       @Override
       public void run() {
         processDataCount();//先计算通知的数量
         sendBroadcast(sendIntent);
-        Log.i("bugbug","执行");
+        Log.i("bugbug", "执行");
       }
     };
     timer.schedule(timerTask, 10 * 1000, K.kTimerInterval * 60 * 1000);
@@ -103,11 +98,11 @@ public class LocalNotificationService extends Service {
    */
   private void processDataCount() {
     try {
-      kpiCount = getDataCount(URLs.kTabKpi, kpiUrl);
-      analyseCount = getDataCount(URLs.kTabAnalyse, analyseUrl);
-      appCount = getDataCount(URLs.kTabApp, appUrl);
-      messageCount = getDataCount(URLs.kTabMessage, messageUrl);
-      thursdaySayCount = getDataCount(URLs.kSettingThursdaySay, thursdaySayUrl);
+      int kpiCount = getDataCount(URLs.kTabKpi, kpiUrl);
+      int analyseCount = getDataCount(URLs.kTabAnalyse, analyseUrl);
+      int appCount = getDataCount(URLs.kTabApp, appUrl);
+      int messageCount = getDataCount(URLs.kTabMessage, messageUrl);
+      int thursdaySayCount = getDataCount(URLs.kSettingThursdaySay, thursdaySayUrl);
 
       /*
        * 遍历获取 Tab 栏上需要显示的通知数量 ("tab_*" 的值)
@@ -119,19 +114,20 @@ public class LocalNotificationService extends Service {
         notificationJSON.put(typeString[i] + "_last", typeCount[i]);
       }
 
+      int updataCount;
       if ((new File(pgyerVersionPath)).exists()) {
         pgyerJSON = FileUtil.readConfigFile(pgyerVersionPath);
         JSONObject responseData = pgyerJSON.getJSONObject(URLs.kData);
-        pgyerCode = responseData.getString("versionCode");
-        packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-        versionCode = String.valueOf(packageInfo.versionCode);
+        String pgyerCode = responseData.getString("versionCode");
+        PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+        String versionCode = String.valueOf(packageInfo.versionCode);
         updataCount = pgyerCode.equals(versionCode) ?  -1 : 1;
       }
       else {
         updataCount = -1;
       }
 
-      passwordCount = userJSON.getString(URLs.kPassword).equals(URLs.MD5(K.kInitPassword)) ? 1 : -1;
+      int passwordCount = userJSON.getString(URLs.kPassword).equals(URLs.MD5(K.kInitPassword)) ? 1 : -1;
       notificationJSON.put(URLs.kSettingPassword, passwordCount);
       notificationJSON.put(URLs.kSettingPgyer, updataCount);
 
@@ -147,14 +143,15 @@ public class LocalNotificationService extends Service {
   /*
    * 正则获取当前 DataCount，未获取到值则返回原数值
    */
-  private int getDataCount(String keyName, String urlString) throws JSONException, IOException {
+  private int getDataCount(String keyName, String urlString)
+          throws JSONException, IOException {
       /*
        * 1. 定时器链接添加标志 platform=android&auto_timer=30&user_device_id=#{user_device_id}
        * 2. 读取本地缓存头文件
        */
     Map<String, String> headers = ApiHelper.checkResponseHeader(urlString, mAssetsPath);
 
-    String extraParams = String.format("platform=android&auto_timer=%d&user_device_id=%d", K.kTimerInterval, userJSON.getInt(K.kUserDeviceId));
+    String extraParams = String.format("os=android&version=atodo&inteval=%d&udi=%d", K.kTimerInterval, userJSON.getInt(K.kUserDeviceId));
     String urlSplit = (urlString.contains("?") ? "&" : "?");
     String urlStringWithExtraParams = String.format("%s%s%s", urlString, urlSplit, extraParams);
     Map<String, String> response = HttpUtil.httpGet(urlStringWithExtraParams, headers);

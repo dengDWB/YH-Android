@@ -1,5 +1,6 @@
 package com.intfocus.yonghuitest;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,11 +21,14 @@ import me.dm7.barcodescanner.zbar.ZBarScannerView;
  */
 public class BarCodeScannerActivity extends BaseActivity implements ZBarScannerView.ResultHandler {
     private ZBarScannerView mScannerView;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_bar_code_scanner);
+
+        mContext = this;
 
         ViewGroup contentFrame = (ViewGroup) findViewById(R.id.bar_code_scanner_frame);
         mScannerView = new ZBarScannerView(this);

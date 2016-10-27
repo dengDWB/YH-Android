@@ -95,34 +95,30 @@ public class BaseActivity extends Activity {
     String assetsPath;
     String urlStringForLoading;
     JSONObject logParams = new JSONObject();
-    Context mContext;
+    Context mAppContext;
     Toast toast;
-    int displayDpi; //屏幕密度
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //获取当前设备屏幕密度
-        displayMetrics = getResources().getDisplayMetrics();
-        displayDpi = displayMetrics.densityDpi;
+        mMyApp = (YHApplication)this.getApplication();
+        mAppContext = mMyApp.getAppContext();
 
-        mMyApp = (YHApplication)this.getApplicationContext();
-        mContext = BaseActivity.this;
-        sharedPath = FileUtil.sharedPath(mContext);
+        sharedPath = FileUtil.sharedPath(mAppContext);
         assetsPath = sharedPath;
         urlStringForDetecting = K.kBaseUrl;
         relativeAssetsPath = "assets";
         urlStringForLoading = loadingPath(kLoading);
 
-        String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
+        String userConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kUserConfigFileName);
         if ((new File(userConfigPath)).exists()) {
             try {
                 user = FileUtil.readConfigFile(userConfigPath);
                 if (user.has(URLs.kIsLogin) && user.getBoolean(URLs.kIsLogin)) {
                     userID = user.getInt("user_id");
-                    assetsPath = FileUtil.dirPath(mContext, K.kHTMLDirName);
+                    assetsPath = FileUtil.dirPath(mAppContext, K.kHTMLDirName);
                     urlStringForDetecting = String.format(K.kDeviceStateAPIPath, K.kBaseUrl, user.getInt("user_device_id"));
                     relativeAssetsPath = "../../Shared/assets";
                 }
@@ -131,14 +127,15 @@ public class BaseActivity extends Activity {
             }
         }
 
-        RefWatcher refWatcher = YHApplication.getRefWatcher(mContext);
-        refWatcher.watch(this);
+//        RefWatcher refWatcher = YHApplication.getRefWatcher(mContext);
+//        refWatcher.watch(this);
     }
 
     protected void onDestroy() {
         clearReferences();
         fixInputMethodManager(BaseActivity.this);
         mMyApp = null;
+        mAppContext = null;
         super.onDestroy();
     }
 
@@ -162,11 +159,10 @@ public class BaseActivity extends Activity {
         String [] arr = new String[]{"mCurRootView", "mServedView", "mNextServedView"};
         Field f = null;
         Object obj_get = null;
-        for (int i = 0;i < arr.length;i ++) {
-            String param = arr[i];
-            try{
+        for (String param : arr) {
+            try {
                 f = imm.getClass().getDeclaredField(param);
-                if (f.isAccessible() == false) {
+                if (!f.isAccessible()) {
                     f.setAccessible(true);
                 }
                 obj_get = f.get(imm);
@@ -178,7 +174,7 @@ public class BaseActivity extends Activity {
                         break;
                     }
                 }
-            }catch(Throwable t){
+            } catch (Throwable t) {
                 t.printStackTrace();
             }
         }
@@ -390,7 +386,7 @@ public class BaseActivity extends Activity {
      */
     public static class HandlerForDetecting extends Handler {
         private final WeakReference<BaseActivity> weakActivity;
-        private Context mContext;
+        private final Context mContext;
         private WebView mWebView;
         private String mSharedPath;
         private String mUrlString;
@@ -398,7 +394,7 @@ public class BaseActivity extends Activity {
         private String mRelativeAssetsPath;
 
         public HandlerForDetecting(BaseActivity activity) {
-            weakActivity = new WeakReference<BaseActivity>(activity);
+            weakActivity = new WeakReference<>(activity);
             mContext = weakActivity.get();
         }
 
@@ -441,7 +437,7 @@ public class BaseActivity extends Activity {
                                 String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
                                 JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
-                                userJSON = ApiHelper.merge(userJSON, configJSON);
+                                userJSON = ApiHelper.mergeJson(userJSON, configJSON);
                                 FileUtil.writeFile(userConfigPath, userJSON.toString());
 
                                 String settingsConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kSettingConfigFileName);
@@ -514,7 +510,7 @@ public class BaseActivity extends Activity {
         private String mSharedPath;
 
         public HandlerWithAPI(BaseActivity activity) {
-            weakActivity = new WeakReference<BaseActivity>(activity);
+            weakActivity = new WeakReference<>(activity);
         }
 
         public void setVariables(WebView webView, String sharedPath) {
@@ -578,7 +574,7 @@ public class BaseActivity extends Activity {
                     return;
                 }
 
-                ApiHelper.actionLog(mContext, logParams);
+                ApiHelper.actionLog(mAppContext, logParams);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -602,13 +598,13 @@ public class BaseActivity extends Activity {
 
     void modifiedUserConfig(JSONObject configJSON) {
         try {
-            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
+            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kUserConfigFileName);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
-            userJSON = ApiHelper.merge(userJSON, configJSON);
+            userJSON = ApiHelper.mergeJson(userJSON, configJSON);
             FileUtil.writeFile(userConfigPath, userJSON.toString());
 
-            String settingsConfigPath = FileUtil.dirPath(mContext, K.kConfigDirName, K.kSettingConfigFileName);
+            String settingsConfigPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kSettingConfigFileName);
             FileUtil.writeFile(settingsConfigPath, userJSON.toString());
         } catch (IOException e) {
             e.printStackTrace();
@@ -669,11 +665,11 @@ public class BaseActivity extends Activity {
                         return;
                     }
 
-                    String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPgyerVersionConfigFileName);
+                    String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPgyerVersionConfigFileName);
                     FileUtil.writeFile(pgyerVersionPath, result);
 
                     final AppBean appBean = getAppBeanFromString(result);
-                    new AlertDialog.Builder(mContext)
+                    new AlertDialog.Builder(activity)
                             .setTitle("版本更新")
                             .setMessage(message.isEmpty() ? "无升级简介" : message)
                             .setPositiveButton(
@@ -787,7 +783,7 @@ public class BaseActivity extends Activity {
             String assetZipPath = String.format("%s/%s.zip", sharedPath, assetName);
             isShouldUpdateAssets = !(new File(assetZipPath)).exists();
 
-            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kUserConfigFileName);
+            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kUserConfigFileName);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
             String localKeyName = String.format("local_%s_md5", assetName);
             String keyName = String.format("%s_md5", assetName);
@@ -799,7 +795,7 @@ public class BaseActivity extends Activity {
 
             LogUtil.d("checkAssetUpdated", String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName), userJSON.getString(keyName)));
             // execute this when the downloader must be fired
-            final DownloadAssetsTask downloadTask = new DownloadAssetsTask(mContext, shouldReloadUIThread, assetName, isInAssets);
+            final DownloadAssetsTask downloadTask = new DownloadAssetsTask(mAppContext, shouldReloadUIThread, assetName, isInAssets);
             downloadTask.execute(String.format(K.kDownloadAssetsAPIPath, K.kBaseUrl, assetName), assetZipPath);
 
             return true;
@@ -813,7 +809,7 @@ public class BaseActivity extends Activity {
     protected void toast(String info) {
         try {
             if (null == toast) {
-                toast = toast.makeText(mContext, info, Toast.LENGTH_SHORT);
+                toast = Toast.makeText(mAppContext, info, Toast.LENGTH_SHORT);
             }
             else {
                 toast.setText(info); //若当前已有 Toast 在显示,则直接修改当前 Toast 显示的内容
@@ -916,7 +912,7 @@ public class BaseActivity extends Activity {
             if (result != null) {
                 Toast.makeText(context, String.format("静态资源更新失败(%s)", result), Toast.LENGTH_LONG).show();
             } else {
-                FileUtil.checkAssets(mContext, assetFilename, isInAssets);
+                FileUtil.checkAssets(mAppContext, assetFilename, isInAssets);
                 if (isReloadUIThread) {
                     new Thread(mRunnableForDetecting).start();
                 }
