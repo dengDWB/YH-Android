@@ -657,6 +657,9 @@ public class BaseActivity extends Activity {
                         return;
                     }
 
+                    String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPgyerVersionConfigFileName);
+                    FileUtil.writeFile(pgyerVersionPath, result);
+
                     if (newVersionCode % 2 == 1) {
                         if (isShowToast) {
                             toast(String.format("有发布测试版本%s(%s)", newVersionName, newVersionCode));
@@ -664,9 +667,6 @@ public class BaseActivity extends Activity {
 
                         return;
                     }
-
-                    String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPgyerVersionConfigFileName);
-                    FileUtil.writeFile(pgyerVersionPath, result);
 
                     final AppBean appBean = getAppBeanFromString(result);
                     new AlertDialog.Builder(activity)
