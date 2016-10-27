@@ -40,6 +40,7 @@ import org.json.JSONObject;
 public class YHApplication extends Application {
     private Context mContext;
     private RefWatcher refWatcher;
+    public static PushAgent mPushAgent;
 
     @Override
     public void onCreate() {
@@ -99,11 +100,12 @@ public class YHApplication extends Application {
          *  监测内存泄漏
          */
         refWatcher = LeakCanary.install(this);
-        PushAgent mPushAgent = PushAgent.getInstance(mContext);
+        mPushAgent = PushAgent.getInstance(mContext);
         // 开启推送并设置注册的回调处理
-        mPushAgent.enable(new IUmengRegisterCallback() {
+        mPushAgent.register(new IUmengRegisterCallback() {
             @Override
-            public void onRegistered(final String registrationId) {
+            public void onSuccess(final String registrationId) {
+                Log.d("device_token",registrationId.equals(null) ? null:registrationId);
                 new Handler().post(new Runnable() {
                     @Override
                     public void run() {
@@ -117,6 +119,7 @@ public class YHApplication extends Application {
                             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
                             pushJSON.put("push_valid", false);
                             pushJSON.put("push_device_token", registrationId);
+                            Log.d("device_token",registrationId);
                             FileUtil.writeFile(pushConfigPath, pushJSON.toString());
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -126,7 +129,14 @@ public class YHApplication extends Application {
                     }
                 });
             }
+
+            @Override
+            public void onFailure(String s, String s1) {
+                Toast.makeText(mContext,"无法使用消息推送功能",Toast.LENGTH_SHORT).show();
+
+            }
         });
+
         mPushAgent.onAppStart();
 
         mPushAgent.setNotificationClickHandler(pushMessageHandler);
@@ -271,8 +281,7 @@ public class YHApplication extends Application {
                     intent = new Intent (mContext, LoginActivity.class);
                 }
                 else {
-                    String activityName = mCurrentActivity.getClass().getSimpleName();
-                    if (activityName.equals("LoginActivity") || activityName.equals("ConfirmPassCodeActivity")) {
+                    if (mCurrentActivity.equals("LoginActivity") || mCurrentActivity.equals("ConfirmPassCodeActivity")) {
                         return;
                     }
                     intent = new Intent (mContext,DashboardActivity.class);
@@ -286,6 +295,10 @@ public class YHApplication extends Application {
             }
         }
     };
+
+    public static PushAgent getPushAgent(){
+        return mPushAgent;
+    }
 
 }
 

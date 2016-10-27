@@ -41,7 +41,7 @@ import com.intfocus.yonghuitest.view.RedPointView;
 import com.pgyersdk.update.PgyUpdateManager;
 import com.readystatesoftware.viewbadger.BadgeView;
 import com.umeng.message.PushAgent;
-import com.umeng.message.UmengRegistrar;
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -172,7 +172,9 @@ public class SettingActivity extends BaseActivity {
             mUserID.setText(user.getString("user_name"));
             mRoleID.setText(user.getString("role_name"));
             mGroupID.setText(user.getString("group_name"));
-            mPushState.setText(PushAgent.getInstance(mContext).isEnabled() ? "开启" : "关闭");
+//            mPushState.setText(mMyApp.getPushAgent().isEnabled() ? "开启" : "关闭");
+            mPushState.setText("开启");
+//            mPushState.setText(mMyApp.getPushAgent().getRegistrationId().equals(null) ? null:mMyApp.getPushAgent().getRegistrationId());
             mAppName.setText(getApplicationName(SettingActivity.this));
             String deviceInfo = String.format("%s(Android %s)",TextUtils.split(android.os.Build.MODEL, " - ")[0],Build.VERSION.RELEASE);
             mDeviceID.setText(deviceInfo);
@@ -710,7 +712,7 @@ public class SettingActivity extends BaseActivity {
                         /*
                          * Umeng Device Token
                          */
-                        String device_token = UmengRegistrar.getRegistrationId(mContext);
+                        String device_token = mMyApp.getPushAgent().getRegistrationId();
                         String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mContext), K.kPushConfigFileName);
                         JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
                         if(!pushJSON.has(URLs.kPushDeviceToken) || pushJSON.getString(URLs.kPushDeviceToken).length() != 44 ||
