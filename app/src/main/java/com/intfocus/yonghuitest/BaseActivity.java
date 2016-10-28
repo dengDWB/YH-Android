@@ -731,7 +731,7 @@ public class BaseActivity extends Activity {
     /**
      * app升级后，清除缓存头文件
      */
-    public void checkVersionUpgrade(String assetsPath) {
+    void checkVersionUpgrade(String assetsPath) {
         try {
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             String versionConfigPath = String.format("%s/%s", assetsPath, K.kCurrentVersionFileName);
