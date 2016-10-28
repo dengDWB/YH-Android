@@ -462,7 +462,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			e.printStackTrace();
 		}
 
-
 		File file = new File(filePath);
 		if (file.exists() && file.length() > 0) {
 				UMImage image = new UMImage(SubjectActivity.this, file);
