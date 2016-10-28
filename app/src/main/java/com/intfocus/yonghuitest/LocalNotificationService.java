@@ -143,14 +143,15 @@ public class LocalNotificationService extends Service {
   /*
    * 正则获取当前 DataCount，未获取到值则返回原数值
    */
-  private int getDataCount(String keyName, String urlString) throws JSONException, IOException {
+  private int getDataCount(String keyName, String urlString)
+          throws JSONException, IOException {
       /*
        * 1. 定时器链接添加标志 platform=android&auto_timer=30&user_device_id=#{user_device_id}
        * 2. 读取本地缓存头文件
        */
     Map<String, String> headers = ApiHelper.checkResponseHeader(urlString, mAssetsPath);
 
-    String extraParams = String.format("platform=android&auto_timer=%d&user_device_id=%d", K.kTimerInterval, userJSON.getInt(K.kUserDeviceId));
+    String extraParams = String.format("os=android&version=atodo&inteval=%d&udi=%d", K.kTimerInterval, userJSON.getInt(K.kUserDeviceId));
     String urlSplit = (urlString.contains("?") ? "&" : "?");
     String urlStringWithExtraParams = String.format("%s%s%s", urlString, urlSplit, extraParams);
     Map<String, String> response = HttpUtil.httpGet(urlStringWithExtraParams, headers);
