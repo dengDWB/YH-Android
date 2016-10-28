@@ -98,6 +98,13 @@ class Settings < Settingslogic
   namespace NAME_SPACE
 end
 
+def runtime_block(info, &block)
+  bint = Time.now
+  yield
+  eint = Time.now
+  puts %(#{Time.now}: #{info} run #{eint - bint}s)
+end
+
 #
 # reset app/build.gradle
 #
@@ -268,13 +275,17 @@ if slop_opts[:apk]
 end
 
 if slop_opts[:pgyer]
-  response = `curl --silent -F "file=@#{apk_path}" -F "uKey=#{Settings.pgyer.user_key}" -F "_api_key=#{Settings.pgyer.api_key}" http://www.pgyer.com/apiv1/app/upload`
+  def upload_apk(apk_path, retry_num = 0)
+    response = `curl --silent -F "file=@#{apk_path}" -F "uKey=#{Settings.pgyer.user_key}" -F "_api_key=#{Settings.pgyer.api_key}" http://www.pgyer.com/apiv1/app/upload`
 
-  begin
     hash = JSON.parse(response).deep_symbolize_keys[:data]
-    puts %(- done: upload apk(#{hash[:appFileSize].to_i.to_s(:human_size)}) to #pgyer#\n\t#{hash[:appName]}\n\t#{hash[:appIdentifier]}\n\t#{hash[:appVersion]}(#{hash[:appVersionNo]})\n\t#{hash[:appQRCodeURL]})
+    puts %(- done(#{retry_num}): upload apk(#{hash[:appFileSize].to_i.to_s(:human_size)}) to #pgyer#\n\t#{hash[:appName]}\n\t#{hash[:appIdentifier]}\n\t#{hash[:appVersion]}(#{hash[:appVersionNo]})\n\t#{hash[:appQRCodeURL]})
   rescue => e
     puts response.inspect
     puts e.message
+
+    upload_apk(apk_path, retry_num + 1) if retry_num < 3
   end
+
+  upload_apk(apk_path)
 end
