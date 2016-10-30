@@ -1,6 +1,5 @@
 package com.intfocus.yonghuitest;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -34,7 +33,6 @@ import com.umeng.socialize.media.UMImage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -180,7 +178,7 @@ public class BarCodeResultActivity extends BaseActivity {
         boolean flag = false;
         String storeName = "";
             if (cachedJSON.has(URLs.kStore) && cachedJSON.getJSONObject(URLs.kStore).has(kId) &&
-                    user.has(URLs.kStoreIds) && user.getJSONArray(URLs.kStoreIds).length() > 0) {
+                    user.has(URLs.kStoreIds)) {
                 storeName = cachedJSON.getJSONObject(URLs.kStore).getString("name");
                 for (int i = 0; i < user.getJSONArray(URLs.kStoreIds).length(); i++) {
                     if (user.getJSONArray(URLs.kStoreIds).getJSONObject(i).getString("name").equals(storeName)){

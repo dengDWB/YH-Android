@@ -462,7 +462,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			e.printStackTrace();
 		}
 
-
 		File file = new File(filePath);
 		if (file.exists() && file.length() > 0) {
 				UMImage image = new UMImage(SubjectActivity.this, file);
@@ -656,17 +655,15 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		public void reportSearchItems(final String arrayString) {
 			try {
 				String searchItemsPath = String.format("%s.search_items", FileUtil.reportJavaScriptDataPath(mAppContext, String.format("%d", groupID), templateID, reportID));
-				if (!new File(searchItemsPath).exists()) {
-					FileUtil.writeFile(searchItemsPath, arrayString);
+				FileUtil.writeFile(searchItemsPath, arrayString);
 
-					/**
-					 *  判断筛选的条件: arrayString 数组不为空
-					 *  报表第一次加载时，此处为判断筛选功能的关键点
-					 */
-					isSupportSearch = FileUtil.reportIsSupportSearch(mAppContext, String.format("%d", groupID), templateID, reportID);
-					if (isSupportSearch) {
-						displayBannerTitleAndSearchIcon();
-					}
+				/**
+				 *  判断筛选的条件: arrayString 数组不为空
+				 *  报表第一次加载时，此处为判断筛选功能的关键点
+				 */
+				isSupportSearch = FileUtil.reportIsSupportSearch(mAppContext, String.format("%d", groupID), templateID, reportID);
+				if (isSupportSearch) {
+					displayBannerTitleAndSearchIcon();
 				}
 			} catch (IOException e) {
 				e.printStackTrace();

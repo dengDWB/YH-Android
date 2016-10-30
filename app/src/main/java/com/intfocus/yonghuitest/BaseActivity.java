@@ -93,11 +93,16 @@ public class BaseActivity extends Activity {
     JSONObject logParams = new JSONObject();
     Context mAppContext;
     Toast toast;
+    int displayDpi; //屏幕密度
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //获取当前设备屏幕密度
+        displayMetrics = getResources().getDisplayMetrics();
+        displayDpi = displayMetrics.densityDpi;
 
         mMyApp = (YHApplication)this.getApplication();
         mAppContext = mMyApp.getAppContext();
