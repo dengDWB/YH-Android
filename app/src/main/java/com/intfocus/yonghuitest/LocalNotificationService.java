@@ -30,7 +30,6 @@ public class LocalNotificationService extends Service {
   private JSONObject notificationJSON;
   private JSONObject userJSON;
   private JSONObject pgyerJSON;
-  private Context mAppContext;
   private String notificationPath, pgyerVersionPath, userConfigPath;
   private String kpiUrl, analyseUrl, appUrl, messageUrl, thursdaySayUrl;
   private Context mContext;
