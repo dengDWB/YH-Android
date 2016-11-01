@@ -76,6 +76,7 @@ public class SettingActivity extends BaseActivity {
     private TextView mApiDomain;
     private Switch mLockSwitch;
     private Switch mLongCatSwitch;
+    private Switch mDashboardSwitch;
     private String screenLockInfo;
     private TextView mPygerLink;
     private TextView mChangePWD;
@@ -119,6 +120,7 @@ public class SettingActivity extends BaseActivity {
         TextView mCheckAssets = (TextView) findViewById(R.id.check_assets);
         Button mLogout = (Button) findViewById(R.id.logout);
         mLockSwitch = (Switch) findViewById(R.id.lock_switch);
+        mDashboardSwitch = (Switch) findViewById(R.id.dashboard_switch);
         mIconImageView =(CircleImageView) findViewById(R.id.img_icon);
         mCheckThursdaySay = (TextView) findViewById(R.id.check_thursday_say);
 
@@ -131,6 +133,7 @@ public class SettingActivity extends BaseActivity {
             JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
             mLongCatSwitch = (Switch) findViewById(R.id.longcat_switch);
             mLongCatSwitch.setChecked(betaJSON.has("image_within_screen") && betaJSON.getBoolean("image_within_screen"));
+            mDashboardSwitch.setChecked(betaJSON.has("allow_brower_copy") && betaJSON.getBoolean("allow_brower_copy"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -145,6 +148,7 @@ public class SettingActivity extends BaseActivity {
         mCheckUpgrade.setOnClickListener(mCheckUpgradeListener);
         mLockSwitch.setOnCheckedChangeListener(mSwitchLockListener);
         mLongCatSwitch.setOnCheckedChangeListener(mSwitchLongCatListener);
+        mDashboardSwitch.setOnCheckedChangeListener(mDashboardListener);
         mPygerLink.setOnClickListener(mPgyerLinkListener);
         mIconImageView.setOnClickListener(mIconImageViewListener);
 
@@ -807,6 +811,21 @@ public class SettingActivity extends BaseActivity {
                 JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
 
                 betaJSON.put("image_within_screen", isChecked);
+                FileUtil.writeFile(betaConfigPath, betaJSON.toString());
+            } catch (JSONException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    private final CompoundButton.OnCheckedChangeListener mDashboardListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            try {
+                String betaConfigPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kBetaConfigFileName);
+                JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
+
+                betaJSON.put("allow_brower_copy", isChecked);
                 FileUtil.writeFile(betaConfigPath, betaJSON.toString());
             } catch (JSONException | IOException e) {
                 e.printStackTrace();

@@ -105,6 +105,7 @@ public class BarCodeResultActivity extends BaseActivity {
                 LogUtil.d("onReceivedError", String.format("errorCode: %d, description: %s, url: %s", errorCode, description, failingUrl));
             }
         });
+        setWebViewLongListener(true);
 
         initDropMenuItem();
 
