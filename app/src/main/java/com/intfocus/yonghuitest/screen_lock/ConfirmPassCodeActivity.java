@@ -313,6 +313,7 @@ public class ConfirmPassCodeActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        mMyApp.setCurrentActivity(null);
         finish();
     }
 }

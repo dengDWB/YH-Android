@@ -276,11 +276,13 @@ end
 
 if slop_opts[:pgyer]
   def upload_apk(apk_path, retry_num = 0)
-    response = `curl --silent -F "file=@#{apk_path}" -F "uKey=#{Settings.pgyer.user_key}" -F "_api_key=#{Settings.pgyer.api_key}" http://www.pgyer.com/apiv1/app/upload`
+    command = %(curl --silent -F "file=@#{apk_path}" -F "uKey=#{Settings.pgyer.user_key}" -F "_api_key=#{Settings.pgyer.api_key}" http://www.pgyer.com/apiv1/app/upload)
+    response = `#{command}`
 
     hash = JSON.parse(response).deep_symbolize_keys[:data]
     puts %(- done(#{retry_num}): upload apk(#{hash[:appFileSize].to_i.to_s(:human_size)}) to #pgyer#\n\t#{hash[:appName]}\n\t#{hash[:appIdentifier]}\n\t#{hash[:appVersion]}(#{hash[:appVersionNo]})\n\t#{hash[:appQRCodeURL]})
   rescue => e
+    puts command
     puts response.inspect
     puts e.message
 

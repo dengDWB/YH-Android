@@ -21,6 +21,7 @@ public class ThursdaySayActivity extends BaseActivity {
         initSubWebView();
 
         animLoading.setVisibility(View.VISIBLE);
+        setWebViewLongListener(false);
         urlString = String.format(K.kThursdaySayMobilePath, PrivateURLs.kBaseUrl, URLs.currentUIVersion(ThursdaySayActivity.this));
         new Thread(mRunnableForDetecting).start();
     }

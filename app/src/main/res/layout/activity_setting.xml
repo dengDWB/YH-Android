@@ -254,16 +254,29 @@
 
                 <TextView
                     style="@style/SettingTitle"
-                    android:text="分享功能"/>
+                    android:text="辅助功能"/>
 
                 <RelativeLayout style="@style/SettingGroup">
 
                     <TextView
                         style="@style/SettingKey"
-                        android:text="截取全屏"/>
+                        android:text="分享长图"/>
 
                     <Switch
                         android:id="@+id/longcat_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"/>
+                </RelativeLayout>
+
+                <RelativeLayout style="@style/SettingGroup">
+
+                    <TextView
+                        style="@style/SettingKey"
+                        android:text="报表操作"/>
+
+                    <Switch
+                        android:id="@+id/dashboard_switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"/>
