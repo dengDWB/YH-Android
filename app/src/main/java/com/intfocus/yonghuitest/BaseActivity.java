@@ -229,10 +229,20 @@ public class BaseActivity extends Activity {
                 return false;
             }
         });
+        setWebViewLongListener(true);
 
         initIndicator(pullToRefreshWebView);
 
         return mWebView;
+    }
+
+    public void setWebViewLongListener(final boolean flag) {
+        mWebView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return flag;
+            }
+        });
     }
 
     android.webkit.WebView initSubWebView() {
@@ -278,6 +288,7 @@ public class BaseActivity extends Activity {
                 return false;
             }
         });
+        setWebViewLongListener(true);
         return mWebView;
     }
 
@@ -942,6 +953,20 @@ public class BaseActivity extends Activity {
                     startActivity(browserIntent);
                 }
             });
+        }
+    }
+
+    public void isAllowBrowerCopy() {
+        try {
+            String betaConfigPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kBetaConfigFileName);
+            JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
+            if (betaJSON.has("allow_brower_copy") && betaJSON.getBoolean("allow_brower_copy")) {
+                setWebViewLongListener(false);
+            } else {
+                setWebViewLongListener(true);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 }

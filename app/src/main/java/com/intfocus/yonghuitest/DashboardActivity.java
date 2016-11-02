@@ -107,6 +107,9 @@ public class DashboardActivity extends BaseActivity {
 		initNotificationService();
 
 		dealSendMessage();
+		if (urlStrings.get(3).equals(urlString)) {
+			setWebViewLongListener(false);
+		}
 
 		new Thread(mRunnableForDetecting).start();
 
@@ -119,8 +122,15 @@ public class DashboardActivity extends BaseActivity {
 		 * 启动 Activity 时也需要判断小红点是否显示
 		 */
 		receiveNotification();
+
+		/*
+		 * 判断是否允许浏览器复制
+		 */
+		isAllowBrowerCopy();
+
 		super.onResume();
 	}
+
 
 	@Override
 	protected void onStop() {
@@ -523,6 +533,10 @@ public class DashboardActivity extends BaseActivity {
 			if (v == mCurrentTab) {
 				return;
 			}
+			/*
+		     * 判断是否允许浏览器复制
+		 	 */
+			isAllowBrowerCopy();
 
 			mCurrentTab.setActive(false);
 			mCurrentTab = (TabView) v;
@@ -566,6 +580,7 @@ public class DashboardActivity extends BaseActivity {
 						bvMessage.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabMessage, 0);
 						FileUtil.writeBehaviorFile(mAppContext,urlString,3);
+						setWebViewLongListener(false);
 						break;
 					default:
 						objectType = 1;

@@ -23,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.intfocus.yonghuitest.util.ApiHelper;
@@ -203,6 +204,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	public void onResume() {
 		checkInterfaceOrientation(this.getResources().getConfiguration());
 		mMyApp.setCurrentActivity(this);
+		/*
+		 * 判断是否允许浏览器复制
+		 */
+		isAllowBrowerCopy();
 		super.onResume();
 	}
 
