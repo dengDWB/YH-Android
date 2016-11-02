@@ -151,6 +151,7 @@ public class LocalNotificationService extends Service {
        */
     Map<String, String> headers = ApiHelper.checkResponseHeader(urlString, mAssetsPath);
     PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0);
+    Log.i("useruser",packageInfo.versionName);
     String extraParams = String.format("os=android&version=a%s&inteval=%d&udi=%d",packageInfo.versionName, K.kTimerInterval, userJSON.getInt(K.kUserDeviceId));
     String urlSplit = (urlString.contains("?") ? "&" : "?");
     String urlStringWithExtraParams = String.format("%s%s%s", urlString, urlSplit, extraParams);
