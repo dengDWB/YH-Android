@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
+import com.iflytek.cloud.SpeechUtility;
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
 import com.intfocus.yonghuitest.util.K;
@@ -100,6 +101,11 @@ public class DashboardActivity extends BaseActivity {
          * 初始化本地通知
          */
 		FileUtil.initLocalNotifications(mAppContext);
+
+		/*
+		 * 语音播报初始化
+		 */
+		SpeechUtility.createUtility(mAppContext, "appid=581aa9e1");
 
 		/*
          * 动态注册广播用于接收通知
@@ -763,7 +769,10 @@ public class DashboardActivity extends BaseActivity {
          */
 		@JavascriptInterface
 		public void pageLink(final String bannerName, final String link, final int objectID) {
-
+			if (null == link || link.equals("")) {
+				toast("该功能正在开发中");
+				return;
+			}
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {

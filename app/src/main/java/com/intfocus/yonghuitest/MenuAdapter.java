@@ -3,9 +3,11 @@ package com.intfocus.yonghuitest;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.iflytek.cloud.SpeechSynthesizer;
 import com.intfocus.yonghuitest.util.FileUtil;
 import com.intfocus.yonghuitest.util.K;
 import com.intfocus.yonghuitest.util.URLs;
@@ -43,6 +45,7 @@ public class MenuAdapter extends SimpleAdapter {
 		}
 
 		TextView itemName = (TextView) v.findViewById(R.id.text_menu_item);
+		ImageView itemImg = (ImageView) v.findViewById(R.id.img_menu_item);
 
 		if (itemName.getText().equals("个人信息")) {
 			JSONObject notificationJSON = FileUtil.readConfigFile(noticePath);
@@ -55,6 +58,13 @@ public class MenuAdapter extends SimpleAdapter {
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();
+			}
+		}
+
+		if (itemName.getText().equals("语音播报")) {
+			Boolean isplay = SpeechSynthesizer.getSynthesizer().isSpeaking();
+			if (isplay){
+				itemImg.setImageResource(R.drawable.btn_stop);
 			}
 		}
 		return v;
