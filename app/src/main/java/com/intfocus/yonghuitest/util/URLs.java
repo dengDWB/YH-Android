@@ -58,7 +58,6 @@ public class URLs implements Serializable {
     public final static String kUseGesturePassword       = "use_gesture_password";
     public final static String kGesturePassword          = "gesture_password";
     public final static String kIsLogin                  = "is_login";
-    public final static String kPushDeviceToken          = "push_device_token";
 
     public final static String kCode                     = "code";
     public final static String kBody                     = "body";

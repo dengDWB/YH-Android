@@ -128,8 +128,8 @@ public class BaseActivity extends Activity {
             }
         }
 
-//        RefWatcher refWatcher = YHApplication.getRefWatcher(mContext);
-//        refWatcher.watch(this);
+    // RefWatcher refWatcher = YHApplication.getRefWatcher(mContext);
+    // refWatcher.watch(this);
     }
 
     protected void onDestroy() {
@@ -769,8 +769,16 @@ public class BaseActivity extends Activity {
                 }
 
                 FileUtil.writeFile(versionConfigPath, packageInfo.versionName);
+
+                // 抢着消息配置，重新上传服务器
+                String pushConfigPath = String.format("%s/%s", FileUtil.basePath(BaseActivity.this), K.kPushConfigFileName );
+                JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
+                pushJSON.put(K.kPushIsValid, false);
+                FileUtil.writeFile(pushConfigPath, pushJSON.toString());
             }
         } catch (PackageManager.NameNotFoundException | IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }

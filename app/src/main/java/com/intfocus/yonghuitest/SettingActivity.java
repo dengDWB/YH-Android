@@ -29,7 +29,6 @@ import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.intfocus.yonghuitest.screen_lock.InitPassCodeActivity;
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
@@ -40,19 +39,12 @@ import com.intfocus.yonghuitest.view.CircleImageView;
 import com.intfocus.yonghuitest.view.RedPointView;
 import com.pgyersdk.update.PgyUpdateManager;
 import com.readystatesoftware.viewbadger.BadgeView;
-import com.umeng.message.PushAgent;
-
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -61,6 +53,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class SettingActivity extends BaseActivity {
     public final static String kGravatar = "gravatar";
@@ -716,10 +710,10 @@ public class SettingActivity extends BaseActivity {
                         String device_token = mMyApp.getPushAgent().getRegistrationId();
                         String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPushConfigFileName);
                         JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
-                        if(!pushJSON.has(URLs.kPushDeviceToken) || pushJSON.getString(URLs.kPushDeviceToken).length() != 44 ||
-                            device_token.length() != 44 || !pushJSON.getString(URLs.kPushDeviceToken).equals(device_token)) {
-                            pushJSON.put("push_valid", false);
-                            pushJSON.put(URLs.kPushDeviceToken, device_token);
+                        if(!pushJSON.has(K.kPushDeviceToken) || pushJSON.getString(K.kPushDeviceToken).length() != 44 ||
+                                (device_token.length() == 44 && !pushJSON.getString(K.kPushDeviceToken).equals(device_token))) {
+                            pushJSON.put(K.kPushIsValid, false);
+                            pushJSON.put(K.kPushDeviceToken, device_token);
                             FileUtil.writeFile(pushConfigPath, pushJSON.toString());
                         }
 

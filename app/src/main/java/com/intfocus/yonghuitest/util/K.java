@@ -51,7 +51,6 @@ public class K extends PrivateURLs implements Serializable {
   public final static String kReportDataFileName        = "group_%s_template_%s_report_%s.js";
   public final static String kUserConfigFileName        = "user.json";
   public final static String kPushMessageFileName       = "push_message.json";
-  public final static String kPushConfigFileName        = "push_message_config.json";
   public final static String kSettingConfigFileName     = "setting.json";
   public final static String kTabIndexConfigFileName    = "page_tab_index.json";
   public final static String kGesturePwdConfigFileName  = "gesture_password.json";
@@ -74,11 +73,18 @@ public class K extends PrivateURLs implements Serializable {
   public final static String kStylesheetsMd5 = "stylesheets_md5";
   public final static String kJavaScriptsMd5 = "javascripts_md5";
   public final static String kInfo = "info";
-  public final static String kPushValid = "push_valid";
   public final static String kValid = "valid";
   public final static String kUserId = "user_id";
   public final static String kUserName = "user_name";
   public final static String kUserDeviceId = "user_device_id";
+
+  /**
+   * Config#Push Message
+   */
+  public final static String kPushConfigFileName = "push_message_config.json";
+  public final static String kPushIsValid        = "push_valid";
+  public final static String kPushDeviceToken    = "push_device_token";
+  public final static String kPushDeviceUUID     = "device_uuid";
 
   /**
    * Config#User Device Info

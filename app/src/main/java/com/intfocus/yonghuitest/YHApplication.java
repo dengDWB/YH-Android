@@ -19,7 +19,6 @@ import com.intfocus.yonghuitest.util.K;
 import com.intfocus.yonghuitest.util.LogUtil;
 import com.intfocus.yonghuitest.util.URLs;
 import com.pgyersdk.crash.PgyCrashManager;
-import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 import com.umeng.message.IUmengRegisterCallback;
 import com.umeng.message.PushAgent;
@@ -32,6 +31,8 @@ import java.util.List;
 import org.OpenUDID.OpenUDID_manager;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import static com.intfocus.yonghuitest.util.K.kPushDeviceToken;
 
 /**
  * Created by lijunjie on 16/1/15.
@@ -99,7 +100,7 @@ public class YHApplication extends Application {
          *  监测内存泄漏
          */
 
-//        refWatcher = LeakCanary.install(this);
+        // refWatcher = LeakCanary.install(this);
         PushAgent mPushAgent = PushAgent.getInstance(appContext);
         // 开启推送并设置注册的回调处理
         mPushAgent.register(new IUmengRegisterCallback() {
@@ -117,10 +118,10 @@ public class YHApplication extends Application {
                             // onRegistered方法的参数registrationId即是device_token
                             String pushConfigPath = String.format("%s/%s", FileUtil.basePath(appContext), K.kPushConfigFileName );
                             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
-                            pushJSON.put("push_valid", false);
-                            pushJSON.put("push_device_token", registrationId);
-                            Log.d("device_token",registrationId);
+                            pushJSON.put(K.kPushIsValid, false);
+                            pushJSON.put(kPushDeviceToken, registrationId);
                             FileUtil.writeFile(pushConfigPath, pushJSON.toString());
+                            Log.d(K.kPushDeviceToken,registrationId);
                         } catch (JSONException | IOException e) {
                             e.printStackTrace();
                         }
@@ -164,16 +165,13 @@ public class YHApplication extends Application {
         FileUtil.makeSureFolderExist(cachedPath);
     }
 
-
-
     /*
      *  手机待机再激活时接收解屏广播,进入解锁密码页
      */
     private final BroadcastReceiver broadcastScreenOnAndOff = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(!intent.getAction().equals(Intent.ACTION_SCREEN_ON) || isBackground(appContext))
-            {
+            if(!intent.getAction().equals(Intent.ACTION_SCREEN_ON) || isBackground(appContext)) {
                 Log.i("BroadcastReceiver", "return" + isBackground(appContext));
                 return;
             }
