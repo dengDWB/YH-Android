@@ -90,6 +90,7 @@ public class SettingActivity extends BaseActivity {
     private String gravatarJsonPath, gravatarImgPath, gravatarFileName;
     private TextView mCheckThursdaySay;
     private Context mContext;
+    private PushAgent mPushAgent;
 
     /* 请求识别码 */
     private static final int CODE_GALLERY_REQUEST = 0xa0;
@@ -102,6 +103,7 @@ public class SettingActivity extends BaseActivity {
         setContentView(R.layout.activity_setting);
 
         mContext = this;
+        mPushAgent = PushAgent.getInstance(mContext);
 
         mUserID = (TextView) findViewById(R.id.user_id);
         mRoleID = (TextView) findViewById(R.id.role_id);
@@ -713,11 +715,12 @@ public class SettingActivity extends BaseActivity {
                         /*
                          * Umeng Device Token
                          */
-                        String device_token = mMyApp.getPushAgent().getRegistrationId();
+                        String device_token = mPushAgent.getRegistrationId();
+                        Log.i("device_token",device_token.equals(null) ? null : device_token);
                         String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPushConfigFileName);
                         JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
                         if(!pushJSON.has(URLs.kPushDeviceToken) || pushJSON.getString(URLs.kPushDeviceToken).length() != 44 ||
-                            device_token.length() != 44 || !pushJSON.getString(URLs.kPushDeviceToken).equals(device_token)) {
+                                device_token.length() != 44 || !pushJSON.getString(URLs.kPushDeviceToken).equals(device_token)) {
                             pushJSON.put("push_valid", false);
                             pushJSON.put(URLs.kPushDeviceToken, device_token);
                             FileUtil.writeFile(pushConfigPath, pushJSON.toString());
