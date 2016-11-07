@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.intfocus.yonghuitest.SubjectActivity">
+    tools:context="com.intfocus.yonghuitest.BarCodeScannerActivity">
+
+    <FrameLayout
+        android:id="@+id/bar_code_scanner_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/actionBar">
+    </FrameLayout>
 
     <RelativeLayout
         android:id="@+id/actionBar"
@@ -54,10 +61,4 @@
 
     </RelativeLayout>
 
-    <FrameLayout
-        android:id="@+id/bar_code_scanner_frame"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/actionBar"/>
-
-</RelativeLayout>
+</FrameLayout>
