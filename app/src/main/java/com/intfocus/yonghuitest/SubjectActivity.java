@@ -69,8 +69,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	private int groupID, objectID, objectType;
 	private String userNum;
 	private RelativeLayout bannerView;
-	private final ArrayList<HashMap<String, Object>> listItem = new ArrayList<>();
-	private Boolean isShowSearchButton = false;
+	private ArrayList<HashMap<String, Object>> listItem;
 	private Context mContext;
 	private SpeechSynthesizer mTts;
 
@@ -143,13 +142,13 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			mPDFView.setVisibility(View.INVISIBLE);
 		}
 		mBannerSetting.setVisibility(View.VISIBLE);
-		initDropMenuItem();
 	}
 
 	/*
 	 * 标题栏点击设置按钮显示下拉菜单
 	 */
 	public void launchDropMenuActivity(View v) {
+		initDropMenuItem();
 		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 		popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
 
@@ -169,12 +168,23 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	 * 初始化标题栏下拉菜单
 	 */
 	private void initDropMenuItem() {
+		listItem = new ArrayList<>();
 		String[] itemName = {"分享", "评论", "刷新","语音播报"};
-		int[] itemImage = {R.drawable.banner_share, R.drawable.banner_comment,R.drawable.btn_refresh,R.drawable.btn_play};
+		int[] itemImage = {R.drawable.banner_share,
+					R.drawable.banner_comment,
+					R.drawable.btn_refresh,
+					mTts.isSpeaking() ? R.drawable.btn_stop : R.drawable.btn_play};
 		for (int i = 0; i < itemName.length; i++) {
 			HashMap<String, Object> map = new HashMap<>();
 			map.put("ItemImage", itemImage[i]);
 			map.put("ItemText", itemName[i]);
+			listItem.add(map);
+		}
+
+		if (FileUtil.reportIsSupportSearch(mAppContext, String.format("%d", groupID), templateID, reportID)) {
+			HashMap<String, Object> map = new HashMap<>();
+			map.put("ItemImage",R.drawable.banner_search);
+			map.put("ItemText","筛选");
 			listItem.add(map);
 		}
 
@@ -208,17 +218,22 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 					break;
 
 				case "语音播报":
+					if (mTts.isSpeaking()){
+						mTts.stopSpeaking();
+						break;
+					}
 					//开始合成
 					initTtsParms();
 					int code = mTts.startSpeaking(" XX 你好，最新数据截止 2016年06月06日 8 点，YY 群组的经营数据如下：\n" +
 							"\" +\n" +
 							"\t\t\t\t\"> 1. 销售额，销售额 120 万元，同比上涨 1%，其中20种品类上涨，13种品类下跌。\\n\" +\n" +
 							"\t\t\t\t\"> 2. 毛利，毛利额 25 万元，同比下降 2%，较上周同天下降 0.5 万元\\n\" +\n" +
-							"\t\t\t\t\"> 3. 客流量，.... ", mSynListener);
+							"\t\t\t\t\"> 3. 客流量，.... ",
+							mSynListener);
 
 					if (code != ErrorCode.SUCCESS) {
 						if (code == ErrorCode.ERROR_COMPONENT_NOT_INSTALLED) {
-							//上面的语音配置对象为初始化时：
+							//上面的语音配置对象未初始化时：
 							toast("语音播报组件未安装");
 						} else {
 							toast("语音播报失败,错误码: " + code + "请联系技术人员");
@@ -246,16 +261,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				if (!isShowSearchButton) {
-						HashMap<String, Object> map = new HashMap<>();
-						map.put("ItemImage",R.drawable.banner_search);
-						map.put("ItemText","筛选");
-						listItem.add(map);
-					SimpleAdapter mSimpleAdapter = new SimpleAdapter(mAppContext, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
-					initDropMenu(mSimpleAdapter, mDropMenuListener);
-					isShowSearchButton = true;
-				}
-
 				String selectedItem = FileUtil.reportSelectedItem(mAppContext, String.format("%d", groupID), templateID, reportID);
 				if (selectedItem == null || selectedItem.length() == 0) {
 					ArrayList<String> items = FileUtil.reportSearchItems(mAppContext, String.format("%d", groupID), templateID, reportID);

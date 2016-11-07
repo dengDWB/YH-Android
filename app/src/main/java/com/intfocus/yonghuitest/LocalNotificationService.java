@@ -118,10 +118,12 @@ public class LocalNotificationService extends Service {
       if ((new File(pgyerVersionPath)).exists()) {
         pgyerJSON = FileUtil.readConfigFile(pgyerVersionPath);
         JSONObject responseData = pgyerJSON.getJSONObject(URLs.kData);
+        Log.i("updatacode",responseData.toString());
         String pgyerCode = responseData.getString("versionCode");
         PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
         String versionCode = String.valueOf(packageInfo.versionCode);
         updataCount = pgyerCode.equals(versionCode) ?  -1 : 1;
+        Log.i("updatacode",updataCount + "     结果");
       }
       else {
         updataCount = -1;
@@ -200,10 +202,8 @@ public class LocalNotificationService extends Service {
         Log.i("notification", "未匹配到数值");
         return lastCount;
       }
-    } else if (response.get("code").equals("304")) {
-      Log.i("notification", "当前无通知");
-      return lastCount;
-    } else {
+    }
+    else {
       Log.i("notification", "网络请求失败");
       return lastCount;
     }

@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -19,13 +18,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.iflytek.cloud.ErrorCode;
-import com.iflytek.cloud.InitListener;
-import com.iflytek.cloud.SpeechConstant;
-import com.iflytek.cloud.SpeechError;
-import com.iflytek.cloud.SpeechSynthesizer;
-import com.iflytek.cloud.SpeechUtility;
-import com.iflytek.cloud.SynthesizerListener;
 import com.intfocus.yonghuitest.screen_lock.ConfirmPassCodeActivity;
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
@@ -35,13 +27,11 @@ import com.pgyersdk.update.PgyUpdateManager;
 import org.json.JSONObject;
 
 public class LoginActivity extends BaseActivity {
-    public final static String kFromActivity = "from_activity";
-    public final static String kSuccess      = "success";
+    public  String kFromActivity = "from_activity";
+    public  String kSuccess      = "success";
     private EditText usernameEditText, passwordEditText;
     private String usernameString, passwordString;
     private final static int CODE_AUTHORITY_REQUEST = 0;
-
-    private SpeechSynthesizer mTts;                  // 语音合成对象
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")

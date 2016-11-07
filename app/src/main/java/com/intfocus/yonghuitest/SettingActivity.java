@@ -324,6 +324,7 @@ public class SettingActivity extends BaseActivity {
         @Override
         public void onClick(View v) {
             checkPgyerVersionUpgrade(SettingActivity.this,true);
+            bvCheckUpgrade.setVisibility(View.GONE);
 
             /*
              * 用户行为记录, 单独异常处理，不可影响用户体验
