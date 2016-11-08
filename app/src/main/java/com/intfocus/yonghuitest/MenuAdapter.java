@@ -3,9 +3,11 @@ package com.intfocus.yonghuitest;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.iflytek.cloud.SpeechSynthesizer;
 import com.intfocus.yonghuitest.util.FileUtil;
 import com.intfocus.yonghuitest.util.K;
 import com.intfocus.yonghuitest.util.URLs;
@@ -38,13 +40,14 @@ public class MenuAdapter extends SimpleAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View v = super.getView(position, convertView, parent);
 
-		if (convertView != null) {
-			return v;
-		}
-
 		TextView itemName = (TextView) v.findViewById(R.id.text_menu_item);
 
 		if (itemName.getText().equals("个人信息")) {
+
+			if (convertView != null) {
+				return v;
+			}
+
 			JSONObject notificationJSON = FileUtil.readConfigFile(noticePath);
 			try {
 				BadgeView bvUser = new BadgeView(mContext, itemName);
@@ -57,6 +60,7 @@ public class MenuAdapter extends SimpleAdapter {
 				e.printStackTrace();
 			}
 		}
+
 		return v;
 	}
 }

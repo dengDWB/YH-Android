@@ -200,10 +200,8 @@ public class LocalNotificationService extends Service {
         Log.i("notification", "未匹配到数值");
         return lastCount;
       }
-    } else if (response.get("code").equals("304")) {
-      Log.i("notification", "当前无通知");
-      return lastCount;
-    } else {
+    }
+    else {
       Log.i("notification", "网络请求失败");
       return lastCount;
     }

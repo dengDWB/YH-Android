@@ -25,7 +25,15 @@ import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.iflytek.cloud.ErrorCode;
+import com.iflytek.cloud.InitListener;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.SpeechSynthesizer;
+import com.iflytek.cloud.SpeechUtility;
+import com.iflytek.cloud.SynthesizerListener;
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
 import com.intfocus.yonghuitest.util.K;
@@ -61,9 +69,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	private int groupID, objectID, objectType;
 	private String userNum;
 	private RelativeLayout bannerView;
-	private final ArrayList<HashMap<String, Object>> listItem = new ArrayList<>();
-	private Boolean isShowSearchButton = false;
+	private ArrayList<HashMap<String, Object>> listItem;
 	private Context mContext;
+//	private SpeechSynthesizer mTts;
 
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
@@ -78,6 +86,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		setContentView(R.layout.activity_subject);
 
 		mContext = this;
+
+		//创建SpeechSynthesizer对象
+//		mTts = SpeechSynthesizer.createSynthesizer(SubjectActivity.this, mTtsInitListener);
 
 		/*
 		 * JSON Data
@@ -111,7 +122,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 
 	private void initActiongBar(){
 		bannerView = (RelativeLayout) findViewById(R.id.actionBar);
-		ImageView mBannerComment = (ImageView) findViewById(R.id.bannerComment);
 		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 		TextView mTitle = (TextView) findViewById(R.id.bannerTitle);
 
@@ -131,13 +141,13 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			mPDFView.setVisibility(View.INVISIBLE);
 		}
 		mBannerSetting.setVisibility(View.VISIBLE);
-		initDropMenuItem();
 	}
 
 	/*
 	 * 标题栏点击设置按钮显示下拉菜单
 	 */
 	public void launchDropMenuActivity(View v) {
+		initDropMenuItem();
 		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 		popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
 
@@ -157,12 +167,23 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	 * 初始化标题栏下拉菜单
 	 */
 	private void initDropMenuItem() {
+		listItem = new ArrayList<>();
 		String[] itemName = {"分享", "评论", "刷新"};
-		int[] itemImage = {R.drawable.banner_share, R.drawable.banner_comment,R.drawable.btn_refresh};
+		int[] itemImage = {R.drawable.banner_share,
+					R.drawable.banner_comment,
+					R.drawable.btn_refresh};
+//					mTts.isSpeaking() ? R.drawable.btn_stop : R.drawable.btn_play};
 		for (int i = 0; i < itemName.length; i++) {
 			HashMap<String, Object> map = new HashMap<>();
 			map.put("ItemImage", itemImage[i]);
 			map.put("ItemText", itemName[i]);
+			listItem.add(map);
+		}
+
+		if (FileUtil.reportIsSupportSearch(mAppContext, String.format("%d", groupID), templateID, reportID)) {
+			HashMap<String, Object> map = new HashMap<>();
+			map.put("ItemImage",R.drawable.banner_search);
+			map.put("ItemText","筛选");
 			listItem.add(map);
 		}
 
@@ -215,16 +236,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				if (!isShowSearchButton) {
-						HashMap<String, Object> map = new HashMap<>();
-						map.put("ItemImage",R.drawable.banner_search);
-						map.put("ItemText","筛选");
-						listItem.add(map);
-					SimpleAdapter mSimpleAdapter = new SimpleAdapter(mAppContext, listItem, R.layout.menu_list_items, new String[]{"ItemImage", "ItemText"}, new int[]{R.id.img_menu_item, R.id.text_menu_item});
-					initDropMenu(mSimpleAdapter, mDropMenuListener);
-					isShowSearchButton = true;
-				}
-
 				String selectedItem = FileUtil.reportSelectedItem(mAppContext, String.format("%d", groupID), templateID, reportID);
 				if (selectedItem == null || selectedItem.length() == 0) {
 					ArrayList<String> items = FileUtil.reportSearchItems(mAppContext, String.format("%d", groupID), templateID, reportID);
