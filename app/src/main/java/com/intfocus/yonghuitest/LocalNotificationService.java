@@ -87,7 +87,6 @@ public class LocalNotificationService extends Service {
       public void run() {
         processDataCount();//先计算通知的数量
         sendBroadcast(sendIntent);
-        Log.i("bugbug", "执行");
       }
     };
     timer.schedule(timerTask, 10 * 1000, K.kTimerInterval * 60 * 1000);
