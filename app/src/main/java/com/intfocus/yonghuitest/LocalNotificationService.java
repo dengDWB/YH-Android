@@ -123,7 +123,6 @@ public class LocalNotificationService extends Service {
         PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
         String versionCode = String.valueOf(packageInfo.versionCode);
         updataCount = pgyerCode.equals(versionCode) ?  -1 : 1;
-        Log.i("updatacode",updataCount + "     结果");
       }
       else {
         updataCount = -1;
