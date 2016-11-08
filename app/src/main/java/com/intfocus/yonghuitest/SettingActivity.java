@@ -191,15 +191,15 @@ public class SettingActivity extends BaseActivity {
                 String currentGravatarUrl = user.getString(kGravatar);
                 String currentGravatarFileName = currentGravatarUrl.substring(currentGravatarUrl.lastIndexOf("/")+1, currentGravatarUrl.length());
                 // 以用户验证响应的 gravatar 值为准，不一致则下载
-                if (!(gravatarFileName.equals(currentGravatarFileName))) {
-                    gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, currentGravatarFileName);
-                    gravatarFileName = currentGravatarFileName;
-                    httpGetBitmap(currentGravatarUrl, true);
+                if ((gravatarFileName.equals(currentGravatarFileName)) || !(user.getString(kGravatar).startsWith("http"))) {
+                    Bitmap bitmap = BitmapFactory.decodeFile(gravatarImgPath);
+                    mIconImageView.setImageBitmap(bitmap);
                     return;
                 }
 
-                Bitmap bitmap = BitmapFactory.decodeFile(gravatarImgPath);
-                mIconImageView.setImageBitmap(bitmap);
+                gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, currentGravatarFileName);
+                gravatarFileName = currentGravatarFileName;
+                httpGetBitmap(currentGravatarUrl, true);
             }
             else {
                 if (user.has(kGravatar) && (user.getString(kGravatar).indexOf("http") != -1)) {
@@ -486,7 +486,7 @@ public class SettingActivity extends BaseActivity {
      */
     public void cropPhoto(Uri uri) {
         Intent intent = new Intent("com.android.camera.action.CROP");
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+        if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.KITKAT) {
             String url=FileUtil.getBitmapUrlPath(this, uri);
             intent.setDataAndType(Uri.fromFile(new File(url)), "image/*");
         }else{
