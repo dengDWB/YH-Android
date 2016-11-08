@@ -88,7 +88,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		mContext = this;
 
 		//创建SpeechSynthesizer对象
-		mTts = SpeechSynthesizer.createSynthesizer(SubjectActivity.this, mTtsInitListener);
+//		mTts = SpeechSynthesizer.createSynthesizer(SubjectActivity.this, mTtsInitListener);
 
 		/*
 		 * JSON Data
@@ -169,11 +169,11 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	 */
 	private void initDropMenuItem() {
 		listItem = new ArrayList<>();
-		String[] itemName = {"分享", "评论", "刷新","语音播报"};
+		String[] itemName = {"分享", "评论", "刷新"};
 		int[] itemImage = {R.drawable.banner_share,
 					R.drawable.banner_comment,
-					R.drawable.btn_refresh,
-					mTts.isSpeaking() ? R.drawable.btn_stop : R.drawable.btn_play};
+					R.drawable.btn_refresh};
+//					mTts.isSpeaking() ? R.drawable.btn_stop : R.drawable.btn_play};
 		for (int i = 0; i < itemName.length; i++) {
 			HashMap<String, Object> map = new HashMap<>();
 			map.put("ItemImage", itemImage[i]);
