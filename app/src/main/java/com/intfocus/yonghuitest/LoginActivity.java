@@ -12,11 +12,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.intfocus.yonghuitest.screen_lock.ConfirmPassCodeActivity;
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
@@ -26,11 +27,11 @@ import com.pgyersdk.update.PgyUpdateManager;
 import org.json.JSONObject;
 
 public class LoginActivity extends BaseActivity {
-    public final static String kFromActivity = "from_activity";
-    public final static String kSuccess      = "success";
+    public  String kFromActivity = "from_activity";         // APP 启动标识
+    public  String kSuccess      = "success";               // 用户登录验证结果
     private EditText usernameEditText, passwordEditText;
     private String usernameString, passwordString;
-    private final static int CODE_AUTHORITY_REQUEST = 0;
+    private final static int CODE_AUTHORITY_REQUEST = 0;    // 权限申请识别码
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -38,13 +39,18 @@ public class LoginActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        // 使背景填满整个屏幕,包括状态栏
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        }
+
         /*
          *  如果是从触屏界面过来，则直接进入主界面如
          *  不是的话，相当于直接启动应用，则检测是否有设置锁屏
          */
         Intent intent = getIntent();
         if (intent.hasExtra(kFromActivity) && intent.getStringExtra(kFromActivity).equals("ConfirmPassCodeActivity")) {
-            Log.i("getIndent", intent.getStringExtra(kFromActivity));
             intent = new Intent(LoginActivity.this, DashboardActivity.class);
             intent.putExtra(kFromActivity, intent.getStringExtra(kFromActivity));
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -72,19 +78,22 @@ public class LoginActivity extends BaseActivity {
         usernameEditText = (EditText) findViewById(R.id.etUsername);
         passwordEditText = (EditText) findViewById(R.id.etPassword);
         TextView versionTv = (TextView) findViewById(R.id.versionTv);
-        PackageInfo packageInfo = null;
+
+        /*
+         * 显示当前应用版本号
+         */
         try {
-            packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             String versionInfo = String.format("a%s(%d)", packageInfo.versionName, packageInfo.versionCode);
             versionTv.setText(versionInfo);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
 
-        if (Build.VERSION.SDK_INT > K.kMaxSdkVersion || Build.VERSION.SDK_INT < K.kMinSdkVersion){
-            /*
-             *  当用户系统不在我们支持范围内时,发出警告。
-             */
+        /*
+         *  当用户系统不在我们支持范围内时,发出警告。
+         */
+        if (Build.VERSION.SDK_INT > K.kMaxSdkVersion || Build.VERSION.SDK_INT < K.kMinSdkVersion) {
             showVersionWarring();
         }
 
@@ -94,6 +103,32 @@ public class LoginActivity extends BaseActivity {
         checkVersionUpgrade(assetsPath);
     }
 
+    protected void onResume() {
+        mMyApp.setCurrentActivity(this);
+        if(mProgressDialog != null)  {
+            mProgressDialog.dismiss();
+        }
+        getAuthority();
+        super.onResume();
+    }
+
+    protected void onDestroy() {
+        mWebView = null;
+        user = null;
+        PgyUpdateManager.unregister(); // 解除注册蒲公英版本更新检查
+        super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        mMyApp.setCurrentActivity(null);
+        finish();
+        System.exit(0);
+    }
+
+    /*
+     * 系统版本警告
+     */
     private void showVersionWarring() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("温馨提示")
@@ -115,12 +150,15 @@ public class LoginActivity extends BaseActivity {
         builder.show();
     }
 
+    /*
+     * 获取权限 : 文件读写 (WRITE_EXTERNAL_STORAGE),读取设备信息 (READ_PHONE_STATE)
+     */
     private void getAuthority() {
-            int writePermission = ContextCompat.checkSelfPermission(mAppContext, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            if(writePermission != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(LoginActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE},CODE_AUTHORITY_REQUEST);
-                return;
-            }else{
+        int writePermission = ContextCompat.checkSelfPermission(mAppContext, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if(writePermission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(LoginActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE},CODE_AUTHORITY_REQUEST);
+            return;
+        }else{
             return;
         }
     }
@@ -144,22 +182,9 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-    protected void onResume() {
-        mMyApp.setCurrentActivity(this);
-        if(mProgressDialog != null)  {
-            mProgressDialog.dismiss();
-        }
-        getAuthority();
-        super.onResume();
-    }
-
-    protected void onDestroy() {
-        mWebView = null;
-        user = null;
-        PgyUpdateManager.unregister(); // 解除注册蒲公英版本更新检查
-        super.onDestroy();
-    }
-
+    /*
+     * 登录按钮点击事件
+     */
     public void actionSubmit(View v) {
         try {
             usernameString = usernameEditText.getText().toString();
@@ -231,12 +256,5 @@ public class LoginActivity extends BaseActivity {
             if (mProgressDialog != null) mProgressDialog.dismiss();
             toast(e.getLocalizedMessage());
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        mMyApp.setCurrentActivity(null);
-        finish();
-        System.exit(0);
     }
 }

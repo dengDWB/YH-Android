@@ -6,28 +6,30 @@
     android:versionName="1.3.67"
     android:hardwareAccelerated="false">
 
-    <uses-permission android:name="android.permission.CAMERA"/> <!-- 扫描条形码或二维码 -->
+    <uses-permission android:name="android.permission.CAMERA" /> <!-- 扫描条形码或二维码 -->
     <!-- 6.0 及以上系统需要在代码中动态注册 -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- 必选 -->
-    <uses-permission android:name="android.permission.INTERNET"/> <!-- 网络通信 -->
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/> <!-- 获取MAC地址 -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/> <!-- 获取网络状态 -->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/> <!-- 获取设备信息 -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- 网络通信 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> <!-- 获取MAC地址 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- 获取网络状态 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- 获取设备信息 -->
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <!-- 6.0 及以上系统需要在代码中动态注册 -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/> <!-- 读写sdcard，storage等等 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 读写sdcard，storage等等 -->
     <!-- 6.0 及以上系统需要在代码中动态注册 -->
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/> <!-- 允许程序录制音频 -->
-    <uses-permission android:name="android.permission.GET_TASKS"/> <!-- 得到当前运行的activity名字 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- 允许程序录制音频 -->
+    <uses-permission android:name="android.permission.GET_TASKS" /> <!-- 得到当前运行的activity名字 -->
     <!-- 5.0 及以上系统不可使用 -->
     <!-- 可选 -->
-    <uses-permission android:name="android.permission.READ_LOGS"/>
+    <uses-permission android:name="android.permission.READ_LOGS" />
+
     <!-- 获取logcat日志 -->
     <application
-        android:name="com.intfocus.yonghuitest.YHApplication"
+        android:name=".YHApplication"
         android:allowBackup="true"
         android:icon="@mipmap/launcher"
         android:label="@string/app_name"
@@ -35,7 +37,7 @@
         tools:replace="android:icon,android:theme">
         <service android:name="org.OpenUDID.OpenUDID_service">
             <intent-filter>
-                <action android:name="org.openudid.GETUDID"/>
+                <action android:name="org.openudid.GETUDID" />
             </intent-filter>
         </service>
         <!--
@@ -49,102 +51,99 @@
             android:enabled="false" />
         -->
         <activity
-            android:name="com.intfocus.yonghuitest.LoginActivity"
+            android:name=".LoginActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/FullscreenTheme">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="com.intfocus.yonghuitest.SettingActivity"
+            android:name=".SettingActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yonghuitest.DashboardActivity"
+            android:name=".DashboardActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yonghuitest.SubjectActivity"
+            android:name=".SubjectActivity"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yonghuitest.ReportSelectorAcitity"
+            android:name=".ReportSelectorAcitity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yonghuitest.CommentActivity"
+            android:name=".CommentActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yonghuitest.ResetPasswordActivity"
+            android:name=".ResetPasswordActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yonghuitest.BarCodeScannerActivity"
+            android:name=".BarCodeScannerActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yonghuitest.BarCodeResultActivity"
+            android:name=".BarCodeResultActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yonghuitest.StoreSelectorActivity"
+            android:name=".StoreSelectorActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yonghuitest.screen_lock.InitPassCodeActivity"
+            android:name=".screen_lock.InitPassCodeActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yonghuitest.screen_lock.ConfirmPassCodeActivity"
+            android:name=".screen_lock.ConfirmPassCodeActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
             android:name="com.umeng.socialize.editorpage.ShareActivity"
             android:excludeFromRecents="true"
-            android:theme="@style/Theme.UMDefault"/>
+            android:theme="@style/Theme.UMDefault" />
         <activity
-            android:name="com.intfocus.yonghuitest.ThursdaySayActivity"
+            android:name=".ThursdaySayActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yonghuitest.DeveloperActivity"
+            android:name=".DeveloperActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yonghuitest.wxapi.WXEntryActivity"
+            android:name=".wxapi.WXEntryActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <!-- Services -->
-        <service android:name="com.intfocus.yonghuitest.LocalNotificationService"/>
+        <service android:name=".LocalNotificationService" />
 
         <!-- 蒲公英 必选 -->
         <meta-data
             android:name="PGYER_APPID"
-            android:value="a0fb26faac52207f08129f092274f8c6">
-        </meta-data>
+            android:value="a0fb26faac52207f08129f092274f8c6"></meta-data>
 
         <!-- 友盟 必选 -->
         <meta-data
             android:name="UMENG_APPKEY"
-            android:value="57b5224467e58e3e9b001fc2">
-        </meta-data>
+            android:value="57b5224467e58e3e9b001fc2"></meta-data>
         <meta-data
             android:name="UMENG_MESSAGE_SECRET"
-            android:value="58d8d622c94e9c63cb4eaf88d80ac657">
-        </meta-data>
+            android:value="58d8d622c94e9c63cb4eaf88d80ac657"></meta-data>
         <meta-data
             android:name="UMENG_CHANNEL"
-            android:value="Umeng">
-        </meta-data>
+            android:value="Umeng"></meta-data>
+
     </application>
 
 </manifest>

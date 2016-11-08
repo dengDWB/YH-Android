@@ -21,8 +21,8 @@
     <string name="nine">9</string>
     <string name="period">.</string>
     <string name="login_submit">登录</string>
-    <string name="login_password_placeholder">请输入密码</string>
-    <string name="login_username_placeholder">请输入账号</string>
+    <string name="login_password_placeholder">密码</string>
+    <string name="login_username_placeholder">账户名</string>
     <string name="login_slogan_text">融合共享，成于至善</string>
     <string name="text_dashboard">仪表盘</string>
     <string name="text_analysis">分析</string>
@@ -33,4 +33,5 @@
     <string name="text_user_info">个人信息</string>
     <string name="text_voice">语音播报</string>
     <string name="title_activity_developer">DeveloperActivity</string>
+    <string name="title_activity_speech">SpeechActivity</string>
 </resources>
