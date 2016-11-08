@@ -118,7 +118,6 @@ public class LocalNotificationService extends Service {
       if ((new File(pgyerVersionPath)).exists()) {
         pgyerJSON = FileUtil.readConfigFile(pgyerVersionPath);
         JSONObject responseData = pgyerJSON.getJSONObject(URLs.kData);
-        Log.i("updatacode",responseData.toString());
         String pgyerCode = responseData.getString("versionCode");
         PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
         String versionCode = String.valueOf(packageInfo.versionCode);
