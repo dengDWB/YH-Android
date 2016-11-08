@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
+
 import com.intfocus.yonghuitest.screen_lock.ConfirmPassCodeActivity;
 import com.intfocus.yonghuitest.util.FileUtil;
 import com.intfocus.yonghuitest.util.K;
@@ -40,7 +41,6 @@ import static com.intfocus.yonghuitest.util.K.kPushDeviceToken;
 public class YHApplication extends Application {
     private Context appContext;
     private RefWatcher refWatcher;
-    public static PushAgent mPushAgent;
 
     @Override
     public void onCreate() {
@@ -264,10 +264,6 @@ public class YHApplication extends Application {
             }
         }
     };
-
-    public static PushAgent getPushAgent(){
-        return mPushAgent;
-    }
 
     /**
      *  新安装、或升级后，把代码包中的静态资源重新拷贝覆盖一下

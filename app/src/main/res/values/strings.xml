@@ -33,4 +33,5 @@
     <string name="text_user_info">个人信息</string>
     <string name="text_voice">语音播报</string>
     <string name="title_activity_developer">DeveloperActivity</string>
+    <string name="title_activity_speech">SpeechActivity</string>
 </resources>
