@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="com.intfocus.yonghuitest.SettingActivity">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.intfocus.yonghuitest.SettingActivity">
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -21,10 +21,11 @@
                 android:background="@drawable/bg_user">
 
                 <com.intfocus.yonghuitest.view.CircleImageView
-                android:id="@+id/img_icon"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_centerInParent="true"/>
+                    android:id="@+id/img_icon"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/login_logo"
+                    android:layout_centerInParent="true" />
 
                 <TextView
                     android:id="@+id/user_id"
@@ -33,7 +34,7 @@
                     android:layout_below="@id/img_icon"
                     android:layout_centerHorizontal="true"
                     android:textColor="@color/white"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -46,21 +47,21 @@
                         android:id="@+id/role_id"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/white"/>
+                        android:textColor="@color/white" />
 
                     <TextView
                         android:id="@+id/commas"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=" | "
-                        android:textColor="@color/white"/>
+                        android:textColor="@color/white" />
 
                     <TextView
                         android:id="@+id/group_id"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_toRightOf="@id/commas"
-                        android:textColor="@color/white"/>
+                        android:textColor="@color/white" />
                 </LinearLayout>
 
             </RelativeLayout>
@@ -78,84 +79,84 @@
 
                 <TextView
                     style="@style/SettingTitle"
-                    android:text="应用信息"/>
+                    android:text="应用信息" />
 
                 <RelativeLayout style="@style/SettingGroup">
 
                     <TextView
                         style="@style/SettingKey"
-                        android:text="名称"/>
+                        android:text="名称" />
 
                     <TextView
                         android:id="@+id/app_name"
                         style="@style/SettingValue"
-                        android:text="应用名称"/>
+                        android:text="应用名称" />
                 </RelativeLayout>
 
                 <RelativeLayout style="@style/SettingGroup">
 
                     <TextView
                         style="@style/SettingKey"
-                        android:text="版本号"/>
+                        android:text="版本号" />
 
                     <TextView
                         android:id="@+id/app_version"
                         style="@style/SettingValue"
-                        android:text="v1.0"/>
+                        android:text="v1.0" />
                 </RelativeLayout>
 
                 <RelativeLayout style="@style/SettingGroup">
 
                     <TextView
                         style="@style/SettingKey"
-                        android:text="设备型号"/>
+                        android:text="设备型号" />
 
                     <TextView
                         android:id="@+id/device_id"
                         style="@style/SettingValue"
-                        android:text="设备型号"/>
+                        android:text="设备型号" />
                 </RelativeLayout>
 
                 <RelativeLayout style="@style/SettingGroup">
 
                     <TextView
                         style="@style/SettingKey"
-                        android:text="消息推送"/>
+                        android:text="消息推送" />
 
                     <TextView
                         android:id="@+id/push_state"
                         style="@style/SettingValue"
                         android:layout_marginTop="5dp"
                         android:text="状态"
-                        android:textSize="12dp"/>
+                        android:textSize="12dp" />
                 </RelativeLayout>
 
                 <RelativeLayout style="@style/SettingGroup">
 
                     <TextView
                         style="@style/SettingKey"
-                        android:text="数据接口"/>
+                        android:text="数据接口" />
 
                     <TextView
                         android:id="@+id/api_domain"
                         style="@style/SettingValue"
                         android:layout_marginTop="5dp"
                         android:text="域名"
-                        android:textSize="12dp"/>
+                        android:textSize="12dp" />
                 </RelativeLayout>
 
                 <RelativeLayout style="@style/SettingGroup">
 
                     <TextView
                         style="@style/SettingKey"
-                        android:text="应用标识"/>
+                        android:text="应用标识" />
 
                     <TextView
                         android:id="@+id/app_identifier"
                         style="@style/SettingValue"
                         android:layout_marginTop="5dp"
                         android:text="标识"
-                        android:textSize="12dp"/>
+                        android:textSize="12dp" />
                 </RelativeLayout>
 
                 <RelativeLayout style="@style/SettingGroup">
@@ -163,14 +164,14 @@
                     <TextView
                         android:id="@+id/check_assets"
                         style="@style/SettingButton"
-                        android:text="校正"/>
+                        android:text="校正" />
 
                     <TextView
                         style="@style/SettingValue"
                         android:layout_marginTop="3dp"
                         android:text="若界面显示异常，请校正"
                         android:textColor="@color/gray"
-                        android:textSize="12dp"/>
+                        android:textSize="12dp" />
                 </RelativeLayout>
 
 
@@ -179,7 +180,7 @@
                     <TextView
                         android:id="@+id/check_upgrade"
                         style="@style/SettingButton"
-                        android:text="检测更新"/>
+                        android:text="检测更新" />
 
                     <TextView
                         android:id="@+id/pgyer_link"
@@ -187,42 +188,43 @@
                         android:layout_marginTop="3dp"
                         android:text="有测试版本发布（1.2.33）"
                         android:textColor="#0000ff"
-                        android:textSize="12dp"/>
+                        android:textSize="12dp" />
                 </RelativeLayout>
 
-                <RelativeLayout style="@style/SettingGroup"
+                <RelativeLayout
+                    style="@style/SettingGroup"
                     android:onClick="launchThursdaySayActivity">
 
                     <TextView
                         android:id="@+id/check_thursday_say"
                         style="@style/SettingKey"
-                        android:text="小四说"/>
+                        android:text="小四说" />
 
                     <ImageView
-                        android:layout_height="20dp"
                         android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
                         android:background="@drawable/icon_thursday_say_pink" />
                 </RelativeLayout>
 
-                <View style="@style/Divider"/>
+                <View style="@style/Divider" />
 
                 <TextView
                     style="@style/SettingTitle"
-                    android:text="安全策略"/>
+                    android:text="安全策略" />
 
                 <RelativeLayout style="@style/SettingGroup">
 
                     <TextView
                         style="@style/SettingKey"
-                        android:text="启用锁屏"/>
+                        android:text="启用锁屏" />
 
                     <Switch
                         android:id="@+id/lock_switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"/>
+                        android:layout_alignParentRight="true" />
                 </RelativeLayout>
 
 
@@ -232,7 +234,7 @@
                         android:id="@+id/change_lock"
                         style="@style/SettingButton"
                         android:text="修改锁屏密码"
-                        android:visibility="gone"/>
+                        android:visibility="gone" />
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -243,58 +245,58 @@
                         android:id="@+id/change_pwd"
                         style="@style/SettingButton"
                         android:gravity="center_vertical"
-                        android:text="修改登陆密码"/>
+                        android:text="修改登陆密码" />
 
                     <TextView
                         android:id="@+id/warn_pwd"
-                        style="@style/SettingValue"/>
+                        style="@style/SettingValue" />
                 </RelativeLayout>
 
-                <View style="@style/Divider"/>
+                <View style="@style/Divider" />
 
                 <TextView
                     style="@style/SettingTitle"
-                    android:text="辅助功能"/>
+                    android:text="辅助功能" />
 
                 <RelativeLayout style="@style/SettingGroup">
 
                     <TextView
                         style="@style/SettingKey"
-                        android:text="分享长图"/>
+                        android:text="分享长图" />
 
                     <Switch
                         android:id="@+id/longcat_switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"/>
+                        android:layout_alignParentRight="true" />
                 </RelativeLayout>
 
                 <RelativeLayout style="@style/SettingGroup">
 
                     <TextView
                         style="@style/SettingKey"
-                        android:text="报表操作"/>
+                        android:text="报表操作" />
 
                     <Switch
                         android:id="@+id/dashboard_switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"/>
+                        android:layout_alignParentRight="true" />
                 </RelativeLayout>
 
-                <View style="@style/Divider"/>
+                <View style="@style/Divider" />
 
                 <TextView
                     android:id="@+id/developerTv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="开发者选项"
-                    android:textColor="#000000"
                     android:clickable="true"
                     android:onClick="launchDeveloperActivity"
-                    android:textSize="18sp"/>
+                    android:text="开发者选项"
+                    android:textColor="#000000"
+                    android:textSize="18sp" />
 
-                <View style="@style/Divider"/>
+                <View style="@style/Divider" />
 
                 <Button
                     android:id="@+id/logout"
@@ -304,7 +306,7 @@
                     android:layout_marginTop="20dp"
                     android:background="@drawable/logout_background"
                     android:text="退出登录"
-                    android:textColor="@color/white"/>
+                    android:textColor="@color/white" />
             </LinearLayout>
         </RelativeLayout>
     </ScrollView>
@@ -319,11 +321,11 @@
         <ImageView
             android:id="@+id/bannerBack"
             style="@style/BannerBackWhiteButton"
-            android:onClick="dismissActivity"/>
+            android:onClick="dismissActivity" />
 
         <TextView
             style="@style/BannerBackWhiteText"
             android:layout_toRightOf="@id/bannerBack"
-            android:onClick="dismissActivity"/>
+            android:onClick="dismissActivity" />
     </RelativeLayout>
 </FrameLayout>

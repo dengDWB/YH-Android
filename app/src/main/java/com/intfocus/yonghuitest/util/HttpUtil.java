@@ -1,6 +1,7 @@
 package com.intfocus.yonghuitest.util;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
