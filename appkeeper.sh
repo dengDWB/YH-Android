@@ -17,6 +17,9 @@ case "$1" in
   github)
     bundle exec ruby config/app_keeper.rb --github
   ;;
+  view)
+    bundle exec ruby config/app_keeper.rb --view
+  ;;
   deploy)
     bash "$0" shengyiplus
     bash "$0" pgyer
