@@ -21,6 +21,7 @@
 #     -v, --version   print the version
 #     -a, --app       current app
 #
+require 'pp'
 require 'json'
 require 'slop'
 require 'nokogiri'
@@ -65,6 +66,7 @@ slop_opts = Slop.parse do |o|
   o.bool '-p', '--pgyer', 'whether upload to pgyer', default: false
   o.bool '-b', '--github', 'black private info when commit', default: false
   o.bool '-c', '--check', 'info mirror', default: false
+  o.bool '-w', '--view', 'pgyer version info', default: false
   o.on '-v', '--version', 'print the version' do
     puts Slop::VERSION
     exit
@@ -84,13 +86,13 @@ bundle_display_hash = {
 }
 bundle_display_names = bundle_display_hash.keys.map(&:to_s)
 exit_when !bundle_display_names.include?(current_app) do
-  puts %(Abort: appname should in #{bundle_display_names}, but #{current_app})
+  puts format(%(Abort: appname should in %s, but %s), bundle_display_names, current_app)
 end
 
 current_app_name = bundle_display_hash.fetch(current_app.to_sym)
 
 `echo '#{current_app}' > .current-app`
-puts %(\n# current app: #{current_app}\n)
+puts format(%(\n# current app: %s\n), current_app)
 
 NAME_SPACE = current_app # TODO: namespace(variable_instance)
 class Settings < Settingslogic
@@ -279,8 +281,10 @@ if slop_opts[:pgyer]
     command = %(curl --silent -F "file=@#{apk_path}" -F "uKey=#{Settings.pgyer.user_key}" -F "_api_key=#{Settings.pgyer.api_key}" http://www.pgyer.com/apiv1/app/upload)
     response = `#{command}`
 
-    hash = JSON.parse(response).deep_symbolize_keys[:data]
-    puts %(- done(#{retry_num}): upload apk(#{hash[:appFileSize].to_i.to_s(:human_size)}) to #pgyer#\n\t#{hash[:appName]}\n\t#{hash[:appIdentifier]}\n\t#{hash[:appVersion]}(#{hash[:appVersionNo]})\n\t#{hash[:appQRCodeURL]})
+    hash = JSON.parse(response).deep_symbolize_keys
+    data = hash.dig(:data)
+    data[:appFileSize] = hash[:appFileSize].to_i.to_s(:human_size)
+    pp data.slice(:appFileSize, :appName, :appIdentifier, :appVersion, :appVersionNo)
   rescue => e
     puts command
     puts response.inspect
@@ -290,4 +294,23 @@ if slop_opts[:pgyer]
   end
 
   upload_apk(apk_path)
+end
+
+if slop_opts[:view]
+  def view_pgyer_version
+    api_url = 'http://www.pgyer.com/apiv1/app/getAppKeyByShortcut'
+    command = format('curl --silent --data "shortcut=%s&_api_key=%s" %s', Settings.pgyer.shortcut , Settings.pgyer.api_key, api_url)
+    response = `#{command}`
+
+    hash = JSON.parse(response).deep_symbolize_keys
+    data = hash.dig(:data)
+    data[:appFileSize] = hash[:appFileSize].to_i.to_s(:human_size)
+    pp data.slice(:appFileName, :appFileSize, :appName, :appVersion, :appVersionNo, :appIdentifier, :appCreated)
+  rescue => e
+    puts command
+    puts response.inspect
+    puts e.message
+  end
+
+  view_pgyer_version
 end
