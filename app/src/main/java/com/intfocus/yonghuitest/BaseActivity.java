@@ -700,6 +700,7 @@ public class BaseActivity extends Activity {
                                         }
                                     })
                             .show();
+
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
