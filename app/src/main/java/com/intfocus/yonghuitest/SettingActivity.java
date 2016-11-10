@@ -129,10 +129,14 @@ public class SettingActivity extends BaseActivity {
         try {
             String betaConfigPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kBetaConfigFileName);
             JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
+            if (!betaJSON.has("image_within_screen")) {
+                betaJSON.put("image_within_screen",true);
+                FileUtil.writeFile(betaConfigPath,betaJSON.toString());
+            }
             mLongCatSwitch = (Switch) findViewById(R.id.longcat_switch);
-            mLongCatSwitch.setChecked(!(betaJSON.has("image_within_screen") && betaJSON.getBoolean("image_within_screen")));
+            mLongCatSwitch.setChecked(betaJSON.has("image_within_screen") && betaJSON.getBoolean("image_within_screen"));
             mDashboardSwitch.setChecked(betaJSON.has("allow_brower_copy") && betaJSON.getBoolean("allow_brower_copy"));
-        } catch (JSONException e) {
+        } catch (JSONException | IOException e) {
             e.printStackTrace();
         }
 
