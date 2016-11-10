@@ -283,7 +283,7 @@ if slop_opts[:pgyer]
 
     hash = JSON.parse(response).deep_symbolize_keys
     data = hash.dig(:data)
-    data[:appFileSize] = hash[:appFileSize].to_i.to_s(:human_size)
+    data[:appFileSize] = data[:appFileSize].to_i.to_s(:human_size)
     pp data.slice(:appFileSize, :appName, :appIdentifier, :appVersion, :appVersionNo)
   rescue => e
     puts command
@@ -304,8 +304,8 @@ if slop_opts[:view]
 
     hash = JSON.parse(response).deep_symbolize_keys
     data = hash.dig(:data)
-    data[:appFileSize] = hash[:appFileSize].to_i.to_s(:human_size)
-    pp data.slice(:appFileName, :appFileSize, :appName, :appVersion, :appVersionNo, :appIdentifier, :appCreated)
+    data[:appSize] = data[:appFileSize].to_i.to_s(:human_size)
+    pp data.slice(:appFileName, :appSize, :appFileSize, :appName, :appVersion, :appVersionNo, :appIdentifier, :appCreated)
   rescue => e
     puts command
     puts response.inspect
