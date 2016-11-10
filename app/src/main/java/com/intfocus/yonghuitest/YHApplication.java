@@ -11,6 +11,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
+import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.widget.Toast;
 
