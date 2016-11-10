@@ -27,13 +27,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.iflytek.cloud.ErrorCode;
-import com.iflytek.cloud.InitListener;
-import com.iflytek.cloud.SpeechConstant;
-import com.iflytek.cloud.SpeechError;
-import com.iflytek.cloud.SpeechSynthesizer;
-import com.iflytek.cloud.SpeechUtility;
-import com.iflytek.cloud.SynthesizerListener;
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
 import com.intfocus.yonghuitest.util.K;
@@ -459,8 +452,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 				}
 				imgBmp = Bitmap.createBitmap(mWebView.getMeasuredWidth(),
 						mWebView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-				if (imgBmp == null) {
+				if (imgBmp == null && imgBmp.getWidth() <= 0 && imgBmp.getHeight() <= 0) {
 					toast("截图失败");
+					return;
 				}
 				Canvas canvas = new Canvas(imgBmp);
 				Paint paint = new Paint();

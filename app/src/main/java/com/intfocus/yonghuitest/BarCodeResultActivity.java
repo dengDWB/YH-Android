@@ -344,8 +344,9 @@ public class BarCodeResultActivity extends BaseActivity {
                 }
                 imgBmp = Bitmap.createBitmap(mWebView.getMeasuredWidth(),
                         mWebView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-                if (imgBmp == null) {
+                if (imgBmp == null && imgBmp.getWidth() <= 0 && imgBmp.getHeight() <= 0) {
                     toast("截图失败");
+                    return;
                 }
                 Canvas canvas = new Canvas(imgBmp);
                 Paint paint = new Paint();
