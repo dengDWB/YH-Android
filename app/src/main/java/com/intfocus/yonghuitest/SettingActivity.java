@@ -11,13 +11,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
@@ -31,7 +29,6 @@ import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.intfocus.yonghuitest.screen_lock.InitPassCodeActivity;
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
@@ -50,7 +47,6 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -59,7 +55,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -88,7 +83,7 @@ public class SettingActivity extends BaseActivity {
     private BadgeView bvCheckThursdaySay;
     private CircleImageView mIconImageView;
     private PopupWindow popupWindow;
-    private String gravatarJsonPath, gravatarImgPath, gravatarFileName, currentGravatarUrl, currentGravatarFileName;
+    private String gravatarJsonPath, gravatarImgPath, gravatarFileName;
     private TextView mCheckThursdaySay;
     private Context mContext;
     private PushAgent mPushAgent;
@@ -124,7 +119,7 @@ public class SettingActivity extends BaseActivity {
         Button mLogout = (Button) findViewById(R.id.logout);
         mLockSwitch = (Switch) findViewById(R.id.lock_switch);
         mDashboardSwitch = (Switch) findViewById(R.id.dashboard_switch);
-        mIconImageView = (CircleImageView) findViewById(R.id.img_icon);
+        mIconImageView =(CircleImageView) findViewById(R.id.img_icon);
         mCheckThursdaySay = (TextView) findViewById(R.id.check_thursday_say);
 
         screenLockInfo = "取消锁屏成功";
@@ -135,7 +130,7 @@ public class SettingActivity extends BaseActivity {
             String betaConfigPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kBetaConfigFileName);
             JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
             mLongCatSwitch = (Switch) findViewById(R.id.longcat_switch);
-            mLongCatSwitch.setChecked(betaJSON.has("image_within_screen") && betaJSON.getBoolean("image_within_screen"));
+            mLongCatSwitch.setChecked(!(betaJSON.has("image_within_screen") && betaJSON.getBoolean("image_within_screen")));
             mDashboardSwitch.setChecked(betaJSON.has("allow_brower_copy") && betaJSON.getBoolean("allow_brower_copy"));
         } catch (JSONException e) {
             e.printStackTrace();
@@ -172,7 +167,6 @@ public class SettingActivity extends BaseActivity {
         PgyUpdateManager.unregister(); // 解除注册蒲公英版本更新检查
         super.onDestroy();
     }
-
     /*
      * 初始化界面内容
      */
@@ -185,47 +179,36 @@ public class SettingActivity extends BaseActivity {
             mPushState.setText("开启");
 //            mPushState.setText(mMyApp.getPushAgent().getRegistrationId().equals(null) ? null:mMyApp.getPushAgent().getRegistrationId());
             mAppName.setText(getApplicationName(SettingActivity.this));
-            String deviceInfo = String.format("%s(Android %s)", TextUtils.split(android.os.Build.MODEL, " - ")[0], Build.VERSION.RELEASE);
+            String deviceInfo = String.format("%s(Android %s)",TextUtils.split(android.os.Build.MODEL, " - ")[0],Build.VERSION.RELEASE);
             mDeviceID.setText(deviceInfo);
             mApiDomain.setText(K.kBaseUrl.replace("http://", "").replace("https://", ""));
 
-            if (user.has("gravatar")) {
-                currentGravatarUrl = user.getString(kGravatar);
-                currentGravatarFileName = currentGravatarUrl.substring(currentGravatarUrl.lastIndexOf("/") + 1, currentGravatarUrl.length());
-                gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName) + "/" + currentGravatarFileName;
-                if (new File(gravatarImgPath).exists()){
-                    Bitmap bitmap = BitmapFactory.decodeFile(gravatarImgPath);
-                    mIconImageView.setImageBitmap(bitmap);
-                }
-                else {
-                    new DownloadImage().execute();
-                }
-            }
-
+            gravatarJsonPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kGravatarConfigFileName);
             if (new File(gravatarJsonPath).exists()) {
                 JSONObject gravatarJSON = FileUtil.readConfigFile(gravatarJsonPath);
                 gravatarFileName = gravatarJSON.getString(URLs.kName);
                 gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, gravatarFileName);
-                currentGravatarUrl = user.getString(kGravatar);
+                String currentGravatarUrl = user.getString(kGravatar);
+                String currentGravatarFileName = currentGravatarUrl.substring(currentGravatarUrl.lastIndexOf("/")+1, currentGravatarUrl.length());
                 // 以用户验证响应的 gravatar 值为准，不一致则下载
                 if ((gravatarFileName.equals(currentGravatarFileName)) || !(user.getString(kGravatar).startsWith("http"))) {
                     Bitmap bitmap = BitmapFactory.decodeFile(gravatarImgPath);
                     mIconImageView.setImageBitmap(bitmap);
-                    return;
+                }else {
+                    gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, currentGravatarFileName);
+                    gravatarFileName = currentGravatarFileName;
+                    httpGetBitmap(currentGravatarUrl, true);
                 }
-
-                gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, currentGravatarFileName);
-                gravatarFileName = currentGravatarFileName;
-                httpGetBitmap(currentGravatarUrl, true);
-            } else {
+            }
+            else {
                 if (user.has(kGravatar) && (user.getString(kGravatar).indexOf("http") != -1)) {
                     String gravatarUrl = user.getString(kGravatar);
-                    gravatarFileName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/") + 1, gravatarUrl.length());
+                    gravatarFileName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/")+1, gravatarUrl.length());
                     gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, gravatarFileName);
                     httpGetBitmap(gravatarUrl, false);
+                }else {
+                    mIconImageView.setImageResource(R.drawable.login_logo);
                 }
-
-                mIconImageView.setImageResource(R.drawable.login_logo);
             }
 
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -236,7 +219,7 @@ public class SettingActivity extends BaseActivity {
 
             String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPgyerVersionConfigFileName),
                     betaLink = "", pgyerInfo = "";
-            if ((new File(pgyerVersionPath)).exists()) {
+            if((new File(pgyerVersionPath)).exists()) {
                 JSONObject pgyerJSON = FileUtil.readConfigFile(pgyerVersionPath);
                 JSONObject responseData = pgyerJSON.getJSONObject(URLs.kData);
                 pgyerInfo = String.format("%s(%s)", responseData.getString("versionName"), responseData.getString("versionCode"));
@@ -246,78 +229,13 @@ public class SettingActivity extends BaseActivity {
                 }
             }
             mPygerLink.setText(betaLink.isEmpty() ? "已是最新版本" : String.format("有发布版本%s", pgyerInfo));
-            mPygerLink.setTextColor(Color.parseColor(betaLink.isEmpty() ? "#808080" : "#0000ff"));
+//            mPygerLink.setTextColor(Color.parseColor(betaLink.isEmpty() ? "#808080" : "#0000ff"));
         } catch (NameNotFoundException | JSONException e) {
             e.printStackTrace();
         }
     }
 
-    class DownloadImage extends AsyncTask<String, Void, Bitmap> {
-        @Override
-        protected void onPreExecute() {
-
-        }
-
-        @Override
-        protected Bitmap doInBackground(String... params) {
-            httpGetBitmap(currentGravatarUrl,true);
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-
-        }
-
-    }
-
-    public void httpGetBitmap(String urlString, final boolean isDelete) {
-
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder().url(urlString).build();
-        Call call = client.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                if (e == null) {
-                    return;
-                }
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mIconImageView.setImageResource(R.drawable.login_logo);
-                    }
-                });
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.code() == 200) {
-                    try {
-                        InputStream is = response.body().byteStream();
-                        final Bitmap bm = BitmapFactory.decodeStream(is);
-                        FileUtil.saveImage(gravatarImgPath, bm);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mIconImageView.setImageBitmap(bm);
-                            }
-                        });
-                        writeJson(gravatarJsonPath, gravatarFileName, true, "", "", isDelete);
-                    } catch (Exception e) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mIconImageView.setImageResource(R.drawable.login_logo);
-                            }
-                        });
-                    }
-                }
-            }
-        });
-    }
-
-    public void writeJson(String path, String name, boolean upload_state, String gravatar_url, String gravatar_id, boolean isDelete) {
+    public void writeJson(String path, String name, boolean upload_state, String gravatar_url, String gravatar_id, boolean isDelete){
         try {
             String previousImgPath = "";
             JSONObject jsonObject;
@@ -327,13 +245,14 @@ public class SettingActivity extends BaseActivity {
                 if (isDelete) {
                     new File(previousImgPath).delete();
                 }
-            } else {
+            }
+            else {
                 jsonObject = new JSONObject();
             }
 
             jsonObject.put(URLs.kName, name);
             jsonObject.put("upload_state", upload_state);
-            if (gravatar_url.length() > 0 && gravatar_url.indexOf("http") > -1) {
+            if(gravatar_url.length() > 0 && gravatar_url.indexOf("http") > -1) {
                 jsonObject.put("gravatar_url", gravatar_url);
 
                 /*
@@ -353,15 +272,61 @@ public class SettingActivity extends BaseActivity {
         }
     }
 
+    public void httpGetBitmap(String urlString, final boolean isDelete) {
+
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(urlString).build();
+        Call call = client.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                if (e == null) { return; }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mIconImageView.setImageResource(R.drawable.login_logo);
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.code() == 200) {
+                    try{
+                        InputStream is = response.body().byteStream();
+                        final Bitmap bm = BitmapFactory.decodeStream(is);
+                        FileUtil.saveImage(gravatarImgPath, bm);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mIconImageView.setImageBitmap(bm);
+                            }
+                        });
+                        writeJson(gravatarJsonPath, gravatarFileName, true, "", "", isDelete);
+                    } catch (Exception e){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mIconImageView.setImageResource(R.drawable.login_logo);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
     private static String getApplicationName(Context context) {
         int stringId = context.getApplicationInfo().labelRes;
+        Log.i("getactivity",context.getString(stringId));
         return context.getString(stringId);
     }
 
     final View.OnClickListener mCheckUpgradeListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            checkPgyerVersionUpgrade(SettingActivity.this, true);
+            checkPgyerVersionUpgrade(SettingActivity.this,true);
             bvCheckUpgrade.setVisibility(View.GONE);
 
             /*
@@ -380,12 +345,12 @@ public class SettingActivity extends BaseActivity {
     private final View.OnClickListener mIconImageViewListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            int cameraPermission = ContextCompat.checkSelfPermission(mAppContext, Manifest.permission.CAMERA);
-            if (cameraPermission != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(SettingActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, CODE_CAMERA_REQUEST);
+            int cameraPermission = ContextCompat.checkSelfPermission(mAppContext,Manifest.permission.CAMERA);
+            if(cameraPermission != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(SettingActivity.this,new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},CODE_CAMERA_REQUEST);
                 return;
-            } else {
-                popupWindow.showAtLocation(mIconImageView, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
+            }else{
+                popupWindow.showAtLocation(mIconImageView, Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
             }
         }
     };
@@ -393,9 +358,9 @@ public class SettingActivity extends BaseActivity {
     public void initIconMenu() {
         final View iconMenuView = LayoutInflater.from(this).inflate(R.layout.activity_icon_dialog, null);
 
-        Button btnTakePhoto = (Button) iconMenuView.findViewById(R.id.btn_icon_takephoto);
-        Button btnGetPhoto = (Button) iconMenuView.findViewById(R.id.btn_icon_getphoto);
-        Button btnCancel = (Button) iconMenuView.findViewById(R.id.btn_icon_cancel);
+        Button btnTakePhoto =(Button) iconMenuView.findViewById(R.id.btn_icon_takephoto);
+        Button btnGetPhoto  =(Button) iconMenuView.findViewById(R.id.btn_icon_getphoto);
+        Button btnCancel =(Button) iconMenuView.findViewById(R.id.btn_icon_cancel);
 
         popupWindow = new PopupWindow(this);
         popupWindow.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
@@ -428,14 +393,14 @@ public class SettingActivity extends BaseActivity {
     }
 
     /*
-     * 权限获取反馈
+	 * 权限获取反馈
 	 */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case CODE_CAMERA_REQUEST:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    popupWindow.showAtLocation(mIconImageView, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
+                    popupWindow.showAtLocation(mIconImageView, Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
                 } else {
                     Toast.makeText(SettingActivity.this, "权限获取失败，请重试", Toast.LENGTH_SHORT)
                             .show();
@@ -458,9 +423,9 @@ public class SettingActivity extends BaseActivity {
      * 获取相册图片
      */
     private void getGallery() {
-        Intent intentFromGallery = new Intent(Intent.ACTION_PICK, null);
-        intentFromGallery.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-        startActivityForResult(intentFromGallery, CODE_GALLERY_REQUEST);
+        Intent intentFromGallery = new Intent(Intent.ACTION_PICK,null);
+        intentFromGallery.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,"image/*");
+        startActivityForResult(intentFromGallery,CODE_GALLERY_REQUEST);
     }
 
     /*
@@ -474,8 +439,9 @@ public class SettingActivity extends BaseActivity {
          */
         if (hasSdcard()) {
             intentFromCapture.putExtra(MediaStore.EXTRA_OUTPUT, Uri.
-                    fromFile(new File(Environment.getExternalStorageDirectory(), "icon.jpg")));
-        } else {
+                    fromFile(new File(Environment.getExternalStorageDirectory(),"icon.jpg")));
+        }
+        else {
             try {
                 logParams = new JSONObject();
                 logParams.put("action", "头像/拍照");
@@ -486,11 +452,11 @@ public class SettingActivity extends BaseActivity {
             }
         }
 
-        startActivityForResult(intentFromCapture, CODE_CAMERA_REQUEST);
+        startActivityForResult(intentFromCapture,CODE_CAMERA_REQUEST);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+    protected void onActivityResult(int requestCode, int resultCode,Intent intent) {
         // 用户没有选择图片，返回
         if (resultCode == RESULT_CANCELED) {
             Toast.makeText(getApplication(), "取消", Toast.LENGTH_LONG).show();
@@ -502,7 +468,7 @@ public class SettingActivity extends BaseActivity {
                 cropPhoto(intent.getData());
                 break;
             case CODE_CAMERA_REQUEST:
-                File tempFile = new File(Environment.getExternalStorageDirectory(), "icon.jpg");
+                File tempFile = new File(Environment.getExternalStorageDirectory(),"icon.jpg");
                 cropPhoto(Uri.fromFile(tempFile));
                 break;
             default:
@@ -520,9 +486,9 @@ public class SettingActivity extends BaseActivity {
     public void cropPhoto(Uri uri) {
         Intent intent = new Intent("com.android.camera.action.CROP");
         if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.KITKAT) {
-            String url = FileUtil.getBitmapUrlPath(this, uri);
+            String url=FileUtil.getBitmapUrlPath(this, uri);
             intent.setDataAndType(Uri.fromFile(new File(url)), "image/*");
-        } else {
+        }else{
             intent.setDataAndType(uri, "image/*");
         }
         intent.putExtra("crop", "true");
@@ -532,7 +498,7 @@ public class SettingActivity extends BaseActivity {
         // outputX outputY 是裁剪图片宽高
         intent.putExtra("outputX", 150);
         intent.putExtra("outputY", 150);
-        intent.putExtra("return-data", true);
+        intent.putExtra("return-data",true);
         startActivityForResult(intent, CODE_RESULT_REQUEST);
     }
 
@@ -545,7 +511,7 @@ public class SettingActivity extends BaseActivity {
             if (extras != null) {
                 Bitmap userIcon = extras.getParcelable(URLs.kData);
                 gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kAppCode + "_" + user.getString(URLs.kUserNum) + "_" + getDate() + ".jpg");
-                gravatarFileName = gravatarImgPath.substring(gravatarImgPath.lastIndexOf("/") + 1, gravatarImgPath.length());
+                gravatarFileName = gravatarImgPath.substring(gravatarImgPath.lastIndexOf("/")+1, gravatarImgPath.length());
                 mIconImageView.setImageBitmap(userIcon);
                 popupWindow.dismiss();
                 FileUtil.saveImage(gravatarImgPath, userIcon);
@@ -614,7 +580,7 @@ public class SettingActivity extends BaseActivity {
         }
     }
 
-    public String getDate() {
+    public String getDate(){
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
         Date date = new Date(System.currentTimeMillis());
         return format.format(date);
@@ -642,7 +608,7 @@ public class SettingActivity extends BaseActivity {
             notificationJson.put(URLs.kSettingThursdaySay, 0);
             FileUtil.writeFile(noticePath, notificationJson.toString());
 
-            Intent blogLinkIntent = new Intent(SettingActivity.this, ThursdaySayActivity.class);
+            Intent blogLinkIntent = new Intent(SettingActivity.this,ThursdaySayActivity.class);
             blogLinkIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(blogLinkIntent);
         } catch (JSONException | IOException e) {
@@ -746,10 +712,10 @@ public class SettingActivity extends BaseActivity {
                          * Umeng Device Token
                          */
                         String device_token = mPushAgent.getRegistrationId();
-                        Log.i("device_token", device_token.equals(null) ? null : device_token);
+                        Log.i("device_token",device_token.equals(null) ? null : device_token);
                         String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPushConfigFileName);
                         JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
-                        if (!pushJSON.has(K.kPushDeviceToken) || pushJSON.getString(K.kPushDeviceToken).length() != 44 ||
+                        if(!pushJSON.has(K.kPushDeviceToken) || pushJSON.getString(K.kPushDeviceToken).length() != 44 ||
                                 (device_token.length() == 44 && !pushJSON.getString(K.kPushDeviceToken).equals(device_token))) {
                             pushJSON.put(K.kPushIsValid, false);
                             pushJSON.put(K.kPushDeviceToken, device_token);
@@ -765,8 +731,7 @@ public class SettingActivity extends BaseActivity {
                          * 检测服务器静态资源是否更新，并下载
                          */
                         runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
+                            @Override public void run() {
                                 checkAssetsUpdated(false);
 
                                 FileUtil.checkAssets(mAppContext, URLs.kAssets, false);
@@ -796,12 +761,12 @@ public class SettingActivity extends BaseActivity {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             Log.i("onCheckedChanged", isChecked ? "ON" : "OFF");
-            if (isChecked) {
+            if(isChecked) {
                 startActivity(InitPassCodeActivity.createIntent(mContext));
             } else {
                 try {
                     String userConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kUserConfigFileName);
-                    if ((new File(userConfigPath)).exists()) {
+                    if((new File(userConfigPath)).exists()) {
                         JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
                         userJSON.put(URLs.kUseGesturePassword, false);
                         userJSON.put(URLs.kGesturePassword, "");
@@ -824,11 +789,14 @@ public class SettingActivity extends BaseActivity {
                 logParams = new JSONObject();
                 logParams.put(URLs.kAction, String.format("点击/设置页面/%s锁屏", isChecked ? "开启" : "禁用"));
                 new Thread(mRunnableForLogger).start();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
         }
     };
+
+
 
 
     /*
@@ -882,7 +850,7 @@ public class SettingActivity extends BaseActivity {
      */
     private void setSettingViewControlBadges() {
         String notificationPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
-        if (!(new File(notificationPath)).exists()) {
+        if(!(new File(notificationPath)).exists()) {
             return;
         }
 
@@ -898,18 +866,25 @@ public class SettingActivity extends BaseActivity {
                 mWarnPWD.setText("请修改初始密码");
                 mChangePWD.setText("   修改登录密码");
                 RedPointView.showRedPoint(mAppContext, URLs.kSettingPassword, bvChangePWD);
-            } else {
+            }
+            else {
                 mWarnPWD.setVisibility(View.GONE);
                 mChangePWD.setText("修改登录密码");
                 bvChangePWD.setVisibility(View.GONE);
             }
-
-            if (notificationJSON.getInt(URLs.kSettingPgyer) > 0) {
+                /*
+                之前的代码
+                */
+//            if (notificationJSON.getInt(URLs.kSettingPgyer) > 0) {
+//                mCheckUpgrade.setText("   检测更新");
+//                RedPointView.showRedPoint(mAppContext, URLs.kSettingPgyer, bvCheckUpgrade);
+//            }
+            if (!mPygerLink.getText().equals("已是最新版本")) {
                 mCheckUpgrade.setText("   检测更新");
                 RedPointView.showRedPoint(mAppContext, URLs.kSettingPgyer, bvCheckUpgrade);
             }
 
-            if (notificationJSON.getInt(URLs.kSettingThursdaySay) > 0) {
+            if (notificationJSON.getInt(URLs.kSettingThursdaySay) > 0){
                 mCheckThursdaySay.setText("   小四说");
                 RedPointView.showRedPoint(mAppContext, URLs.kSettingThursdaySay, bvCheckThursdaySay);
             }

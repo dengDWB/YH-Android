@@ -1,7 +1,6 @@
 package com.intfocus.yonghuitest.util;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
@@ -167,7 +166,7 @@ public class HttpUtil {
             for (int i = 0; i < headerSize; i++) {
                 retMap.put(responseHeaders.name(i), responseHeaders.value(i));
                 LogUtil.d("HEADER", String.format("Key : %s, Value: %s", responseHeaders.name(i),
-                    responseHeaders.value(i)));
+                        responseHeaders.value(i)));
             }
 
             retMap.put(URLs.kCode, String.format("%d", response.code()));
@@ -233,7 +232,7 @@ public class HttpUtil {
             for (int i = 0, headerSize = responseHeaders.size(); i < headerSize; i++) {
                 retMap.put(responseHeaders.name(i), responseHeaders.value(i));
                 LogUtil.d("HEADER", String.format("Key : %s, Value: %s", responseHeaders.name(i),
-                    responseHeaders.value(i)));
+                        responseHeaders.value(i)));
             }
             retMap.put(URLs.kCode, String.format("%d", response.code()));
             retMap.put("body", response.body().string());
@@ -336,7 +335,6 @@ public class HttpUtil {
      * Check if there is any connectivity to a mobile network
      * @param context
      * @param type
-
      * @return
      */
     public static boolean isConnectedMobile(Context context){
