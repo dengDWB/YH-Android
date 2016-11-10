@@ -129,10 +129,14 @@ public class SettingActivity extends BaseActivity {
         try {
             String betaConfigPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kBetaConfigFileName);
             JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
+            if (!betaJSON.has("image_within_screen")) {
+                betaJSON.put("image_within_screen",true);
+                FileUtil.writeFile(betaConfigPath,betaJSON.toString());
+            }
             mLongCatSwitch = (Switch) findViewById(R.id.longcat_switch);
             mLongCatSwitch.setChecked(betaJSON.has("image_within_screen") && betaJSON.getBoolean("image_within_screen"));
             mDashboardSwitch.setChecked(betaJSON.has("allow_brower_copy") && betaJSON.getBoolean("allow_brower_copy"));
-        } catch (JSONException e) {
+        } catch (JSONException | IOException e) {
             e.printStackTrace();
         }
 
@@ -218,7 +222,7 @@ public class SettingActivity extends BaseActivity {
             mAppIdentifier.setText(packageInfo.packageName);
 
             String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPgyerVersionConfigFileName),
-                   betaLink = "", pgyerInfo = "";
+                    betaLink = "", pgyerInfo = "";
             if((new File(pgyerVersionPath)).exists()) {
                 JSONObject pgyerJSON = FileUtil.readConfigFile(pgyerVersionPath);
                 JSONObject responseData = pgyerJSON.getJSONObject(URLs.kData);
@@ -539,9 +543,9 @@ public class SettingActivity extends BaseActivity {
             MultipartBody requestBody = builder.build();
 
             Request request = new Request.Builder()
-                        .url(String.format(K.kUploadGravatarAPIPath, PrivateURLs.kBaseUrl, user.getString("user_device_id"), user.getString("user_id")))
-                        .post(requestBody)
-                        .build();
+                    .url(String.format(K.kUploadGravatarAPIPath, PrivateURLs.kBaseUrl, user.getString("user_device_id"), user.getString("user_id")))
+                    .post(requestBody)
+                    .build();
 
             client.newCall(request).enqueue(new Callback() {
                 @Override

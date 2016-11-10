@@ -448,9 +448,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		try {
 			mWebView.setDrawingCacheEnabled(true);
 			if (betaJSON.has("image_within_screen") && betaJSON.getBoolean("image_within_screen")){
-				imgBmp = mWebView.getDrawingCache();
-			}
-			else {
 				mWebView.measure(View.MeasureSpec.makeMeasureSpec(
 						View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
 						View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
@@ -470,6 +467,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 				int iHeight = imgBmp.getHeight();
 				canvas.drawBitmap(imgBmp, 0, iHeight, paint);
 				mWebView.draw(canvas);
+			}
+			else {
+				imgBmp = mWebView.getDrawingCache();
 			}
 			FileUtil.saveImage(filePath, imgBmp);
 			mWebView.setDrawingCacheEnabled(false);
