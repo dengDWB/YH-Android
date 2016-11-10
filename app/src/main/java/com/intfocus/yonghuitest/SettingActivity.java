@@ -194,12 +194,11 @@ public class SettingActivity extends BaseActivity {
                 if ((gravatarFileName.equals(currentGravatarFileName)) || !(user.getString(kGravatar).startsWith("http"))) {
                     Bitmap bitmap = BitmapFactory.decodeFile(gravatarImgPath);
                     mIconImageView.setImageBitmap(bitmap);
-                    return;
+                }else {
+                    gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, currentGravatarFileName);
+                    gravatarFileName = currentGravatarFileName;
+                    httpGetBitmap(currentGravatarUrl, true);
                 }
-
-                gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, currentGravatarFileName);
-                gravatarFileName = currentGravatarFileName;
-                httpGetBitmap(currentGravatarUrl, true);
             }
             else {
                 if (user.has(kGravatar) && (user.getString(kGravatar).indexOf("http") != -1)) {
@@ -207,9 +206,9 @@ public class SettingActivity extends BaseActivity {
                     gravatarFileName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/")+1, gravatarUrl.length());
                     gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, gravatarFileName);
                     httpGetBitmap(gravatarUrl, false);
+                }else {
+                    mIconImageView.setImageResource(R.drawable.login_logo);
                 }
-
-                mIconImageView.setImageResource(R.drawable.login_logo);
             }
 
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -230,7 +229,7 @@ public class SettingActivity extends BaseActivity {
                 }
             }
             mPygerLink.setText(betaLink.isEmpty() ? "已是最新版本" : String.format("有发布版本%s", pgyerInfo));
-            mPygerLink.setTextColor(Color.parseColor(betaLink.isEmpty() ? "#808080" : "#0000ff"));
+//            mPygerLink.setTextColor(Color.parseColor(betaLink.isEmpty() ? "#808080" : "#0000ff"));
         } catch (NameNotFoundException | JSONException e) {
             e.printStackTrace();
         }
@@ -873,8 +872,14 @@ public class SettingActivity extends BaseActivity {
                 mChangePWD.setText("修改登录密码");
                 bvChangePWD.setVisibility(View.GONE);
             }
-
-            if (notificationJSON.getInt(URLs.kSettingPgyer) > 0) {
+                /*
+                之前的代码
+                */
+//            if (notificationJSON.getInt(URLs.kSettingPgyer) > 0) {
+//                mCheckUpgrade.setText("   检测更新");
+//                RedPointView.showRedPoint(mAppContext, URLs.kSettingPgyer, bvCheckUpgrade);
+//            }
+            if (!mPygerLink.getText().equals("已是最新版本")) {
                 mCheckUpgrade.setText("   检测更新");
                 RedPointView.showRedPoint(mAppContext, URLs.kSettingPgyer, bvCheckUpgrade);
             }

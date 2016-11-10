@@ -186,7 +186,7 @@
                         style="@style/SettingValue"
                         android:layout_marginTop="3dp"
                         android:text="有测试版本发布（1.2.33）"
-                        android:textColor="#0000ff"
+                        android:textColor="@color/gray"
                         android:textSize="12dp"/>
                 </RelativeLayout>
 
