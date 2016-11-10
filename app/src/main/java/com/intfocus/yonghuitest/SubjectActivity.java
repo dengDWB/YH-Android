@@ -447,7 +447,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 
 		try {
 			mWebView.setDrawingCacheEnabled(true);
-			if (betaJSON.has("image_within_screen") && betaJSON.getBoolean("image_within_screen")){
+			if (!betaJSON.has("image_within_screen") || betaJSON.getBoolean("image_within_screen")){
 				mWebView.measure(View.MeasureSpec.makeMeasureSpec(
 						View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
 						View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
