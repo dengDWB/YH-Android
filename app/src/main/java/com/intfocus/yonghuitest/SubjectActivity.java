@@ -78,7 +78,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		}
 		setContentView(R.layout.activity_subject);
 
-		mContext = this;
+		mContext = SubjectActivity.this;
 
 		//创建SpeechSynthesizer对象
 //		mTts = SpeechSynthesizer.createSynthesizer(SubjectActivity.this, mTtsInitListener);
@@ -216,6 +216,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	};
 
 	public void onResume() {
+
 		checkInterfaceOrientation(this.getResources().getConfiguration());
 		mMyApp.setCurrentActivity(this);
 		/*
@@ -229,9 +230,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				String selectedItem = FileUtil.reportSelectedItem(mAppContext, String.format("%d", groupID), templateID, reportID);
+				String selectedItem = FileUtil.reportSelectedItem(SubjectActivity.this, String.format("%d", groupID), templateID, reportID);
 				if (selectedItem == null || selectedItem.length() == 0) {
-					ArrayList<String> items = FileUtil.reportSearchItems(mAppContext, String.format("%d", groupID), templateID, reportID);
+					ArrayList<String> items = FileUtil.reportSearchItems(SubjectActivity.this, String.format("%d", groupID), templateID, reportID);
 					if (items.size() > 0) {
 						selectedItem = items.get(0);
 					}
@@ -664,14 +665,14 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		@JavascriptInterface
 		public void reportSearchItems(final String arrayString) {
 			try {
-				String searchItemsPath = String.format("%s.search_items", FileUtil.reportJavaScriptDataPath(mAppContext, String.format("%d", groupID), templateID, reportID));
+ 				String searchItemsPath = String.format("%s.search_items", FileUtil.reportJavaScriptDataPath(SubjectActivity.this, String.format("%d", groupID), templateID, reportID));
 				FileUtil.writeFile(searchItemsPath, arrayString);
 
 				/**
 				 *  判断筛选的条件: arrayString 数组不为空
 				 *  报表第一次加载时，此处为判断筛选功能的关键点
 				 */
-				isSupportSearch = FileUtil.reportIsSupportSearch(mAppContext, String.format("%d", groupID), templateID, reportID);
+				isSupportSearch = FileUtil.reportIsSupportSearch(SubjectActivity.this, String.format("%d", groupID), templateID, reportID);
 				if (isSupportSearch) {
 					displayBannerTitleAndSearchIcon();
 				}
@@ -683,7 +684,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		@JavascriptInterface
 		public String reportSelectedItem() {
 			String item = null;
-			String selectedItemPath = String.format("%s.selected_item", FileUtil.reportJavaScriptDataPath(mAppContext, String.format("%d", groupID), templateID, reportID));
+			String selectedItemPath = String.format("%s.selected_item", FileUtil.reportJavaScriptDataPath(SubjectActivity.this, String.format("%d", groupID), templateID, reportID));
 			if (new File(selectedItemPath).exists()) {
 				item = FileUtil.readFile(selectedItemPath);
 			}
