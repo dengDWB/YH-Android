@@ -82,6 +82,7 @@ public class BaseActivity extends Activity {
     protected YHApplication mMyApp;
     protected PopupWindow popupWindow;
     protected DisplayMetrics displayMetrics;
+    public boolean isWeiXinShared = false;
     PullToRefreshWebView pullToRefreshWebView;
     android.webkit.WebView mWebView;
     JSONObject user;
@@ -112,6 +113,8 @@ public class BaseActivity extends Activity {
         urlStringForDetecting = K.kBaseUrl;
         relativeAssetsPath = "assets";
         urlStringForLoading = loadingPath(kLoading);
+
+        mMyApp.setCurrentActivity(this);
 
         String userConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kUserConfigFileName);
         if ((new File(userConfigPath)).exists()) {
@@ -272,6 +275,7 @@ public class BaseActivity extends Activity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 animLoading.setVisibility(View.GONE);
+                isWeiXinShared = true;
                 LogUtil.d("onPageFinished", String.format("%s - %s", URLs.timestamp(), url));
             }
 
