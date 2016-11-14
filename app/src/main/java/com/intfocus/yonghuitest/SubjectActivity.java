@@ -299,6 +299,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		checkInterfaceOrientation(newConfig);
 	}
 
+	/*
+	 * 横屏 or 竖屏
+	 */
 	private void checkInterfaceOrientation(Configuration config) {
 		Boolean isLandscape = (config.orientation == Configuration.ORIENTATION_LANDSCAPE);
 

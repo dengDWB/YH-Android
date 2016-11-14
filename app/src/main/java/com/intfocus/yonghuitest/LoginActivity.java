@@ -9,16 +9,20 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,7 +50,7 @@ public class LoginActivity extends BaseActivity{
         // 使背景填满整个屏幕,包括状态栏
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         }
 
         /*
@@ -100,6 +104,10 @@ public class LoginActivity extends BaseActivity{
         if (Build.VERSION.SDK_INT > K.kMaxSdkVersion || Build.VERSION.SDK_INT < K.kMinSdkVersion) {
             showVersionWarring();
         }
+
+        RelativeLayout loginLayout = (RelativeLayout) findViewById(R.id.login_layout);
+        Button mSubmit = (Button) findViewById(R.id.btn_login);
+        controlKeyboardLayout(loginLayout, mSubmit);
 
         /*
          * 检测登录界面，版本是否升级
@@ -187,6 +195,42 @@ public class LoginActivity extends BaseActivity{
     }
 
     /*
+     * 键盘弹出监听,使用键盘时,整体布局上移
+     */
+    private void controlKeyboardLayout(final View view, final View scrollToView) {
+        view.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        Rect rect = new Rect();
+                        view.getWindowVisibleDisplayFrame(rect);// 获取完整布局在窗体的可视区域
+                        int rootInvisibleHeight = view.getRootView().getHeight() - rect.bottom; //完整布局高度 减去 可视区域高度
+                        if (rootInvisibleHeight > 0) {
+                            //软键盘弹出来的时候
+                            int[] location = new int[2];
+                            // 获取 scrollToView 在窗体的坐标
+                            scrollToView.getLocationInWindow(location);
+                            // 计算完整布局滚动高度，使 scrollToView 在可见区域的底部
+                            int srollHeight = (location[1] + scrollToView.getHeight()) - rect.bottom;
+                            view.scrollTo(0, srollHeight + 20);
+                        } else {
+                            // 软键盘没有弹出来的时候
+                            view.scrollTo(0, 0);
+                        }
+                    }
+                });
+    }
+
+    /*
+     * 点击空白处,收起软键盘
+     */
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        return imm.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
+    }
+
+    /*
      * 登录按钮点击事件
      */
     public void actionSubmit(View v) {
@@ -259,11 +303,5 @@ public class LoginActivity extends BaseActivity{
             if (mProgressDialog != null) mProgressDialog.dismiss();
             toast(e.getLocalizedMessage());
         }
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        return imm.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
     }
 }

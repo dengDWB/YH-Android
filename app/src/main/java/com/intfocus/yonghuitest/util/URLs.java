@@ -73,7 +73,7 @@ public class URLs implements Serializable {
         //    } else {
         //        path =String.format("%s/com.intfocus.yonghuitest", context.getApplicationContext().getFilesDir());
         //    }
-        return context.getFilesDir().toString();
+        return context.getFilesDir().getPath();
     }
 
     public static String timestamp() {
