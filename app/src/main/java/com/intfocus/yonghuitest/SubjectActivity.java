@@ -87,7 +87,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		mContext = SubjectActivity.this;
 
 		//创建SpeechSynthesizer对象
-		mTts = SpeechSynthesizer.createSynthesizer(SubjectActivity.this, mTtsInitListener);
+		mTts = SpeechSynthesizer.createSynthesizer(SubjectActivity.this, null);
 
 		/*
 		 * JSON Data
@@ -216,6 +216,11 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 					break;
 
 				case "语音播报":
+					// 若正在播报,停止
+					if (mTts.isSpeaking()) {
+						mTts.stopSpeaking();
+						break;
+					}
 					//开始合成
 					initTtsParms();
 					int code = mTts.startSpeaking(" XX 你好，最新数据截止 2016年06月06日 8 点，YY 群组的经营数据如下：\n" +
@@ -239,18 +244,18 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			}
 		}
 	};
-	/**
-	 * 	 初始化监听。
-	 *
-	 */
-	private InitListener mTtsInitListener = new InitListener() {
-		@Override
-		public void onInit(int code) {
-			if (code != ErrorCode.SUCCESS) {
-				toast("语音播报初始化失败,误错码：" + code + ",请联系技术人员");
-			}
-		}
-	};
+//	/**
+//	 * 	 初始化监听。
+//	 *
+//	 */
+//	private InitListener mTtsInitListener = new InitListener() {
+//		@Override
+//		public void onInit(int code) {
+//			if (code != ErrorCode.SUCCESS) {
+//				toast("语音播报初始化失败,误错码：" + code + ",请联系技术人员");
+//			}
+//		}
+//	};
 
 	private void initTtsParms() {
 		// 清空参数
