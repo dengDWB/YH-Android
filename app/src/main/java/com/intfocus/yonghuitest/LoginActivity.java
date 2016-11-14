@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -13,13 +14,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
+
 import android.view.MotionEvent;
+
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -33,12 +36,12 @@ import com.intfocus.yonghuitest.util.URLs;
 import com.pgyersdk.update.PgyUpdateManager;
 import org.json.JSONObject;
 
-public class LoginActivity extends BaseActivity {
+public class LoginActivity extends BaseActivity{
     public  String kFromActivity = "from_activity";         // APP 启动标识
     public  String kSuccess      = "success";               // 用户登录验证结果
     private EditText usernameEditText, passwordEditText;
     private String usernameString, passwordString;
-    private final static int CODE_AUTHORITY_REQUEST = 0;    // 权限申请识别码
+    private final static int CODE_AUTHORITY_REQUEST = 0;// 权限申请识别码
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -138,8 +141,8 @@ public class LoginActivity extends BaseActivity {
     }
 
     /*
-     * 系统版本警告
-     */
+         * 系统版本警告
+         */
     private void showVersionWarring() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("温馨提示")
