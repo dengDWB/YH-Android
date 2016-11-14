@@ -32,11 +32,11 @@ android {
         abortOnError false
         checkReleaseBuilds false
     }
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['libs']
-        }
-    }
+//    sourceSets {
+//        main {
+//            jniLibs.srcDirs = ['libs']
+//        }
+//    }
 }
 
 repositories {

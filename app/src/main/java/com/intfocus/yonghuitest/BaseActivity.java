@@ -114,8 +114,6 @@ public class BaseActivity extends Activity {
         relativeAssetsPath = "assets";
         urlStringForLoading = loadingPath(kLoading);
 
-        mMyApp.setCurrentActivity(this);
-
         String userConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kUserConfigFileName);
         if ((new File(userConfigPath)).exists()) {
             try {
