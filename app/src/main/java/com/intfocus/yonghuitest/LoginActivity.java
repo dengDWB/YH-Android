@@ -14,9 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-
 import android.view.MotionEvent;
-
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
@@ -295,7 +293,6 @@ public class LoginActivity extends BaseActivity{
                             if (mProgressDialog != null) {
                                 mProgressDialog.dismiss();
                             }
-
                             finish();
                         }
                     });

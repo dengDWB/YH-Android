@@ -98,6 +98,7 @@ public class BarCodeResultActivity extends BaseActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 animLoading.setVisibility(View.GONE);
+                isWeiXinShared = true;
                 LogUtil.d("onPageFinished", String.format("%s - %s", URLs.timestamp(), url));
             }
 
@@ -149,6 +150,7 @@ public class BarCodeResultActivity extends BaseActivity {
     public void onResume() {
         super.onResume();
         mMyApp.setCurrentActivity(this);
+        isWeiXinShared = false;
         /*
          * 初始化默认选中门店（第一家）
          */
@@ -324,6 +326,10 @@ public class BarCodeResultActivity extends BaseActivity {
      * 分享截图至微信
      */
     private void actionShare2Weixin() {
+        if (!isWeiXinShared) {
+            toast("网页加载完成,才能使用分享功能");
+            return;
+        }
         Bitmap imgBmp;
         String filePath = FileUtil.basePath(mAppContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
 
