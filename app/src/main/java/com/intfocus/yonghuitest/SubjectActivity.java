@@ -7,9 +7,12 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
@@ -37,6 +40,7 @@ import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
 import com.intfocus.yonghuitest.util.K;
 import com.intfocus.yonghuitest.util.URLs;
+import com.intfocus.yonghuitest.view.ImageViewPlus;
 import com.joanzapata.pdfview.PDFView;
 import com.joanzapata.pdfview.listener.OnErrorOccurredListener;
 import com.joanzapata.pdfview.listener.OnLoadCompleteListener;
@@ -51,6 +55,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,6 +76,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	private ArrayList<HashMap<String, Object>> listItem;
 	private Context mContext;
 	private SpeechSynthesizer mTts;
+	private MediaPlayer mediaPlayer;
+	private ImageView mBannerSetting;
 
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
@@ -87,8 +94,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		mContext = SubjectActivity.this;
 
 		//创建SpeechSynthesizer对象
-		mTts = SpeechSynthesizer.createSynthesizer(SubjectActivity.this, null);
-
+		mTts = SpeechSynthesizer.createSynthesizer(mAppContext, null);
+		mediaPlayer = SpeechReport.getMediaPlayer();
 		/*
 		 * JSON Data
 		 */
@@ -121,7 +128,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 
 	private void initActiongBar(){
 		bannerView = (RelativeLayout) findViewById(R.id.actionBar);
-		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
+		mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 		TextView mTitle = (TextView) findViewById(R.id.bannerTitle);
 
 		/*
@@ -147,7 +154,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	 */
 	public void launchDropMenuActivity(View v) {
 		initDropMenuItem();
-		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 		popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
 
 		/*
@@ -171,7 +177,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		int[] itemImage = {R.drawable.banner_share,
 					R.drawable.banner_comment,
 					R.drawable.btn_refresh,
-					mTts.isSpeaking() ? R.drawable.btn_stop : R.drawable.btn_play};
+					mediaPlayer.isPlaying() ? R.drawable.btn_stop : R.drawable.btn_play};
 		for (int i = 0; i < itemName.length; i++) {
 			HashMap<String, Object> map = new HashMap<>();
 			map.put("ItemImage", itemImage[i]);
@@ -217,26 +223,16 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 
 				case "语音播报":
 					// 若正在播报,停止
-					if (mTts.isSpeaking()) {
-						mTts.stopSpeaking();
+					if (mediaPlayer.isPlaying()) {
+						mediaPlayer.stop();
 						break;
 					}
 					//开始合成
-					initTtsParms();
-					int code = mTts.startSpeaking(" XX 你好，最新数据截止 2016年06月06日 8 点，YY 群组的经营数据如下：\n" +
+					SpeechReport.startSpeechSynthesizer(mAppContext," XX 你好，最新数据截止 2016年06月06日 8 点，YY 群组的经营数据如下：\n" +
 							"\" +\n" +
 							"\t\t\t\t\"> 1. 销售额，销售额 120 万元，同比上涨 1%，其中20种品类上涨，13种品类下跌。\\n\" +\n" +
 							"\t\t\t\t\"> 2. 毛利，毛利额 25 万元，同比下降 2%，较上周同天下降 0.5 万元\\n\" +\n" +
-							"\t\t\t\t\"> 3. 客流量，.... ", mSynListener);
-
-					if (code != ErrorCode.SUCCESS) {
-						if (code == ErrorCode.ERROR_COMPONENT_NOT_INSTALLED) {
-							//上面的语音配置对象为初始化时：
-							toast("语音播报组件未安装");
-						} else {
-							toast("语音播报失败,错误码: " + code + "请联系技术人员");
-						}
-					}
+							"\t\t\t\t\"> 3. 客流量，.... ");
 					break;
 
 				default:
@@ -244,70 +240,8 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			}
 		}
 	};
-//	/**
-//	 * 	 初始化监听。
-//	 *
-//	 */
-//	private InitListener mTtsInitListener = new InitListener() {
-//		@Override
-//		public void onInit(int code) {
-//			if (code != ErrorCode.SUCCESS) {
-//				toast("语音播报初始化失败,误错码：" + code + ",请联系技术人员");
-//			}
-//		}
-//	};
-
-	private void initTtsParms() {
-		// 清空参数
-		mTts.setParameter(SpeechConstant.PARAMS, null);
-
-		mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD); //设置云端
-		mTts.setParameter(SpeechConstant.VOICE_NAME, "xiaofeng");//设置发音人
-		mTts.setParameter(SpeechConstant.SPEED, "50");//设置语速
-		//设置合成音调
-		mTts.setParameter(SpeechConstant.PITCH, "50");
-		mTts.setParameter(SpeechConstant.VOLUME, "80");//设置音量，范围0~100
-		mTts.setParameter(SpeechConstant.STREAM_TYPE, "3");
-		// 设置播放合成音频打断音乐播放，默认为true
-		mTts.setParameter(SpeechConstant.KEY_REQUEST_FOCUS, "true");
-	}
-
-
-	//合成监听器
-	private SynthesizerListener mSynListener = new SynthesizerListener() {
-		//会话结束回调接口，没有错误时，error为null
-		public void onCompleted(SpeechError error) {
-		}
-
-		//缓冲进度回调
-		//percent为缓冲进度0~100，beginPos为缓冲音频在文本中开始位置，endPos表示缓冲音频在文本中结束位置，info为附加信息。
-		public void onBufferProgress(int percent, int beginPos, int endPos, String info) {
-		}
-
-		//开始播放
-		public void onSpeakBegin() {
-		}
-
-		//暂停播放
-		public void onSpeakPaused() {
-		}
-
-		//播放进度回调
-		//percent为播放进度0~100,beginPos为播放音频在文本中开始位置，endPos表示播放音频在文本中结束位置.
-		public void onSpeakProgress(int percent, int beginPos, int endPos) {
-		}
-
-		//恢复播放回调接口
-		public void onSpeakResumed() {
-		}
-
-		//会话事件回调接口
-		public void onEvent(int arg0, int arg1, int arg2, Bundle arg3) {
-		}
-	};
 
 	public void onResume() {
-
 		checkInterfaceOrientation(this.getResources().getConfiguration());
 		mMyApp.setCurrentActivity(this);
 		/*

@@ -188,6 +188,7 @@ public class SettingActivity extends BaseActivity {
             mApiDomain.setText(K.kBaseUrl.replace("http://", "").replace("https://", ""));
 
             gravatarJsonPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kGravatarConfigFileName);
+
             if (new File(gravatarJsonPath).exists()) {
                 JSONObject gravatarJSON = FileUtil.readConfigFile(gravatarJsonPath);
                 gravatarFileName = gravatarJSON.getString(URLs.kName);
