@@ -6,8 +6,6 @@ import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.google.gson.JsonParser;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,12 +63,11 @@ public class HttpUtil {
         if (headers.containsKey(URLs.kLastModified)) {
             builder = builder.addHeader("If-Modified-Since", headers.get(URLs.kLastModified));
         }
-        Response response = null;
+        Response response;
         Request request = builder.build();
         try {
             response = client.newCall(request).execute();
             Headers responseHeaders = response.headers();
-            new JsonParser().parse(response.toString());
             boolean isJSON = false;
             for (int i = 0, len = responseHeaders.size(); i < len; i++) {
                 retMap.put(responseHeaders.name(i), responseHeaders.value(i));
@@ -108,13 +105,6 @@ public class HttpUtil {
                     retMap.put(URLs.kBody, "{\"info\": \"用户名或密码错误\"}");
                 }
             }
-        }
-
-        try {
-            new JsonParser().parse(response.toString()).getAsJsonObject();
-        } catch (Exception e) {
-            retMap.put(URLs.kCode, "400");
-            retMap.put(URLs.kBody, "{\"info\": \"请检查网络环境！\"}");
         }
         return retMap;
     }
