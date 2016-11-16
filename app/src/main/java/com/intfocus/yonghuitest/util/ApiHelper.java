@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -108,15 +110,16 @@ public class ApiHelper {
     public static void reportData(Context context, String groupID, String templateID, String reportID) {
         String urlString = String.format(K.kReportDataAPIPath, K.kBaseUrl, groupID, templateID, reportID);
         String javascriptPath = FileUtil.reportJavaScriptDataPath(context, groupID, templateID, reportID);
-
         String assetsPath = FileUtil.sharedPath(context);
         Map<String, String> headers = ApiHelper.checkResponseHeader(urlString, assetsPath);
         String jsFileName = String.format("group_%s_template_%s_report_%s.js", groupID, templateID, reportID);
         String cachedZipPath = FileUtil.dirPath(context, K.kCachedDirName, String.format("%s.zip", jsFileName));
         Map<String, String> response = HttpUtil.downloadZip(urlString, cachedZipPath, headers);
 
-        if (!response.get(URLs.kCode).equals("200") || !(new File(cachedZipPath)).exists()) {
-            return;
+        //添加code字段是否存在。原因:网络不好的情况下response为{}
+
+        if (!response.containsKey(URLs.kCode) || !response.get(URLs.kCode).equals("200") || !(new File(cachedZipPath)).exists()) {
+            return ;
         }
 
         try {
