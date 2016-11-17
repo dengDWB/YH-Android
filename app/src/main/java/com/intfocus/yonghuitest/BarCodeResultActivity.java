@@ -20,6 +20,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.JsonParser;
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
 import com.intfocus.yonghuitest.util.K;
@@ -207,6 +208,12 @@ public class BarCodeResultActivity extends BaseActivity {
                 Map<String,String> response = ApiHelper.barCodeScan(groupID, roleID, userNum, storeID, codeInfo, codeType);
                 String responseCode = response.get(URLs.kCode);
                 String responseString = response.get(URLs.kBody);
+                try{
+                    new JsonParser().parse(responseString).getAsJsonObject();
+                }catch (Exception e) {
+                    showWebViewForWithoutNetwork();
+                    return ;
+                }
                 updateHtmlContentTimetamp();
 
                 if (!responseCode.equals("200") || responseString.equals("")) {

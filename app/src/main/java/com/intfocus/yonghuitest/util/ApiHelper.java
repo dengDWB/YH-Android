@@ -115,8 +115,13 @@ public class ApiHelper {
         String cachedZipPath = FileUtil.dirPath(context, K.kCachedDirName, String.format("%s.zip", jsFileName));
         Map<String, String> response = HttpUtil.downloadZip(urlString, cachedZipPath, headers);
 
+        //添加code字段是否存在。原因:网络不好的情况下response为{}
+        if (!response.containsKey(URLs.kCode)) {
+            return ;
+        }
+
         if (!response.get(URLs.kCode).equals("200") || !(new File(cachedZipPath)).exists()) {
-            return;
+            return ;
         }
 
         try {
