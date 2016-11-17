@@ -75,7 +75,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	private RelativeLayout bannerView;
 	private ArrayList<HashMap<String, Object>> listItem;
 	private Context mContext;
-	private SpeechSynthesizer mTts;
 	private MediaPlayer mediaPlayer;
 	private ImageView mBannerSetting;
 
@@ -94,7 +93,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		mContext = SubjectActivity.this;
 
 		//创建SpeechSynthesizer对象
-		mTts = SpeechSynthesizer.createSynthesizer(mAppContext, null);
 		mediaPlayer = SpeechReport.getMediaPlayer();
 		/*
 		 * JSON Data

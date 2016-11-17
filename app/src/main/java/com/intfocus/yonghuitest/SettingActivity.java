@@ -88,6 +88,9 @@ public class SettingActivity extends BaseActivity {
     private Context mContext;
     private PushAgent mPushAgent;
 
+    private String gravatarUrl;
+    private String gravatarImgName;
+
     /* 请求识别码 */
     private static final int CODE_GALLERY_REQUEST = 0xa0;
     private static final int CODE_CAMERA_REQUEST = 0xa1;
@@ -189,6 +192,25 @@ public class SettingActivity extends BaseActivity {
 
             gravatarJsonPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kGravatarConfigFileName);
 
+            if (user.has(kGravatar) && user.getString(kGravatar).startsWith("http")) {
+                gravatarUrl = user.getString(kGravatar);
+                gravatarImgName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/")+1, gravatarUrl.length());
+                gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, gravatarImgName);
+                if (new File(gravatarImgPath).exists()) {
+                    Bitmap bitmap = BitmapFactory.decodeFile(gravatarImgPath);
+                    mIconImageView.setImageBitmap(bitmap);
+                }
+                else {
+
+                }
+            }
+
+            gravatarUrl = user.getString(kGravatar);
+            gravatarImgName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/")+1, gravatarUrl.length());
+            gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, gravatarImgName);
+            if (new File(gravatarImgPath).exists()) {
+
+            }
             if (new File(gravatarJsonPath).exists()) {
                 JSONObject gravatarJSON = FileUtil.readConfigFile(gravatarJsonPath);
                 gravatarFileName = gravatarJSON.getString(URLs.kName);
@@ -239,6 +261,8 @@ public class SettingActivity extends BaseActivity {
             e.printStackTrace();
         }
     }
+
+
 
     public void writeJson(String path, String name, boolean upload_state, String gravatar_url, String gravatar_id, boolean isDelete){
         try {
