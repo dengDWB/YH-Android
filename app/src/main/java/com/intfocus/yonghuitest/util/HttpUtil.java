@@ -6,8 +6,6 @@ import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.google.gson.JsonParser;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -108,7 +106,6 @@ public class HttpUtil {
                 }
             }
         }
-
         return retMap;
     }
 

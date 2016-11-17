@@ -84,7 +84,7 @@ public class K extends PrivateURLs implements Serializable {
   public final static String kPushConfigFileName = "push_message_config.json";
   public final static String kPushIsValid        = "push_valid";
   public final static String kPushDeviceToken    = "push_device_token";
-  public final static String kPushDeviceUUID      = "device_uuid";
+  public final static String kPushDeviceUUID     = "device_uuid";
 
   /**
    * Config#User Device Info
