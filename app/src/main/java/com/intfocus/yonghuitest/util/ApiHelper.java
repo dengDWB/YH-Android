@@ -117,7 +117,7 @@ public class ApiHelper {
 
         //添加code字段是否存在。原因:网络不好的情况下response为{}
         if (!response.containsKey(URLs.kCode)) {
-            return;
+            return ;
         }
 
         if (!response.get(URLs.kCode).equals("200") || !(new File(cachedZipPath)).exists()) {

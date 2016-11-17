@@ -886,6 +886,8 @@ public class SettingActivity extends BaseActivity {
             if (!mPygerLink.getText().equals("已是最新版本")) {
                 mCheckUpgrade.setText("   检测更新");
                 RedPointView.showRedPoint(mAppContext, URLs.kSettingPgyer, bvCheckUpgrade);
+            }else {
+                notificationJSON.put(URLs.kSettingPgyer, 0);
             }
 
             if (notificationJSON.getInt(URLs.kSettingThursdaySay) > 0){

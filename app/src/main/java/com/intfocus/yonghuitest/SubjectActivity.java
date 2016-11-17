@@ -64,7 +64,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	private RelativeLayout bannerView;
 	private ArrayList<HashMap<String, Object>> listItem;
 	private Context mContext;
-//	private SpeechSynthesizer mTts;
 
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
@@ -79,9 +78,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		setContentView(R.layout.activity_subject);
 
 		mContext = SubjectActivity.this;
-
-		//创建SpeechSynthesizer对象
-//		mTts = SpeechSynthesizer.createSynthesizer(SubjectActivity.this, mTtsInitListener);
 
 		/*
 		 * JSON Data
