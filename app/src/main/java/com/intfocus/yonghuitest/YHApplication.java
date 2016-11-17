@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -42,6 +43,7 @@ import static com.intfocus.yonghuitest.util.K.kPushDeviceToken;
 public class YHApplication extends Application {
     private Context appContext;
     private RefWatcher refWatcher;
+    private SharedPreferences mSharedPreferences;
 
     @Override
     public void onCreate() {
@@ -97,6 +99,11 @@ public class YHApplication extends Application {
          */
         registerReceiver(broadcastScreenOnAndOff, new IntentFilter(Intent.ACTION_SCREEN_ON));
 
+        mSharedPreferences=  appContext.getSharedPreferences("PushServerState", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putBoolean("state", false);
+        editor.commit();
+
         /*
          *  监测内存泄漏
          */
@@ -121,6 +128,9 @@ public class YHApplication extends Application {
                             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
                             pushJSON.put(K.kPushIsValid, false);
                             pushJSON.put(kPushDeviceToken, registrationId);
+                            SharedPreferences.Editor editor = mSharedPreferences.edit();
+                            editor.putBoolean("state",true);
+                            editor.commit();
                             FileUtil.writeFile(pushConfigPath, pushJSON.toString());
                             Log.d(K.kPushDeviceToken,registrationId);
                         } catch (JSONException | IOException e) {

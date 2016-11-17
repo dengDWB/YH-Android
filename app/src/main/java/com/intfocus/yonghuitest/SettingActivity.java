@@ -1,8 +1,10 @@
 package com.intfocus.yonghuitest;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -87,6 +89,7 @@ public class SettingActivity extends BaseActivity {
     private TextView mCheckThursdaySay;
     private Context mContext;
     private PushAgent mPushAgent;
+    private SharedPreferences mSharedPreferences;
 
     /* 请求识别码 */
     private static final int CODE_GALLERY_REQUEST = 0xa0;
@@ -179,9 +182,10 @@ public class SettingActivity extends BaseActivity {
             mUserID.setText(user.getString("user_name"));
             mRoleID.setText(user.getString("role_name"));
             mGroupID.setText(user.getString("group_name"));
-//            mPushState.setText(mMyApp.getPushAgent().isEnabled() ? "开启" : "关闭");
-            mPushState.setText("开启");
-//            mPushState.setText(mMyApp.getPushAgent().getRegistrationId().equals(null) ? null:mMyApp.getPushAgent().getRegistrationId());
+
+            mSharedPreferences = getSharedPreferences("PushServerState",
+                    Activity.MODE_PRIVATE);
+            mPushState.setText(mSharedPreferences.getBoolean("state",false) ? "开启" : "关闭");
             mAppName.setText(getApplicationName(SettingActivity.this));
             String deviceInfo = String.format("%s(Android %s)",TextUtils.split(android.os.Build.MODEL, " - ")[0],Build.VERSION.RELEASE);
             mDeviceID.setText(deviceInfo);
@@ -715,15 +719,16 @@ public class SettingActivity extends BaseActivity {
                         /*
                          * Umeng Device Token
                          */
-                        String device_token = mPushAgent.getRegistrationId();
-                        Log.i("device_token",device_token.equals(null) ? null : device_token);
-                        String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPushConfigFileName);
-                        JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
-                        if(!pushJSON.has(K.kPushDeviceToken) || pushJSON.getString(K.kPushDeviceToken).length() != 44 ||
-                                (device_token.length() == 44 && !pushJSON.getString(K.kPushDeviceToken).equals(device_token))) {
-                            pushJSON.put(K.kPushIsValid, false);
-                            pushJSON.put(K.kPushDeviceToken, device_token);
-                            FileUtil.writeFile(pushConfigPath, pushJSON.toString());
+                        if (mSharedPreferences.getBoolean("state",false)) {
+                            String device_token = mPushAgent.getRegistrationId();
+                            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPushConfigFileName);
+                            JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
+                            if(!pushJSON.has(K.kPushDeviceToken) || pushJSON.getString(K.kPushDeviceToken).length() != 44 ||
+                                    (device_token.length() == 44 && !pushJSON.getString(K.kPushDeviceToken).equals(device_token))) {
+                                pushJSON.put(K.kPushIsValid, false);
+                                pushJSON.put(K.kPushDeviceToken, device_token);
+                                FileUtil.writeFile(pushConfigPath, pushJSON.toString());
+                            }
                         }
 
                         ApiHelper.authentication(SettingActivity.this, user.getString(URLs.kUserNum), user.getString(URLs.kPassword));
