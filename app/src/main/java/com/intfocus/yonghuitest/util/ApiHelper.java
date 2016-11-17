@@ -117,8 +117,11 @@ public class ApiHelper {
         Map<String, String> response = HttpUtil.downloadZip(urlString, cachedZipPath, headers);
 
         //添加code字段是否存在。原因:网络不好的情况下response为{}
+        if (!response.containsKey(URLs.kCode)) {
+            return;
+        }
 
-        if (!response.containsKey(URLs.kCode) || !response.get(URLs.kCode).equals("200") || !(new File(cachedZipPath)).exists()) {
+        if (!response.get(URLs.kCode).equals("200") || !(new File(cachedZipPath)).exists()) {
             return ;
         }
 

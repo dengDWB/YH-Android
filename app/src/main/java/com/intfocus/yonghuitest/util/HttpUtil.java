@@ -51,9 +51,9 @@ public class HttpUtil {
         LogUtil.d("GET", urlString);
         Map<String, String> retMap = new HashMap<>();
         OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .writeTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(10, TimeUnit.SECONDS)
+                .connectTimeout(1, TimeUnit.SECONDS)
+                .writeTimeout(1, TimeUnit.SECONDS)
+                .readTimeout(1, TimeUnit.SECONDS)
                 .build();
         okhttp3.Request.Builder builder = new Request.Builder()
                 .url(urlString)
@@ -65,12 +65,11 @@ public class HttpUtil {
         if (headers.containsKey(URLs.kLastModified)) {
             builder = builder.addHeader("If-Modified-Since", headers.get(URLs.kLastModified));
         }
-        Response response = null;
+        Response response;
         Request request = builder.build();
         try {
             response = client.newCall(request).execute();
             Headers responseHeaders = response.headers();
-            new JsonParser().parse(response.toString());
             boolean isJSON = false;
             for (int i = 0, len = responseHeaders.size(); i < len; i++) {
                 retMap.put(responseHeaders.name(i), responseHeaders.value(i));
@@ -110,12 +109,6 @@ public class HttpUtil {
             }
         }
 
-        try {
-            new JsonParser().parse(response.toString()).getAsJsonObject();
-        } catch (Exception e) {
-            retMap.put(URLs.kCode, "400");
-            retMap.put(URLs.kBody, "{\"info\": \"请检查网络环境！\"}");
-        }
         return retMap;
     }
 
