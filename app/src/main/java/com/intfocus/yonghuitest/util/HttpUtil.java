@@ -1,6 +1,8 @@
 package com.intfocus.yonghuitest.util;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
@@ -107,6 +109,36 @@ public class HttpUtil {
             }
         }
         return retMap;
+    }
+    /**
+     * ִ执行一个HTTP GET请求，返回请求响应的 Bitmap
+     *
+     * @param urlString 请求的URL地址
+     * @return 返回请求响应的  Bitmap
+     */
+    public static Bitmap httpGetBitmap(String urlString) {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
+                .build();
+        okhttp3.Request.Builder builder = new Request.Builder()
+                .url(urlString);
+
+        Response response;
+        Request request = builder.build();
+        try {
+            response = client.newCall(request).execute();
+            InputStream is = response.body().byteStream();
+            Bitmap bm = BitmapFactory.decodeStream(is);
+            return bm;
+        } catch (UnknownHostException e) {
+            if(e != null && e.getMessage() != null) {
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
