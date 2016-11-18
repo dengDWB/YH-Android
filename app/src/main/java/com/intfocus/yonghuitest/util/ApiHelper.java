@@ -435,23 +435,23 @@ public class ApiHelper {
             String pushConfigPath = String.format("%s/%s", FileUtil.basePath(context), K.kPushConfigFileName);
             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
 
-            if(pushJSON.has(K.kPushIsValid) && pushJSON.getBoolean(K.kPushIsValid) && pushJSON.has(K.kPushDeviceToken) && pushJSON
-                .getString(K.kPushDeviceToken).length() == 44) return true;
-            if(pushJSON.has(K.kPushDeviceToken) && pushJSON.getString(K.kPushDeviceToken).length() != 44) return false;
+            if(!pushJSON.has(K.kPushDeviceToken) || pushJSON.getString(K.kPushDeviceToken).length() != 44) return false;
+            if(pushJSON.has(K.kPushIsValid) && pushJSON.getBoolean(K.kPushIsValid)) return true;
 
-            if(pushJSON.has(K.kPushDeviceToken)) {
-                String urlString = String.format(K.kPushDeviceTokenAPIPath, K.kBaseUrl, deviceUUID, pushJSON.getString(K.kPushDeviceToken));
-                Map<String, String> response = HttpUtil.httpPost(urlString, new JSONObject());
-                JSONObject responseJSON = new JSONObject(response.get(URLs.kBody));
+            /**
+             *  必须符合以下两条件:
+             *  1. device_token 存在并且长度为 44
+             *  2. is_valid = false
+             */
+            String urlString = String.format(K.kPushDeviceTokenAPIPath, K.kBaseUrl, deviceUUID, pushJSON.getString(K.kPushDeviceToken));
+            Map<String, String> response = HttpUtil.httpPost(urlString, new JSONObject());
+            JSONObject responseJSON = new JSONObject(response.get(URLs.kBody));
 
-                pushJSON.put(K.kPushIsValid, responseJSON.has(K.kValid) && responseJSON.getBoolean(K.kValid));
-                pushJSON.put(K.kPushDeviceUUID, deviceUUID);
-                FileUtil.writeFile(pushConfigPath, pushJSON.toString());
+            pushJSON.put(K.kPushIsValid, responseJSON.has(K.kValid) && responseJSON.getBoolean(K.kValid));
+            pushJSON.put(K.kPushDeviceUUID, deviceUUID);
+            FileUtil.writeFile(pushConfigPath, pushJSON.toString());
 
-                return pushJSON.has(K.kPushIsValid) && pushJSON.getBoolean(K.kPushIsValid);
-            } else {
-                return false;
-            }
+            return pushJSON.has(K.kPushIsValid) && pushJSON.getBoolean(K.kPushIsValid);
         } catch (JSONException | IOException e) {
             e.printStackTrace();
         }
