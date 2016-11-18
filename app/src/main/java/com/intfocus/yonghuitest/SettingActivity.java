@@ -725,9 +725,9 @@ public class SettingActivity extends BaseActivity {
                             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
                             if(!pushJSON.has(K.kPushDeviceToken) || pushJSON.getString(K.kPushDeviceToken).length() != 44 ||
                                     (device_token.length() == 44 && !pushJSON.getString(K.kPushDeviceToken).equals(device_token))) {
-                                pushJSON.put(K.kPushIsValid, false);
-                                pushJSON.put(K.kPushDeviceToken, device_token);
-                                FileUtil.writeFile(pushConfigPath, pushJSON.toString());
+                            pushJSON.put(K.kPushIsValid, false);
+                            pushJSON.put(K.kPushDeviceToken, device_token);
+                            FileUtil.writeFile(pushConfigPath, pushJSON.toString());
                             }
                         }
 
