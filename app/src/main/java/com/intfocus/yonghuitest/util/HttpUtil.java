@@ -8,6 +8,7 @@ import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -129,6 +130,9 @@ public class HttpUtil {
         Request request = builder.build();
         try {
             response = client.newCall(request).execute();
+            if (response.code() != 200) {
+                return null;
+            }
             InputStream is = response.body().byteStream();
             Bitmap bm = BitmapFactory.decodeStream(is);
             return bm;
@@ -292,6 +296,39 @@ public class HttpUtil {
                     retMap.put(URLs.kBody, "{\"info\": \"用户名或密码错误\"}");
                 }
             }
+        }
+        return retMap;
+    }
+
+    public static Map<String,String> httpPostFile(String urlString,String fileType,File file) {
+        Map<String, String> retMap = new HashMap<>();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(3, TimeUnit.SECONDS)
+                .writeTimeout(3, TimeUnit.SECONDS)
+                .readTimeout(3, TimeUnit.SECONDS)
+                .build();
+
+        Request request;
+        Response response;
+        Request.Builder requestBuilder = new Request.Builder();
+        try {
+            request = requestBuilder
+                    .url(urlString)
+                    .post(RequestBody.create(MediaType.parse(fileType),file))
+                    .build();
+            response = client.newCall(request).execute();
+
+            retMap.put(URLs.kCode, String.format("%d", response.code()));
+            retMap.put("body", response.body().string());
+        } catch (UnknownHostException e) {
+            if(e != null && e.getMessage() != null) {
+                LogUtil.d("UnknownHostException2", e.getMessage());
+            }
+            retMap.put(URLs.kCode, "400");
+            retMap.put(URLs.kBody, "{\"info\": \"请检查网络环境！\"}");
+        } catch (Exception e) {
+            retMap.put(URLs.kCode, "400");
+            retMap.put(URLs.kBody, "{\"info\": \"请检查网络环境！\"}");
         }
         return retMap;
     }
