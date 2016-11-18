@@ -300,18 +300,19 @@ public class HttpUtil {
         return retMap;
     }
 
-    public static Map<String,String> httpPostFile(String urlString,String fileType,File file) {
+    public static Map<String,String> httpPostFile(String urlString,String fileType,String filePath) {
         Map<String, String> retMap = new HashMap<>();
         OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(3, TimeUnit.SECONDS)
-                .writeTimeout(3, TimeUnit.SECONDS)
-                .readTimeout(3, TimeUnit.SECONDS)
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
                 .build();
 
         Request request;
         Response response;
         Request.Builder requestBuilder = new Request.Builder();
         try {
+            File file = new File(filePath);
             request = requestBuilder
                     .url(urlString)
                     .post(RequestBody.create(MediaType.parse(fileType),file))
