@@ -199,7 +199,6 @@ public class SettingActivity extends BaseActivity {
             mApiDomain.setText(K.kBaseUrl.replace("http://", "").replace("https://", ""));
 
             gravatarJsonPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kGravatarConfigFileName);
-
             if (user.has(kGravatar) && user.getString(kGravatar).startsWith("http")) {
                 gravatarUrl = user.getString(kGravatar);
                 gravatarImgName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/") + 1, gravatarUrl.length());
@@ -234,83 +233,6 @@ public class SettingActivity extends BaseActivity {
         } catch (NameNotFoundException | JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    class DownloadGravatar extends AsyncTask<String,Void,Bitmap> {
-        @Override
-        protected Bitmap doInBackground(String... params) {
-            Bitmap imgBmp = HttpUtil.httpGetBitmap(gravatarUrl);
-            return imgBmp;
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap imgBmp) {
-            if (imgBmp != null) {
-                mIconImageView.setImageBitmap(imgBmp);
-                FileUtil.saveImage(gravatarImgPath,imgBmp);
-                updataGravatarJson(gravatarJsonPath,gravatarImgName,true,"","");
-            }
-            super.onPostExecute(imgBmp);
-        }
-    }
-
-    class UploadGravatar extends AsyncTask<String,Void,Map<String,String>> {
-        @Override
-        protected Map<String,String> doInBackground(String... params) {
-            try {
-                String urlString = String.format(K.kUploadGravatarAPIPath, PrivateURLs.kBaseUrl, user.getString("user_device_id"), user.getString("user_id"));
-                Map<String,String> response = HttpUtil.httpPostFile(urlString,"image/jpg",gravatarImgPath);
-                Log.i("gravatar",response.get("code") + response.get("body"));
-                return response;
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Log.i("gravatar","upload no bac" + e.toString());
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Map<String,String> response){
-            try {
-                if (response.get("code").equals("201")) {
-                    JSONObject jsonObject = new JSONObject(response.get("body"));
-                    updataGravatarJson(gravatarJsonPath,gravatarImgName,true,jsonObject.getString("gravatar_id"),jsonObject.getString("gravatar_url"));
-                    Log.i("gravatar","upload successful 201");
-                }
-                Log.i("gravatar","upload no 201");
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Log.i("gravatar","upload no " + e.toString());
-            }
-            super.onPostExecute(response);
-        }
-    }
-
-    public void updataGravatarJson(String jsonPath,String imgName,boolean isUpload,String gravatarID,String uploadUrl) {
-        File file = new File(jsonPath);
-        try {
-            JSONObject jsonObject;
-            if (file.exists()) {
-                jsonObject = FileUtil.readConfigFile(jsonPath);
-                String oldGravatarImgName = jsonObject.getString("name");
-                String oldGravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, oldGravatarImgName);
-                new File(oldGravatarImgPath).delete();
-            }
-
-            jsonObject = new JSONObject();
-            jsonObject.put("name",imgName);
-            jsonObject.put("upload_state",true);
-            if (isUpload) {
-                jsonObject.put("gravatar_id",gravatarID);
-                String userConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kUserConfigFileName);
-                user.put("gravatar", uploadUrl);
-                FileUtil.writeFile(userConfigPath, user.toString());
-            }
-            FileUtil.writeFile(jsonPath,jsonObject.toString());
-        } catch (JSONException |IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     private static String getApplicationName(Context context) {
@@ -508,7 +430,6 @@ public class SettingActivity extends BaseActivity {
                 gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kAppCode + "_" + user.getString(URLs.kUserNum) + "_" + getDate() + ".jpg");
                 gravatarFileName = gravatarImgPath.substring(gravatarImgPath.lastIndexOf("/") + 1, gravatarImgPath.length());
                 FileUtil.saveImage(gravatarImgPath, userIcon);
-                Log.i("gravatar",gravatarImgPath);
                 new UploadGravatar().execute();
                 popupWindow.dismiss();
             }
@@ -517,63 +438,77 @@ public class SettingActivity extends BaseActivity {
         }
     }
 
-//    private void uploadImg() {
-//        try {
-//            OkHttpClient client = new OkHttpClient.Builder()
-//                    .connectTimeout(5, TimeUnit.SECONDS)
-//                    .writeTimeout(5, TimeUnit.SECONDS)
-//                    .readTimeout(5, TimeUnit.SECONDS)
-//                    .build();
-//
-//            File file = new File(gravatarImgPath);
-//            RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpg"), file);
-//            MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
-//            builder.addFormDataPart(kGravatar, file.getName(), fileBody);
-//
-//            MultipartBody requestBody = builder.build();
-//
-//            Request request = new Request.Builder()
-//                    .url(String.format(K.kUploadGravatarAPIPath, PrivateURLs.kBaseUrl, user.getString("user_device_id"), user.getString("user_id")))
-//                    .post(requestBody)
-//                    .build();
-//
-//            client.newCall(request).enqueue(new Callback() {
-//                @Override
-//                public void onFailure(Call call, IOException e) {
-//                    uploadImg();
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            toast("上传失败");
-//                        }
-//                    });
-//                }
-//
-//                @Override
-//                public void onResponse(Call call, Response response) throws IOException {
-//                    if (response.code() == 201) {
-//                        try {
-//                            String uploadURL = String.format(K.kUploadGravatarAPIPath, PrivateURLs.kBaseUrl, user.getString("user_device_id"), user.getString("user_id"));
-//                            JSONObject json = new JSONObject(response.body().string());
-//                            updataGravatarJson(gravatarJsonPath, gravatarFileName,true,json.getString("gravatar_id"),uploadURL);
-//                            runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    toast("上传成功");
-//                                }
-//                            });
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    } else {
-//                        uploadImg();
-//                    }
-//                }
-//            });
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    class DownloadGravatar extends AsyncTask<String,Void,Bitmap> {
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            Bitmap imgBmp = HttpUtil.httpGetBitmap(gravatarUrl);
+            return imgBmp;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap imgBmp) {
+            if (imgBmp != null) {
+                mIconImageView.setImageBitmap(imgBmp);
+                FileUtil.saveImage(gravatarImgPath,imgBmp);
+                updataGravatarJson(gravatarJsonPath,gravatarImgName,false,"","");
+            }
+            super.onPostExecute(imgBmp);
+        }
+    }
+
+    class UploadGravatar extends AsyncTask<String,Void,Map<String,String>> {
+        @Override
+        protected Map<String,String> doInBackground(String... params) {
+            try {
+                String urlString = String.format(K.kUploadGravatarAPIPath, PrivateURLs.kBaseUrl, user.getString("user_device_id"), user.getString("user_id"));
+                Map<String,String> response = HttpUtil.httpPostFile(urlString,"image/jpg",kGravatar,gravatarImgPath);
+                return response;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Map<String,String> response){
+            try {
+                if (response.get("code").equals("201")) {
+                    JSONObject jsonObject = new JSONObject(response.get("body"));
+                    updataGravatarJson(gravatarJsonPath,gravatarImgName,true,jsonObject.getString("gravatar_id"),jsonObject.getString("gravatar_url"));
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            super.onPostExecute(response);
+        }
+    }
+
+    public void updataGravatarJson(String jsonPath,String imgName,boolean isUpload,String gravatarID,String uploadUrl) {
+        File file = new File(jsonPath);
+        try {
+            JSONObject jsonObject;
+            if (file.exists()) {
+                jsonObject = FileUtil.readConfigFile(jsonPath);
+                String oldGravatarImgName = jsonObject.getString("name");
+                String oldGravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, oldGravatarImgName);
+                new File(oldGravatarImgPath).delete();
+            }
+
+            jsonObject = new JSONObject();
+            jsonObject.put("name",imgName);
+            jsonObject.put("upload_state",true);
+            if (isUpload) {
+                jsonObject.put("gravatar_id",gravatarID);
+                String userConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kUserConfigFileName);
+                user.put("gravatar", uploadUrl);
+                FileUtil.writeFile(userConfigPath, user.toString());
+            }
+            FileUtil.writeFile(jsonPath,jsonObject.toString());
+        } catch (JSONException |IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     public String getDate() {
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");

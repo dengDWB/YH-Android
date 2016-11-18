@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import okhttp3.Headers;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -299,8 +300,10 @@ public class HttpUtil {
         }
         return retMap;
     }
-
-    public static Map<String,String> httpPostFile(String urlString,String fileType,String filePath) {
+    /**
+     * ִ执行一个HTTP POST请求，上传文件
+     */
+    public static Map<String,String> httpPostFile(String urlString,String fileType,String fileKey,String filePath) {
         Map<String, String> retMap = new HashMap<>();
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
@@ -313,9 +316,14 @@ public class HttpUtil {
         Request.Builder requestBuilder = new Request.Builder();
         try {
             File file = new File(filePath);
+            RequestBody fileBody = RequestBody.create(MediaType.parse(fileType), file);
+            MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+            builder.addFormDataPart(fileKey, file.getName(), fileBody);
+            MultipartBody requestBody = builder.build();
+
             request = requestBuilder
                     .url(urlString)
-                    .post(RequestBody.create(MediaType.parse(fileType),file))
+                    .post(requestBody)
                     .build();
             response = client.newCall(request).execute();
 
