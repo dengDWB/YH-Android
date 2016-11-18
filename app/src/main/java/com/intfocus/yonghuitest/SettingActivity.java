@@ -698,7 +698,7 @@ public class SettingActivity extends BaseActivity {
     };
 
     /*
-     * 校正静态文件
+     * 校正，客户使用遇到问题时的终极解决方案
      */
     private final View.OnClickListener mCheckAssetsListener = new View.OnClickListener() {
         @Override
@@ -708,27 +708,21 @@ public class SettingActivity extends BaseActivity {
                 public void run() {
                     try {
                         /*
-                         * 用户报表数据js文件存放在公共区域
+                         * 用户报表数据 js 文件存放在公共区域
                          */
                         String headerPath = String.format("%s/%s", FileUtil.sharedPath(mAppContext), K.kCachedHeaderConfigFileName);
                         new File(headerPath).delete();
                         headerPath = String.format("%s/%s", FileUtil.dirPath(mAppContext, K.kHTMLDirName), K.kCachedHeaderConfigFileName);
-
                         new File(headerPath).delete();
 
                         /*
-                         * Umeng Device Token
+                         * Umeng Device Token 重新上传服务器
                          */
-                        if (mSharedPreferences.getBoolean("state",false)) {
-                            String device_token = mPushAgent.getRegistrationId();
-                            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPushConfigFileName);
-                            JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
-                            if(!pushJSON.has(K.kPushDeviceToken) || pushJSON.getString(K.kPushDeviceToken).length() != 44 ||
-                                    (device_token.length() == 44 && !pushJSON.getString(K.kPushDeviceToken).equals(device_token))) {
+                        String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPushConfigFileName);
+                        JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
+                        if(pushJSON.has(K.kPushDeviceToken) && pushJSON.getString(K.kPushDeviceToken).length() == 44) {
                             pushJSON.put(K.kPushIsValid, false);
-                            pushJSON.put(K.kPushDeviceToken, device_token);
                             FileUtil.writeFile(pushConfigPath, pushJSON.toString());
-                            }
                         }
 
                         ApiHelper.authentication(SettingActivity.this, user.getString(URLs.kUserNum), user.getString(URLs.kPassword));
