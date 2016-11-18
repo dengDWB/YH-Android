@@ -13,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -34,6 +35,7 @@ import android.widget.Toast;
 import com.intfocus.yonghuitest.screen_lock.InitPassCodeActivity;
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
+import com.intfocus.yonghuitest.util.HttpUtil;
 import com.intfocus.yonghuitest.util.K;
 import com.intfocus.yonghuitest.util.PrivateURLs;
 import com.intfocus.yonghuitest.util.URLs;
@@ -48,6 +50,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -85,7 +88,7 @@ public class SettingActivity extends BaseActivity {
     private BadgeView bvCheckThursdaySay;
     private CircleImageView mIconImageView;
     private PopupWindow popupWindow;
-    private String gravatarJsonPath, gravatarImgPath, gravatarFileName;
+    private String gravatarJsonPath, gravatarImgPath, gravatarFileName, gravatarUrl, gravatarImgName;
     private TextView mCheckThursdaySay;
     private Context mContext;
     private PushAgent mPushAgent;
@@ -192,30 +195,15 @@ public class SettingActivity extends BaseActivity {
             mApiDomain.setText(K.kBaseUrl.replace("http://", "").replace("https://", ""));
 
             gravatarJsonPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kGravatarConfigFileName);
-            if (new File(gravatarJsonPath).exists()) {
-                JSONObject gravatarJSON = FileUtil.readConfigFile(gravatarJsonPath);
-                gravatarFileName = gravatarJSON.getString(URLs.kName);
-                gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, gravatarFileName);
-                String currentGravatarUrl = user.getString(kGravatar);
-                String currentGravatarFileName = currentGravatarUrl.substring(currentGravatarUrl.lastIndexOf("/")+1, currentGravatarUrl.length());
-                // 以用户验证响应的 gravatar 值为准，不一致则下载
-                if ((gravatarFileName.equals(currentGravatarFileName)) || !(user.getString(kGravatar).startsWith("http"))) {
-                    Bitmap bitmap = BitmapFactory.decodeFile(gravatarImgPath);
-                    mIconImageView.setImageBitmap(bitmap);
-                }else {
-                    gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, currentGravatarFileName);
-                    gravatarFileName = currentGravatarFileName;
-                    httpGetBitmap(currentGravatarUrl, true);
-                }
-            }
-            else {
-                if (user.has(kGravatar) && (user.getString(kGravatar).indexOf("http") != -1)) {
-                    String gravatarUrl = user.getString(kGravatar);
-                    gravatarFileName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/")+1, gravatarUrl.length());
-                    gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, gravatarFileName);
-                    httpGetBitmap(gravatarUrl, false);
-                }else {
-                    mIconImageView.setImageResource(R.drawable.login_logo);
+            if (user.has(kGravatar) && user.getString(kGravatar).startsWith("http")) {
+                gravatarUrl = user.getString(kGravatar);
+                gravatarImgName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/") + 1, gravatarUrl.length());
+                gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, gravatarImgName);
+                if (new File(gravatarImgPath).exists()) {
+                    Bitmap imgBmp = BitmapFactory.decodeFile(gravatarImgPath);
+                    mIconImageView.setImageBitmap(imgBmp);
+                } else {
+                    new DownloadGravatar().execute();
                 }
             }
 
@@ -241,88 +229,6 @@ public class SettingActivity extends BaseActivity {
         } catch (NameNotFoundException | JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    public void writeJson(String path, String name, boolean upload_state, String gravatar_url, String gravatar_id, boolean isDelete){
-        try {
-            String previousImgPath = "";
-            JSONObject jsonObject;
-            if (new File(path).exists()) {
-                jsonObject = new JSONObject(FileUtil.readFile(path));
-                previousImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, jsonObject.getString(URLs.kName));
-                if (isDelete) {
-                    new File(previousImgPath).delete();
-                }
-            }
-            else {
-                jsonObject = new JSONObject();
-            }
-
-            jsonObject.put(URLs.kName, name);
-            jsonObject.put("upload_state", upload_state);
-            if(gravatar_url.length() > 0 && gravatar_url.indexOf("http") > -1) {
-                jsonObject.put("gravatar_url", gravatar_url);
-
-                /*
-                 * 上传头像成功后，重置user.json#gravatar, 以名再回到设置界面被还原
-                 */
-                String userConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kUserConfigFileName);
-                user.put("gravatar", gravatar_url);
-                FileUtil.writeFile(userConfigPath, user.toString());
-            }
-            if (!gravatar_id.equals("")) {
-                jsonObject.put(kGravatarId, gravatar_id);
-            }
-            FileUtil.writeFile(path, jsonObject.toString());
-            Log.i("upload", FileUtil.readFile(path));
-        } catch (JSONException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void httpGetBitmap(String urlString, final boolean isDelete) {
-
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder().url(urlString).build();
-        Call call = client.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                if (e == null) { return; }
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mIconImageView.setImageResource(R.drawable.login_logo);
-                    }
-                });
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.code() == 200) {
-                    try{
-                        InputStream is = response.body().byteStream();
-                        final Bitmap bm = BitmapFactory.decodeStream(is);
-                        FileUtil.saveImage(gravatarImgPath, bm);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mIconImageView.setImageBitmap(bm);
-                            }
-                        });
-                        writeJson(gravatarJsonPath, gravatarFileName, true, "", "", isDelete);
-                    } catch (Exception e){
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mIconImageView.setImageResource(R.drawable.login_logo);
-                            }
-                        });
-                    }
-                }
-            }
-        });
     }
 
     private static String getApplicationName(Context context) {
@@ -518,74 +424,97 @@ public class SettingActivity extends BaseActivity {
             Bundle extras = intent.getExtras();
             if (extras != null) {
                 Bitmap userIcon = extras.getParcelable(URLs.kData);
-                gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kAppCode + "_" + user.getString(URLs.kUserNum) + "_" + getDate() + ".jpg");
-                gravatarFileName = gravatarImgPath.substring(gravatarImgPath.lastIndexOf("/")+1, gravatarImgPath.length());
                 mIconImageView.setImageBitmap(userIcon);
-                popupWindow.dismiss();
+                gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kAppCode + "_" + user.getString(URLs.kUserNum) + "_" + getDate() + ".jpg");
+                gravatarFileName = gravatarImgPath.substring(gravatarImgPath.lastIndexOf("/") + 1, gravatarImgPath.length());
                 FileUtil.saveImage(gravatarImgPath, userIcon);
-                writeJson(gravatarJsonPath, gravatarFileName, false, "", "", true);
-                uploadImg();
+                new UploadGravatar().execute();
+                popupWindow.dismiss();
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private void uploadImg() {
+    /*
+     * 头像下载
+     */
+    class DownloadGravatar extends AsyncTask<String,Void,Bitmap> {
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            Bitmap imgBmp = HttpUtil.httpGetBitmap(gravatarUrl);
+            return imgBmp;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap imgBmp) {
+            if (imgBmp != null) {
+                mIconImageView.setImageBitmap(imgBmp);
+                FileUtil.saveImage(gravatarImgPath,imgBmp);
+                updataGravatarJson(gravatarJsonPath,gravatarImgName,false,"","");
+            }
+            super.onPostExecute(imgBmp);
+        }
+    }
+
+    /*
+     * 头像上传
+     */
+    class UploadGravatar extends AsyncTask<String,Void,Map<String,String>> {
+        @Override
+        protected Map<String,String> doInBackground(String... params) {
+            try {
+                String urlString = String.format(K.kUploadGravatarAPIPath, PrivateURLs.kBaseUrl, user.getString("user_device_id"), user.getString("user_id"));
+                Map<String,String> response = HttpUtil.httpPostFile(urlString,"image/jpg",kGravatar,gravatarImgPath);
+                return response;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Map<String,String> response){
+            try {
+                if (response.get("code").equals("201")) {
+                    JSONObject jsonObject = new JSONObject(response.get("body"));
+                    updataGravatarJson(gravatarJsonPath,gravatarImgName,true,jsonObject.getString("gravatar_id"),jsonObject.getString("gravatar_url"));
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            super.onPostExecute(response);
+        }
+    }
+
+    /*
+     * 头像 JSON 文件更新
+     */
+    public void updataGravatarJson(String jsonPath,String imgName,boolean isUpload,String gravatarID,String uploadUrl) {
+        File file = new File(jsonPath);
         try {
-            OkHttpClient client = new OkHttpClient.Builder()
-                    .connectTimeout(5, TimeUnit.SECONDS)
-                    .writeTimeout(5, TimeUnit.SECONDS)
-                    .readTimeout(5, TimeUnit.SECONDS)
-                    .build();
+            JSONObject jsonObject;
+            if (file.exists()) {
+                jsonObject = FileUtil.readConfigFile(jsonPath);
+                String oldGravatarImgName = jsonObject.getString("name");
+                String oldGravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, oldGravatarImgName);
+                new File(oldGravatarImgPath).delete();
+            }
 
-            File file = new File(gravatarImgPath);
-            RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpg"), file);
-            MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
-            builder.addFormDataPart(kGravatar, file.getName(), fileBody);
-
-            MultipartBody requestBody = builder.build();
-
-            Request request = new Request.Builder()
-                    .url(String.format(K.kUploadGravatarAPIPath, PrivateURLs.kBaseUrl, user.getString("user_device_id"), user.getString("user_id")))
-                    .post(requestBody)
-                    .build();
-
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    uploadImg();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            toast("上传失败");
-                        }
-                    });
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    if (response.code() == 201) {
-                        try {
-                            JSONObject json = new JSONObject(response.body().string());
-                            writeJson(gravatarJsonPath, gravatarFileName, true, json.getString("gravatar_url"), json.getString(kGravatarId), false);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    toast("上传成功");
-                                }
-                            });
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        uploadImg();
-                    }
-                }
-            });
-        } catch (JSONException e) {
+            jsonObject = new JSONObject();
+            jsonObject.put("name",imgName);
+            jsonObject.put("upload_state",true);
+            if (isUpload) {
+                jsonObject.put("gravatar_id",gravatarID);
+                String userConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kUserConfigFileName);
+                user.put("gravatar", uploadUrl);
+                FileUtil.writeFile(userConfigPath, user.toString());
+            }
+            FileUtil.writeFile(jsonPath,jsonObject.toString());
+        } catch (JSONException |IOException e) {
             e.printStackTrace();
         }
+
     }
 
     public String getDate(){
@@ -731,10 +660,19 @@ public class SettingActivity extends BaseActivity {
                         // mPushState.setText(pushJSON.has("push_valid") && pushJSON.getBoolean("push_valid") ? "开启" : "关闭");
 
                         /*
+                         * 获取头像下载链接,准备重新下载头像
+                         */
+                        gravatarUrl = user.getString(kGravatar);
+                        gravatarImgName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/") + 1, gravatarUrl.length());
+                        gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, gravatarImgName);
+
+                        /*
                          * 检测服务器静态资源是否更新，并下载
                          */
                         runOnUiThread(new Runnable() {
                             @Override public void run() {
+                                new DownloadGravatar().execute(); //校正头像,必须在主线程运行
+
                                 checkAssetsUpdated(false);
 
                                 FileUtil.checkAssets(mAppContext, URLs.kAssets, false);
