@@ -1,11 +1,14 @@
 package com.intfocus.yonghuitest.util;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import okhttp3.Headers;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -107,6 +111,40 @@ public class HttpUtil {
             }
         }
         return retMap;
+    }
+
+    /**
+     * ִ执行一个HTTP GET请求，返回请求响应的 Bitmap
+     *
+     * @param urlString 请求的URL地址
+     * @return 返回请求响应的  Bitmap
+     */
+    public static Bitmap httpGetBitmap(String urlString) {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
+                .build();
+        okhttp3.Request.Builder builder = new Request.Builder()
+                .url(urlString);
+
+        Response response;
+        Request request = builder.build();
+        try {
+            response = client.newCall(request).execute();
+            if (response.code() != 200) {
+                return null;
+            }
+            InputStream is = response.body().byteStream();
+            Bitmap bm = BitmapFactory.decodeStream(is);
+            return bm;
+        } catch (UnknownHostException e) {
+            if(e != null && e.getMessage() != null) {
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -260,6 +298,48 @@ public class HttpUtil {
                     retMap.put(URLs.kBody, "{\"info\": \"用户名或密码错误\"}");
                 }
             }
+        }
+        return retMap;
+    }
+
+    /**
+     * ִ执行一个HTTP POST请求，上传文件
+     */
+    public static Map<String,String> httpPostFile(String urlString,String fileType,String fileKey,String filePath) {
+        Map<String, String> retMap = new HashMap<>();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
+                .build();
+
+        Request request;
+        Response response;
+        Request.Builder requestBuilder = new Request.Builder();
+        try {
+            File file = new File(filePath);
+            RequestBody fileBody = RequestBody.create(MediaType.parse(fileType), file);
+            MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+            builder.addFormDataPart(fileKey, file.getName(), fileBody);
+            MultipartBody requestBody = builder.build();
+
+            request = requestBuilder
+                    .url(urlString)
+                    .post(requestBody)
+                    .build();
+            response = client.newCall(request).execute();
+
+            retMap.put(URLs.kCode, String.format("%d", response.code()));
+            retMap.put("body", response.body().string());
+        } catch (UnknownHostException e) {
+            if(e != null && e.getMessage() != null) {
+                LogUtil.d("UnknownHostException2", e.getMessage());
+            }
+            retMap.put(URLs.kCode, "400");
+            retMap.put(URLs.kBody, "{\"info\": \"请检查网络环境！\"}");
+        } catch (Exception e) {
+            retMap.put(URLs.kCode, "400");
+            retMap.put(URLs.kBody, "{\"info\": \"请检查网络环境！\"}");
         }
         return retMap;
     }
