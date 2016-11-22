@@ -220,11 +220,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 						break;
 					}
 					//开始合成
-					SpeechReport.startSpeechSynthesizer(mAppContext," XX 你好，最新数据截止 2016年06月06日 8 点，YY 群组的经营数据如下：\n" +
-							"\" +\n" +
-							"\t\t\t\t\"> 1. 销售额，销售额 120 万元，同比上涨 1%，其中20种品类上涨，13种品类下跌。\\n\" +\n" +
-							"\t\t\t\t\"> 2. 毛利，毛利额 25 万元，同比下降 2%，较上周同天下降 0.5 万元\\n\" +\n" +
-							"\t\t\t\t\"> 3. 客流量，.... ");
+					SpeechReport.startSpeechSynthesizer(mAppContext,"大家早上好,我的印象笔记出了问题,无法完成录音.上周五我完成了语音播报各种状态的回调，以及头像上传下载逻辑的优化，今天请假，已与俊杰协调，如有工作任务，会在今晚完成。今天的空闲时间会阅读资料思考如何提高我们代码的可拓展性.就这些.");
 					break;
 
 				default:
