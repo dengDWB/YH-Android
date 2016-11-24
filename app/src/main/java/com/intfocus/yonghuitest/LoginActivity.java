@@ -222,15 +222,6 @@ public class LoginActivity extends BaseActivity{
     }
 
     /*
-     * 点击空白处,收起软键盘
-     */
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        return imm.hideSoftInputFromWindow(LoginActivity.this.getCurrentFocus().getWindowToken(), 0);
-    }
-
-    /*
      * 登录按钮点击事件
      */
     public void actionSubmit(View v) {
