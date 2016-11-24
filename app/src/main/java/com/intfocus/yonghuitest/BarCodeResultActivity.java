@@ -216,11 +216,8 @@ public class BarCodeResultActivity extends BaseActivity {
                 }
                 updateHtmlContentTimetamp();
 
-                if (!responseCode.equals("200") || responseString.equals("")) {
+                if (!responseCode.equals("200") || responseString.equals("{}")) {
                     showWebViewForWithoutNetwork();
-                    if (responseString.equals("")) {
-                        toast("Js 获取为空");
-                    }
                 }
                 else {
                     FileUtil.barCodeScanResult(mAppContext, responseString);
