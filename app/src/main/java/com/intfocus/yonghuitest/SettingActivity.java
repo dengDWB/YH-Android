@@ -1,8 +1,10 @@
 package com.intfocus.yonghuitest;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -47,20 +49,10 @@ import com.umeng.message.PushAgent;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -90,13 +82,11 @@ public class SettingActivity extends BaseActivity {
     private BadgeView bvCheckThursdaySay;
     private CircleImageView mIconImageView;
     private PopupWindow popupWindow;
-    private String gravatarJsonPath, gravatarImgPath, gravatarFileName;
+    private String gravatarJsonPath, gravatarImgPath, gravatarFileName, gravatarUrl, gravatarImgName;
     private TextView mCheckThursdaySay;
     private Context mContext;
     private PushAgent mPushAgent;
-
-    private String gravatarUrl;
-    private String gravatarImgName;
+    private SharedPreferences mSharedPreferences;
 
     /* 请求识别码 */
     private static final int CODE_GALLERY_REQUEST = 0xa0;
@@ -190,9 +180,10 @@ public class SettingActivity extends BaseActivity {
             mUserID.setText(user.getString("user_name"));
             mRoleID.setText(user.getString("role_name"));
             mGroupID.setText(user.getString("group_name"));
-//            mPushState.setText(mMyApp.getPushAgent().isEnabled() ? "开启" : "关闭");
-            mPushState.setText("开启");
-//            mPushState.setText(mMyApp.getPushAgent().getRegistrationId().equals(null) ? null:mMyApp.getPushAgent().getRegistrationId());
+
+            mSharedPreferences = getSharedPreferences("PushServerState",
+                    Activity.MODE_PRIVATE);
+            mPushState.setText(mSharedPreferences.getBoolean("state",false) ? "开启" : "关闭");
             mAppName.setText(getApplicationName(SettingActivity.this));
             String deviceInfo = String.format("%s(Android %s)", TextUtils.split(android.os.Build.MODEL, " - ")[0], Build.VERSION.RELEASE);
             mDeviceID.setText(deviceInfo);
@@ -438,6 +429,9 @@ public class SettingActivity extends BaseActivity {
         }
     }
 
+    /*
+     * 头像下载
+     */
     class DownloadGravatar extends AsyncTask<String,Void,Bitmap> {
         @Override
         protected Bitmap doInBackground(String... params) {
@@ -456,6 +450,10 @@ public class SettingActivity extends BaseActivity {
         }
     }
 
+
+    /*
+     * 头像上传
+     */
     class UploadGravatar extends AsyncTask<String,Void,Map<String,String>> {
         @Override
         protected Map<String,String> doInBackground(String... params) {
@@ -483,6 +481,9 @@ public class SettingActivity extends BaseActivity {
         }
     }
 
+    /*
+     * 头像 JSON 文件更新
+     */
     public void updataGravatarJson(String jsonPath,String imgName,boolean isUpload,String gravatarID,String uploadUrl) {
         File file = new File(jsonPath);
         try {
@@ -620,7 +621,7 @@ public class SettingActivity extends BaseActivity {
     };
 
     /*
-     * 校正静态文件
+     * 校正，客户使用遇到问题时的终极解决方案
      */
     private final View.OnClickListener mCheckAssetsListener = new View.OnClickListener() {
         @Override
@@ -630,25 +631,20 @@ public class SettingActivity extends BaseActivity {
                 public void run() {
                     try {
                         /*
-                         * 用户报表数据js文件存放在公共区域
+                         * 用户报表数据 js 文件存放在公共区域
                          */
                         String headerPath = String.format("%s/%s", FileUtil.sharedPath(mAppContext), K.kCachedHeaderConfigFileName);
                         new File(headerPath).delete();
                         headerPath = String.format("%s/%s", FileUtil.dirPath(mAppContext, K.kHTMLDirName), K.kCachedHeaderConfigFileName);
-
                         new File(headerPath).delete();
 
                         /*
-                         * Umeng Device Token
+                         * Umeng Device Token 重新上传服务器
                          */
-                        String device_token = mPushAgent.getRegistrationId();
-                        Log.i("device_token", device_token.equals(null) ? null : device_token);
                         String pushConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPushConfigFileName);
                         JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
-                        if (!pushJSON.has(K.kPushDeviceToken) || pushJSON.getString(K.kPushDeviceToken).length() != 44 ||
-                                (device_token.length() == 44 && !pushJSON.getString(K.kPushDeviceToken).equals(device_token))) {
+                        if(pushJSON.has(K.kPushDeviceToken) && pushJSON.getString(K.kPushDeviceToken).length() == 44) {
                             pushJSON.put(K.kPushIsValid, false);
-                            pushJSON.put(K.kPushDeviceToken, device_token);
                             FileUtil.writeFile(pushConfigPath, pushJSON.toString());
                         }
 
@@ -658,11 +654,19 @@ public class SettingActivity extends BaseActivity {
                         // mPushState.setText(pushJSON.has("push_valid") && pushJSON.getBoolean("push_valid") ? "开启" : "关闭");
 
                         /*
+                         * 获取头像下载链接,准备重新下载头像
+                         */
+                        gravatarUrl = user.getString(kGravatar);
+                        gravatarImgName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/") + 1, gravatarUrl.length());
+                        gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, gravatarImgName);
+
+                        /*
                          * 检测服务器静态资源是否更新，并下载
                          */
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                new DownloadGravatar().execute(); //校正头像,必须在主线程运行
                                 checkAssetsUpdated(false);
 
                                 FileUtil.checkAssets(mAppContext, URLs.kAssets, false);
@@ -809,6 +813,8 @@ public class SettingActivity extends BaseActivity {
             if (!mPygerLink.getText().equals("已是最新版本")) {
                 mCheckUpgrade.setText("   检测更新");
                 RedPointView.showRedPoint(mAppContext, URLs.kSettingPgyer, bvCheckUpgrade);
+            }else {
+                notificationJSON.put(URLs.kSettingPgyer, 0);
             }
 
             if (notificationJSON.getInt(URLs.kSettingThursdaySay) > 0) {

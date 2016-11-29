@@ -71,7 +71,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	private Context mContext;
 	private MediaPlayer mediaPlayer;
 	private ImageView mBannerSetting;
-
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +87,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 
 		//创建SpeechSynthesizer对象
 		mediaPlayer = SpeechReport.getMediaPlayer();
+
 		/*
 		 * JSON Data
 		 */
@@ -232,6 +232,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	public void onResume() {
 		checkInterfaceOrientation(this.getResources().getConfiguration());
 		mMyApp.setCurrentActivity(this);
+		isWeiXinShared = false;
 		/*
 		 * 判断是否允许浏览器复制
 		 */
@@ -447,6 +448,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	public void actionShare2Weixin(View v) {
 		if (link.toLowerCase().endsWith(".pdf")) {
 			toast("暂不支持 PDF 分享");
+			return;
+		}
+		if (!isWeiXinShared) {
+			toast("网页加载完成,才能使用分享功能");
 			return;
 		}
 		Bitmap imgBmp;

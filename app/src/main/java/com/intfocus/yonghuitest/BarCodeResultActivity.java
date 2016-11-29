@@ -20,6 +20,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.JsonParser;
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
 import com.intfocus.yonghuitest.util.K;
@@ -98,6 +99,7 @@ public class BarCodeResultActivity extends BaseActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 animLoading.setVisibility(View.GONE);
+                isWeiXinShared = true;
                 LogUtil.d("onPageFinished", String.format("%s - %s", URLs.timestamp(), url));
             }
 
@@ -149,6 +151,7 @@ public class BarCodeResultActivity extends BaseActivity {
     public void onResume() {
         super.onResume();
         mMyApp.setCurrentActivity(this);
+        isWeiXinShared = false;
         /*
          * 初始化默认选中门店（第一家）
          */
@@ -205,13 +208,16 @@ public class BarCodeResultActivity extends BaseActivity {
                 Map<String,String> response = ApiHelper.barCodeScan(groupID, roleID, userNum, storeID, codeInfo, codeType);
                 String responseCode = response.get(URLs.kCode);
                 String responseString = response.get(URLs.kBody);
+                try{
+                    new JsonParser().parse(responseString).getAsJsonObject();
+                }catch (Exception e) {
+                    showWebViewForWithoutNetwork();
+                    return ;
+                }
                 updateHtmlContentTimetamp();
 
-                if (!responseCode.equals("200") || responseString.equals("")) {
+                if (!responseCode.equals("200") || responseString.equals("{}")) {
                     showWebViewForWithoutNetwork();
-                    if (responseString.equals("")) {
-                        toast("Js 获取为空");
-                    }
                 }
                 else {
                     FileUtil.barCodeScanResult(mAppContext, responseString);
@@ -324,6 +330,10 @@ public class BarCodeResultActivity extends BaseActivity {
      * 分享截图至微信
      */
     private void actionShare2Weixin() {
+        if (!isWeiXinShared) {
+            toast("网页加载完成,才能使用分享功能");
+            return;
+        }
         Bitmap imgBmp;
         String filePath = FileUtil.basePath(mAppContext) + "/" + K.kCachedDirName + "/" + "timestmap.png";
 
