@@ -20,10 +20,6 @@
         <attr name="src_height" format="dimension" />
     </declare-styleable>
 
-    <declare-styleable name="ImageViewPlus">
-        <attr name="auto_play" format="boolean"></attr>
-    </declare-styleable>
-
     <declare-styleable name="ProgressWheel">
         <attr name="textColor" format="color" />
         <attr name="textSize" format="dimension" />
