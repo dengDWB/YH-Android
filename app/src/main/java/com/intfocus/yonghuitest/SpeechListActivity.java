@@ -61,25 +61,27 @@ public class SpeechListActivity extends BaseActivity{
         initListView();
     }
 
-    private void initListView() {
+    private void initListView(){
         String speechCachePath = FileUtil.dirPath(mAppContext, K.kHTMLDirName,"PlayData.plist");
-        if (new File(speechCachePath).exists()){
-            JSONObject speechJson = FileUtil.readConfigFile(speechCachePath);
-            try {
+        mSpeechList.add("播报列表初始化失败");
+        try {
+            if (!new File(speechCachePath).exists()) {
+                mSpeechList.clear(); //
+                JSONObject speechJson = FileUtil.readConfigFile(speechCachePath);
                 JSONArray speechArray = speechJson.getJSONArray("data");
-                for(int i = 0, len = speechArray.length(); i < len; i ++) {
+                for (int i = 0, len = speechArray.length(); i < len; i++) {
                     JSONObject speechInfo = (JSONObject) speechArray.get(i);
                     mSpeechList.add(speechInfo.getString("title"));
                 }
-
-                mListView = (ListView) findViewById(R.id.list_speech);
-                SpeechListActivity.ListArrayAdapter mArrayAdapter = new SpeechListActivity.ListArrayAdapter(this, R.layout.speech_list_item, mSpeechList);
-                mListView.setAdapter(mArrayAdapter);
-                mListView.setTextFilterEnabled(true);
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
+        mListView = (ListView) findViewById(R.id.list_speech);
+        SpeechListActivity.ListArrayAdapter mArrayAdapter = new SpeechListActivity.ListArrayAdapter(this, R.layout.speech_list_item, mSpeechList);
+        mListView.setAdapter(mArrayAdapter);
+        mListView.setTextFilterEnabled(true);
     }
 
     public void onClick(View v) {
