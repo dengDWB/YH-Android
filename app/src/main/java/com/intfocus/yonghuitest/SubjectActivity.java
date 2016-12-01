@@ -1,6 +1,7 @@
 package com.intfocus.yonghuitest;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -26,12 +27,6 @@ import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-import com.iflytek.cloud.ErrorCode;
-import com.iflytek.cloud.InitListener;
-import com.iflytek.cloud.SpeechConstant;
-import com.iflytek.cloud.SpeechError;
-import com.iflytek.cloud.SpeechSynthesizer;
-import com.iflytek.cloud.SynthesizerListener;
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
 import com.intfocus.yonghuitest.util.K;
@@ -56,6 +51,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static android.webkit.WebView.enableSlowWholeDocumentDraw;
+import static com.intfocus.yonghuitest.util.PrivateURLs.kBaseUrl;
 import static java.lang.String.format;
 
 public class SubjectActivity extends BaseActivity implements OnPageChangeListener, OnLoadCompleteListener, OnErrorOccurredListener {
@@ -75,6 +71,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	@SuppressLint("SetJavaScriptEnabled")
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		/*
 		 * 判断当前设备版本，5.0 以上 Android 系统使用才 enableSlowWholeDocumentDraw();
 		 */
@@ -220,7 +217,20 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 						break;
 					}
 					//开始合成
-					SpeechReport.startSpeechSynthesizer(mAppContext,"大家早上好,我的印象笔记出了问题,无法完成录音.上周五我完成了语音播报各种状态的回调，以及头像上传下载逻辑的优化，今天请假，已与俊杰协调，如有工作任务，会在今晚完成。今天的空闲时间会阅读资料思考如何提高我们代码的可拓展性.就这些.");
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+								try {
+									reportID = TextUtils.split(link, "/")[8];
+									String urlString = String.format("%s/api/v1/group/%d/role/%d/report/%s/audio",kBaseUrl,user.getInt("group_id"),user.getInt("role_id"),reportID);
+									String userInfo = "本次报表针对" + user.getString("role_name") + user.getString("group_name");
+									String speechInfo = userInfo + SpeechReport.infoProcess(mAppContext,urlString,"report");
+									SpeechReport.startSpeechSynthesizer(mAppContext,speechInfo);
+								} catch (JSONException e) {
+								e.printStackTrace();
+							}
+						}
+					}).start();
 					break;
 
 				default:
