@@ -364,7 +364,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                         /*
                          * 外部链接传参: user_num, timestamp
                          */
-						mWebView.getSettings().setDomStorageEnabled(true);
 						String appendParams = String.format("user_num=%s&timestamp=%s", userNum, URLs.timestamp());
 						String splitString = urlString.contains("?") ? "&" : "?";
 						urlString = String.format("%s%s%s", urlString, splitString, appendParams);
