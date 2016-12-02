@@ -282,25 +282,21 @@ public class DashboardActivity extends BaseActivity {
 						@Override
 						public void run() {
 							try {
-								String urlString = String.format("%s/api/v1/group/%d/role/%d/audio",kBaseUrl,user.getInt("group_id"),user.getInt("role_id"));
-								final String speechAudio = SpeechReport.infoProcess(mAppContext,urlString,"kpi");
-								runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-										if (!speechAudio.equals("语音合成错误")) {
-											Intent intent = new Intent(DashboardActivity.this,SpeechListActivity.class);
-											intent.putExtra("speechAudio",speechAudio);
-											startActivity(intent);
-										}
-										else {
-											toast("语音合成错误");
-										}
+								String urlString = String.format("%s/api/v1/group/%d/role/%d/audio", kBaseUrl, user.getInt("group_id"), user.getInt("role_id"));
+								final String speechAudio = SpeechReport.infoProcess(mAppContext, urlString, "kpi");
 
-										if (mProgressDialog != null) {
-											mProgressDialog.dismiss();
-										}
-									}
-								});
+								if (speechAudio.equals("语音合成错误")) {
+									toast("语音合成错误");
+								}
+								else {
+									Intent intent = new Intent(DashboardActivity.this, SpeechListActivity.class);
+									intent.putExtra("speechAudio", speechAudio);
+									startActivity(intent);
+								}
+
+								if (mProgressDialog != null) {
+									mProgressDialog.dismiss();
+								}
 							} catch (JSONException e) {
 								e.printStackTrace();
 							}

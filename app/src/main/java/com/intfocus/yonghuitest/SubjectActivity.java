@@ -217,20 +217,33 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 						break;
 					}
 					//开始合成
+					mProgressDialog = ProgressDialog.show(SubjectActivity.this,"稍等","正在合成数据");
 					new Thread(new Runnable() {
 						@Override
 						public void run() {
 								try {
 									reportID = TextUtils.split(link, "/")[8];
 									String urlString = String.format("%s/api/v1/group/%d/role/%d/report/%s/audio",kBaseUrl,user.getInt("group_id"),user.getInt("role_id"),reportID);
-									String userInfo = "本次报表针对" + user.getString("role_name") + user.getString("group_name");
-									String speechInfo = userInfo + SpeechReport.infoProcess(mAppContext,urlString,"report");
-									SpeechReport.startSpeechSynthesizer(mAppContext,speechInfo);
+									String speechInfo = SpeechReport.infoProcess(mAppContext,urlString,"report");
+
+									if (speechInfo.equals("语音合成错误")) {
+										toast("语音合成错误");
+									}
+									else {
+										String userInfo = "本次报表针对" + user.getString("role_name") + user.getString("group_name");
+										speechInfo = userInfo + speechInfo;
+										SpeechReport.startSpeechSynthesizer(mAppContext,speechInfo);
+									}
+
+									if (mProgressDialog != null) {
+										mProgressDialog.dismiss();
+									}
 								} catch (JSONException e) {
 								e.printStackTrace();
 							}
 						}
 					}).start();
+
 					break;
 
 				default:

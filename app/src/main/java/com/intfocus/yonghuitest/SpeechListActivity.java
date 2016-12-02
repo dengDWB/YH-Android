@@ -42,7 +42,6 @@ public class SpeechListActivity extends BaseActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_speech_selector);
 
-
         mPlayButton = (CircleImageView) findViewById(R.id.btn_play);
         mPlayButton.setImageResource(R.drawable.btn_stop);
         mTts = SpeechReport.getmTts(mAppContext);
@@ -65,8 +64,8 @@ public class SpeechListActivity extends BaseActivity{
         String speechCachePath = FileUtil.dirPath(mAppContext, K.kHTMLDirName,"PlayData.plist");
         mSpeechList.add("播报列表初始化失败");
         try {
-            if (!new File(speechCachePath).exists()) {
-                mSpeechList.clear(); //
+            if (new File(speechCachePath).exists()) {
+                mSpeechList.clear();
                 JSONObject speechJson = FileUtil.readConfigFile(speechCachePath);
                 JSONArray speechArray = speechJson.getJSONArray("data");
                 for (int i = 0, len = speechArray.length(); i < len; i++) {
