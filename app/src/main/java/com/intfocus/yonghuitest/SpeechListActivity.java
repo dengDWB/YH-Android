@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.intfocus.yonghuitest.util.FileUtil;
 import com.intfocus.yonghuitest.util.K;
+import com.intfocus.yonghuitest.util.URLs;
 import com.intfocus.yonghuitest.view.CircleImageView;
 
 import org.json.JSONArray;
@@ -46,6 +48,8 @@ public class SpeechListActivity extends BaseActivity{
         mPlayButton.setImageResource(R.drawable.btn_stop);
         mTts = SpeechReport.getmTts(mAppContext);
 
+
+        initListView();
         Intent intent = getIntent();
         speechAudio = intent.getStringExtra("speechAudio");
         try {
@@ -57,7 +61,6 @@ public class SpeechListActivity extends BaseActivity{
             e.printStackTrace();
         }
 
-        initListView();
     }
 
     private void initListView(){
@@ -78,6 +81,7 @@ public class SpeechListActivity extends BaseActivity{
         }
 
         mListView = (ListView) findViewById(R.id.list_speech);
+        mListView.setOnItemClickListener(mItemClickListener);
         SpeechListActivity.ListArrayAdapter mArrayAdapter = new SpeechListActivity.ListArrayAdapter(this, R.layout.speech_list_item, mSpeechList);
         mListView.setAdapter(mArrayAdapter);
         mListView.setTextFilterEnabled(true);
@@ -117,6 +121,22 @@ public class SpeechListActivity extends BaseActivity{
             return listItem;
         }
     }
+
+    /*
+     * listview 点击事件
+     */
+    private AdapterView.OnItemClickListener mItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            try {
+                SpeechReport.speechNum = position + 1;
+                SpeechReport.startSpeechPlayer(mAppContext,speechArray);
+                mPlayButton.setImageResource(R.drawable.btn_stop);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
 
     /*
      * 返回
