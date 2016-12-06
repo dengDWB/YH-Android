@@ -38,6 +38,7 @@ public class SpeechListActivity extends BaseActivity{
     private CircleImageView mPlayButton;
     private String speechAudio;
     private JSONArray speechArray;
+    private SpeechListAdapter.ListArrayAdapter mArrayAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,20 +48,24 @@ public class SpeechListActivity extends BaseActivity{
         mPlayButton = (CircleImageView) findViewById(R.id.btn_play);
         mPlayButton.setImageResource(R.drawable.btn_stop);
         mTts = SpeechReport.getmTts(mAppContext);
-
-
+        initSpeechInfo();
         initListView();
-        Intent intent = getIntent();
-        speechAudio = intent.getStringExtra("speechAudio");
-        try {
-            speechArray = new JSONArray(speechAudio);
-            speechArray.put(0,"本次报表针对" + user.getString("role_name") + user.getString("group_name"));
+
+        if (!mTts.isSpeaking()) {
             SpeechReport.speechNum = 0;
             SpeechReport.startSpeechPlayer(mAppContext,speechArray);
+        }
+    }
+
+    private void initSpeechInfo() {
+        try {
+            Intent intent = getIntent();
+            speechAudio = intent.getStringExtra("speechAudio");
+            speechArray = new JSONArray(speechAudio);
+            speechArray.put(0,"本次报表针对" + user.getString("role_name") + user.getString("group_name"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
 
     private void initListView(){
@@ -69,6 +74,7 @@ public class SpeechListActivity extends BaseActivity{
         try {
             if (new File(speechCachePath).exists()) {
                 mSpeechList.clear();
+                mSpeechList.add("本次报表针对" + user.getString("role_name") + user.getString("group_name"));
                 JSONObject speechJson = FileUtil.readConfigFile(speechCachePath);
                 JSONArray speechArray = speechJson.getJSONArray("data");
                 for (int i = 0, len = speechArray.length(); i < len; i++) {
@@ -82,43 +88,22 @@ public class SpeechListActivity extends BaseActivity{
 
         mListView = (ListView) findViewById(R.id.list_speech);
         mListView.setOnItemClickListener(mItemClickListener);
-        SpeechListActivity.ListArrayAdapter mArrayAdapter = new SpeechListActivity.ListArrayAdapter(this, R.layout.speech_list_item, mSpeechList);
+        mArrayAdapter = SpeechListAdapter.SpeechListAdapter(this, R.layout.speech_list_item, mSpeechList);
         mListView.setAdapter(mArrayAdapter);
         mListView.setTextFilterEnabled(true);
     }
 
     public void onClick(View v) {
+        SpeechReport.speechNum = 0;
+        mArrayAdapter.notifyDataSetChanged();
         if (mTts.isSpeaking()){
+
             mTts.stopSpeaking();
             mPlayButton.setImageResource(R.drawable.btn_play);
         }
         else {
-            SpeechReport.speechNum = 0;
             SpeechReport.startSpeechPlayer(mAppContext,speechArray);
             mPlayButton.setImageResource(R.drawable.btn_stop);
-        }
-    }
-
-    public class ListArrayAdapter extends ArrayAdapter<String> {
-        private int resourceId;
-
-        public ListArrayAdapter(Context context, int textViewResourceId, List<String> items) {
-            super(context, textViewResourceId, items);
-            this.resourceId = textViewResourceId;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            String item = getItem(position).trim();
-            LinearLayout listItem = new LinearLayout(getContext());
-            String inflater = Context.LAYOUT_INFLATER_SERVICE;
-            LayoutInflater vi = (LayoutInflater) getContext().getSystemService(inflater);
-            vi.inflate(resourceId, listItem, true);
-            TextView viewItem = (TextView) listItem.findViewById(R.id.speechSelectorItem);
-            viewItem.setText(item);
-            viewItem.setBackgroundColor(Color.WHITE);
-
-            return listItem;
         }
     }
 
@@ -129,9 +114,10 @@ public class SpeechListActivity extends BaseActivity{
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             try {
-                SpeechReport.speechNum = position + 1;
+                SpeechReport.speechNum = position;
                 SpeechReport.startSpeechPlayer(mAppContext,speechArray);
                 mPlayButton.setImageResource(R.drawable.btn_stop);
+                mArrayAdapter.notifyDataSetChanged();
             } catch (Exception e) {
                 e.printStackTrace();
             }

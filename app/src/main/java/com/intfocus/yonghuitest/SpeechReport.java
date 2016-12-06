@@ -1,7 +1,6 @@
 package com.intfocus.yonghuitest;
 
 import android.content.Context;
-import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,12 +22,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
 
 /**
  * Created by liuruilin on 2016/11/15.
@@ -39,7 +33,8 @@ public class SpeechReport {
     private static MediaPlayer mediaPlayer;
     private static SpeechSynthesizer mTts;                            // 语音合成对象
     public static JSONArray speechArray;
-    public static int speechNum;
+    public static int speechNum = 0;
+    private static SpeechListAdapter.ListArrayAdapter mSpeechListAdapter;
 
     public static void startSpeechSynthesizer(Context mContext,String info) {
         context = mContext;
@@ -138,6 +133,8 @@ public class SpeechReport {
             if (speechNum <= speechArray.length()) {
                 speechNum++;
                 startSpeechPlayer(context,speechArray);
+                mSpeechListAdapter = SpeechListAdapter.getAdapter();
+                mSpeechListAdapter.notifyDataSetChanged();
             }
             else {
                 mTts.destroy();
