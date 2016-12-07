@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.intfocus.yonghuitest"
-    android:versionCode="256"
-    android:versionName="1.3.94"
+    android:versionCode="257"
+    android:versionName="1.3.95"
     android:hardwareAccelerated="false">
 
     <uses-permission android:name="android.permission.CAMERA" /> <!-- 扫描条形码或二维码 --><!-- 6.0 及以上系统需要在代码中动态注册 -->

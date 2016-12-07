@@ -105,7 +105,6 @@ public class SpeechReport {
             Uri uri = Uri.fromFile(new File("./sdcard/iflytek.wav"));
             mediaPlayer = MediaPlayer.create(context,uri);
             mediaPlayer.start();
-            Log.i("voicePlay",mediaPlayer.getDuration() + " is time");
         }
 
         //缓冲进度回调

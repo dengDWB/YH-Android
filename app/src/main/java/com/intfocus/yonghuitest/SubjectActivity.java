@@ -18,6 +18,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -215,7 +218,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 						break;
 					}
 					//开始合成
-					mProgressDialog = ProgressDialog.show(SubjectActivity.this,"稍等","正在合成数据");
 					new Thread(new Runnable() {
 						@Override
 						public void run() {
@@ -232,16 +234,11 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 										speechInfo = userInfo + speechInfo;
 										SpeechReport.startSpeechSynthesizer(mAppContext,speechInfo);
 									}
-
-									if (mProgressDialog != null) {
-										mProgressDialog.dismiss();
-									}
 								} catch (JSONException e) {
 								e.printStackTrace();
 							}
 						}
 					}).start();
-
 					break;
 
 				default:
