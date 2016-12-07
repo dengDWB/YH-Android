@@ -438,6 +438,9 @@ public class SettingActivity extends BaseActivity {
     class DownloadGravatar extends AsyncTask<String,Void,Bitmap> {
         @Override
         protected Bitmap doInBackground(String... params) {
+            if (gravatarUrl == null || gravatarUrl.equals("")) {
+                return null;
+            }
             Bitmap imgBmp = HttpUtil.httpGetBitmap(gravatarUrl);
             return imgBmp;
         }
@@ -659,9 +662,11 @@ public class SettingActivity extends BaseActivity {
                         /*
                          * 获取头像下载链接,准备重新下载头像
                          */
-                        gravatarUrl = user.getString(kGravatar);
-                        gravatarImgName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/") + 1, gravatarUrl.length());
-                        gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, gravatarImgName);
+                        if (user.has(kGravatar)) {
+                            gravatarUrl = user.getString(kGravatar);
+                            gravatarImgName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/") + 1, gravatarUrl.length());
+                            gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, gravatarImgName);
+                        }
 
                         /*
                          * 检测服务器静态资源是否更新，并下载
