@@ -116,6 +116,9 @@ public class YHApplication extends Application {
                             }
                             // onRegistered方法的参数registrationId即是device_token
                             String pushConfigPath = String.format("%s/%s", FileUtil.basePath(appContext), K.kPushConfigFileName );
+                            if (new File(pushConfigPath).exists()) {
+                                new File(pushConfigPath).delete();
+                            }
                             JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
                             pushJSON.put(K.kPushIsValid, false);
                             pushJSON.put(kPushDeviceToken, registrationId);

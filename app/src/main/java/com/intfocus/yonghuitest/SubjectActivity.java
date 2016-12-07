@@ -40,15 +40,13 @@ import com.umeng.socialize.UMShareAPI;
 import com.umeng.socialize.UMShareListener;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.media.UMImage;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import static android.webkit.WebView.enableSlowWholeDocumentDraw;
 import static com.intfocus.yonghuitest.util.PrivateURLs.kBaseUrl;
@@ -409,8 +407,10 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
                         /*
                          * 外部链接传参: user_num, timestamp
                          */
-						String appendParams = String.format("?user_num=%s&timestamp=%s", userNum, URLs.timestamp());
-						urlString = urlString.contains("?") ? urlString.replace("?", appendParams) : String.format("%s%s", urlString, appendParams);
+						mWebView.getSettings().setDomStorageEnabled(true);
+						String appendParams = String.format("user_num=%s&timestamp=%s", userNum, URLs.timestamp());
+						String splitString = urlString.contains("?") ? "&" : "?";
+						urlString = String.format("%s%s%s", urlString, splitString, appendParams);
 						mWebView.loadUrl(urlString);
 						Log.i("OutLink", urlString);
 					}

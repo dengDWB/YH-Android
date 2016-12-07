@@ -52,8 +52,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
-
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -86,7 +84,6 @@ public class SettingActivity extends BaseActivity {
     private TextView mCheckThursdaySay;
     private Context mContext;
     private PushAgent mPushAgent;
-    private SharedPreferences mSharedPreferences;
 
     /* 请求识别码 */
     private static final int CODE_GALLERY_REQUEST = 0xa0;
@@ -99,6 +96,7 @@ public class SettingActivity extends BaseActivity {
         setContentView(R.layout.activity_setting);
 
         mContext = this;
+
         mPushAgent = PushAgent.getInstance(mContext);
 
         mUserID = (TextView) findViewById(R.id.user_id);
@@ -177,13 +175,18 @@ public class SettingActivity extends BaseActivity {
      */
     private void initializeUI() {
         try {
+            String deviceToken  = mPushAgent.getRegistrationId();
+            if (deviceToken.length() == 44) {
+                mPushState.setText("开启");
+            }
+        }catch (NullPointerException e){
+            mPushState.setText("关闭");
+        }
+
+        try {
             mUserID.setText(user.getString("user_name"));
             mRoleID.setText(user.getString("role_name"));
             mGroupID.setText(user.getString("group_name"));
-
-            mSharedPreferences = getSharedPreferences("PushServerState",
-                    Activity.MODE_PRIVATE);
-            mPushState.setText(mSharedPreferences.getBoolean("state",false) ? "开启" : "关闭");
             mAppName.setText(getApplicationName(SettingActivity.this));
             String deviceInfo = String.format("%s(Android %s)", TextUtils.split(android.os.Build.MODEL, " - ")[0], Build.VERSION.RELEASE);
             mDeviceID.setText(deviceInfo);
