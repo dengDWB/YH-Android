@@ -6,12 +6,14 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -28,6 +30,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
+import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.SpeechSynthesizer;
+import com.iflytek.cloud.SpeechUtility;
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
 import com.intfocus.yonghuitest.util.K;
@@ -38,6 +43,7 @@ import com.intfocus.yonghuitest.view.TabView;
 import com.pgyersdk.update.PgyUpdateManager;
 import com.readystatesoftware.viewbadger.BadgeView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -48,6 +54,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.intfocus.yonghuitest.util.PrivateURLs.kBaseUrl;
 import static com.intfocus.yonghuitest.util.URLs.kGroupId;
 
 public class DashboardActivity extends BaseActivity {
@@ -70,6 +77,7 @@ public class DashboardActivity extends BaseActivity {
 	private String currentUIVersion = "";
 
 	private Context mContext;
+	private MediaPlayer mediaPlayer;
 
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
@@ -104,14 +112,17 @@ public class DashboardActivity extends BaseActivity {
 		/*
 		 * 语音播报初始化
 		 */
-//		SpeechUtility.createUtility(mAppContext, "appid=581aa9e1");
+		SpeechUtility.createUtility(mAppContext, "appid=581aa9e1");
 
 		/*
          * 动态注册广播用于接收通知
 		 */
 		initNotificationService();
 
+		mediaPlayer = SpeechReport.getMediaPlayer();
+
 		dealSendMessage();
+
 		if (urlStrings.get(3).equals(urlString)) {
 			setWebViewLongListener(false);
 		}
@@ -197,15 +208,15 @@ public class DashboardActivity extends BaseActivity {
 						break;
 					case "analyse":
 						jumpTab(mTabAnalyse);
-						urlString = String.format(K.kAnalyseMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+						urlString = String.format(K.kAnalyseMobilePath, kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 						break;
 					case "app":
 						jumpTab(mTabAPP);
-						urlString = String.format(K.kAppMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+						urlString = String.format(K.kAppMobilePath, kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 						break;
 					case "message":
 						jumpTab(mTabMessage);
-						urlString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(kGroupId), user.getString(kUserId));
+						urlString = String.format(K.kMessageMobilePath, kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(kGroupId), user.getString(kUserId));
 						break;
 					case "thursday_say":
 						Intent blogLinkIntent = new Intent(DashboardActivity.this, ThursdaySayActivity.class);
@@ -266,7 +277,31 @@ public class DashboardActivity extends BaseActivity {
 					break;
 
 				case "语音播报":
-					toast("功能开发中，敬请期待");
+					mProgressDialog = ProgressDialog.show(DashboardActivity.this, "稍等", "正在合成数据...");
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								String urlString = String.format("%s/api/v1/group/%d/role/%d/audio", kBaseUrl, user.getInt("group_id"), user.getInt("role_id"));
+								final String speechAudio = SpeechReport.infoProcess(mAppContext, urlString, "kpi");
+
+								if (speechAudio.equals("语音合成错误")) {
+									toast("语音合成错误");
+								}
+								else {
+									Intent intent = new Intent(DashboardActivity.this, SpeechListActivity.class);
+									intent.putExtra("speechAudio", speechAudio);
+									startActivity(intent);
+								}
+
+								if (mProgressDialog != null) {
+									mProgressDialog.dismiss();
+								}
+							} catch (JSONException e) {
+								e.printStackTrace();
+							}
+						}
+					}).start();
 					break;
 
 				case "搜索":
@@ -555,7 +590,7 @@ public class DashboardActivity extends BaseActivity {
 				switch (v.getId()) {
 					case R.id.tabKPI:
 						objectType = 1;
-						urlString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(
+						urlString = String.format(K.kKPIMobilePath, kBaseUrl, currentUIVersion, user.getString(
 								kGroupId), user.getString(URLs.kRoleId));
 
 						bvKpi.setVisibility(View.GONE);
@@ -564,7 +599,7 @@ public class DashboardActivity extends BaseActivity {
 						break;
 					case R.id.tabAnalyse:
 						objectType = 2;
-						urlString = String.format(K.kAnalyseMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+						urlString = String.format(K.kAnalyseMobilePath, kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 
 						bvAnalyse.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabAnalyse, 0);
@@ -572,7 +607,7 @@ public class DashboardActivity extends BaseActivity {
 						break;
 					case R.id.tabApp:
 						objectType = 3;
-						urlString = String.format(K.kAppMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+						urlString = String.format(K.kAppMobilePath, kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 
 						bvApp.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabApp, 0);
@@ -580,7 +615,7 @@ public class DashboardActivity extends BaseActivity {
 						break;
 					case R.id.tabMessage:
 						objectType = 5;
-						urlString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(kGroupId), user.getString(kUserId));
+						urlString = String.format(K.kMessageMobilePath, kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(kGroupId), user.getString(kUserId));
 
 						bvMessage.setVisibility(View.GONE);
 						notificationJSON.put(URLs.kTabMessage, 0);
@@ -589,7 +624,7 @@ public class DashboardActivity extends BaseActivity {
 						break;
 					default:
 						objectType = 1;
-						urlString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(
+						urlString = String.format(K.kKPIMobilePath, kBaseUrl, currentUIVersion, user.getString(
 								kGroupId), user.getString(URLs.kRoleId));
 
 						bvKpi.setVisibility(View.GONE);
@@ -742,17 +777,17 @@ public class DashboardActivity extends BaseActivity {
 		String currentUIVersion = URLs.currentUIVersion(mAppContext);
 		String tmpString;
 		try {
-			tmpString = String.format(K.kKPIMobilePath, K.kBaseUrl, currentUIVersion, user.getString(
+			tmpString = String.format(K.kKPIMobilePath, kBaseUrl, currentUIVersion, user.getString(
 					kGroupId), user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
-			tmpString = String.format(K.kAnalyseMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+			tmpString = String.format(K.kAnalyseMobilePath, kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
-			tmpString = String.format(K.kAppMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
+			tmpString = String.format(K.kAppMobilePath, kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId));
 			urlStrings.add(tmpString);
-			tmpString = String.format(K.kMessageMobilePath, K.kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(
+			tmpString = String.format(K.kMessageMobilePath, kBaseUrl, currentUIVersion, user.getString(URLs.kRoleId), user.getString(
 					kGroupId), user.getString(kUserId));
 			urlStrings.add(tmpString);
-			tmpString = String.format(K.kThursdaySayMobilePath, K.kBaseUrl, currentUIVersion);
+			tmpString = String.format(K.kThursdaySayMobilePath, kBaseUrl, currentUIVersion);
 			urlStrings.add(tmpString);
 		} catch (JSONException e) {
 			e.printStackTrace();

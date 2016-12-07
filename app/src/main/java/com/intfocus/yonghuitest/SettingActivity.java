@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
@@ -32,6 +33,7 @@ import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.intfocus.yonghuitest.screen_lock.InitPassCodeActivity;
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
@@ -115,7 +117,7 @@ public class SettingActivity extends BaseActivity {
         Button mLogout = (Button) findViewById(R.id.logout);
         mLockSwitch = (Switch) findViewById(R.id.lock_switch);
         mDashboardSwitch = (Switch) findViewById(R.id.dashboard_switch);
-        mIconImageView =(CircleImageView) findViewById(R.id.img_icon);
+        mIconImageView = (CircleImageView) findViewById(R.id.img_icon);
         mCheckThursdaySay = (TextView) findViewById(R.id.check_thursday_say);
 
         screenLockInfo = "取消锁屏成功";
@@ -126,8 +128,8 @@ public class SettingActivity extends BaseActivity {
             String betaConfigPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kBetaConfigFileName);
             JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
             if (!betaJSON.has("image_within_screen")) {
-                betaJSON.put("image_within_screen",true);
-                FileUtil.writeFile(betaConfigPath,betaJSON.toString());
+                betaJSON.put("image_within_screen", true);
+                FileUtil.writeFile(betaConfigPath, betaJSON.toString());
             }
             mLongCatSwitch = (Switch) findViewById(R.id.longcat_switch);
             mLongCatSwitch.setChecked(betaJSON.has("image_within_screen") && betaJSON.getBoolean("image_within_screen"));
@@ -167,6 +169,7 @@ public class SettingActivity extends BaseActivity {
         PgyUpdateManager.unregister(); // 解除注册蒲公英版本更新检查
         super.onDestroy();
     }
+
     /*
      * 初始化界面内容
      */
@@ -185,7 +188,7 @@ public class SettingActivity extends BaseActivity {
             mRoleID.setText(user.getString("role_name"));
             mGroupID.setText(user.getString("group_name"));
             mAppName.setText(getApplicationName(SettingActivity.this));
-            String deviceInfo = String.format("%s(Android %s)",TextUtils.split(android.os.Build.MODEL, " - ")[0],Build.VERSION.RELEASE);
+            String deviceInfo = String.format("%s(Android %s)", TextUtils.split(android.os.Build.MODEL, " - ")[0], Build.VERSION.RELEASE);
             mDeviceID.setText(deviceInfo);
             mApiDomain.setText(K.kBaseUrl.replace("http://", "").replace("https://", ""));
 
@@ -210,7 +213,7 @@ public class SettingActivity extends BaseActivity {
 
             String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPgyerVersionConfigFileName),
                     betaLink = "", pgyerInfo = "";
-            if((new File(pgyerVersionPath)).exists()) {
+            if ((new File(pgyerVersionPath)).exists()) {
                 JSONObject pgyerJSON = FileUtil.readConfigFile(pgyerVersionPath);
                 JSONObject responseData = pgyerJSON.getJSONObject(URLs.kData);
                 pgyerInfo = String.format("%s(%s)", responseData.getString("versionName"), responseData.getString("versionCode"));
@@ -228,14 +231,13 @@ public class SettingActivity extends BaseActivity {
 
     private static String getApplicationName(Context context) {
         int stringId = context.getApplicationInfo().labelRes;
-        Log.i("getactivity",context.getString(stringId));
         return context.getString(stringId);
     }
 
     final View.OnClickListener mCheckUpgradeListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            checkPgyerVersionUpgrade(SettingActivity.this,true);
+            checkPgyerVersionUpgrade(SettingActivity.this, true);
             bvCheckUpgrade.setVisibility(View.GONE);
 
             /*
@@ -254,12 +256,12 @@ public class SettingActivity extends BaseActivity {
     private final View.OnClickListener mIconImageViewListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            int cameraPermission = ContextCompat.checkSelfPermission(mAppContext,Manifest.permission.CAMERA);
-            if(cameraPermission != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(SettingActivity.this,new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},CODE_CAMERA_REQUEST);
+            int cameraPermission = ContextCompat.checkSelfPermission(mAppContext, Manifest.permission.CAMERA);
+            if (cameraPermission != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(SettingActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, CODE_CAMERA_REQUEST);
                 return;
-            }else{
-                popupWindow.showAtLocation(mIconImageView, Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
+            } else {
+                popupWindow.showAtLocation(mIconImageView, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
             }
         }
     };
@@ -267,9 +269,9 @@ public class SettingActivity extends BaseActivity {
     public void initIconMenu() {
         final View iconMenuView = LayoutInflater.from(this).inflate(R.layout.activity_icon_dialog, null);
 
-        Button btnTakePhoto =(Button) iconMenuView.findViewById(R.id.btn_icon_takephoto);
-        Button btnGetPhoto  =(Button) iconMenuView.findViewById(R.id.btn_icon_getphoto);
-        Button btnCancel =(Button) iconMenuView.findViewById(R.id.btn_icon_cancel);
+        Button btnTakePhoto = (Button) iconMenuView.findViewById(R.id.btn_icon_takephoto);
+        Button btnGetPhoto = (Button) iconMenuView.findViewById(R.id.btn_icon_getphoto);
+        Button btnCancel = (Button) iconMenuView.findViewById(R.id.btn_icon_cancel);
 
         popupWindow = new PopupWindow(this);
         popupWindow.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
@@ -302,14 +304,14 @@ public class SettingActivity extends BaseActivity {
     }
 
     /*
-	 * 权限获取反馈
+     * 权限获取反馈
 	 */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case CODE_CAMERA_REQUEST:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    popupWindow.showAtLocation(mIconImageView, Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
+                    popupWindow.showAtLocation(mIconImageView, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
                 } else {
                     Toast.makeText(SettingActivity.this, "权限获取失败，请重试", Toast.LENGTH_SHORT)
                             .show();
@@ -332,9 +334,9 @@ public class SettingActivity extends BaseActivity {
      * 获取相册图片
      */
     private void getGallery() {
-        Intent intentFromGallery = new Intent(Intent.ACTION_PICK,null);
-        intentFromGallery.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,"image/*");
-        startActivityForResult(intentFromGallery,CODE_GALLERY_REQUEST);
+        Intent intentFromGallery = new Intent(Intent.ACTION_PICK, null);
+        intentFromGallery.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+        startActivityForResult(intentFromGallery, CODE_GALLERY_REQUEST);
     }
 
     /*
@@ -348,9 +350,8 @@ public class SettingActivity extends BaseActivity {
          */
         if (hasSdcard()) {
             intentFromCapture.putExtra(MediaStore.EXTRA_OUTPUT, Uri.
-                    fromFile(new File(Environment.getExternalStorageDirectory(),"icon.jpg")));
-        }
-        else {
+                    fromFile(new File(Environment.getExternalStorageDirectory(), "icon.jpg")));
+        } else {
             try {
                 logParams = new JSONObject();
                 logParams.put("action", "头像/拍照");
@@ -361,11 +362,11 @@ public class SettingActivity extends BaseActivity {
             }
         }
 
-        startActivityForResult(intentFromCapture,CODE_CAMERA_REQUEST);
+        startActivityForResult(intentFromCapture, CODE_CAMERA_REQUEST);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode,Intent intent) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         // 用户没有选择图片，返回
         if (resultCode == RESULT_CANCELED) {
             Toast.makeText(getApplication(), "取消", Toast.LENGTH_LONG).show();
@@ -377,7 +378,7 @@ public class SettingActivity extends BaseActivity {
                 cropPhoto(intent.getData());
                 break;
             case CODE_CAMERA_REQUEST:
-                File tempFile = new File(Environment.getExternalStorageDirectory(),"icon.jpg");
+                File tempFile = new File(Environment.getExternalStorageDirectory(), "icon.jpg");
                 cropPhoto(Uri.fromFile(tempFile));
                 break;
             default:
@@ -395,9 +396,9 @@ public class SettingActivity extends BaseActivity {
     public void cropPhoto(Uri uri) {
         Intent intent = new Intent("com.android.camera.action.CROP");
         if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.KITKAT) {
-            String url=FileUtil.getBitmapUrlPath(this, uri);
+            String url = FileUtil.getBitmapUrlPath(this, uri);
             intent.setDataAndType(Uri.fromFile(new File(url)), "image/*");
-        }else{
+        } else {
             intent.setDataAndType(uri, "image/*");
         }
         intent.putExtra("crop", "true");
@@ -407,7 +408,7 @@ public class SettingActivity extends BaseActivity {
         // outputX outputY 是裁剪图片宽高
         intent.putExtra("outputX", 150);
         intent.putExtra("outputY", 150);
-        intent.putExtra("return-data",true);
+        intent.putExtra("return-data", true);
         startActivityForResult(intent, CODE_RESULT_REQUEST);
     }
 
@@ -437,6 +438,9 @@ public class SettingActivity extends BaseActivity {
     class DownloadGravatar extends AsyncTask<String,Void,Bitmap> {
         @Override
         protected Bitmap doInBackground(String... params) {
+            if (gravatarUrl == null || gravatarUrl.equals("")) {
+                return null;
+            }
             Bitmap imgBmp = HttpUtil.httpGetBitmap(gravatarUrl);
             return imgBmp;
         }
@@ -451,6 +455,7 @@ public class SettingActivity extends BaseActivity {
             super.onPostExecute(imgBmp);
         }
     }
+
 
     /*
      * 头像上传
@@ -512,7 +517,7 @@ public class SettingActivity extends BaseActivity {
 
     }
 
-    public String getDate(){
+    public String getDate() {
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
         Date date = new Date(System.currentTimeMillis());
         return format.format(date);
@@ -540,7 +545,7 @@ public class SettingActivity extends BaseActivity {
             notificationJson.put(URLs.kSettingThursdaySay, 0);
             FileUtil.writeFile(noticePath, notificationJson.toString());
 
-            Intent blogLinkIntent = new Intent(SettingActivity.this,ThursdaySayActivity.class);
+            Intent blogLinkIntent = new Intent(SettingActivity.this, ThursdaySayActivity.class);
             blogLinkIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(blogLinkIntent);
         } catch (JSONException | IOException e) {
@@ -657,17 +662,19 @@ public class SettingActivity extends BaseActivity {
                         /*
                          * 获取头像下载链接,准备重新下载头像
                          */
-                        gravatarUrl = user.getString(kGravatar);
-                        gravatarImgName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/") + 1, gravatarUrl.length());
-                        gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, gravatarImgName);
+                        if (user.has(kGravatar)) {
+                            gravatarUrl = user.getString(kGravatar);
+                            gravatarImgName = gravatarUrl.substring(gravatarUrl.lastIndexOf("/") + 1, gravatarUrl.length());
+                            gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, gravatarImgName);
+                        }
 
                         /*
                          * 检测服务器静态资源是否更新，并下载
                          */
                         runOnUiThread(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 new DownloadGravatar().execute(); //校正头像,必须在主线程运行
-
                                 checkAssetsUpdated(false);
 
                                 FileUtil.checkAssets(mAppContext, URLs.kAssets, false);
@@ -697,12 +704,12 @@ public class SettingActivity extends BaseActivity {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             Log.i("onCheckedChanged", isChecked ? "ON" : "OFF");
-            if(isChecked) {
+            if (isChecked) {
                 startActivity(InitPassCodeActivity.createIntent(mContext));
             } else {
                 try {
                     String userConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kUserConfigFileName);
-                    if((new File(userConfigPath)).exists()) {
+                    if ((new File(userConfigPath)).exists()) {
                         JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
                         userJSON.put(URLs.kUseGesturePassword, false);
                         userJSON.put(URLs.kGesturePassword, "");
@@ -725,14 +732,11 @@ public class SettingActivity extends BaseActivity {
                 logParams = new JSONObject();
                 logParams.put(URLs.kAction, String.format("点击/设置页面/%s锁屏", isChecked ? "开启" : "禁用"));
                 new Thread(mRunnableForLogger).start();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     };
-
-
 
 
     /*
@@ -786,7 +790,7 @@ public class SettingActivity extends BaseActivity {
      */
     private void setSettingViewControlBadges() {
         String notificationPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kLocalNotificationConfigFileName);
-        if(!(new File(notificationPath)).exists()) {
+        if (!(new File(notificationPath)).exists()) {
             return;
         }
 
@@ -802,8 +806,7 @@ public class SettingActivity extends BaseActivity {
                 mWarnPWD.setText("请修改初始密码");
                 mChangePWD.setText("   修改登录密码");
                 RedPointView.showRedPoint(mAppContext, URLs.kSettingPassword, bvChangePWD);
-            }
-            else {
+            } else {
                 mWarnPWD.setVisibility(View.GONE);
                 mChangePWD.setText("修改登录密码");
                 bvChangePWD.setVisibility(View.GONE);
@@ -822,7 +825,7 @@ public class SettingActivity extends BaseActivity {
                 notificationJSON.put(URLs.kSettingPgyer, 0);
             }
 
-            if (notificationJSON.getInt(URLs.kSettingThursdaySay) > 0){
+            if (notificationJSON.getInt(URLs.kSettingThursdaySay) > 0) {
                 mCheckThursdaySay.setText("   小四说");
                 RedPointView.showRedPoint(mAppContext, URLs.kSettingThursdaySay, bvCheckThursdaySay);
             }

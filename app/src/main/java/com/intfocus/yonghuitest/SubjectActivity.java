@@ -1,12 +1,14 @@
 package com.intfocus.yonghuitest;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +18,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -23,9 +28,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
-import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
@@ -40,17 +43,16 @@ import com.umeng.socialize.UMShareAPI;
 import com.umeng.socialize.UMShareListener;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.media.UMImage;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import static android.webkit.WebView.enableSlowWholeDocumentDraw;
+import static com.intfocus.yonghuitest.util.PrivateURLs.kBaseUrl;
 import static java.lang.String.format;
 
 public class SubjectActivity extends BaseActivity implements OnPageChangeListener, OnLoadCompleteListener, OnErrorOccurredListener {
@@ -64,11 +66,13 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	private RelativeLayout bannerView;
 	private ArrayList<HashMap<String, Object>> listItem;
 	private Context mContext;
-
+	private MediaPlayer mediaPlayer;
+	private ImageView mBannerSetting;
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		/*
 		 * 判断当前设备版本，5.0 以上 Android 系统使用才 enableSlowWholeDocumentDraw();
 		 */
@@ -78,6 +82,9 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		setContentView(R.layout.activity_subject);
 
 		mContext = SubjectActivity.this;
+
+		//创建SpeechSynthesizer对象
+		mediaPlayer = SpeechReport.getMediaPlayer();
 
 		/*
 		 * JSON Data
@@ -111,7 +118,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 
 	private void initActiongBar(){
 		bannerView = (RelativeLayout) findViewById(R.id.actionBar);
-		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
+		mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 		TextView mTitle = (TextView) findViewById(R.id.bannerTitle);
 
 		/*
@@ -137,7 +144,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	 */
 	public void launchDropMenuActivity(View v) {
 		initDropMenuItem();
-		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
 		popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
 
 		/*
@@ -157,11 +163,11 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	 */
 	private void initDropMenuItem() {
 		listItem = new ArrayList<>();
-		String[] itemName = {"分享", "评论", "刷新"};
+		String[] itemName = {"分享", "评论", "刷新","语音播报"};
 		int[] itemImage = {R.drawable.banner_share,
 					R.drawable.banner_comment,
-					R.drawable.btn_refresh};
-//					mTts.isSpeaking() ? R.drawable.btn_stop : R.drawable.btn_play};
+					R.drawable.btn_refresh,
+					mediaPlayer.isPlaying() ? R.drawable.btn_stop : R.drawable.btn_play};
 		for (int i = 0; i < itemName.length; i++) {
 			HashMap<String, Object> map = new HashMap<>();
 			map.put("ItemImage", itemImage[i]);
@@ -205,6 +211,36 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 					refresh(arg1);
 					break;
 
+				case "语音播报":
+					// 若正在播报,停止
+					if (mediaPlayer.isPlaying()) {
+						mediaPlayer.stop();
+						break;
+					}
+					//开始合成
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+								try {
+									reportID = TextUtils.split(link, "/")[8];
+									String urlString = String.format("%s/api/v1/group/%d/role/%d/report/%s/audio",kBaseUrl,user.getInt("group_id"),user.getInt("role_id"),reportID);
+									String speechInfo = SpeechReport.infoProcess(mAppContext,urlString,"report");
+
+									if (speechInfo.equals("语音合成错误")) {
+										toast("语音合成错误");
+									}
+									else {
+										String userInfo = "本次报表针对" + user.getString("role_name") + user.getString("group_name");
+										speechInfo = userInfo + speechInfo;
+										SpeechReport.startSpeechSynthesizer(mAppContext,speechInfo);
+									}
+								} catch (JSONException e) {
+								e.printStackTrace();
+							}
+						}
+					}).start();
+					break;
+
 				default:
 					break;
 			}
@@ -212,7 +248,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	};
 
 	public void onResume() {
-
 		checkInterfaceOrientation(this.getResources().getConfiguration());
 		mMyApp.setCurrentActivity(this);
 		isWeiXinShared = false;
