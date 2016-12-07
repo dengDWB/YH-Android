@@ -351,9 +351,12 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					ApiHelper.reportData(mAppContext, String.format("%d", groupID), templateID, reportID);
-
-					new Thread(mRunnableForDetecting).start();
+					boolean reportDataState = ApiHelper.reportData(mAppContext, String.format("%d", groupID), templateID, reportID);
+					if (reportDataState){
+						new Thread(mRunnableForDetecting).start();
+					}else {
+						showWebViewForWithoutNetwork();
+					}
 				}
 			}).start();
 		} else {
@@ -585,8 +588,12 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 				urlKey = String.format(K.kReportDataAPIPath, K.kBaseUrl, groupID, templateID, reportID);
 				ApiHelper.clearResponseHeader(urlKey, FileUtil.sharedPath(mAppContext));
 
-				ApiHelper.reportData(mAppContext, String.format("%d", groupID), templateID, reportID);
-				new Thread(mRunnableForDetecting).start();
+				boolean reportDataState = ApiHelper.reportData(mAppContext, String.format("%d", groupID), templateID, reportID);
+				if (reportDataState){
+					new Thread(mRunnableForDetecting).start();
+				}else {
+					showWebViewForWithoutNetwork();
+				}
                 /*
                  * 用户行为记录, 单独异常处理，不可影响用户体验
                  */
@@ -696,5 +703,17 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			}
 			return item;
 		}
+	}
+
+	private void showWebViewForWithoutNetwork() {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				// 没有使用动画的界面,调用此方法会报空指针异常
+				animLoading.setVisibility(View.GONE);
+				String urlStringForLoading = loadingPath("400");
+				mWebView.loadUrl(urlStringForLoading);
+			}
+		});
 	}
 }

@@ -94,6 +94,7 @@ public class HttpUtil {
             retMap.put(URLs.kCode, "400");
             retMap.put(URLs.kBody, "{\"info\": \"请检查网络环境！\"}");
         } catch (Exception e) {
+            Log.i("Exception4",e.toString());
             // Default Response
             retMap.put(URLs.kCode, "400");
             retMap.put(URLs.kBody, "{\"info\": \"请检查网络环境！\"}");
@@ -500,6 +501,8 @@ public class HttpUtil {
             connection.setRequestProperty("accept", "*/*");
             connection.setRequestProperty("connection", "Keep-Alive");
             connection.setRequestProperty("user-agent", HttpUtil.webViewUserAgent());
+            connection.setConnectTimeout(10 * 1000);
+            connection.setReadTimeout(10 * 1000);
             if (headers.containsKey(URLs.kETag)) {
                 connection.setRequestProperty("IF-None-Match", headers.get(URLs.kETag));
             }
@@ -537,6 +540,7 @@ public class HttpUtil {
         }
         catch (Exception e) {
             LogUtil.d("Exception", e.toString());
+            response.put(URLs.kCode,"400");
             return response;
         }
         finally {
