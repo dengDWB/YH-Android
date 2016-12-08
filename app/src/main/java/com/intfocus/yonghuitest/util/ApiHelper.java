@@ -106,7 +106,7 @@ public class ApiHelper {
     /*
      *  获取报表网页数据
      */
-    public static void reportData(Context context, String groupID, String templateID, String reportID) {
+    public static boolean reportData(Context context, String groupID, String templateID, String reportID) {
         String urlString = String.format(K.kReportDataAPIPath, K.kBaseUrl, groupID, templateID, reportID);
         String javascriptPath = FileUtil.reportJavaScriptDataPath(context, groupID, templateID, reportID);
 
@@ -118,11 +118,11 @@ public class ApiHelper {
 
         //添加code字段是否存在。原因:网络不好的情况下response为{}
         if (!response.containsKey(URLs.kCode)) {
-            return ;
+            return false;
         }
 
         if (!response.get(URLs.kCode).equals("200") || !(new File(cachedZipPath)).exists()) {
-            return ;
+            return false;
         }
 
         try {
@@ -146,7 +146,9 @@ public class ApiHelper {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
+        return true;
     }
 
     /*
