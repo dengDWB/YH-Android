@@ -53,7 +53,7 @@ public class HttpUtil {
         LogUtil.d("GET", urlString);
         Map<String, String> retMap = new HashMap<>();
         OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(10, TimeUnit.SECONDS)
+                .connectTimeout(5, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(10, TimeUnit.SECONDS)
                 .build();
@@ -121,7 +121,7 @@ public class HttpUtil {
      */
     public static Bitmap httpGetBitmap(String urlString) {
         OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(10, TimeUnit.SECONDS)
+                .connectTimeout(5, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(10, TimeUnit.SECONDS)
                 .build();
@@ -308,7 +308,7 @@ public class HttpUtil {
     public static Map<String,String> httpPostFile(String urlString,String fileType,String fileKey,String filePath) {
         Map<String, String> retMap = new HashMap<>();
         OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(10, TimeUnit.SECONDS)
+                .connectTimeout(5, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(10, TimeUnit.SECONDS)
                 .build();
@@ -500,6 +500,8 @@ public class HttpUtil {
             connection.setRequestProperty("accept", "*/*");
             connection.setRequestProperty("connection", "Keep-Alive");
             connection.setRequestProperty("user-agent", HttpUtil.webViewUserAgent());
+            connection.setConnectTimeout(5 * 1000);
+            connection.setReadTimeout(10 * 1000);
             if (headers.containsKey(URLs.kETag)) {
                 connection.setRequestProperty("IF-None-Match", headers.get(URLs.kETag));
             }
@@ -537,6 +539,7 @@ public class HttpUtil {
         }
         catch (Exception e) {
             LogUtil.d("Exception", e.toString());
+            response.put(URLs.kCode,"400");
             return response;
         }
         finally {
