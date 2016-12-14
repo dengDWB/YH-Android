@@ -26,6 +26,7 @@ import static com.intfocus.yonghuitest.util.K.kFontsMd5;
 import static com.intfocus.yonghuitest.util.K.kImagesMd5;
 import static com.intfocus.yonghuitest.util.K.kInfo;
 import static com.intfocus.yonghuitest.util.K.kUserName;
+import static com.intfocus.yonghuitest.util.PrivateURLs.kAppCode;
 
 public class ApiHelper {
     /*
@@ -108,8 +109,6 @@ public class ApiHelper {
      */
     public static boolean reportData(Context context, String groupID, String templateID, String reportID) {
         String urlString = String.format(K.kReportDataAPIPath, K.kBaseUrl, groupID, templateID, reportID);
-        String javascriptPath = FileUtil.reportJavaScriptDataPath(context, groupID, templateID, reportID);
-
         String assetsPath = FileUtil.sharedPath(context);
         Map<String, String> headers = ApiHelper.checkResponseHeader(urlString, assetsPath);
         String jsFileName = String.format("group_%s_template_%s_report_%s.js", groupID, templateID, reportID);
@@ -121,11 +120,28 @@ public class ApiHelper {
             return false;
         }
 
-        if (!response.get(URLs.kCode).equals("200") || !(new File(cachedZipPath)).exists()) {
-            return false;
+        String codeStatus = response.get(URLs.kCode);
+
+        switch (codeStatus) {
+            case "200":
+            case "201":
+                break;
+            case "304":
+                return true;
+            default:
+                return false;
         }
 
         try {
+            //获取的内容为attachment; filename="group_%s_template_%s_report_%s.js.zip"
+            String contentDis = response.get("Content-Disposition");
+
+            //获取的内容为 group_%s_template_%s_report_%s.js.zip
+            String subContentDis = contentDis.substring(contentDis.indexOf("\"")+1, contentDis.lastIndexOf("\""));
+
+            jsFileName = subContentDis.replace(".zip", "");
+            String javascriptPath = String.format("%s/assets/javascripts/%s", assetsPath, jsFileName);
+
             ApiHelper.storeResponseHeader(urlString, assetsPath, response);
 
             InputStream zipStream = new FileInputStream(cachedZipPath);

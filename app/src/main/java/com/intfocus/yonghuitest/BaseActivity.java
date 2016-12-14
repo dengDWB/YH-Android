@@ -478,6 +478,7 @@ public class BaseActivity extends Activity {
                 LogUtil.d("httpGetWithHeader", String.format("url: %s, assets: %s, relativeAssets: %s", mUrlString, mAssetsPath, mRelativeAssetsPath));
                 Map<String, String> response = ApiHelper.httpGetWithHeader(mUrlString, mAssetsPath, mRelativeAssetsPath);
 
+
                 Looper.prepare();
                 HandlerWithAPI mHandlerWithAPI = new HandlerWithAPI(weakActivity.get());
                 mHandlerWithAPI.setVariables(mWebView, mSharedPath);

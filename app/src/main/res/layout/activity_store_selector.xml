@@ -82,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/lightgray"
                 android:padding="5dp"
-                android:text="已选门店"
+                android:text="已选项"
                 android:textSize="14sp"/>
 
             <TextView
@@ -99,7 +99,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/lightgray"
                 android:padding="5dp"
-                android:text="所有门店"
+                android:text="所有选项"
                 android:textSize="14sp"/>
         </LinearLayout>
 

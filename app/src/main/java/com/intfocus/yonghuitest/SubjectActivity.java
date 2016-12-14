@@ -347,7 +347,6 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 				@Override
 				public void run() {
 					boolean reportDataState = ApiHelper.reportData(mAppContext, String.format("%d", groupID), templateID, reportID);
-
 					if (reportDataState) {
 						new Thread(mRunnableForDetecting).start();
 					} else {
