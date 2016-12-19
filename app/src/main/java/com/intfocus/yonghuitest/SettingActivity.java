@@ -437,6 +437,9 @@ public class SettingActivity extends BaseActivity {
     class DownloadGravatar extends AsyncTask<String,Void,Bitmap> {
         @Override
         protected Bitmap doInBackground(String... params) {
+            if (gravatarUrl == null || gravatarUrl.equals("")) {
+                return null;
+            }
             Bitmap imgBmp = HttpUtil.httpGetBitmap(gravatarUrl);
             return imgBmp;
         }
