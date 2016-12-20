@@ -218,6 +218,7 @@ public class DashboardActivity extends BaseActivity {
 			e.printStackTrace();
 		}
 	}
+
 	public void jumpTab(TabView tabView) {
 		mCurrentTab.setActive(false);
 		mCurrentTab = tabView;
