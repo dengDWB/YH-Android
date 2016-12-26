@@ -21,6 +21,8 @@ android {
         }
     buildTypes {
         release {
+            minifyEnabled false
+            shrinkResources false
             proguardFiles 'proguard-rules.pro' //getDefaultProguardFile('proguard-android.txt'),
             if (System.getenv().containsKey("KEYSTORE"))
                 signingConfig signingConfigs.release

@@ -21,6 +21,7 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -695,7 +696,7 @@ public class BaseActivity extends Activity {
                                             startDownloadTask(activity, appBean.getDownloadURL());
                                         }
                                     })
-                            .setNegativeButton("取消",
+                            .setNegativeButton("下一次",
                                     new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
