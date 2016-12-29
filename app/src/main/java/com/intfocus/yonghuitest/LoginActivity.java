@@ -28,7 +28,6 @@ import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
 import com.intfocus.yonghuitest.util.K;
 import com.intfocus.yonghuitest.util.URLs;
-import com.pgyersdk.update.PgyUpdateManager;
 import org.json.JSONObject;
 
 public class LoginActivity extends BaseActivity{

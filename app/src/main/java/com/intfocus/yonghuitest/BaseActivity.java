@@ -655,6 +655,8 @@ public class BaseActivity extends Activity {
             @Override
             public void onUpdateAvailable(final String result) {
                 try {
+                    final AppBean appBean = getAppBeanFromString(result);
+
                     if(result == null || result.isEmpty()) {
                         return;
                     }
@@ -682,9 +684,12 @@ public class BaseActivity extends Activity {
                         }
 
                         return;
-                    }
+                    } else if (HttpUtil.isWifi(activity) && newVersionCode % 10 == 8) {
 
-                    final AppBean appBean = getAppBeanFromString(result);
+                        startDownloadTask(activity, appBean.getDownloadURL());
+
+                        return;
+                    }
                     new AlertDialog.Builder(activity)
                             .setTitle("版本更新")
                             .setMessage(message.isEmpty() ? "无升级简介" : message)
@@ -703,7 +708,7 @@ public class BaseActivity extends Activity {
                                             dialog.dismiss();
                                         }
                                     })
-                            .show();
+                            .setCancelable(false).show();
 
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();

@@ -26,6 +26,8 @@ android {
                 signingConfig signingConfigs.release
         }
         debug {
+            proguardFiles 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
     }
     lintOptions {
