@@ -565,7 +565,7 @@ public class HttpUtil {
                 && activeNetInfo.getType() == ConnectivityManager.TYPE_WIFI) {
             return true;
         }
-        
+
         return false;
     }
 }

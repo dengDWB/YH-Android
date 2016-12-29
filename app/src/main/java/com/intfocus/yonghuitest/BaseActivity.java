@@ -708,7 +708,8 @@ public class BaseActivity extends Activity {
                                             dialog.dismiss();
                                         }
                                     })
-                            .setCancelable(false).show();
+                            .setCancelable(false)
+                            .show();
 
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
