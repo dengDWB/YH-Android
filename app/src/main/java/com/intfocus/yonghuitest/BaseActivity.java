@@ -513,6 +513,7 @@ public class BaseActivity extends Activity {
                     showDialogForDeviceForbided();
                     break;
                 default:
+                    showWebViewForWithoutNetwork();
                     LogUtil.d("UnkownCode", String.format("%d", message.what));
                     break;
             }
