@@ -572,6 +572,7 @@ public class BaseActivity extends Activity {
                     showWebViewForWithoutNetwork();
                     break;
                 default:
+                    showWebViewForWithoutNetwork();
                     String msg = String.format("访问服务器失败（%d)", message.what);
                     Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
                     break;
