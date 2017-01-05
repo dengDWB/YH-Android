@@ -21,7 +21,6 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +38,7 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
+
 import com.handmark.pulltorefresh.library.ILoadingLayout;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
@@ -51,6 +51,10 @@ import com.intfocus.yonghuitest.util.URLs;
 import com.pgyersdk.javabean.AppBean;
 import com.pgyersdk.update.PgyUpdateManager;
 import com.pgyersdk.update.UpdateManagerListener;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -64,8 +68,6 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by lijunjie on 16/1/14.
@@ -568,6 +570,7 @@ public class BaseActivity extends Activity {
                     });
                     break;
                 case 400:
+                case 401:
                 case 408:
                     showWebViewForWithoutNetwork();
                     break;

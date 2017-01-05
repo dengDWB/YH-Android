@@ -79,7 +79,6 @@ public class URLs implements Serializable {
     public static String timestamp() {
         return (new SimpleDateFormat("yyyyMMddKKmmss")).format(new Date());
     }
-
     /*
      * UI 版本
      */
