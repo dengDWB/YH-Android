@@ -28,6 +28,7 @@ public class CommentActivity extends BaseActivity {
     private String bannerName;
     private int objectID;
     private int objectType;
+    private int loadCount = 0;
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -124,6 +125,12 @@ public class CommentActivity extends BaseActivity {
                 logParams.put(URLs.kObjType, objectType);
                 logParams.put(URLs.kObjTitle, String.format("评论页面/%s/%s", bannerName, ex));
                 new Thread(mRunnableForLogger).start();
+
+                //点击两次还是有异常 异常报出
+                if (loadCount < 2) {
+                    showWebViewExceptionForWithoutNetwork();
+                    loadCount++;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -194,7 +194,7 @@ public class BaseActivity extends Activity {
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDefaultTextEncodingName("utf-8");
-        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
         mWebView.setWebChromeClient(new WebChromeClient());
         mWebView.setWebViewClient(new WebViewClient() {
@@ -252,7 +252,7 @@ public class BaseActivity extends Activity {
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDefaultTextEncodingName("utf-8");
-        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
         mWebView.setWebChromeClient(new WebChromeClient());
         mWebView.setDrawingCacheEnabled(true);
@@ -568,11 +568,13 @@ public class BaseActivity extends Activity {
                     });
                     break;
                 case 400:
+                case 401:
                 case 408:
                     showWebViewForWithoutNetwork();
                     break;
                 default:
                     String msg = String.format("访问服务器失败（%d)", message.what);
+                    showWebViewForWithoutNetwork();
                     Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
                     break;
             }
@@ -988,5 +990,15 @@ public class BaseActivity extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public void showWebViewExceptionForWithoutNetwork() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String urlStringForLoading = loadingPath("400");
+                mWebView.loadUrl(urlStringForLoading);
+            }
+        });
     }
 }

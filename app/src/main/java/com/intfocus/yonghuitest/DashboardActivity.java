@@ -70,6 +70,7 @@ public class DashboardActivity extends BaseActivity {
 	private String currentUIVersion = "";
 
 	private Context mContext;
+	private int loadCount = 0;
 
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
@@ -931,6 +932,12 @@ public class DashboardActivity extends BaseActivity {
 				logParams.put(URLs.kObjType, objectType);
 				logParams.put(URLs.kObjTitle, String.format("主页面/%s", ex));
 				new Thread(mRunnableForLogger).start();
+
+				//点击两次还是有异常 异常报出
+				if (loadCount < 2) {
+					showWebViewExceptionForWithoutNetwork();
+					loadCount++;
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
