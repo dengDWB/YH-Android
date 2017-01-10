@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.intfocus.yonghuitest.BaseActivity;
 import com.intfocus.yonghuitest.LoginActivity;
 import com.intfocus.yonghuitest.R;
 import com.intfocus.yonghuitest.YHApplication;

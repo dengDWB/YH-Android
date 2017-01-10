@@ -70,6 +70,7 @@ public class DashboardActivity extends BaseActivity {
 	private String currentUIVersion = "";
 
 	private Context mContext;
+	private int loadCount = 0;
 
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
@@ -85,6 +86,11 @@ public class DashboardActivity extends BaseActivity {
 		initUserIDColorView();
 		loadWebView();
 		displayAdOrNot(true);
+
+		/*
+		 * 检测版本更新
+		 */
+		checkPgyerVersionUpgrade(DashboardActivity.this,false);
 
 		/*
          * 通过解屏进入界面后，进行用户验证
@@ -428,7 +434,6 @@ public class DashboardActivity extends BaseActivity {
 		Intent intent = getIntent();
 		if (intent.hasExtra("from_activity")) {
 			checkVersionUpgrade(assetsPath);
-			checkPgyerVersionUpgrade(DashboardActivity.this,false);
 
 			new Thread(new Runnable() {
 				@Override
@@ -439,10 +444,13 @@ public class DashboardActivity extends BaseActivity {
 
 						String info = ApiHelper.authentication(mAppContext, userJSON.getString("user_num"), userJSON.getString(URLs.kPassword));
 						if (!info.isEmpty() && (info.contains("用户") || info.contains("密码"))) {
-							userJSON.put("is_login", false);
-							FileUtil.writeFile(userConfigPath, userJSON.toString());
+							// 解锁验证信息失败,也只变化登录状态,其余状况保持登录状态
+							JSONObject configJSON = new JSONObject();
+							configJSON.put("is_login", false);
+
+							modifiedUserConfig(configJSON);
 						}
-					} catch (JSONException | IOException e) {
+					} catch (JSONException e) {
 						e.printStackTrace();
 					}
 				}
@@ -925,6 +933,12 @@ public class DashboardActivity extends BaseActivity {
 				logParams.put(URLs.kObjType, objectType);
 				logParams.put(URLs.kObjTitle, String.format("主页面/%s", ex));
 				new Thread(mRunnableForLogger).start();
+
+				//点击两次还是有异常 异常报出
+				if (loadCount < 2) {
+					showWebViewExceptionForWithoutNetwork();
+					loadCount++;
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

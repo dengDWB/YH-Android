@@ -66,7 +66,6 @@ public class ApiHelper {
             }
             // FileUtil.dirPath 需要优先写入登录用户信息
             JSONObject responseJSON = new JSONObject(response.get(URLs.kBody));
-            Log.d("denglu",responseJSON.toString());
             userJSON = ApiHelper.mergeJson(userJSON, responseJSON);
             FileUtil.writeFile(userConfigPath, userJSON.toString());
 
@@ -105,8 +104,8 @@ public class ApiHelper {
     }
 
     /*
-     *  获取报表网页数据
-     */
+         *  获取报表网页数据
+         */
     public static boolean reportData(Context context, String groupID, String templateID, String reportID) {
         String urlString = String.format(K.kReportDataAPIPath, K.kBaseUrl, groupID, templateID, reportID);
         String assetsPath = FileUtil.sharedPath(context);
@@ -124,6 +123,7 @@ public class ApiHelper {
 
         switch (codeStatus) {
             case "200":
+
             case "201":
                 break;
             case "304":

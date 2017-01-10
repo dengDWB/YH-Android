@@ -23,6 +23,7 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -204,7 +205,7 @@ public class BaseActivity extends Activity {
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDefaultTextEncodingName("utf-8");
-        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
         mWebView.setWebChromeClient(new WebChromeClient());
         mWebView.setWebViewClient(new WebViewClient() {
@@ -262,7 +263,7 @@ public class BaseActivity extends Activity {
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDefaultTextEncodingName("utf-8");
-        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
         mWebView.setWebChromeClient(new WebChromeClient());
         mWebView.setDrawingCacheEnabled(true);
@@ -523,6 +524,7 @@ public class BaseActivity extends Activity {
                     showDialogForDeviceForbided();
                     break;
                 default:
+                    showWebViewForWithoutNetwork();
                     LogUtil.d("UnkownCode", String.format("%d", message.what));
                     break;
             }
@@ -577,11 +579,13 @@ public class BaseActivity extends Activity {
                     });
                     break;
                 case 400:
+                case 401:
                 case 408:
                     showWebViewForWithoutNetwork();
                     break;
                 default:
                     String msg = String.format("访问服务器失败（%d)", message.what);
+                    showWebViewForWithoutNetwork();
                     Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
                     break;
             }
@@ -665,6 +669,8 @@ public class BaseActivity extends Activity {
             @Override
             public void onUpdateAvailable(final String result) {
                 try {
+                    final AppBean appBean = getAppBeanFromString(result);
+
                     if(result == null || result.isEmpty()) {
                         return;
                     }
@@ -692,9 +698,12 @@ public class BaseActivity extends Activity {
                         }
 
                         return;
-                    }
+                    } else if (HttpUtil.isWifi(activity) && newVersionCode % 10 == 8) {
 
-                    final AppBean appBean = getAppBeanFromString(result);
+                        startDownloadTask(activity, appBean.getDownloadURL());
+
+                        return;
+                    }
                     new AlertDialog.Builder(activity)
                             .setTitle("版本更新")
                             .setMessage(message.isEmpty() ? "无升级简介" : message)
@@ -706,13 +715,14 @@ public class BaseActivity extends Activity {
                                             startDownloadTask(activity, appBean.getDownloadURL());
                                         }
                                     })
-                            .setNegativeButton("取消",
+                            .setNegativeButton("下一次",
                                     new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             dialog.dismiss();
                                         }
                                     })
+                            .setCancelable(false)
                             .show();
 
                 } catch (PackageManager.NameNotFoundException e) {
@@ -991,5 +1001,15 @@ public class BaseActivity extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public void showWebViewExceptionForWithoutNetwork() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String urlStringForLoading = loadingPath("400");
+                mWebView.loadUrl(urlStringForLoading);
+            }
+        });
     }
 }

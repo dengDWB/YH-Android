@@ -25,6 +25,8 @@ import java.util.Map;
  */
 public class ResetPasswordActivity extends BaseActivity {
 
+    private int loadCount = 0;
+
     @Override
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +142,12 @@ public class ResetPasswordActivity extends BaseActivity {
                 logParams.put(URLs.kAction, "JS异常");
                 logParams.put(URLs.kObjTitle, String.format("重置密码页面/%s", ex));
                 new Thread(mRunnableForLogger).start();
+
+                //点击两次还是有异常 异常报出
+                if (loadCount < 2) {
+                    showWebViewExceptionForWithoutNetwork();
+                    loadCount++;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
