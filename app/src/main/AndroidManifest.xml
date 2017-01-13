@@ -58,6 +58,10 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ForgetPasswordActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+        <activity
             android:name=".SettingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />

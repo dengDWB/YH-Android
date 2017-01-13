@@ -18,6 +18,7 @@ public class K extends PrivateURLs implements Serializable {
    *  API#paths
    */
   public final static String kUserAuthenticateAPIPath = "%s/api/v1/%s/%s/%s/authentication";
+  public final static String kUserForgetAPIPath       = "%s/api/v1/:platform/reset_password";
   public final static String kReportDataAPIPath       = "%s/api/v1/group/%s/template/%s/report/%s/zip";
   public final static String kCommentAPIPath          = "%s/api/v1/user/%d/id/%d/type/%d";
   public final static String kScreenLockAPIPath       = "%s/api/v1/user_device/%s/screen_lock";

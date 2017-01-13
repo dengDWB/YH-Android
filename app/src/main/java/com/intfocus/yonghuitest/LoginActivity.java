@@ -82,6 +82,13 @@ public class LoginActivity extends BaseActivity{
         usernameEditText = (EditText) findViewById(R.id.etUsername);
         passwordEditText = (EditText) findViewById(R.id.etPassword);
         TextView versionTv = (TextView) findViewById(R.id.versionTv);
+        findViewById(R.id.forgetPasswordTv).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent (LoginActivity.this, ForgetPasswordActivity.class);
+                startActivity(intent);
+            }
+        });
 
         /*
          * 显示当前应用版本号

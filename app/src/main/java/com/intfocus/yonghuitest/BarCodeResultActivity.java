@@ -78,7 +78,7 @@ public class BarCodeResultActivity extends BaseActivity {
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDefaultTextEncodingName("utf-8");
-        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);
         mWebView.setWebChromeClient(new WebChromeClient());
         mWebView.setWebViewClient(new WebViewClient() {
@@ -211,13 +211,13 @@ public class BarCodeResultActivity extends BaseActivity {
                 try{
                     new JsonParser().parse(responseString).getAsJsonObject();
                 }catch (Exception e) {
-                    showWebViewForWithoutNetwork();
+                    showWebViewExceptionForWithoutNetwork();
                     return ;
                 }
                 updateHtmlContentTimetamp();
 
                 if (!responseCode.equals("200") || responseString.equals("{}")) {
-                    showWebViewForWithoutNetwork();
+                    showWebViewExceptionForWithoutNetwork();
                 }
                 else {
                     FileUtil.barCodeScanResult(mAppContext, responseString);
@@ -424,17 +424,6 @@ public class BarCodeResultActivity extends BaseActivity {
         UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data);
     }
 
-    private void showWebViewForWithoutNetwork() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                animLoading.setVisibility(View.GONE);
-                String urlStringForLoading = loadingPath("400");
-                mWebView.loadUrl(urlStringForLoading);
-            }
-        });
-    }
-
     private class JavaScriptInterface{
         /*
          * JS 接口，暴露给JS的方法使用@JavascriptInterface装饰
@@ -444,6 +433,7 @@ public class BarCodeResultActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    animLoading.setVisibility(View.VISIBLE);
                     showBarCodeResult();
                 }
             });
