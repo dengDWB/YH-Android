@@ -84,7 +84,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     androidTestCompile 'com.android.support:support-annotations:23.2.1'
-    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:runner:0.2'
     androidTestCompile 'com.android.support.test:rules:0.5'
 
     // Local Unit test dependencies
