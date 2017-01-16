@@ -40,6 +40,7 @@ public class K extends PrivateURLs implements Serializable {
   public final static String kCommentMobilePath        = "%s/mobile/%s/id/%s/type/%s/comment";
   public final static String kResetPwdMobilePath       = "%s/mobile/%s/update_user_password";
   public final static String kThursdaySayMobilePath    = "%s/mobile/%s/thursday_say";
+  public final static String kForgetPwdMobilePath      = "%s/mobile/%s/forget_user_password";
 
   /**
    *  Config#Application
