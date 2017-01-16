@@ -3,14 +3,16 @@ package com.intfocus.yonghuitest;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebView;
 
 import com.intfocus.yonghuitest.util.HttpUtil;
 import com.intfocus.yonghuitest.util.K;
+import com.intfocus.yonghuitest.util.PrivateURLs;
+import com.intfocus.yonghuitest.util.URLs;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,76 +25,26 @@ import java.util.Map;
 
 public class ForgetPasswordActivity extends BaseActivity {
 
-    public EditText idEt,iphoneEt;
-    public TextView tipsTv;
-    public String result = "", urlString = "";
+    public String result = "";
     public boolean flag = false;
-    public JSONObject jsonParams;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forget_password);
 
-        // 组件初始化与监听
-        viewInitAndListener();
+        mWebView = (WebView) findViewById(R.id.browser);
+        initSubWebView();
+        mWebView.requestFocus();
+        mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);
+
+        animLoading.setVisibility(View.VISIBLE);
+        setWebViewLongListener(false);
+        urlString = String.format(K.kForgetPwdMobilePath, PrivateURLs.kBaseUrl, URLs.currentUIVersion(mAppContext));
+        new Thread(mRunnableForDetecting).start();
     }
 
-    public void viewInitAndListener() {
-        idEt = (EditText) findViewById(R.id.etUserId);
-        iphoneEt = (EditText) findViewById(R.id.etIphone);
-        tipsTv = (TextView) findViewById(R.id.tipsTv);
-
-        findViewById(R.id.btn_submit).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tipsTv.setText("");
-
-                String userNum = idEt.getText().toString().trim();
-                String mobile = iphoneEt.getText().toString().trim();
-
-                // 检测任意输入是否为空
-                if (!checkInput(userNum, mobile)) {
-                    return;
-                }
-
-                //配置 Post 需要的信息
-                postInfoConfigure(userNum, mobile);
-
-                //提交数据到服务器端
-                submitData();
-            }
-        });
-    }
-
-    public boolean checkInput(String userNum, String mobile) {
-        if (userNum.equals("")) {
-            toast("用户编号不能为空");
-            return false;
-        }
-        if (mobile.equals("")) {
-            toast("联系方式不能为空");
-            return false;
-        }
-        return true;
-    }
-
-    public void postInfoConfigure(String userNum, String mobile) {
-        try {
-            urlString = String.format(K.kUserForgetAPIPath, K.kBaseUrl);
-            jsonParams = new JSONObject();
-            jsonParams.put("user_num", userNum);
-            jsonParams.put("mobile", mobile);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void submitData() {
-
-        tipsTv.setTextColor(Color.BLACK);
-        tipsTv.setText("正在提交,请稍后。。。");
-
+    public void submitData(final String urlString, final JSONObject jsonParams) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -111,22 +63,20 @@ public class ForgetPasswordActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        setTipsTv(result, flag);
+                        isSuccess(result, flag);
                     }
                 });
             }
         }).start();
     }
 
-    public void setTipsTv(String info, boolean flag) {
+    public void isSuccess(String info, boolean flag) {
         if (flag) {
             showAlertDialog(info);
-            tipsTv.setText("");
             return;
         }
 
-        tipsTv.setTextColor(Color.RED);
-        tipsTv.setText(info);
+        toast(info);
     }
 
     public void showAlertDialog(String message) {
@@ -142,6 +92,36 @@ public class ForgetPasswordActivity extends BaseActivity {
                 }).setCancelable(false);
         builder.show();
 
+    }
+
+    private class JavaScriptInterface extends JavaScriptBase  {
+        /*
+         * JS 接口，暴露给JS的方法使用@JavascriptInterface装饰
+         */
+        @JavascriptInterface
+        public void forgetPassword(final String userNum, final String mobile) {
+            try {
+                JSONObject jsonParams = new JSONObject();
+                jsonParams.put("user_num", userNum);
+                jsonParams.put("mobile", mobile);
+                String urlString = String.format(K.kUserForgetAPIPath, K.kBaseUrl);
+                submitData(urlString, jsonParams);
+
+
+                /*
+                 * 用户行为记录, 单独异常处理，不可影响用户体验
+                 */
+                try {
+                    logParams = new JSONObject();
+                    logParams.put(URLs.kAction, "找回密码");
+                    new Thread(mRunnableForLogger).start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } catch (JSONException e1) {
+                e1.toString();
+            }
+        }
     }
 
     public void dismissActivity(View view) {
