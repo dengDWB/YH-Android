@@ -49,35 +49,8 @@ public class LoginActivity extends BaseActivity{
 //            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         }
 
-        /*
-         *  如果是从触屏界面过来，则直接进入主界面如
-         *  不是的话，相当于直接启动应用，则检测是否有设置锁屏
-         */
-        Intent intent = getIntent();
-        if (intent.hasExtra(kFromActivity) && intent.getStringExtra(kFromActivity).equals("ConfirmPassCodeActivity")) {
-            intent = new Intent(LoginActivity.this, DashboardActivity.class);
-            intent.putExtra(kFromActivity, intent.getStringExtra(kFromActivity));
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            LoginActivity.this.startActivity(intent);
-
-            finish();
-        }
-        else if (FileUtil.checkIsLocked(mAppContext)) {
-            intent = new Intent(this, ConfirmPassCodeActivity.class);
-            intent.putExtra("is_from_login", true);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            this.startActivity(intent);
-
-            finish();
-        }
-        else {
-            /*
-             *  检测版本更新
-             *    1. 与锁屏界面互斥；取消解屏时，返回登录界面，则不再检测版本更新；
-             *    2. 原因：如果解屏成功，直接进入MainActivity,会在BaseActivity#finishLoginActivityWhenInMainAcitivty中结束LoginActivity,若此时有AlertDialog，会报错误:Activity has leaked window com.android.internal.policy.impl.PhoneWindow$DecorView@44f72ff0 that was originally added here
-             */
-            checkPgyerVersionUpgrade(LoginActivity.this,false);
-        }
+        // 判断从哪个界面来的和检查配置的信息做相应的操作
+        fromActivity();
 
         usernameEditText = (EditText) findViewById(R.id.etUsername);
         passwordEditText = (EditText) findViewById(R.id.etPassword);
@@ -116,6 +89,34 @@ public class LoginActivity extends BaseActivity{
          * 检测登录界面，版本是否升级
          */
         checkVersionUpgrade(assetsPath);
+    }
+
+    public void fromActivity() {
+        Intent intent = getIntent();
+        if (intent.hasExtra(kFromActivity) && intent.getStringExtra(kFromActivity).equals("ConfirmPassCodeActivity")) {
+            intent = new Intent(LoginActivity.this, DashboardActivity.class);
+            intent.putExtra(kFromActivity, intent.getStringExtra(kFromActivity));
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            LoginActivity.this.startActivity(intent);
+
+            finish();
+        }
+        else if (FileUtil.checkIsLocked(mAppContext)) {
+            intent = new Intent(this, ConfirmPassCodeActivity.class);
+            intent.putExtra("is_from_login", true);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            this.startActivity(intent);
+
+            finish();
+        }
+        else {
+            /*
+             *  检测版本更新
+             *    1. 与锁屏界面互斥；取消解屏时，返回登录界面，则不再检测版本更新；
+             *    2. 原因：如果解屏成功，直接进入MainActivity,会在BaseActivity#finishLoginActivityWhenInMainAcitivty中结束LoginActivity,若此时有AlertDialog，会报错误:Activity has leaked window com.android.internal.policy.impl.PhoneWindow$DecorView@44f72ff0 that was originally added here
+             */
+            checkPgyerVersionUpgrade(LoginActivity.this,false);
+        }
     }
 
     protected void onResume() {
