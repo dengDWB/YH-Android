@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -28,6 +30,7 @@ public class ForgetPasswordActivity extends BaseActivity {
     public String result = "", urlString = "";
     public boolean flag = false;
     public JSONObject jsonParams;
+    public String userID = "", iphone = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,21 +46,51 @@ public class ForgetPasswordActivity extends BaseActivity {
         iphoneEt = (EditText) findViewById(R.id.etIphone);
         tipsTv = (TextView) findViewById(R.id.tipsTv);
 
+        idEt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                setUserID(s.toString());
+            }
+        });
+        iphoneEt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                setIphone(s.toString());
+            }
+        });
+
         findViewById(R.id.btn_submit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 tipsTv.setText("");
 
-                String userNum = idEt.getText().toString().trim();
-                String mobile = iphoneEt.getText().toString().trim();
-
                 // 检测任意输入是否为空
-                if (!checkInput(userNum, mobile)) {
+                if (!checkInput(getUserID(), getIphone())) {
                     return;
                 }
 
                 //配置 Post 需要的信息
-                postInfoConfigure(userNum, mobile);
+                postInfoConfigure(getUserID(), getIphone());
 
                 //提交数据到服务器端
                 submitData();
@@ -142,6 +175,22 @@ public class ForgetPasswordActivity extends BaseActivity {
                 }).setCancelable(false);
         builder.show();
 
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public void setIphone(String iphone) {
+        this.iphone = iphone;
+    }
+
+    public String getIphone() {
+        return iphone;
     }
 
     public void dismissActivity(View view) {

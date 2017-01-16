@@ -99,7 +99,7 @@ public class YHApplication extends Application {
          *  监测内存泄漏
          */
 
-        // refWatcher = LeakCanary.install(this);
+//         refWatcher = LeakCanary.install(this);
         PushAgent mPushAgent = PushAgent.getInstance(appContext);
         // 开启推送并设置注册的回调处理
         mPushAgent.register(new IUmengRegisterCallback() {
