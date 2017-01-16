@@ -24,15 +24,6 @@ public class ForgetPasswordActivityTest {
 
     @Test
     public void checkInput() throws Exception {
-        ForgetPasswordActivity fpActivity = Robolectric.setupActivity(ForgetPasswordActivity.class);
-        fpActivity.setUserID("1");
-        fpActivity.setIphone("");
-        fpActivity.findViewById(R.id.btn_submit).performClick();
-
-        Toast toast = ShadowToast.getLatestToast();
-        assertNotNull(toast);
-
-        assertEquals(ShadowToast.getTextOfLatestToast(),"联系方式不能为空");
 
     }
 

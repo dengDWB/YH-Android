@@ -76,7 +76,7 @@ public class LoginActivity extends BaseActivity{
              *    1. 与锁屏界面互斥；取消解屏时，返回登录界面，则不再检测版本更新；
              *    2. 原因：如果解屏成功，直接进入MainActivity,会在BaseActivity#finishLoginActivityWhenInMainAcitivty中结束LoginActivity,若此时有AlertDialog，会报错误:Activity has leaked window com.android.internal.policy.impl.PhoneWindow$DecorView@44f72ff0 that was originally added here
              */
-//            checkPgyerVersionUpgrade(LoginActivity.this,false);
+            checkPgyerVersionUpgrade(LoginActivity.this,false);
         }
 
         usernameEditText = (EditText) findViewById(R.id.etUsername);
