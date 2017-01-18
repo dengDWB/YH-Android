@@ -31,6 +31,11 @@ import com.intfocus.yonghuitest.util.K;
 import com.intfocus.yonghuitest.util.URLs;
 import org.json.JSONObject;
 
+import java.util.concurrent.Executor;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
+import edu.emory.mathcs.backport.java.util.concurrent.Executors;
+
 public class LoginActivity extends BaseActivity{
     public  String kFromActivity = "from_activity";         // APP 启动标识
     public  String kSuccess      = "success";               // 用户登录验证结果
@@ -38,6 +43,7 @@ public class LoginActivity extends BaseActivity{
     private String usernameString = "", passwordString = "";
     private final static int CODE_AUTHORITY_REQUEST = 0;// 权限申请识别码
     public String info = "";
+    private Runnable runnable;
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -236,11 +242,13 @@ public class LoginActivity extends BaseActivity{
      */
     public void actionSubmit() {
         try {
-            inputDeal();
-
+            if (!inputDeal()) {
+                return ;
+            }
+            setRunnable(getUserNameString(),getPasswordString());
             mProgressDialog = ProgressDialog.show(LoginActivity.this, "稍等", "验证用户信息...");
 
-            postData(getUserNameString(), getPasswordString());
+            postData();
         } catch (Exception e) {
             e.printStackTrace();
             if (mProgressDialog != null) mProgressDialog.dismiss();
@@ -248,35 +256,45 @@ public class LoginActivity extends BaseActivity{
         }
     }
 
-    public void inputDeal() {
+    public boolean inputDeal() {
         setUserNameString(usernameEditText.getText().toString());
         setPasswordString(passwordEditText.getText().toString());
         if (getUserNameString().equals("") || getPasswordString().equals("")) {
             toast("请输入用户名与密码");
-            return;
+            return false;
         }
+        return true;
     }
 
-    public void postData(final String userNameString, final String passwordString) {
+    public void postData() {
         try {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    final String info = ApiHelper.authentication(mAppContext, userNameString, URLs.MD5(passwordString));
-                    setInfo(info);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            returnPostDataDeal(getInfo());
-                        }
-                    });
-                }
-            }).start();
+            ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+            cachedThreadPool.submit(getRunnable());
         } catch (Exception e) {
             e.printStackTrace();
             if (mProgressDialog != null) mProgressDialog.dismiss();
             toast(e.getLocalizedMessage());
         }
+    }
+
+    public void setRunnable(final String userNameString, final String passwordString) {
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                final String info = ApiHelper.authentication(mAppContext, userNameString, URLs.MD5(passwordString));
+                setInfo(info);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        returnPostDataDeal(getInfo());
+                    }
+                });
+            }
+        };
+    }
+
+    public Runnable getRunnable () {
+        return runnable;
     }
 
     public void returnPostDataDeal(String info) {

@@ -93,4 +93,5 @@ dependencies {
 
     testCompile "org.robolectric:robolectric:3.2.2"
 
+    compile 'backport-util-concurrent:backport-util-concurrent:3.1'
 }

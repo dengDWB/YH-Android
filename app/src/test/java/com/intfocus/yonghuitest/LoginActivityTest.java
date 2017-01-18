@@ -20,6 +20,8 @@ import org.robolectric.shadows.ShadowLooper;
 import org.robolectric.shadows.ShadowToast;
 import org.robolectric.util.ActivityController;
 
+import java.util.concurrent.Executor;
+
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -56,11 +58,19 @@ public class LoginActivityTest {
         loginBtn = (Button) loginActivity.findViewById(R.id.btn_login);
     }
 
-//    @Test
-//    public void clickLoginBtnSuccess() {
+    @Test
+    public void clickLoginBtnSuccess() {
 //        userNameEt.setText("admin");
 //        pwdEt.setText("yh123");
-//        loginBtn.performClick();
+        loginActivity.setRunnable("admin","yh123");
+        Executor immediateExecutor = new Executor() {
+            @Override
+            public void execute(Runnable command) {
+                command.run();
+            }
+        };
+        immediateExecutor.execute(loginActivity.getRunnable());
+
 //        loginActivity.onResume();
 //        assertNotNull(pwdEt);
 //        assertNotNull(userNameEt);
@@ -68,13 +78,13 @@ public class LoginActivityTest {
 //        assertEquals("admin",userNameEt.getText().toString());
 //        assertEquals("yh123",pwdEt.getText().toString());
 //        Intent intent = new Intent(loginActivity, DashboardActivity.class);
-////        ShadowApplication application = ShadowApplication.getInstance();
-//        Intent actualIntent = shadowOf(loginActivity).getNextStartedActivity();;
-//        assertNull(actualIntent);
+//        ShadowApplication application = ShadowApplication.getInstance();
+        Intent actualIntent = shadowOf(loginActivity).getNextStartedActivity();;
+        assertNull(actualIntent);
 ////        assertEquals(intent, actualIntent);
 ////        assertNotNull(intent);
 ////        assertThat("Next activity has started", application.getNextStartedActivity(), is(nullValue()));
-//    }
+    }
 
 //    @Test
 //    public void clickLoginBtnFail() {
@@ -88,16 +98,16 @@ public class LoginActivityTest {
 //
 //    }
 
-    @Test
-    public void clickingLogin_shouldStartLoginActivity() {
-        userNameEt.setText("admin");
-        pwdEt.setText("yh123");
-        loginBtn.performClick();
+//    @Test
+//    public void clickingLogin_shouldStartLoginActivity() {
+//        userNameEt.setText("admin");
+//        pwdEt.setText("yh123");
+//        loginBtn.performClick();
 //        Robolectric.flushBackgroundThreadScheduler();
 //        Robolectric.flushBackgroundThreadScheduler();
-        Robolectric.flushForegroundThreadScheduler();
+//        Robolectric.flushForegroundThreadScheduler();
 //        assertEquals("123",Robolectric.getBackgroundThreadScheduler().toString());
-        assertNotNull(shadowOf(loginActivity).getNextStartedActivity());
+//        assertNotNull(shadowOf(loginActivity).getNextStartedActivity());
 
 //        ShadowActivity toast = shadowOf(loginActivity);
 //        assertNotNull(toast.getNextStartedActivity());
@@ -106,7 +116,7 @@ public class LoginActivityTest {
 //        assertNotNull(toast.getNextStartedActivity());
 //        assertEquals(loginActivity.actionSubmit(loginBtn), "123");
 //        assertEquals("123", toast.getTextOfLatestToast());
-    }
+//    }
 
     @Test
     public void clickLoginShowToast() {

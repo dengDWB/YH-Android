@@ -234,38 +234,38 @@ public class YHApplication extends Application {
         return isBackground;
     }
 
-    final UmengNotificationClickHandler pushMessageHandler = new UmengNotificationClickHandler() {
-        @Override
-        public void dealWithCustomAction(Context context, UMessage uMessage) {
-            super.dealWithCustomAction(context, uMessage);
-            try {
-                if (uMessage.custom.equals(null) ||uMessage.custom.equals("")) {
-                    Toast.makeText(appContext,"推送没有携带消息",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                String pushMessagePath = String.format("%s/%s", FileUtil.basePath(appContext), K.kPushMessageFileName);
-                JSONObject pushMessageJSON = new JSONObject(uMessage.custom);
-                pushMessageJSON.put("state", false);
-                FileUtil.writeFile(pushMessagePath, pushMessageJSON.toString());
-
-                Intent intent;
-                if ((mCurrentActivity == null)) {
-                    intent = new Intent (appContext, LoginActivity.class);
-                }
-                else {
-                    String activityName = mCurrentActivity;
-                    if (activityName.equals("LoginActivity") || activityName.equals("ConfirmPassCodeActivity")) {
-                        return;
-                    }
-                    intent = new Intent (appContext,DashboardActivity.class);
-                }
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-            } catch (JSONException | IOException e) {
-                e.printStackTrace();
-            }
-        }
-    };
+//    final UmengNotificationClickHandler pushMessageHandler = new UmengNotificationClickHandler() {
+//        @Override
+//        public void dealWithCustomAction(Context context, UMessage uMessage) {
+//            super.dealWithCustomAction(context, uMessage);
+//            try {
+//                if (uMessage.custom.equals(null) ||uMessage.custom.equals("")) {
+//                    Toast.makeText(appContext,"推送没有携带消息",Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//                String pushMessagePath = String.format("%s/%s", FileUtil.basePath(appContext), K.kPushMessageFileName);
+//                JSONObject pushMessageJSON = new JSONObject(uMessage.custom);
+//                pushMessageJSON.put("state", false);
+//                FileUtil.writeFile(pushMessagePath, pushMessageJSON.toString());
+//
+//                Intent intent;
+//                if ((mCurrentActivity == null)) {
+//                    intent = new Intent (appContext, LoginActivity.class);
+//                }
+//                else {
+//                    String activityName = mCurrentActivity;
+//                    if (activityName.equals("LoginActivity") || activityName.equals("ConfirmPassCodeActivity")) {
+//                        return;
+//                    }
+//                    intent = new Intent (appContext,DashboardActivity.class);
+//                }
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                startActivity(intent);
+//            } catch (JSONException | IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    };
 
     /**
      *  新安装、或升级后，把代码包中的静态资源重新拷贝覆盖一下
