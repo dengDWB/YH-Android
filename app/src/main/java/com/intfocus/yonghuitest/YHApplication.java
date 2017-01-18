@@ -100,47 +100,47 @@ public class YHApplication extends Application {
          */
 
 //         refWatcher = LeakCanary.install(this);
-        PushAgent mPushAgent = PushAgent.getInstance(appContext);
-        // 开启推送并设置注册的回调处理
-        mPushAgent.register(new IUmengRegisterCallback() {
-            @Override
-            public void onSuccess(final String registrationId) {
-                Log.d("device_token",registrationId.equals(null) ? null:registrationId);
-                new Handler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            if(appContext == null) {
-                                LogUtil.d("PushAgent", "mContext is null");
-                                return;
-                            }
-                            // onRegistered方法的参数registrationId即是device_token
-                            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(appContext), K.kPushConfigFileName );
-                            if (new File(pushConfigPath).exists()) {
-                                new File(pushConfigPath).delete();
-                            }
-                            JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
-                            pushJSON.put(K.kPushIsValid, false);
-                            pushJSON.put(kPushDeviceToken, registrationId);
-                            FileUtil.writeFile(pushConfigPath, pushJSON.toString());
-                            Log.d(K.kPushDeviceToken,registrationId);
-                        } catch (JSONException | IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(String s, String s1) {
-                Toast.makeText(appContext,"无法使用消息推送功能",Toast.LENGTH_SHORT).show();
-
-            }
-        });
-
-        mPushAgent.onAppStart();
-
-        mPushAgent.setNotificationClickHandler(pushMessageHandler);
+//        PushAgent mPushAgent = PushAgent.getInstance(this);
+//        // 开启推送并设置注册的回调处理
+//        mPushAgent.register(new IUmengRegisterCallback() {
+//            @Override
+//            public void onSuccess(final String registrationId) {
+//                Log.d("device_token",registrationId.equals(null) ? null:registrationId);
+//                new Handler().post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        try {
+//                            if(appContext == null) {
+//                                LogUtil.d("PushAgent", "mContext is null");
+//                                return;
+//                            }
+//                            // onRegistered方法的参数registrationId即是device_token
+//                            String pushConfigPath = String.format("%s/%s", FileUtil.basePath(appContext), K.kPushConfigFileName );
+//                            if (new File(pushConfigPath).exists()) {
+//                                new File(pushConfigPath).delete();
+//                            }
+//                            JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
+//                            pushJSON.put(K.kPushIsValid, false);
+//                            pushJSON.put(kPushDeviceToken, registrationId);
+//                            FileUtil.writeFile(pushConfigPath, pushJSON.toString());
+//                            Log.d(K.kPushDeviceToken,registrationId);
+//                        } catch (JSONException | IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            public void onFailure(String s, String s1) {
+//                Toast.makeText(appContext,"无法使用消息推送功能",Toast.LENGTH_SHORT).show();
+//
+//            }
+//        });
+//
+//        mPushAgent.onAppStart();
+//
+//        mPushAgent.setNotificationClickHandler(pushMessageHandler);
     }
 
     /*

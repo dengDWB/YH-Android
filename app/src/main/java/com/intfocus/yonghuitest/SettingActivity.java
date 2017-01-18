@@ -122,6 +122,13 @@ public class SettingActivity extends BaseActivity {
         mLockSwitch.setChecked(FileUtil.checkIsLocked(mAppContext));
         mCheckAssets.setOnClickListener(mCheckAssetsListener);
 
+        findViewById(R.id.developerTv).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchDeveloperActivity();
+            }
+        });
+
         try {
             String betaConfigPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kBetaConfigFileName);
             JSONObject betaJSON = FileUtil.readConfigFile(betaConfigPath);
@@ -551,7 +558,7 @@ public class SettingActivity extends BaseActivity {
         }
     }
 
-    public void launchDeveloperActivity(View v) {
+    public void launchDeveloperActivity() {
         Intent developerIntent = new Intent(SettingActivity.this, DeveloperActivity.class);
         developerIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(developerIntent);
