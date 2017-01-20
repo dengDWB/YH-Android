@@ -1,35 +1,41 @@
 package com.intfocus.yonghuitest;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
+import android.os.Build;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.intfocus.yonghuitest.util.FileUtil;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.ShadowActivity;
-import org.robolectric.shadows.ShadowActivityThread;
 import org.robolectric.shadows.ShadowApplication;
-import org.robolectric.shadows.ShadowLooper;
 import org.robolectric.shadows.ShadowToast;
-import org.robolectric.util.ActivityController;
 
 import java.util.concurrent.Executor;
-
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 import static org.robolectric.Shadows.shadowOf;
 
 /**
@@ -42,13 +48,17 @@ import static org.robolectric.Shadows.shadowOf;
  */
 
 @RunWith(RobolectricTestRunner.class)
-@Config(manifest = "src/main/AndroidManifest.xml")
-//@Config(constants = BuildConfig.class)
-public class LoginActivityTest {
+//@Config(manifest = "src/main/AndroidManifest.xml",resourceDir = "/res",assetDir = "/assets")
+//@PowerMockIgnore({"org.mockito.*","org.robolectric.*","android.*" })
+@PrepareForTest(FileUtil.class)
+
+public class LoginActivityTest extends RobolectricTest{
     private EditText userNameEt;
     private EditText pwdEt;
     private Button loginBtn;
     private LoginActivity loginActivity;
+    private Executor immediateExecutor;
+    @Mock FileUtil fileUtil;
 
     @Before
     public void setUp() {
@@ -56,67 +66,34 @@ public class LoginActivityTest {
         userNameEt = (EditText) loginActivity.findViewById(R.id.etUsername);
         pwdEt = (EditText) loginActivity.findViewById(R.id.etPassword);
         loginBtn = (Button) loginActivity.findViewById(R.id.btn_login);
-    }
-
-    @Test
-    public void clickLoginBtnSuccess() {
-//        userNameEt.setText("admin");
-//        pwdEt.setText("yh123");
-        loginActivity.setRunnable("admin","yh123");
-        Executor immediateExecutor = new Executor() {
+        immediateExecutor = new Executor() {
             @Override
             public void execute(Runnable command) {
                 command.run();
             }
         };
-        immediateExecutor.execute(loginActivity.getRunnable());
-
-//        loginActivity.onResume();
-//        assertNotNull(pwdEt);
-//        assertNotNull(userNameEt);
-//        assertNotNull(loginBtn);
-//        assertEquals("admin",userNameEt.getText().toString());
-//        assertEquals("yh123",pwdEt.getText().toString());
-//        Intent intent = new Intent(loginActivity, DashboardActivity.class);
-//        ShadowApplication application = ShadowApplication.getInstance();
-        Intent actualIntent = shadowOf(loginActivity).getNextStartedActivity();;
-        assertNull(actualIntent);
-////        assertEquals(intent, actualIntent);
-////        assertNotNull(intent);
-////        assertThat("Next activity has started", application.getNextStartedActivity(), is(nullValue()));
     }
 
-//    @Test
-//    public void clickLoginBtnFail() {
-//        userNameEt.setText("admin");
-//        pwdEt.setText("yh123");
-//        loginBtn.performClick();
-////        ShadowApplication application = ShadowApplication.getInstance();
-//        ShadowActivity activity = shadowOf(loginActivity);
-//        assertNotNull(activity.getNextStartedActivity());
-////        assertThat("Next activity has started", application.getNextStartedActivity(), is(notNullValue()));
-//
-//    }
+    @Test
+    public void clickLoginBtnSuccess() {
+        loginActivity.setRunnable("admin","yh123");
+        immediateExecutor.execute(loginActivity.getRunnable());
+        Intent intent = new Intent(loginActivity, DashboardActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Intent actualIntent = shadowOf(loginActivity).getNextStartedActivity();
+        assertEquals(intent.toString(), actualIntent.toString());
+    }
 
-//    @Test
-//    public void clickingLogin_shouldStartLoginActivity() {
-//        userNameEt.setText("admin");
-//        pwdEt.setText("yh123");
-//        loginBtn.performClick();
-//        Robolectric.flushBackgroundThreadScheduler();
-//        Robolectric.flushBackgroundThreadScheduler();
-//        Robolectric.flushForegroundThreadScheduler();
-//        assertEquals("123",Robolectric.getBackgroundThreadScheduler().toString());
-//        assertNotNull(shadowOf(loginActivity).getNextStartedActivity());
+    @Test
+    public void clickLoginBtnFail() {
+        loginActivity.setRunnable("admin","123");
+        immediateExecutor.execute(loginActivity.getRunnable());
+        assertEquals("密码错误，找平台帮忙初始化密码",loginActivity.getInfo());
 
-//        ShadowActivity toast = shadowOf(loginActivity);
-//        assertNotNull(toast.getNextStartedActivity());
-//        ShadowApplication application = ShadowApplication.getInstance();
-//        assertThat(loginActivity.toString(), is(notNullValue()));
-//        assertNotNull(toast.getNextStartedActivity());
-//        assertEquals(loginActivity.actionSubmit(loginBtn), "123");
-//        assertEquals("123", toast.getTextOfLatestToast());
-//    }
+        loginActivity.setRunnable("admi","123");
+        immediateExecutor.execute(loginActivity.getRunnable());
+        assertEquals("用户不存在，找平台申请开通账号",loginActivity.getInfo());
+    }
 
     @Test
     public void clickLoginShowToast() {
@@ -136,11 +113,27 @@ public class LoginActivityTest {
         assertEquals("请输入用户名与密码", ShadowToast.getTextOfLatestToast());
     }
 
-//    @Test
-//    public void verifySuccess() {
-//        LoginActivity mocklLoginActivity = Mockito.mock(LoginActivity.class);
-//        mocklLoginActivity.postData("admin","yh123");
-//        assertEquals("123",mocklLoginActivity.getInfo());
-//    }
+    @Test
+    public void formConfirmPassCodeActivity() {
+        Intent intent = new Intent();
+        intent.putExtra("from_activity","ConfirmPassCodeActivity");
+        loginActivity = Robolectric.buildActivity(LoginActivity.class).withIntent(intent).create().get();
+        intent = Shadows.shadowOf(loginActivity).getNextStartedActivity();
+        Intent mockIntent = new Intent(loginActivity, DashboardActivity.class);
+        mockIntent.putExtra("from_activity","ConfirmPassCodeActivity");
+        mockIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        assertEquals(mockIntent.toString(), Shadows.shadowOf(loginActivity).getNextStartedActivity().toString());
+    }
 
+    @Test
+    public void checkIsLocked() {
+        mockStatic(FileUtil.class);
+        fileUtil = mock(FileUtil.class);
+        Context context = Mockito.mock(Context.class);
+//        ShadowApplication apllication = ShadowApplication.getInstance();
+//        when(fileUtil.checkIsLocked(context)).thenReturn(true);
+//        doReturn(true).when(fileUtil.checkIsLocked(context));
+        assertEquals(false,fileUtil.checkIsLocked(context));
+
+    }
 }

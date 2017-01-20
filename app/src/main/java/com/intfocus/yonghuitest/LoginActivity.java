@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
@@ -66,6 +67,7 @@ public class LoginActivity extends BaseActivity{
             intent = new Intent(LoginActivity.this, DashboardActivity.class);
             intent.putExtra(kFromActivity, intent.getStringExtra(kFromActivity));
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            Log.i("Intent123", intent.toString());
             LoginActivity.this.startActivity(intent);
 
             finish();
