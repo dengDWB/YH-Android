@@ -8,6 +8,8 @@ import android.widget.EditText;
 
 import com.intfocus.yonghuitest.util.FileUtil;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +30,7 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowApplication;
 import org.robolectric.shadows.ShadowToast;
 
+import java.io.File;
 import java.util.concurrent.Executor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -35,6 +38,8 @@ import static org.junit.Assert.assertTrue;
 import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.verifyNew;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.robolectric.Shadows.shadowOf;
 
@@ -47,7 +52,7 @@ import static org.robolectric.Shadows.shadowOf;
  * 3.验证用户名密码正确与错误是否登录成功
  */
 
-@RunWith(RobolectricTestRunner.class)
+//@RunWith(PowerMockRunner.class)
 //@Config(manifest = "src/main/AndroidManifest.xml",resourceDir = "/res",assetDir = "/assets")
 //@PowerMockIgnore({"org.mockito.*","org.robolectric.*","android.*" })
 @PrepareForTest(FileUtil.class)
@@ -120,20 +125,31 @@ public class LoginActivityTest extends RobolectricTest{
         loginActivity = Robolectric.buildActivity(LoginActivity.class).withIntent(intent).create().get();
         intent = Shadows.shadowOf(loginActivity).getNextStartedActivity();
         Intent mockIntent = new Intent(loginActivity, DashboardActivity.class);
-        mockIntent.putExtra("from_activity","ConfirmPassCodeActivity");
+        mockIntent.putExtra("from_activity","null");
         mockIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        assertEquals(mockIntent.toString(), Shadows.shadowOf(loginActivity).getNextStartedActivity().toString());
+        assertEquals(mockIntent.toString(), intent.toString());
     }
 
     @Test
     public void checkIsLocked() {
         mockStatic(FileUtil.class);
-        fileUtil = mock(FileUtil.class);
-        Context context = Mockito.mock(Context.class);
-//        ShadowApplication apllication = ShadowApplication.getInstance();
-//        when(fileUtil.checkIsLocked(context)).thenReturn(true);
+//        fileUtil = mock(FileUtil.class);
+        LoginActivity loginActivity = Mockito.mock(LoginActivity.class);
+        File mockFile = mock(File.class);
+        when(mockFile.exists()).thenReturn(true);
+        ShadowApplication apllication = ShadowApplication.getInstance();
+        JSONObject mockJson = mock(JSONObject.class);
+        try {
+            when(mockJson.getBoolean("is_login")).thenReturn(true);
+            when(mockJson.getBoolean("use_gesture_password")).thenReturn(true);
+            when(mockJson.getString("gesture_password")).thenReturn("123");
+            Mockito.verify(mockJson).getBoolean("is_login");
+            assertEquals(true,FileUtil.checkIsLocked(loginActivity));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+//        when(FileUtil.checkIsLocked(loginActivity)).thenReturn(true);
 //        doReturn(true).when(fileUtil.checkIsLocked(context));
-        assertEquals(false,fileUtil.checkIsLocked(context));
 
     }
 }
