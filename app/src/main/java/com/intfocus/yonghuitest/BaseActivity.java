@@ -100,6 +100,8 @@ public class BaseActivity extends Activity {
     Context mAppContext;
     Toast toast;
     int displayDpi; //屏幕密度
+    Map<String, String> detectingResponse;
+    static Map<String, String> apiResponse;
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -392,6 +394,7 @@ public class BaseActivity extends Activity {
         public void run() {
             Map<String, String> response = HttpUtil.httpGet(urlStringForDetecting,
                     new HashMap<String, String>());
+            detectingResponse = response;
             int statusCode = Integer.parseInt(response.get(URLs.kCode));
             if (statusCode == 200 && !urlStringForDetecting.equals(K.kBaseUrl)) {
                 try {
@@ -491,8 +494,6 @@ public class BaseActivity extends Activity {
             public void run() {
                 LogUtil.d("httpGetWithHeader", String.format("url: %s, assets: %s, relativeAssets: %s", mUrlString, mAssetsPath, mRelativeAssetsPath));
                 Map<String, String> response = ApiHelper.httpGetWithHeader(mUrlString, mAssetsPath, mRelativeAssetsPath);
-
-
                 Looper.prepare();
                 HandlerWithAPI mHandlerWithAPI = new HandlerWithAPI(weakActivity.get());
                 mHandlerWithAPI.setVariables(mWebView, mSharedPath);
@@ -1013,5 +1014,17 @@ public class BaseActivity extends Activity {
                 mWebView.loadUrl(urlStringForLoading);
             }
         });
+    }
+
+    public Map<String, String> getdetectingResponse() {
+        return detectingResponse;
+    }
+
+    public Map<String, String> getApiResponse() {
+        return apiResponse;
+    }
+
+    public YHApplication getYHApplication() {
+        return mMyApp;
     }
 }

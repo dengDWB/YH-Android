@@ -247,7 +247,7 @@ public class LoginActivity extends BaseActivity{
             if (!inputDeal()) {
                 return ;
             }
-            setRunnable(getUserNameString(),getPasswordString());
+            setRunnable(usernameString, passwordString);
             mProgressDialog = ProgressDialog.show(LoginActivity.this, "稍等", "验证用户信息...");
 
             postData();
@@ -261,7 +261,7 @@ public class LoginActivity extends BaseActivity{
     public boolean inputDeal() {
         setUserNameString(usernameEditText.getText().toString());
         setPasswordString(passwordEditText.getText().toString());
-        if (getUserNameString().equals("") || getPasswordString().equals("")) {
+        if (usernameString.equals("") || passwordString.equals("")) {
             toast("请输入用户名与密码");
             return false;
         }
@@ -271,7 +271,7 @@ public class LoginActivity extends BaseActivity{
     public void postData() {
         try {
             ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
-            cachedThreadPool.submit(getRunnable());
+            cachedThreadPool.submit(runnable);
         } catch (Exception e) {
             e.printStackTrace();
             if (mProgressDialog != null) mProgressDialog.dismiss();
@@ -279,24 +279,23 @@ public class LoginActivity extends BaseActivity{
         }
     }
 
+    public Runnable getRunnable() {
+        return runnable;
+    }
+
     public void setRunnable(final String userNameString, final String passwordString) {
         runnable = new Runnable() {
             @Override
             public void run() {
-                final String info = ApiHelper.authentication(mAppContext, userNameString, URLs.MD5(passwordString));
-                setInfo(info);
+                info = ApiHelper.authentication(mAppContext, userNameString, URLs.MD5(passwordString));
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        returnPostDataDeal(getInfo());
+                        returnPostDataDeal(info);
                     }
                 });
             }
         };
-    }
-
-    public Runnable getRunnable () {
-        return runnable;
     }
 
     public void returnPostDataDeal(String info) {
@@ -338,23 +337,11 @@ public class LoginActivity extends BaseActivity{
         this.usernameString = userNameString;
     }
 
-    public String getUserNameString() {
-        return usernameString;
-    }
-
     public void setPasswordString(String passwordString) {
         this.passwordString = passwordString;
     }
 
-    public String getPasswordString() {
-        return passwordString;
-    }
-
     public String getInfo() {
         return info;
-    }
-
-    public void setInfo(String info) {
-        this.info = info;
     }
 }
