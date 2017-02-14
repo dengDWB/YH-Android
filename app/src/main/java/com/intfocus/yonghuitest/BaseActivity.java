@@ -3,10 +3,12 @@ package com.intfocus.yonghuitest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -23,6 +25,7 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -101,7 +104,8 @@ public class BaseActivity extends Activity {
     Toast toast;
     int displayDpi; //屏幕密度
     Map<String, String> detectingResponse;
-    static Map<String, String> apiResponse;
+    Map<String, String> apiResponse;
+    ListView listView;
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -415,7 +419,7 @@ public class BaseActivity extends Activity {
     /**
      * Instances of static inner classes do not hold an implicit reference to their outer class.
      */
-    public static class HandlerForDetecting extends Handler {
+    public class HandlerForDetecting extends Handler {
         private final WeakReference<BaseActivity> weakActivity;
         private final Context mContext;
         private WebView mWebView;
@@ -489,12 +493,14 @@ public class BaseActivity extends Activity {
             alertDialog.show();
         }
 
-        private final Runnable mRunnableWithAPI = new Runnable() {
+        public Runnable mRunnableWithAPI = new Runnable() {
             @Override
             public void run() {
                 LogUtil.d("httpGetWithHeader", String.format("url: %s, assets: %s, relativeAssets: %s", mUrlString, mAssetsPath, mRelativeAssetsPath));
                 Map<String, String> response = ApiHelper.httpGetWithHeader(mUrlString, mAssetsPath, mRelativeAssetsPath);
-                Looper.prepare();
+                Log.i("actual1", response.toString());
+                apiResponse = response;
+                if (Looper.myLooper()==null) Looper.prepare();
                 HandlerWithAPI mHandlerWithAPI = new HandlerWithAPI(weakActivity.get());
                 mHandlerWithAPI.setVariables(mWebView, mSharedPath);
                 Message message = mHandlerWithAPI.obtainMessage();
@@ -504,7 +510,7 @@ public class BaseActivity extends Activity {
                 LogUtil.d("mRunnableWithAPI",
                         String.format("code: %s, path: %s", response.get(URLs.kCode), response.get(kPath)));
                 mHandlerWithAPI.sendMessage(message);
-                Looper.loop();
+                if (Looper.myLooper()!=null) Looper.loop();
             }
         };
 
@@ -754,7 +760,7 @@ public class BaseActivity extends Activity {
     public void initDropMenu(SimpleAdapter adapter,AdapterView.OnItemClickListener itemClickListener) {
         View contentView = LayoutInflater.from(this).inflate(R.layout.menu_dialog, null);
 
-        ListView listView = (ListView) contentView.findViewById(R.id.list_dropmenu);
+        listView = (ListView) contentView.findViewById(R.id.list_dropmenu);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(itemClickListener);
 
@@ -1024,7 +1030,11 @@ public class BaseActivity extends Activity {
         return apiResponse;
     }
 
-    public YHApplication getYHApplication() {
+    public ListView getListView() {
+        return listView;
+    }
+    public YHApplication getmMyApp(){
         return mMyApp;
     }
+
 }

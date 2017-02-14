@@ -259,10 +259,12 @@ public class DashboardActivity extends BaseActivity {
 			switch (listItem.get(arg2).get("ItemText").toString()) {
 				case "个人信息":
 					Intent settingIntent = new Intent(mContext, SettingActivity.class);
-					mContext.startActivity(settingIntent);
+					startActivity(settingIntent);
+					Log.i("intent10","1");
 					break;
 
 				case "扫一扫":
+					Log.i("intent10","2");
 					if (ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.CAMERA)
 							!= PackageManager.PERMISSION_GRANTED) {
 						ActivityCompat.requestPermissions(DashboardActivity.this, new String[]{Manifest.permission.CAMERA}, ZBAR_CAMERA_PERMISSION);
