@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_barcode_input"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.intfocus.yonghuitest.BarCodeScannerActivity">
-
-    <FrameLayout
-        android:id="@+id/bar_code_scanner_frame"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/actionBar">
-    </FrameLayout>
+    tools:context="com.intfocus.yonghuitest.InputBarCodeActivity">
 
     <RelativeLayout
         android:id="@+id/actionBar"
@@ -31,7 +24,7 @@
 
         <TextView
             android:id="@+id/bannerTitle"
-            android:text="扫一扫"
+            android:text="手工录入"
             style="@style/BannerTitle" />
 
         <RelativeLayout
@@ -63,21 +56,29 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/inputBarCode"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@null">
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_below="@id/actionBar">
+        <EditText
+            android:id="@+id/etBarCode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="请输入条形码"
+            android:inputType="number"
+            android:lines="1"
+            android:paddingRight="45dp"
+            android:textSize="18sp" />
         <Button
             android:id="@+id/inputBarCodeBtn"
-            android:layout_width="75dp"
-            android:layout_height="75dp"
-            android:background="@drawable/input_barcode_btn"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="30dp"
-            android:textSize="12sp"
-            android:textColor="#FFFFFF"
-            android:text="手工录入"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/etBarCode"
+            android:text="提交"/>
+
     </RelativeLayout>
 
-</FrameLayout>
+</RelativeLayout>

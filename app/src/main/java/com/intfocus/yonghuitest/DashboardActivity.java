@@ -142,16 +142,22 @@ public class DashboardActivity extends BaseActivity {
 		super.onResume();
 	}
 
+	@Override
+	protected void onPause() {
+		super.onPause();
+	}
 
 	@Override
 	protected void onStop() {
 		if (popupWindow != null) {
 			popupWindow.dismiss();
 		}
+		Log.d("111", 111+"");
 		super.onStop();
 	}
 
 	protected void onDestroy() {
+		Log.d("111", 1111+"");
 		mWebView = null;
 		user = null;
 		PgyUpdateManager.unregister(); // 解除注册蒲公英版本更新检查
@@ -266,9 +272,11 @@ public class DashboardActivity extends BaseActivity {
 					if (ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.CAMERA)
 							!= PackageManager.PERMISSION_GRANTED) {
 						ActivityCompat.requestPermissions(DashboardActivity.this, new String[]{Manifest.permission.CAMERA}, ZBAR_CAMERA_PERMISSION);
+						Log.d("111", 1+"");
 					} else {
 						Intent barCodeScannerIntent = new Intent(mContext, BarCodeScannerActivity.class);
 						mContext.startActivity(barCodeScannerIntent);
+						Log.d("111", 11+"");
 					}
 					break;
 
@@ -290,10 +298,11 @@ public class DashboardActivity extends BaseActivity {
      */
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		Log.d("111", 11111+"");
 		switch (requestCode) {
 			case ZBAR_CAMERA_PERMISSION:
 				if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					Intent barCodeScannerIntent = new Intent(mContext, BarCodeScannerActivity.class);
+					Intent barCodeScannerIntent = new Intent(DashboardActivity.this, BarCodeScannerActivity.class);
 					mContext.startActivity(barCodeScannerIntent);
 				} else {
 					Toast.makeText(DashboardActivity.this, "相机权限获取失败，请重试", Toast.LENGTH_SHORT)

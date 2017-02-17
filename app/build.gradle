@@ -54,6 +54,7 @@ dependencies {
     // compile 'com.joanzapata.pdfview:android-pdfview:1.0.4@aar'
     compile 'com.android.support:appcompat-v7:' + SUPPORT_VERSION
     compile 'com.android.support:support-v4:' + SUPPORT_VERSION
+    compile 'com.android.support:design:' + SUPPORT_VERSION
     compile 'com.pgyersdk:sdk:2.4.2'
     compile 'commons-io:commons-io:+'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
