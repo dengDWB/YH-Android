@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.intfocus.yh_android"
     android:hardwareAccelerated="false"
-    android:versionCode="212"
-    android:versionName="1.4.8">
+    android:versionCode="271"
+    android:versionName="1.4.9">
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera"/>
