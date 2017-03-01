@@ -6,9 +6,12 @@ android {
     compileSdkVersion 24
     buildToolsVersion '24.0.3'
     defaultConfig {
-        applicationId 'com.intfocus.yh_android'
+        applicationId 'com.intfocus.yonghuitest'
         minSdkVersion 14
         targetSdkVersion 23
+//        jackOptions {
+//            enabled true
+//        }
     }
     if (System.getenv().containsKey("KEYSTORE"))
         signingConfigs {
@@ -29,6 +32,26 @@ android {
 
         }
     }
+//    dexOptions {
+//        incremental true
+//    }
+
+//    compileOptions {
+//        sourceCompatibility JavaVersion.VERSION_1_8
+//        targetCompatibility JavaVersion.VERSION_1_8
+//    }
+
+    allprojects {
+        repositories {
+            jcenter()
+//            tasks.withType(JavaCompile) {
+//                sourceCompatibility = 1.7
+//                targetCompatibility = 1.7
+//            }
+//            maven { url "https://raw.githubusercontent.com/Pgyer/mvn_repo_pgyer/master" }
+        }
+    }
+
     lintOptions {
         abortOnError false
         checkReleaseBuilds false

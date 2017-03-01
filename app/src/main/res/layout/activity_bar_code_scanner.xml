@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.intfocus.yh_android.BarCodeScannerActivity">
+    tools:context="com.intfocus.yonghuitest.BarCodeScannerActivity">
 
     <FrameLayout
         android:id="@+id/bar_code_scanner_frame"

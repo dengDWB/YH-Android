@@ -47,6 +47,5 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile files('libs/com.umeng.message_v3.0.1.jar')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
 }
