@@ -24,6 +24,7 @@ import android.os.PowerManager;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -695,6 +696,7 @@ public class BaseActivity extends Activity {
 
                     JSONObject responseVersionJSON = response.getJSONObject(URLs.kData);
                     int newVersionCode = responseVersionJSON.getInt(kVersionCode);
+                    Log.i("1111", newVersionCode+"");
                     String newVersionName = responseVersionJSON.getString("versionName");
 
                     if (currentVersionCode >= newVersionCode) {

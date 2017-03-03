@@ -2,9 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.intfocus.yonghuitest"
-    android:hardwareAccelerated="false"
-    android:versionCode="275"
-    android:versionName="1.4.13">
+    android:versionCode="1"
+    android:versionName="0.01">
 
     <!-- 扫描条形码或二维码 -->
     <uses-permission android:name="android.permission.CAMERA" />
