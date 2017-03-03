@@ -26,6 +26,7 @@ import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
 import com.intfocus.yonghuitest.util.K;
 import com.intfocus.yonghuitest.util.URLs;
+import com.pgyersdk.update.PgyUpdateManager;
 
 import org.json.JSONObject;
 
@@ -136,6 +137,7 @@ public class LoginActivity extends BaseActivity{
     protected void onDestroy() {
         mWebView = null;
         user = null;
+        PgyUpdateManager.unregister();
         super.onDestroy();
     }
 
@@ -147,8 +149,8 @@ public class LoginActivity extends BaseActivity{
     }
 
     /*
-         * 系统版本警告
-         */
+     * 系统版本警告
+     */
     private void showVersionWarring() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("温馨提示")

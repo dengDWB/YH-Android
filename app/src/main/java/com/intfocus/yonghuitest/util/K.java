@@ -92,5 +92,5 @@ public class K extends PrivateURLs implements Serializable {
    * Config#User Device Info
    */
   public final static int kMinSdkVersion = 14;
-  public final static int kMaxSdkVersion = 23;
+  public final static int kMaxSdkVersion = 25;
 }

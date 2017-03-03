@@ -677,84 +677,6 @@ public class BaseActivity extends Activity {
      * 偶数: 正式版本，点击安装更新
      */
     void checkPgyerVersionUpgrade(final Activity activity, final boolean isShowToast) {
-//        PgyUpdateManager.register(activity,"com.intfocus.yonghuitest.fileprovider",
-//                new UpdateManagerListener() {
-//                    @Override
-//                    public void onUpdateAvailable(final String result) {
-//                        try {
-//                            final AppBean appBean = getAppBeanFromString(result);
-//
-//                            if(result == null || result.isEmpty()) {
-//                                return;
-//                            }
-//
-//                            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-//                            int currentVersionCode = packageInfo.versionCode;
-//
-//                            JSONObject response = new JSONObject(result);
-//                            String message = response.getString("message");
-//
-//                            JSONObject responseVersionJSON = response.getJSONObject(URLs.kData);
-//                            int newVersionCode = responseVersionJSON.getInt(kVersionCode);
-//                            String newVersionName = responseVersionJSON.getString("versionName");
-//
-//                            if (currentVersionCode >= newVersionCode) {
-//                                return;
-//                            }
-//
-//                            String pgyerVersionPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPgyerVersionConfigFileName);
-//                            FileUtil.writeFile(pgyerVersionPath, result);
-//
-//                            if (newVersionCode % 2 == 1) {
-//                                if (true) {
-//                                    toast(String.format("有发布测试版本%s(%s)", newVersionName, newVersionCode));
-//                                }
-//
-//                                return;
-//                            } else if (HttpUtil.isWifi(activity) && newVersionCode % 10 == 8) {
-//
-//                                startDownloadTask(activity, appBean.getDownloadURL());
-//
-//                                return;
-//                            }
-//                            new AlertDialog.Builder(activity)
-//                                    .setTitle("版本更新")
-//                                    .setMessage(message.isEmpty() ? "无升级简介" : message)
-//                                    .setPositiveButton(
-//                                            "确定",
-//                                            new DialogInterface.OnClickListener() {
-//                                                @Override
-//                                                public void onClick(DialogInterface dialog, int which) {
-//                                                    startDownloadTask(activity, appBean.getDownloadURL());
-//                                                }
-//                                            })
-//                                    .setNegativeButton("下一次",
-//                                            new DialogInterface.OnClickListener() {
-//                                                @Override
-//                                                public void onClick(DialogInterface dialog, int which) {
-//                                                    dialog.dismiss();
-//                                                }
-//                                            })
-//                                    .setCancelable(false)
-//                                    .show();
-//
-//                        } catch (PackageManager.NameNotFoundException e) {
-//                            e.printStackTrace();
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onNoUpdateAvailable() {
-//                        if(isShowToast) {
-//                            toast("已是最新版本");
-//                        }
-//                    }
-//                });
-
         UpdateManagerListener updateManagerListener = new UpdateManagerListener() {
             @Override
             public void onUpdateAvailable(final String result) {
@@ -783,7 +705,7 @@ public class BaseActivity extends Activity {
                     FileUtil.writeFile(pgyerVersionPath, result);
 
                     if (newVersionCode % 2 == 1) {
-                        if (true) {
+                        if (isShowToast) {
                             toast(String.format("有发布测试版本%s(%s)", newVersionName, newVersionCode));
                         }
 

@@ -3,15 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.intfocus.yonghuitest"
     android:hardwareAccelerated="false"
-    android:versionCode="156"
-    android:versionName="1.4.6">
+    android:versionCode="275"
+    android:versionName="1.4.13">
 
     <!-- 扫描条形码或二维码 -->
     <uses-permission android:name="android.permission.CAMERA" />
-    <!--<uses-feature android:name="android.hardware.camera"/>-->
-    <!--<uses-feature android:name="android.hardware.camera.autofocus"/>-->
-    <!--<uses-feature android:name="android.hardware.camera.flash"/>-->
-    <!--<uses-feature android:name="android.hardware.location"/>-->
 
     <!-- 6.0 及以上系统需要在代码中动态注册 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -40,16 +36,6 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         tools:replace="android:icon,android:theme">
-        <!--<activity android:name="com.pgyersdk.activity.FeedbackActivity"/>-->
-        <!--蒲公英-->
-        <!--<provider android:name="android.support.v4.content.FileProvider"-->
-            <!--android:authorities="com.intfocus.yonghuitest.fileprovider"-->
-            <!--android:exported="false"-->
-            <!--android:grantUriPermissions="true">-->
-            <!--<meta-data-->
-                <!--android:name="android.support.FILE_PROVIDER_PATHS"-->
-                <!--android:resource="@xml/provider_paths"/>-->
-        <!--</provider>-->
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.intfocus.yonghuitest.fileprovider"
@@ -174,9 +160,5 @@
             android:name="UMENG_CHANNEL"
             android:value="Umeng" />
     </application>
-
-    <!--<uses-permission android:name="android.permission.CAMERA" /> &lt;!&ndash; 扫描条形码或二维码 &ndash;&gt;-->
-    <!--<uses-feature android:name="android.hardware.camera" />-->
-    <!--<uses-feature android:name="android.hardware.camera.autofocus" />-->
 
 </manifest>
