@@ -4,11 +4,14 @@ android {
     signingConfigs {
     }
     compileSdkVersion 24
-    buildToolsVersion '24.0.3'
+    buildToolsVersion '25.0.0'
     defaultConfig {
-        applicationId 'com.intfocus.yonghuitest'
+        applicationId 'com.intfocus.yh_android'
         minSdkVersion 14
         targetSdkVersion 23
+//        jackOptions {
+//            enabled true
+//        }
     }
     if (System.getenv().containsKey("KEYSTORE"))
         signingConfigs {
@@ -26,8 +29,29 @@ android {
                 signingConfig signingConfigs.release
         }
         debug {
+
         }
     }
+//    dexOptions {
+//        incremental true
+//    }
+
+//    compileOptions {
+//        sourceCompatibility JavaVersion.VERSION_1_8
+//        targetCompatibility JavaVersion.VERSION_1_8
+//    }
+
+    allprojects {
+        repositories {
+            jcenter()
+//            tasks.withType(JavaCompile) {
+//                sourceCompatibility = 1.7
+//                targetCompatibility = 1.7
+//            }
+//            maven { url "https://raw.githubusercontent.com/Pgyer/mvn_repo_pgyer/master" }
+        }
+    }
+
     lintOptions {
         abortOnError false
         checkReleaseBuilds false
@@ -53,6 +77,7 @@ dependencies {
     // compile 'com.joanzapata.pdfview:android-pdfview:1.0.4@aar'
     compile 'com.android.support:appcompat-v7:' + SUPPORT_VERSION
     compile 'com.android.support:support-v4:' + SUPPORT_VERSION
+    compile 'com.android.support:design:' + SUPPORT_VERSION
     compile 'com.pgyersdk:sdk:2.4.2'
     compile 'commons-io:commons-io:+'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'

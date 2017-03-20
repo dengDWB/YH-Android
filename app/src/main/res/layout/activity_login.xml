@@ -110,10 +110,10 @@
             android:id="@+id/btn_login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/linearPasswordBelowLine"
+            android:layout_below="@+id/forgetPasswordTv"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/btn_style"
             android:onClick="actionSubmit"
             android:text="@string/login_submit"
@@ -134,5 +134,17 @@
                 android:textColor="#c0c0c0"
                 android:textSize="16sp" />
         </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/linearPasswordBelowLine"
+            android:layout_marginTop="15dp"
+            android:layout_alignParentRight="true"
+            android:id="@+id/forgetPasswordTv"
+            android:text="@string/forgetPassword"
+            android:textSize="14sp"
+            android:layout_marginRight="15dp"
+            android:textColor="#FFFFFF"/>
     </RelativeLayout>
 </RelativeLayout>
