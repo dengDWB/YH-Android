@@ -22,6 +22,7 @@ import me.dm7.barcodescanner.zbar.ZBarScannerView;
 public class BarCodeScannerActivity extends BaseActivity implements ZBarScannerView.ResultHandler {
     private ZBarScannerView mScannerView;
     private Context mContext;
+    private static final int ZBAR_CAMERA_PERMISSION = 1;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -41,6 +42,14 @@ public class BarCodeScannerActivity extends BaseActivity implements ZBarScannerV
         colorViews.add((ImageView) findViewById(R.id.colorView3));
         colorViews.add((ImageView) findViewById(R.id.colorView4));
         initColorView(colorViews);
+
+        findViewById(R.id.inputBarCodeBtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(BarCodeScannerActivity.this, InputBarCodeActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -72,18 +81,18 @@ public class BarCodeScannerActivity extends BaseActivity implements ZBarScannerV
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                  mScannerView.resumeCameraPreview(BarCodeScannerActivity.this);
+                    mScannerView.resumeCameraPreview(BarCodeScannerActivity.this);
                 }
-              }, 2000);
+            }, 2000);
         }
         else {
             if (URLs.kIsQRCode && rawResult.getBarcodeFormat().getName().equals("QRCODE")) {
                 mScannerView.resumeCameraPreview(BarCodeScannerActivity.this);
                 runOnUiThread(new Runnable() {
-                  @Override
-                  public void run() {
-                      toast("本应用现只支持条形码扫描");
-                  }
+                    @Override
+                    public void run() {
+                        toast("本应用现只支持条形码扫描");
+                    }
                 });
                 return;
             }
@@ -91,13 +100,13 @@ public class BarCodeScannerActivity extends BaseActivity implements ZBarScannerV
             intent.putExtra(URLs.kCodeInfo, rawResult.getContents());
             intent.putExtra(URLs.kCodeType, rawResult.getBarcodeFormat().getName());
             mContext.startActivity(intent);
-      }
+        }
     }
 
     /*
      * 返回
      */
     public void dismissActivity(View v) {
-      BarCodeScannerActivity.this.onBackPressed();
+        BarCodeScannerActivity.this.onBackPressed();
     }
 }

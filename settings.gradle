@@ -1,4 +1,4 @@
-include ':app', ':pull-to-refresh', ':umeng-social', ':android-pdfview', ':PushSDK'
+include ':app', ':pull-to-refresh', ':umeng-social', ':android-pdfview', 'umeng-push', ':PushSDK'
 project(':android-pdfview').projectDir = new File('libs/android-pdfview')
 project(':umeng-social').projectDir = new File('libs/umeng-social')
 project(':pull-to-refresh').projectDir = new File('libs/pull-to-refresh')

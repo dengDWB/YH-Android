@@ -37,13 +37,15 @@ import com.umeng.socialize.UMShareAPI;
 import com.umeng.socialize.UMShareListener;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.media.UMImage;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import static android.webkit.WebView.enableSlowWholeDocumentDraw;
 import static java.lang.String.format;
@@ -59,6 +61,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	private RelativeLayout bannerView;
 	private ArrayList<HashMap<String, Object>> listItem;
 	private Context mContext;
+	private int loadCount = 0;
 
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
@@ -350,13 +353,12 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 					if (reportDataState) {
 						new Thread(mRunnableForDetecting).start();
 					} else {
-						showWebViewForWithoutNetwork();
+						showWebViewExceptionForWithoutNetwork();
 					}
 				}
 			}).start();
 		} else {
 			urlString = link;
-			webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
 			runOnUiThread(new Runnable() {
 				@Override
@@ -588,7 +590,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 				if (reportDataState) {
 					new Thread(mRunnableForDetecting).start();
 				} else {
-					showWebViewForWithoutNetwork();
+					showWebViewExceptionForWithoutNetwork();
 				}
 
                 /*
@@ -667,6 +669,12 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 				logParams.put(URLs.kObjType, objectType);
 				logParams.put(URLs.kObjTitle, String.format("主题页面/%s/%s", bannerName, ex));
 				new Thread(mRunnableForLogger).start();
+
+				//点击两次还是有异常 异常报出
+				if (loadCount < 2) {
+					showWebViewExceptionForWithoutNetwork();
+					loadCount++;
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -700,17 +708,16 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			}
 			return item;
 		}
-	}
 
-	// 没有放在 BaseActivity,原因:防止在没有使用动画的界面中也使用了该方法。没有使用动画的界面用该方法,会报空指针异常
-	private void showWebViewForWithoutNetwork() {
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				animLoading.setVisibility(View.GONE);
-				String urlStringForLoading = loadingPath("400");
-				mWebView.loadUrl(urlStringForLoading);
-			}
-		});
+		@JavascriptInterface
+		public void refreshBrowser() {
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					animLoading.setVisibility(View.VISIBLE);
+					loadHtml();
+				}
+			});
+		}
 	}
 }

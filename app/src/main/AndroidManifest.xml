@@ -2,11 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.intfocus.yh_android"
-    android:versionCode="263"
-    android:versionName="1.4.01"
+    android:versionCode="265"
+    android:versionName="1.4.03"
     android:hardwareAccelerated="false">
 
-    <uses-permission android:name="android.permission.CAMERA" /> <!-- 扫描条形码或二维码 --><!-- 6.0 及以上系统需要在代码中动态注册 -->
+    <!-- 扫描条形码或二维码 -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- 6.0 及以上系统需要在代码中动态注册 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -16,10 +19,12 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> <!-- 获取MAC地址 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- 获取网络状态 -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- 获取设备信息 -->
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" /><!-- 6.0 及以上系统需要在代码中动态注册 -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 读写sdcard，storage等等 --><!-- 6.0 及以上系统需要在代码中动态注册 -->
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" /> <!-- 6.0 及以上系统需要在代码中动态注册 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 读写sdcard，storage等等 -->
+    <!-- 6.0 及以上系统需要在代码中动态注册 -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- 允许程序录制音频 -->
-    <uses-permission android:name="android.permission.GET_TASKS" /> <!-- 得到当前运行的activity名字 --><!-- 5.0 及以上系统不可使用 -->
+    <uses-permission android:name="android.permission.GET_TASKS" /> <!-- 得到当前运行的activity名字 -->
+    <!-- 5.0 及以上系统不可使用 -->
     <!-- 可选 -->
     <uses-permission android:name="android.permission.READ_LOGS" />
 
@@ -27,10 +32,19 @@
     <application
         android:name=".YHApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         tools:replace="android:icon,android:theme">
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.intfocus.yonghuitest.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
         <service android:name="org.OpenUDID.OpenUDID_service">
             <intent-filter>
                 <action android:name="org.openudid.GETUDID" />
@@ -58,6 +72,16 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ForgetPasswordActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".InputBarCodeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".BarCodeScannerActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+        <activity
             android:name=".SettingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
@@ -80,10 +104,6 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ResetPasswordActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
-        <activity
-            android:name=".BarCodeScannerActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
@@ -138,8 +158,7 @@
             android:value="da55d55bd0b2a0bba722d541fe0454ac"></meta-data>
         <meta-data
             android:name="UMENG_CHANNEL"
-            android:value="Umeng"></meta-data>
-
+            android:value="Umeng" />
     </application>
 
 </manifest>

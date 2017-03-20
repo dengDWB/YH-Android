@@ -18,6 +18,7 @@ public class K extends PrivateURLs implements Serializable {
    *  API#paths
    */
   public final static String kUserAuthenticateAPIPath = "%s/api/v1/%s/%s/%s/authentication";
+  public final static String kUserForgetAPIPath       = "%s/api/v1/:platform/reset_password";
   public final static String kReportDataAPIPath       = "%s/api/v1/group/%s/template/%s/report/%s/zip";
   public final static String kCommentAPIPath          = "%s/api/v1/user/%d/id/%d/type/%d";
   public final static String kScreenLockAPIPath       = "%s/api/v1/user_device/%s/screen_lock";
@@ -39,6 +40,7 @@ public class K extends PrivateURLs implements Serializable {
   public final static String kCommentMobilePath        = "%s/mobile/%s/id/%s/type/%s/comment";
   public final static String kResetPwdMobilePath       = "%s/mobile/%s/update_user_password";
   public final static String kThursdaySayMobilePath    = "%s/mobile/%s/thursday_say";
+  public final static String kForgetPwdMobilePath      = "%s/mobile/%s/forget_user_password";
 
   /**
    *  Config#Application
@@ -90,5 +92,5 @@ public class K extends PrivateURLs implements Serializable {
    * Config#User Device Info
    */
   public final static int kMinSdkVersion = 14;
-  public final static int kMaxSdkVersion = 23;
+  public final static int kMaxSdkVersion = 25;
 }

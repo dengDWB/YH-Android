@@ -21,8 +21,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +42,7 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
+
 import com.handmark.pulltorefresh.library.ILoadingLayout;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
@@ -52,6 +55,10 @@ import com.intfocus.yh_android.util.URLs;
 import com.pgyersdk.javabean.AppBean;
 import com.pgyersdk.update.PgyUpdateManager;
 import com.pgyersdk.update.UpdateManagerListener;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -65,8 +72,6 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by lijunjie on 16/1/14.
@@ -204,7 +209,7 @@ public class BaseActivity extends Activity {
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDefaultTextEncodingName("utf-8");
-        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
         mWebView.setWebChromeClient(new WebChromeClient());
         mWebView.setWebViewClient(new WebViewClient() {
@@ -262,7 +267,7 @@ public class BaseActivity extends Activity {
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDefaultTextEncodingName("utf-8");
-        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
         mWebView.setWebChromeClient(new WebChromeClient());
         mWebView.setDrawingCacheEnabled(true);
@@ -487,12 +492,10 @@ public class BaseActivity extends Activity {
             @Override
             public void run() {
                 LogUtil.d("httpGetWithHeader", String.format("url: %s, assets: %s, relativeAssets: %s", mUrlString, mAssetsPath, mRelativeAssetsPath));
-                Map<String, String> response = ApiHelper.httpGetWithHeader(mUrlString, mAssetsPath, mRelativeAssetsPath);
-
-
+                final Map<String, String> response = ApiHelper.httpGetWithHeader(mUrlString, mAssetsPath, mRelativeAssetsPath);
                 Looper.prepare();
                 HandlerWithAPI mHandlerWithAPI = new HandlerWithAPI(weakActivity.get());
-                mHandlerWithAPI.setVariables(mWebView, mSharedPath);
+                mHandlerWithAPI.setVariables(mWebView, mSharedPath, mAssetsPath);
                 Message message = mHandlerWithAPI.obtainMessage();
                 message.what = Integer.parseInt(response.get(URLs.kCode));
                 message.obj = response.get(kPath);
@@ -523,6 +526,7 @@ public class BaseActivity extends Activity {
                     showDialogForDeviceForbided();
                     break;
                 default:
+                    showWebViewForWithoutNetwork();
                     LogUtil.d("UnkownCode", String.format("%d", message.what));
                     break;
             }
@@ -534,14 +538,16 @@ public class BaseActivity extends Activity {
         private final WeakReference<BaseActivity> weakActivity;
         private WebView mWebView;
         private String mSharedPath;
+        private String mAssetsPath;
 
         public HandlerWithAPI(BaseActivity activity) {
             weakActivity = new WeakReference<>(activity);
         }
 
-        public void setVariables(WebView webView, String sharedPath) {
+        public void setVariables(WebView webView, String sharedPath, String assetsPath ) {
             mWebView = webView;
             mSharedPath = sharedPath;
+            mAssetsPath = assetsPath;
         }
 
         protected String loadingPath(String htmlName) {
@@ -555,6 +561,13 @@ public class BaseActivity extends Activity {
                     mWebView.loadUrl(urlStringForLoading);
                 }
             });
+        }
+
+        private void deleteHeadersFile() {
+            String headersFilePath = String.format("%s/%s", mAssetsPath, K.kCachedHeaderConfigFileName);
+            if ((new File(headersFilePath)).exists()) {
+                new File(headersFilePath).delete();
+            }
         }
 
         @Override
@@ -577,12 +590,16 @@ public class BaseActivity extends Activity {
                     });
                     break;
                 case 400:
+                case 401:
                 case 408:
                     showWebViewForWithoutNetwork();
+                    deleteHeadersFile();
                     break;
                 default:
                     String msg = String.format("访问服务器失败（%d)", message.what);
+                    showWebViewForWithoutNetwork();
                     Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
+                    deleteHeadersFile();
                     break;
             }
         }
@@ -665,6 +682,8 @@ public class BaseActivity extends Activity {
             @Override
             public void onUpdateAvailable(final String result) {
                 try {
+                    final AppBean appBean = getAppBeanFromString(result);
+
                     if(result == null || result.isEmpty()) {
                         return;
                     }
@@ -677,6 +696,7 @@ public class BaseActivity extends Activity {
 
                     JSONObject responseVersionJSON = response.getJSONObject(URLs.kData);
                     int newVersionCode = responseVersionJSON.getInt(kVersionCode);
+                    Log.i("1111", newVersionCode+"");
                     String newVersionName = responseVersionJSON.getString("versionName");
 
                     if (currentVersionCode >= newVersionCode) {
@@ -692,9 +712,12 @@ public class BaseActivity extends Activity {
                         }
 
                         return;
-                    }
+                    } else if (HttpUtil.isWifi(activity) && newVersionCode % 10 == 8) {
 
-                    final AppBean appBean = getAppBeanFromString(result);
+                        startDownloadTask(activity, appBean.getDownloadURL());
+
+                        return;
+                    }
                     new AlertDialog.Builder(activity)
                             .setTitle("版本更新")
                             .setMessage(message.isEmpty() ? "无升级简介" : message)
@@ -706,13 +729,14 @@ public class BaseActivity extends Activity {
                                             startDownloadTask(activity, appBean.getDownloadURL());
                                         }
                                     })
-                            .setNegativeButton("取消",
+                            .setNegativeButton("下一次",
                                     new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             dialog.dismiss();
                                         }
                                     })
+                            .setCancelable(false)
                             .show();
 
                 } catch (PackageManager.NameNotFoundException e) {
@@ -991,5 +1015,42 @@ public class BaseActivity extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public void showWebViewExceptionForWithoutNetwork() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String urlStringForLoading = loadingPath("400");
+                mWebView.loadUrl(urlStringForLoading);
+            }
+        });
+    }
+
+    public void setAlertDialog(Context context, String message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("温馨提示")
+                .setMessage(message)
+                .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        goToAppSetting();
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 返回DashboardActivity
+                    }
+                });
+        builder.show();
+    }
+
+    private void goToAppSetting() {
+        Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        intent.setData(uri);
+        startActivity(intent);
     }
 }

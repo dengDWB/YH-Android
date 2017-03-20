@@ -14,7 +14,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
@@ -25,7 +24,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yh_android.util.ApiHelper;
@@ -70,6 +68,7 @@ public class DashboardActivity extends BaseActivity {
 	private String currentUIVersion = "";
 
 	private Context mContext;
+	private int loadCount = 0;
 
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
@@ -85,6 +84,11 @@ public class DashboardActivity extends BaseActivity {
 		initUserIDColorView();
 		loadWebView();
 		displayAdOrNot(true);
+
+		/*
+		 * 检测版本更新
+		 */
+		checkPgyerVersionUpgrade(DashboardActivity.this,false);
 
 		/*
          * 通过解屏进入界面后，进行用户验证
@@ -136,6 +140,10 @@ public class DashboardActivity extends BaseActivity {
 		super.onResume();
 	}
 
+	@Override
+	protected void onPause() {
+		super.onPause();
+	}
 
 	@Override
 	protected void onStop() {
@@ -259,7 +267,7 @@ public class DashboardActivity extends BaseActivity {
 				case "扫一扫":
 					if (ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.CAMERA)
 							!= PackageManager.PERMISSION_GRANTED) {
-						ActivityCompat.requestPermissions(DashboardActivity.this, new String[]{Manifest.permission.CAMERA}, ZBAR_CAMERA_PERMISSION);
+						setAlertDialog(DashboardActivity.this, "相机权限获取失败，是否到本应用的设置界面设置权限");
 					} else {
 						Intent barCodeScannerIntent = new Intent(mContext, BarCodeScannerActivity.class);
 						mContext.startActivity(barCodeScannerIntent);
@@ -278,26 +286,6 @@ public class DashboardActivity extends BaseActivity {
 			}
 		}
 	};
-
-	/*
-     * 权限获取反馈
-     */
-	@Override
-	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-		switch (requestCode) {
-			case ZBAR_CAMERA_PERMISSION:
-				if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					Intent barCodeScannerIntent = new Intent(mContext, BarCodeScannerActivity.class);
-					mContext.startActivity(barCodeScannerIntent);
-				} else {
-					Toast.makeText(DashboardActivity.this, "相机权限获取失败，请重试", Toast.LENGTH_SHORT)
-							.show();
-				}
-				break;
-			default:
-				super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		}
-	}
 
 	/*
      * 仪表盘界面可以显示广告
@@ -428,7 +416,6 @@ public class DashboardActivity extends BaseActivity {
 		Intent intent = getIntent();
 		if (intent.hasExtra("from_activity")) {
 			checkVersionUpgrade(assetsPath);
-			checkPgyerVersionUpgrade(DashboardActivity.this,false);
 
 			new Thread(new Runnable() {
 				@Override
@@ -439,10 +426,13 @@ public class DashboardActivity extends BaseActivity {
 
 						String info = ApiHelper.authentication(mAppContext, userJSON.getString("user_num"), userJSON.getString(URLs.kPassword));
 						if (!info.isEmpty() && (info.contains("用户") || info.contains("密码"))) {
-							userJSON.put("is_login", false);
-							FileUtil.writeFile(userConfigPath, userJSON.toString());
+							// 解锁验证信息失败,也只变化登录状态,其余状况保持登录状态
+							JSONObject configJSON = new JSONObject();
+							configJSON.put("is_login", false);
+
+							modifiedUserConfig(configJSON);
 						}
-					} catch (JSONException | IOException e) {
+					} catch (JSONException e) {
 						e.printStackTrace();
 					}
 				}
@@ -925,6 +915,12 @@ public class DashboardActivity extends BaseActivity {
 				logParams.put(URLs.kObjType, objectType);
 				logParams.put(URLs.kObjTitle, String.format("主页面/%s", ex));
 				new Thread(mRunnableForLogger).start();
+
+				//点击两次还是有异常 异常报出
+				if (loadCount < 2) {
+					showWebViewExceptionForWithoutNetwork();
+					loadCount++;
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

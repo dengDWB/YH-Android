@@ -34,4 +34,9 @@
     <string name="text_voice">语音播报</string>
     <string name="title_activity_developer">DeveloperActivity</string>
     <string name="title_activity_speech">SpeechActivity</string>
+    <string name="findPassword">找回密码</string>
+    <string name="userID">用户编号</string>
+    <string name="iphone">联系方式</string>
+    <string name="submit">提交</string>
+    <string name="forgetPassword">忘记密码?</string>
 </resources>

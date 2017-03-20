@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -14,17 +13,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity;
 import com.intfocus.yh_android.util.ApiHelper;
@@ -32,14 +27,22 @@ import com.intfocus.yh_android.util.FileUtil;
 import com.intfocus.yh_android.util.K;
 import com.intfocus.yh_android.util.URLs;
 import com.pgyersdk.update.PgyUpdateManager;
+
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LoginActivity extends BaseActivity{
     public  String kFromActivity = "from_activity";         // APP 启动标识
     public  String kSuccess      = "success";               // 用户登录验证结果
     private EditText usernameEditText, passwordEditText;
     private String usernameString, passwordString;
-    private final static int CODE_AUTHORITY_REQUEST = 0;// 权限申请识别码
+    private final static int CODE_AUTHORITY_REQUEST = 0;
+    private static final String[] permissionsArray = new String[]{
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.CAMERA };
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -86,6 +89,13 @@ public class LoginActivity extends BaseActivity{
         usernameEditText = (EditText) findViewById(R.id.etUsername);
         passwordEditText = (EditText) findViewById(R.id.etPassword);
         TextView versionTv = (TextView) findViewById(R.id.versionTv);
+        findViewById(R.id.forgetPasswordTv).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent (LoginActivity.this, ForgetPasswordActivity.class);
+                startActivity(intent);
+            }
+        });
 
         /*
          * 显示当前应用版本号
@@ -113,6 +123,7 @@ public class LoginActivity extends BaseActivity{
          * 检测登录界面，版本是否升级
          */
         checkVersionUpgrade(assetsPath);
+        getAuthority();
     }
 
     protected void onResume() {
@@ -120,14 +131,13 @@ public class LoginActivity extends BaseActivity{
         if(mProgressDialog != null)  {
             mProgressDialog.dismiss();
         }
-        getAuthority();
         super.onResume();
     }
 
     protected void onDestroy() {
         mWebView = null;
         user = null;
-        PgyUpdateManager.unregister(); // 解除注册蒲公英版本更新检查
+        PgyUpdateManager.unregister();
         super.onDestroy();
     }
 
@@ -139,8 +149,8 @@ public class LoginActivity extends BaseActivity{
     }
 
     /*
-         * 系统版本警告
-         */
+     * 系统版本警告
+     */
     private void showVersionWarring() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("温馨提示")
@@ -166,12 +176,14 @@ public class LoginActivity extends BaseActivity{
      * 获取权限 : 文件读写 (WRITE_EXTERNAL_STORAGE),读取设备信息 (READ_PHONE_STATE)
      */
     private void getAuthority() {
-        int writePermission = ContextCompat.checkSelfPermission(mAppContext, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if(writePermission != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(LoginActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE},CODE_AUTHORITY_REQUEST);
-            return;
-        }else{
-            return;
+        List<String> permissionsList = new ArrayList<>();
+        for (String permission : permissionsArray) {
+            if (ContextCompat.checkSelfPermission(LoginActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
+                permissionsList.add(permission);
+            }
+        }
+        if (!permissionsList.isEmpty() && permissionsList != null){
+            ActivityCompat.requestPermissions(LoginActivity.this, permissionsList.toArray(new String[permissionsList.size()]), CODE_AUTHORITY_REQUEST);
         }
     }
 
@@ -181,13 +193,22 @@ public class LoginActivity extends BaseActivity{
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
+
             case CODE_AUTHORITY_REQUEST:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    break;
-                } else {
-                    Toast.makeText(LoginActivity.this, "文件权限获取失败，可能影响使用哦", Toast.LENGTH_SHORT)
-                            .show();
+                boolean flag = false;
+                if (grantResults.length > 0){
+                    for (int i = 0; i < permissions.length; i++) {
+                        if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                        } else {
+                            flag = true;
+                        }
+                    }
                 }
+
+                if (flag) {
+                    setAlertDialog(LoginActivity.this, "某些权限获取失败，是否到本应用的设置界面设置权限");
+                }
+
                 break;
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);

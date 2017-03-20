@@ -25,14 +25,16 @@ import com.umeng.message.PushAgent;
 import com.umeng.message.UmengNotificationClickHandler;
 import com.umeng.message.entity.UMessage;
 import com.umeng.socialize.PlatformConfig;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
+
 import org.OpenUDID.OpenUDID_manager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import static com.intfocus.yh_android.util.K.kPushDeviceToken;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 
 /**
  * Created by lijunjie on 16/1/15.
@@ -123,7 +125,7 @@ public class YHApplication extends Application {
                             pushJSON.put(K.kPushIsValid, false);
                             pushJSON.put(kPushDeviceToken, registrationId);
                             FileUtil.writeFile(pushConfigPath, pushJSON.toString());
-                            Log.d(K.kPushDeviceToken,registrationId);
+                            Log.d(kPushDeviceToken,registrationId);
                         } catch (JSONException | IOException e) {
                             e.printStackTrace();
                         }
@@ -142,6 +144,39 @@ public class YHApplication extends Application {
 
         mPushAgent.setNotificationClickHandler(pushMessageHandler);
     }
+
+    final UmengNotificationClickHandler pushMessageHandler = new UmengNotificationClickHandler() {
+        @Override
+        public void dealWithCustomAction(Context context, UMessage uMessage) {
+            super.dealWithCustomAction(context, uMessage);
+            try {
+                if (uMessage.custom.equals(null) ||uMessage.custom.equals("")) {
+                    Toast.makeText(appContext,"推送没有携带消息",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                String pushMessagePath = String.format("%s/%s", FileUtil.basePath(appContext), K.kPushMessageFileName);
+                JSONObject pushMessageJSON = new JSONObject(uMessage.custom);
+                pushMessageJSON.put("state", false);
+                FileUtil.writeFile(pushMessagePath, pushMessageJSON.toString());
+
+                Intent intent;
+                if ((mCurrentActivity == null)) {
+                    intent = new Intent (appContext, LoginActivity.class);
+                }
+                else {
+                    String activityName = mCurrentActivity;
+                    if (activityName.equals("LoginActivity") || activityName.equals("ConfirmPassCodeActivity")) {
+                        return;
+                    }
+                    intent = new Intent (appContext,DashboardActivity.class);
+                }
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            } catch (JSONException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+    };
 
     /*
      * 程序终止时会执行以下代码
@@ -233,39 +268,6 @@ public class YHApplication extends Application {
 
         return isBackground;
     }
-
-    final UmengNotificationClickHandler pushMessageHandler = new UmengNotificationClickHandler() {
-        @Override
-        public void dealWithCustomAction(Context context, UMessage uMessage) {
-            super.dealWithCustomAction(context, uMessage);
-            try {
-                if (uMessage.custom.equals(null) ||uMessage.custom.equals("")) {
-                    Toast.makeText(appContext,"推送没有携带消息",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                String pushMessagePath = String.format("%s/%s", FileUtil.basePath(appContext), K.kPushMessageFileName);
-                JSONObject pushMessageJSON = new JSONObject(uMessage.custom);
-                pushMessageJSON.put("state", false);
-                FileUtil.writeFile(pushMessagePath, pushMessageJSON.toString());
-
-                Intent intent;
-                if ((mCurrentActivity == null)) {
-                    intent = new Intent (appContext, LoginActivity.class);
-                }
-                else {
-                    String activityName = mCurrentActivity;
-                    if (activityName.equals("LoginActivity") || activityName.equals("ConfirmPassCodeActivity")) {
-                        return;
-                    }
-                    intent = new Intent (appContext,DashboardActivity.class);
-                }
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-            } catch (JSONException | IOException e) {
-                e.printStackTrace();
-            }
-        }
-    };
 
     /**
      *  新安装、或升级后，把代码包中的静态资源重新拷贝覆盖一下

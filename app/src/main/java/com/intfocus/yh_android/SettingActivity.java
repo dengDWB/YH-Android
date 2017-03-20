@@ -1,10 +1,8 @@
 package com.intfocus.yh_android;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -18,8 +16,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -41,17 +39,19 @@ import com.intfocus.yh_android.util.PrivateURLs;
 import com.intfocus.yh_android.util.URLs;
 import com.intfocus.yh_android.view.CircleImageView;
 import com.intfocus.yh_android.view.RedPointView;
+
 import com.pgyersdk.update.PgyUpdateManager;
 import com.readystatesoftware.viewbadger.BadgeView;
 import com.umeng.message.PushAgent;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class SettingActivity extends BaseActivity {
     public final static String kGravatar = "gravatar";
@@ -165,6 +165,7 @@ public class SettingActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         PgyUpdateManager.unregister(); // 解除注册蒲公英版本更新检查
+        popupWindow = null;
         super.onDestroy();
     }
     /*
@@ -256,8 +257,7 @@ public class SettingActivity extends BaseActivity {
         public void onClick(View v) {
             int cameraPermission = ContextCompat.checkSelfPermission(mAppContext,Manifest.permission.CAMERA);
             if(cameraPermission != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(SettingActivity.this,new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},CODE_CAMERA_REQUEST);
-                return;
+                setAlertDialog(SettingActivity.this, "相机权限获取失败，是否到本应用的设置界面设置权限");
             }else{
                 popupWindow.showAtLocation(mIconImageView, Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
             }
@@ -302,33 +302,6 @@ public class SettingActivity extends BaseActivity {
     }
 
     /*
-	 * 权限获取反馈
-	 */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case CODE_CAMERA_REQUEST:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    popupWindow.showAtLocation(mIconImageView, Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
-                } else {
-                    Toast.makeText(SettingActivity.this, "权限获取失败，请重试", Toast.LENGTH_SHORT)
-                            .show();
-                    try {
-                        logParams = new JSONObject();
-                        logParams.put("action", "头像/拍照");
-                        logParams.put("obj_title", "功能: \"头像上传，拍照\",报错: \"相机权限获取失败\"");
-                        new Thread(mRunnableForLogger).start();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-    /*
      * 获取相册图片
      */
     private void getGallery() {
@@ -347,8 +320,15 @@ public class SettingActivity extends BaseActivity {
          * 需要调用裁剪图片功能，无法读取内部存储，故使用 SD 卡先存储图片
          */
         if (hasSdcard()) {
-            intentFromCapture.putExtra(MediaStore.EXTRA_OUTPUT, Uri.
-                    fromFile(new File(Environment.getExternalStorageDirectory(),"icon.jpg")));
+            Uri imageUri;
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+                imageUri = FileProvider.getUriForFile(SettingActivity.this, "com.intfocus.yonghuitest.fileprovider", new File(Environment.getExternalStorageDirectory(),"icon.jpg"));
+                intentFromCapture.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intentFromCapture.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            }else {
+                imageUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(),"icon.jpg"));
+            }
+            intentFromCapture.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
         }
         else {
             try {
@@ -378,7 +358,14 @@ public class SettingActivity extends BaseActivity {
                 break;
             case CODE_CAMERA_REQUEST:
                 File tempFile = new File(Environment.getExternalStorageDirectory(),"icon.jpg");
-                cropPhoto(Uri.fromFile(tempFile));
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+                    Uri photoURI = FileProvider.getUriForFile(this,
+                            "com.intfocus.yonghuitest.fileprovider",
+                            tempFile);
+                    cropPhoto(photoURI);
+                }else {
+                    cropPhoto(Uri.fromFile(tempFile));
+                }
                 break;
             default:
                 if (intent != null) {
@@ -394,12 +381,15 @@ public class SettingActivity extends BaseActivity {
      */
     public void cropPhoto(Uri uri) {
         Intent intent = new Intent("com.android.camera.action.CROP");
+        File tempFile = new File(Environment.getExternalStorageDirectory(),"icon.jpg");
+        Uri outPutUri = Uri.fromFile(tempFile);
         if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.KITKAT) {
             String url=FileUtil.getBitmapUrlPath(this, uri);
             intent.setDataAndType(Uri.fromFile(new File(url)), "image/*");
         }else{
             intent.setDataAndType(uri, "image/*");
         }
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.putExtra("crop", "true");
         // aspectX aspectY 是宽高的比例
         intent.putExtra("aspectX", 1);
@@ -408,6 +398,7 @@ public class SettingActivity extends BaseActivity {
         intent.putExtra("outputX", 150);
         intent.putExtra("outputY", 150);
         intent.putExtra("return-data",true);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, outPutUri);
         startActivityForResult(intent, CODE_RESULT_REQUEST);
     }
 
@@ -416,13 +407,13 @@ public class SettingActivity extends BaseActivity {
      */
     private void setImageToHeadView(Intent intent) {
         try {
-            Bundle extras = intent.getExtras();
-            if (extras != null) {
-                Bitmap userIcon = extras.getParcelable(URLs.kData);
-                mIconImageView.setImageBitmap(userIcon);
+            Bitmap bitmap = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory()+"/icon.jpg");
+            if (bitmap != null) {
+                mIconImageView.setImageBitmap(bitmap);
+                new File(Environment.getExternalStorageDirectory()+"/icon.jpg").delete();
                 gravatarImgPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kAppCode + "_" + user.getString(URLs.kUserNum) + "_" + getDate() + ".jpg");
                 gravatarFileName = gravatarImgPath.substring(gravatarImgPath.lastIndexOf("/") + 1, gravatarImgPath.length());
-                FileUtil.saveImage(gravatarImgPath, userIcon);
+                FileUtil.saveImage(gravatarImgPath, bitmap);
                 new UploadGravatar().execute();
                 popupWindow.dismiss();
             }
