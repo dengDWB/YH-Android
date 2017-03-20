@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.intfocus.yonghuitest.BarCodeScannerActivity">
+    tools:context="com.intfocus.yh_android.BarCodeScannerActivity">
 
     <FrameLayout
         android:id="@+id/bar_code_scanner_frame"
@@ -59,6 +59,24 @@
                 style="@style/ColorViewStyle4" />
         </RelativeLayout>
 
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@null">
+        <Button
+            android:id="@+id/inputBarCodeBtn"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:background="@drawable/input_barcode_btn"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="30dp"
+            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:text="手工录入"/>
     </RelativeLayout>
 
 </FrameLayout>

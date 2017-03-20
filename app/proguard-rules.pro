@@ -1,15 +1,15 @@
 # 指定代码的压缩级别
--optimizationpasses 5
+ -optimizationpasses 5
 # 包明不混合大小写
--dontusemixedcaseclassnames
+ -dontusemixedcaseclassnames
 # 不去忽略非公共的库类
--dontskipnonpubliclibraryclasses
+ -dontskipnonpubliclibraryclasses
 # 不优化输入的类文件
--dontoptimize
+ -dontoptimize
 # 预校验
--dontpreverify
+ -dontpreverify
 # 混淆时是否记录日志
--verbose
+ -verbose
 
 # LeakCanary
 -keep class org.eclipse.mat.** { *; }

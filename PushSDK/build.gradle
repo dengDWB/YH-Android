@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 22
-    buildToolsVersion "23.0.2"
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         minSdkVersion 11
@@ -47,6 +47,5 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile files('libs/com.umeng.message_v3.0.1.jar')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
 }
