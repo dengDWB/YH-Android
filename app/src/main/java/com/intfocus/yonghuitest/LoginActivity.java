@@ -97,6 +97,22 @@ public class LoginActivity extends BaseActivity{
             }
         });
 
+        findViewById(R.id.applyRegistTv).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                builder.setTitle("温馨提示")
+                        .setMessage("请到数据化运营平台申请开通账号")
+                        .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                builder.show();
+            }
+        });
+
         /*
          * 显示当前应用版本号
          */
