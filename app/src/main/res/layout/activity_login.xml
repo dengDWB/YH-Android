@@ -146,5 +146,17 @@
             android:textSize="14sp"
             android:layout_marginRight="15dp"
             android:textColor="#FFFFFF"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/linearPasswordBelowLine"
+            android:layout_marginTop="15dp"
+            android:layout_alignParentLeft="true"
+            android:id="@+id/applyRegistTv"
+            android:text="申请注册"
+            android:textSize="14sp"
+            android:layout_marginLeft="15dp"
+            android:textColor="#FFFFFF"/>
     </RelativeLayout>
 </RelativeLayout>

@@ -39,12 +39,13 @@
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.intfocus.yonghuitest.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
+
         <service android:name="org.OpenUDID.OpenUDID_service">
             <intent-filter>
                 <action android:name="org.openudid.GETUDID" />
@@ -75,10 +76,12 @@
             android:name=".ForgetPasswordActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
-        <activity android:name=".InputBarCodeActivity"
+        <activity
+            android:name=".InputBarCodeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
-        <activity android:name=".BarCodeScannerActivity"
+        <activity
+            android:name=".BarCodeScannerActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
@@ -167,6 +170,8 @@
         <meta-data
             android:name="UMENG_CHANNEL"
             android:value="Umeng" />
+
+        <activity android:name=".ShowListMsgActivity"></activity>
     </application>
 
 </manifest>

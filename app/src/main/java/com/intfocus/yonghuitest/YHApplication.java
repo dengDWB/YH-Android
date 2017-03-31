@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -156,6 +157,21 @@ public class YHApplication extends Application {
                     Toast.makeText(appContext,"推送没有携带消息",Toast.LENGTH_SHORT).show();
                     return;
                 }
+                // 保存所有推送的消息
+                JSONObject json;
+                SharedPreferences sp = getSharedPreferences("allPushMessage", MODE_PRIVATE);
+                String allMesaage = sp.getString("message","false");
+                if (!allMesaage.equals("false")){
+                    json = new JSONObject(allMesaage);
+                }else {
+                    json = new JSONObject();
+                }
+
+                SharedPreferences.Editor editor = sp.edit();
+                json.put("" + json.length(), uMessage.custom);
+                editor.putString("message", json.toString());
+                editor.commit();
+
                 String pushMessagePath = String.format("%s/%s", FileUtil.basePath(appContext), K.kPushMessageFileName);
                 JSONObject pushMessageJSON = new JSONObject(uMessage.custom);
                 pushMessageJSON.put("state", false);

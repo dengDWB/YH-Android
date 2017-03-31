@@ -90,6 +90,12 @@ public class SettingActivity extends BaseActivity {
                     startActivity(appInfoIntent);
                     break;
 
+                case "消息推送" :
+                    Intent pushIntent = new Intent(mContext, SettingListActivity.class);
+                    pushIntent.putExtra("type", "消息推送");
+                    startActivity(pushIntent);
+                    break;
+
                 case "小四说" :
                     Intent thursdaySayIntent = new Intent(SettingActivity.this,ThursdaySayActivity.class);
                     thursdaySayIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
