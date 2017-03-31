@@ -1,5 +1,7 @@
 package com.intfocus.yonghuitest.setting;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -13,10 +15,17 @@ import android.widget.TextView;
 
 import com.intfocus.yonghuitest.BaseActivity;
 import com.intfocus.yonghuitest.R;
+import com.intfocus.yonghuitest.ShowListMsgActivity;
+import com.intfocus.yonghuitest.util.HttpUtil;
 import com.intfocus.yonghuitest.util.K;
+import com.umeng.message.PushAgent;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by liuruilin on 2017/3/29.
@@ -24,6 +33,8 @@ import java.util.HashMap;
 public class SettingListActivity extends BaseActivity {
     private ArrayList<HashMap<String, Object>> listItem;
     private SimpleAdapter mSimpleAdapter;
+    private String[] mItemNameList;
+    private String[] mItemContentList;
     private TextView mBannerTitle;
     private String mListType;
     private long mLastExitTime;
@@ -39,33 +50,64 @@ public class SettingListActivity extends BaseActivity {
     }
 
     private void initListInfo(String type) {
-        if (type.equals("个人资料")) {
-            String[] itemName = {};
+        switch (type) {
+            case "个人资料" :
+                mItemNameList = new String[]{};
+                mItemContentList = new String[]{};
+                break;
+
+            case "应用信息" :
+                PackageInfo packageInfo = null;
+                try {
+                    packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+                String appName = getString(getApplicationInfo().labelRes);
+                String deviceInfo = String.format("%s(Android %s)", TextUtils.split(android.os.Build.MODEL, " - ")[0], Build.VERSION.RELEASE);
+                String apiDomain = K.kBaseUrl.replace("http://", "").replace("https://", "");
+                String versionInfo = String.format("%s(%d)", packageInfo.versionName, packageInfo.versionCode);
+                String appPackageInfo = packageInfo.packageName;
+                mItemNameList = new String[]{"应用名称", "版本号", "设备型号", "数据接口", "应用标识"};
+                mItemContentList = new String[]{appName, versionInfo, deviceInfo, apiDomain, appPackageInfo};
+                break;
+
+            case "消息推送" :
+                PushAgent mPushAgent = PushAgent.getInstance(mAppContext);
+                String isPushOpened = isPushOpened(mPushAgent);
+                mItemNameList = new String[]{"消息推送", "关联的设备列表", "推送的消息列表"};
+                mItemContentList = new String[]{isPushOpened, "", ""};
+                break;
+
+            default:
+                mItemNameList = new String[]{};
+                mItemContentList = new String[]{};
+                break;
         }
-        else if (type.equals("应用信息")) {
-            PackageInfo packageInfo = null;
-            try {
-                packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
-            String appName = getString(getApplicationInfo().labelRes);
-            String deviceInfo = String.format("%s(Android %s)", TextUtils.split(android.os.Build.MODEL, " - ")[0], Build.VERSION.RELEASE);
-            String apiDomain = K.kBaseUrl.replace("http://", "").replace("https://", "");
-            String versionInfo = String.format("%s(%d)", packageInfo.versionName, packageInfo.versionCode);
-            String appPackageInfo = packageInfo.packageName;
-            String[] itemName = {"应用名称", "版本号", "设备型号", "数据接口", "应用标识"};
-            String[] itemContent = {appName, versionInfo, deviceInfo, apiDomain, appPackageInfo};
-            initListView(itemName, itemContent);
-        }
+        initListView(mItemNameList, mItemContentList);
     }
 
-    private void initListView(String[] itemName, String[] itemContent) {
+    private String isPushOpened(PushAgent mPushAgent) {
+        try {
+            String deviceToken  = mPushAgent.getRegistrationId();
+            if (deviceToken.length() == 44) {
+                return "开启";
+            }
+        }catch (NullPointerException e){
+            return "关闭";
+        }
+        return "关闭";
+    }
+
+    /*
+     * ListView 内容填充
+     */
+    private void initListView(String[] mItemNameList, String[] mItemContentList) {
         listItem = new ArrayList<>();
-        for (int i = 0; i < itemName.length; i++) {
+        for (int i = 0; i < mItemNameList.length; i++) {
             HashMap<String, Object> map = new HashMap<>();
-            map.put("ItemName", itemName[i]);
-            map.put("ItemContent", itemContent[i]);
+            map.put("ItemName", mItemNameList[i]);
+            map.put("ItemContent", mItemContentList[i]);
             listItem.add(map);
         }
 
@@ -97,7 +139,54 @@ public class SettingListActivity extends BaseActivity {
                     checkPgyerVersionUpgrade(SettingListActivity.this, true);
                     break;
 
+                case "关联的设备列表":
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                String deviceTokenUrl = String.format(K.kDeviceTokenAPIPath, K.kBaseUrl, user.getString("user_num"));
+                                final Map<String, String> response = HttpUtil.httpGet(deviceTokenUrl, new HashMap<String, String>());
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (response.containsKey("code") && response.get("code").equals("200")){
+                                            Intent intent = new Intent(SettingListActivity.this, ShowListMsgActivity.class);
+                                            try {
+                                                JSONObject jsonObject = new JSONObject(response.get("body"));
+                                                intent.putExtra("response", jsonObject.getString("devices"));
+                                                intent.putExtra("title", "关联的设备列表");
+                                                startActivity(intent);
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }else {
+                                            toast("获取关联的设备列表失败");
+                                        }
+                                    }
+                                });
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                    break;
 
+                case "推送的消息列表":
+                    try {
+                        SharedPreferences sp = getSharedPreferences("allPushMessage", MODE_PRIVATE);
+                        String allMessage = sp.getString("message","false");
+                        if (allMessage.equals("false")){
+                            toast("从未接收到推送消息");
+                        }else {
+                            Intent intent = new Intent(SettingListActivity.this, ShowListMsgActivity.class);
+                            intent.putExtra("pushMessage", true);
+                            intent.putExtra("title", "推送的消息列表");
+                            startActivity(intent);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
             }
         }
     };

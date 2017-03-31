@@ -550,7 +550,11 @@ public class OldSettingActivity extends BaseActivity {
     }
 
     public void launchDeveloperActivity(View v) {
+<<<<<<< HEAD:app/src/main/java/com/intfocus/yonghuitest/setting/OldSettingActivity.txt
         Intent developerIntent = new Intent(OldSettingActivity.this, DeveloperActivity.class);
+=======
+        Intent developerIntent = new Intent(SettingActivity.this, PushListActivity.class);
+>>>>>>> 06c3889e1ce7622077a9a977d77a8f0cc4423903:app/src/main/java/com/intfocus/yonghuitest/SettingActivity.java
         developerIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(developerIntent);
     }
