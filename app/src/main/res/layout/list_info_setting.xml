@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                style="@style/SettingGroup">
+    <TextView
+        android:id="@+id/item_setting_key"
+        style="@style/SettingKey"
+        android:text="标题"/>
+
+    <TextView
+        android:id="@+id/item_setting_info"
+        style="@style/SettingValue"
+        android:textColor="@color/gray"
+        android:text="内容"/>
+</RelativeLayout>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">永辉生意人</string>
-    <string name="title_activity_main">永辉生意人</string>
+    <string name="app_name">永辉应用(测试)</string>
+    <string name="title_activity_main">永辉应用(测试)</string>
     <string name="image_error">错误</string>
     <string name="cansel">取消</string>
     <string name="passcode_lock">启用锁屏</string>
@@ -24,7 +24,7 @@
     <string name="login_password_placeholder">密码</string>
     <string name="login_username_placeholder">账户名</string>
     <string name="login_slogan_text">融合共享，成于至善</string>
-    <string name="text_dashboard">仪表盘</string>
+    <string name="text_kpi">仪表盘</string>
     <string name="text_analysis">分析</string>
     <string name="text_app">应用</string>
     <string name="text_message">消息</string>

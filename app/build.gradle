@@ -6,7 +6,7 @@ android {
     compileSdkVersion 24
     buildToolsVersion '25.0.0'
     defaultConfig {
-        applicationId 'com.intfocus.yh_android'
+        applicationId 'com.intfocus.yonghuitest'
         minSdkVersion 14
         targetSdkVersion 23
 //        jackOptions {
@@ -55,6 +55,10 @@ android {
     lintOptions {
         abortOnError false
         checkReleaseBuilds false
+    }
+
+    dataBinding{
+        enabled = true
     }
 //    sourceSets {
 //        main {

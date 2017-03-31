@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/actionBar">
+
+        <ImageView
+            android:id="@+id/bannerBack"
+            style="@style/BannerBackButton"
+            android:onClick="dismissActivity" />
+
+        <TextView
+            style="@style/BannerBackText"
+            android:layout_toRightOf="@id/bannerBack"
+            android:onClick="dismissActivity" />
+
+        <TextView
+            android:id="@+id/bannerTitle"
+            android:text="选项配置"
+            style="@style/BannerTitle" />
+
+    </RelativeLayout>
+
+    <RelativeLayout style="@style/SettingGroup">
+
+        <TextView
+            style="@style/SettingKey"
+            android:text="启用锁屏"/>
+
+        <Switch
+            android:id="@+id/switch_screenLock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"/>
+    </RelativeLayout>
+
+    <View style="@style/Divider"/>
+
+    <RelativeLayout style="@style/SettingGroup">
+
+        <TextView
+            style="@style/SettingKey"
+            android:text="微信分析长图"/>
+
+        <Switch
+            android:id="@+id/switch_screenshot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"/>
+    </RelativeLayout>
+
+    <View style="@style/Divider"/>
+
+    <RelativeLayout style="@style/SettingGroup">
+
+        <TextView
+            style="@style/SettingKey"
+            android:text="报表操作"/>
+
+        <Switch
+            android:id="@+id/switch_report_copy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"/>
+    </RelativeLayout>
+
+    <View style="@style/Divider"/>
+
+    <RelativeLayout style="@style/SettingGroup">
+
+        <TextView
+            style="@style/SettingKey"
+            android:text="横屏显示标题栏"/>
+
+        <Switch
+            android:id="@+id/switch_landscape_banner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"/>
+    </RelativeLayout>
+
+    <View style="@style/Divider"/>
+
+    <RelativeLayout
+        android:id="@+id/item_clear_cache"
+        style="@style/SettingGroup">
+
+        <TextView
+            style="@style/SettingKey"
+            android:text="清理缓存(缓存列表)"/>
+    </RelativeLayout>
+
+    <View style="@style/Divider"/>
+</LinearLayout>

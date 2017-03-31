@@ -38,5 +38,8 @@
     <color name="pink">#FFC0CB</color>
 
     <color name="pass_number">#000000</color>
+    <color name="tab_background">#ffffff</color>
+    <color name="tab_checked">#53a93f</color>
+    <color name="tab_default">#000000</color>
 
 </resources>

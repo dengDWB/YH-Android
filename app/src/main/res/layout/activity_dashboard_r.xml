@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".dashboard.DashboardActivity">
+
+    <RelativeLayout
+        android:id="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/actionBar">
+
+        <ImageView
+            android:id="@+id/bannerLogo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/banner_logo"/>
+
+        <ImageView
+            android:id="@+id/bannerSetting"
+            style="@style/BannerRightButton"
+            android:layout_alignBottom="@+id/colorViewLayout"
+            android:layout_marginTop="0dp"
+            android:onClick="launchDropMenuActivity"
+            android:src="@drawable/banner_setting"/>
+
+        <RelativeLayout
+            android:id="@+id/colorViewLayout"
+            android:layout_width="35dp"
+            android:layout_height="5dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="6dp">
+
+            <ImageView
+                android:id="@+id/colorView0"
+                style="@style/ColorViewStyle0"/>
+
+            <ImageView
+                android:id="@+id/colorView1"
+                style="@style/ColorViewStyle1"/>
+
+            <ImageView
+                android:id="@+id/colorView2"
+                style="@style/ColorViewStyle2"/>
+
+            <ImageView
+                android:id="@+id/colorView3"
+                style="@style/ColorViewStyle3"/>
+
+            <ImageView
+                android:id="@+id/colorView4"
+                style="@style/ColorViewStyle4"/>
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/toolBar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white"
+        android:orientation="horizontal">
+
+        <com.intfocus.yonghuitest.view.TabView
+            android:id="@+id/tab_kpi"
+            style="@style/ToolBarTab"
+            app:active_src="@drawable/tab_kpi_s"
+            app:src="@drawable/tab_kpi"
+            app:text="仪表盘"/>
+
+        <com.intfocus.yonghuitest.view.TabView
+            android:id="@+id/tab_analysis"
+            style="@style/ToolBarTab"
+            app:active_src="@drawable/tab_analysis_s"
+            app:src="@drawable/tab_analysis"
+            app:text="分析"/>
+
+        <com.intfocus.yonghuitest.view.TabView
+            android:id="@+id/tab_app"
+            style="@style/ToolBarTab"
+            app:active_src="@drawable/tab_app_s"
+            app:src="@drawable/tab_app"
+            app:text="应用"/>
+
+        <com.intfocus.yonghuitest.view.TabView
+            android:id="@+id/tab_message"
+            style="@style/ToolBarTab"
+            app:active="false"
+            app:active_src="@drawable/tab_message_s"
+            app:src="@drawable/tab_message"
+            app:text="消息"/>
+
+    </LinearLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/content_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/actionBar"
+        android:layout_above="@+id/view"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+    </android.support.v4.view.ViewPager>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@id/toolBar"
+        android:background="@color/divider"
+        android:id="@+id/view" />
+
+</RelativeLayout>
