@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.intfocus.yonghuitest.PushListActivity">
+
+    <RelativeLayout
+        android:id="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/actionBar">
+
+        <ImageView
+            android:id="@+id/bannerBack"
+            style="@style/BannerBackButton"
+            android:onClick="dismissActivity" />
+
+        <TextView
+            style="@style/BannerBackText"
+            android:layout_toRightOf="@id/bannerBack"
+            android:onClick="dismissActivity" />
+
+        <TextView
+            android:id="@+id/bannerTitle"
+            android:text="消息推送"
+            style="@style/BannerTitle" />
+
+    </RelativeLayout>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/actionBar"
+        android:id="@+id/pushListView"></ListView>
+
+</RelativeLayout>

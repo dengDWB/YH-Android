@@ -543,7 +543,7 @@ public class SettingActivity extends BaseActivity {
     }
 
     public void launchDeveloperActivity(View v) {
-        Intent developerIntent = new Intent(SettingActivity.this, DeveloperActivity.class);
+        Intent developerIntent = new Intent(SettingActivity.this, PushListActivity.class);
         developerIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(developerIntent);
     }
