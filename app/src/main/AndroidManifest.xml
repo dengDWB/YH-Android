@@ -138,7 +138,7 @@
             android:excludeFromRecents="true"
             android:theme="@style/Theme.UMDefault" />
         <activity
-            android:name=".ThursdaySayActivity"
+            android:name=".setting.ThursdaySayActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
@@ -171,7 +171,7 @@
             android:name="UMENG_CHANNEL"
             android:value="Umeng" />
 
-        <activity android:name=".ShowListMsgActivity"></activity>
+        <activity android:name=".setting.ShowListMsgActivity"></activity>
     </application>
 
 </manifest>

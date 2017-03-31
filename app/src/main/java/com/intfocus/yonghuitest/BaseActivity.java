@@ -269,7 +269,7 @@ public class BaseActivity extends Activity {
         });
     }
 
-    android.webkit.WebView initSubWebView() {
+    public android.webkit.WebView initSubWebView() {
         animLoading = (RelativeLayout) findViewById(R.id.anim_loading);
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);

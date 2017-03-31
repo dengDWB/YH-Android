@@ -1,13 +1,15 @@
-package com.intfocus.yonghuitest;
+package com.intfocus.yonghuitest.setting;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+
+import com.intfocus.yonghuitest.BaseActivity;
+import com.intfocus.yonghuitest.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;

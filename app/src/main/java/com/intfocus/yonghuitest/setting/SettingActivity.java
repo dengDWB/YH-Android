@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.intfocus.yonghuitest.BaseActivity;
 import com.intfocus.yonghuitest.R;
-import com.intfocus.yonghuitest.ThursdaySayActivity;
 
 import org.json.JSONException;
 

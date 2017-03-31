@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import com.intfocus.yonghuitest.BaseActivity;
 import com.intfocus.yonghuitest.R;
-import com.intfocus.yonghuitest.ShowListMsgActivity;
 import com.intfocus.yonghuitest.util.HttpUtil;
 import com.intfocus.yonghuitest.util.K;
 import com.umeng.message.PushAgent;

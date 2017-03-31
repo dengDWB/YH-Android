@@ -36,7 +36,7 @@ import com.intfocus.yonghuitest.DeveloperActivity;
 import com.intfocus.yonghuitest.LoginActivity;
 import com.intfocus.yonghuitest.R;
 import com.intfocus.yonghuitest.ResetPasswordActivity;
-import com.intfocus.yonghuitest.ThursdaySayActivity;
+import com.intfocus.yonghuitest.setting.ThursdaySayActivity;
 import com.intfocus.yonghuitest.screen_lock.InitPassCodeActivity;
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
