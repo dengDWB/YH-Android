@@ -8,9 +8,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebView;
 import android.widget.Toast;
 
-import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.K;
 import com.intfocus.yonghuitest.util.URLs;
@@ -34,9 +34,8 @@ public class ResetPasswordActivity extends BaseActivity {
         setContentView(R.layout.activity_reset_password);
         mMyApp.setCurrentActivity(this);
 
-        pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
-        initPullWebView();
-        setPullToRefreshWebView(false);
+        mWebView = (WebView) findViewById(R.id.browser);
+        initSubWebView();
 
         mWebView.requestFocus();
         mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);
@@ -80,14 +79,7 @@ public class ResetPasswordActivity extends BaseActivity {
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        try {
-                                            JSONObject configJSON = new JSONObject();
-                                            configJSON.put("is_login", false);
-
-                                            modifiedUserConfig(configJSON);
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
+                                        modifiedUserConfig(false);
 
                                         Intent intent = new Intent();
                                         intent.setClass(ResetPasswordActivity.this, LoginActivity.class);

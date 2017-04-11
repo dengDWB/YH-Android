@@ -16,19 +16,20 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -43,9 +44,6 @@ import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
-import com.handmark.pulltorefresh.library.ILoadingLayout;
-import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.FileUtil;
 import com.intfocus.yonghuitest.util.HttpUtil;
@@ -68,7 +66,6 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +87,6 @@ public class BaseActivity extends Activity {
     public PopupWindow popupWindow;
     public DisplayMetrics displayMetrics;
     public boolean isWeiXinShared = false;
-    public PullToRefreshWebView pullToRefreshWebView;
     public android.webkit.WebView mWebView;
     public JSONObject user;
     public RelativeLayout animLoading;
@@ -209,57 +205,6 @@ public class BaseActivity extends Activity {
         return String.format("file:///%s/loading/%s.html", sharedPath, htmlName);
     }
 
-    android.webkit.WebView initPullWebView() {
-        animLoading = (RelativeLayout) findViewById(R.id.anim_loading);
-        pullToRefreshWebView.setMode(PullToRefreshBase.Mode.PULL_FROM_START);
-        mWebView = pullToRefreshWebView.getRefreshableView();
-        WebSettings webSettings = mWebView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setDefaultTextEncodingName("utf-8");
-        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-
-        mWebView.setWebChromeClient(new WebChromeClient());
-        mWebView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(android.webkit.WebView view, String url) {
-                //返回值是true的时候控制去WebView打开，为false调用系统浏览器或第三方浏览器
-                view.loadUrl(url);
-                return true;
-            }
-
-            @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                super.onPageStarted(view, url, favicon);
-                LogUtil.d("onPageStarted", String.format("%s - %s", URLs.timestamp(), url));
-            }
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                animLoading.setVisibility(View.GONE);
-                LogUtil.d("onPageFinished", String.format("%s - %s", URLs.timestamp(), url));
-            }
-
-            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                LogUtil.d("onReceivedError",
-                        String.format("errorCode: %d, description: %s, url: %s", errorCode, description,
-                                failingUrl));
-            }
-        });
-
-        mWebView.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                return false;
-            }
-        });
-        setWebViewLongListener(true);
-
-        initIndicator(pullToRefreshWebView);
-
-        return mWebView;
-    }
-
     public void setWebViewLongListener(final boolean flag) {
         mWebView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -317,85 +262,15 @@ public class BaseActivity extends Activity {
         return mWebView;
     }
 
-    private void initIndicator(PullToRefreshWebView pullToRefreshWebView) {
-        ILoadingLayout startLabels = pullToRefreshWebView
-                .getLoadingLayoutProxy(true, false);
-        startLabels.setPullLabel("请继续下拉...");// 刚下拉时，显示的提示
-        startLabels.setRefreshingLabel("正在刷新...");// 刷新时
-        startLabels.setReleaseLabel("放了我，我就刷新...");// 下来达到一定距离时，显示的提示
-
-        ILoadingLayout endLabels = pullToRefreshWebView.getLoadingLayoutProxy(
-                false, true);
-        endLabels.setPullLabel("请继续下拉");// 刚下拉时，显示的提示
-        endLabels.setRefreshingLabel("正在刷新");// 刷新时
-        endLabels.setReleaseLabel("放了我，我就刷新");// 下来达到一定距离时，显示的提示
-    }
-
-    void setPullToRefreshWebView(boolean isAllow) {
-        if (!isAllow) {
-            pullToRefreshWebView.setMode(PullToRefreshBase.Mode.DISABLED);
-            return;
-        }
-
-        // 刷新监听事件
-        pullToRefreshWebView.setOnRefreshListener(
-                new PullToRefreshBase.OnRefreshListener<android.webkit.WebView>() {
-                    @Override
-                    public void onRefresh(PullToRefreshBase<android.webkit.WebView> refreshView) {
-                        new pullToRefreshTask().execute();
-
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        String label = simpleDateFormat.format(System.currentTimeMillis());
-                        refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
-                    }
-                });
-    }
-
     public static int dip2px(Context context, float dpValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
     }
 
-    private class pullToRefreshTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-            // 如果这个地方不使用线程休息的话，刷新就不会显示在那个 PullToRefreshListView 的 UpdatedLabel 上面
-
-            /*
-             *  下拉浏览器刷新时，删除响应头文件，相当于无缓存刷新
-             */
-            if (urlString != null && !urlString.isEmpty()) {
-                String urlKey = urlString.contains("?") ? TextUtils.split(urlString, "?")[0] : urlString;
-                ApiHelper.clearResponseHeader(urlKey, assetsPath);
-            }
-            new Thread(mRunnableForDetecting).start();
-
-            /*
-             * 用户行为记录, 单独异常处理，不可影响用户体验
-             */
-            try {
-                logParams.put(URLs.kAction, "刷新/浏览器");
-                logParams.put(URLs.kObjTitle, urlString);
-                new Thread(mRunnableForLogger).start();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            // Call onRefreshComplete when the list has been refreshed. 如果没有下面的函数那么刷新将不会停
-            pullToRefreshWebView.onRefreshComplete();
-        }
-    }
-
     protected final HandlerForDetecting mHandlerForDetecting = new HandlerForDetecting(BaseActivity.this);
     protected final HandlerWithAPI mHandlerWithAPI = new HandlerWithAPI(BaseActivity.this);
 
-    protected final Runnable mRunnableForDetecting = new Runnable() {
+    public final Runnable mRunnableForDetecting = new Runnable() {
         @Override
         public void run() {
             Map<String, String> response = HttpUtil.httpGet(urlStringForDetecting,
@@ -645,8 +520,10 @@ public class BaseActivity extends Activity {
         }
     }
 
-    public void modifiedUserConfig(JSONObject configJSON) {
+    public void modifiedUserConfig(boolean isLogin) {
         try {
+            JSONObject configJSON = new JSONObject();
+            configJSON.put("is_login", isLogin);
             String userConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kUserConfigFileName);
             JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
 
@@ -655,7 +532,7 @@ public class BaseActivity extends Activity {
 
             String settingsConfigPath = FileUtil.dirPath(mAppContext, K.kConfigDirName, K.kSettingConfigFileName);
             FileUtil.writeFile(settingsConfigPath, userJSON.toString());
-        } catch (IOException e) {
+        } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
     }
@@ -815,7 +692,7 @@ public class BaseActivity extends Activity {
 
                 FileUtil.writeFile(versionConfigPath, packageInfo.versionName);
 
-                // 抢着消息配置，重新上传服务器
+                // 强制消息配置，重新上传服务器
                 String pushConfigPath = String.format("%s/%s", FileUtil.basePath(BaseActivity.this), K.kPushConfigFileName );
                 JSONObject pushJSON = FileUtil.readConfigFile(pushConfigPath);
                 pushJSON.put(K.kPushIsValid, false);
@@ -826,49 +703,6 @@ public class BaseActivity extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * 检测服务器端静态文件是否更新
-     * to do
-     */
-    public void checkAssetsUpdated(boolean shouldReloadUIThread) {
-        checkAssetUpdated(shouldReloadUIThread, kLoading, false);
-        checkAssetUpdated(shouldReloadUIThread, URLs.kFonts, true);
-        checkAssetUpdated(shouldReloadUIThread, URLs.kImages, true);
-        checkAssetUpdated(shouldReloadUIThread, URLs.kStylesheets, true);
-        checkAssetUpdated(shouldReloadUIThread, URLs.kJavaScripts, true);
-        checkAssetUpdated(shouldReloadUIThread, URLs.kBarCodeScan, false);
-        // checkAssetUpdated(shouldReloadUIThread, URLs.kAdvertisement, false);
-    }
-
-    private boolean checkAssetUpdated(boolean shouldReloadUIThread, String assetName, boolean isInAssets) {
-        try {
-            boolean isShouldUpdateAssets = false;
-            String assetZipPath = String.format("%s/%s.zip", sharedPath, assetName);
-            isShouldUpdateAssets = !(new File(assetZipPath)).exists();
-
-            String userConfigPath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kUserConfigFileName);
-            JSONObject userJSON = FileUtil.readConfigFile(userConfigPath);
-            String localKeyName = String.format("local_%s_md5", assetName);
-            String keyName = String.format("%s_md5", assetName);
-            isShouldUpdateAssets = !isShouldUpdateAssets && !userJSON.getString(localKeyName).equals(userJSON.getString(keyName));
-
-            if (!isShouldUpdateAssets) {
-                return false;
-            }
-
-            LogUtil.d("checkAssetUpdated", String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName), userJSON.getString(keyName)));
-            // execute this when the downloader must be fired
-            final DownloadAssetsTask downloadTask = new DownloadAssetsTask(mAppContext, shouldReloadUIThread, assetName, isInAssets);
-            downloadTask.execute(String.format(K.kDownloadAssetsAPIPath, K.kBaseUrl, assetName), assetZipPath);
-
-            return true;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return false;
     }
 
     protected void toast(String info) {
@@ -882,106 +716,6 @@ public class BaseActivity extends Activity {
             toast.show();
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    class DownloadAssetsTask extends AsyncTask<String, Integer, String> {
-        private final Context context;
-        private PowerManager.WakeLock mWakeLock;
-        private final boolean isReloadUIThread;
-        private final String assetFilename;
-        private final boolean isInAssets;
-
-        public DownloadAssetsTask(Context context, boolean shouldReloadUIThread, String assetFilename, boolean isInAssets) {
-            this.context = context;
-            this.isReloadUIThread = shouldReloadUIThread;
-            this.assetFilename = assetFilename;
-            this.isInAssets = isInAssets;
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            InputStream input = null;
-            OutputStream output = null;
-            HttpURLConnection connection = null;
-            try {
-                URL url = new URL(params[0]);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.connect();
-
-                // expect HTTP 200 OK, so we don't mistakenly save error report
-                // instead of the file
-                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                    return "Server returned HTTP " + connection.getResponseCode() + " " + connection.getResponseMessage();
-                }
-
-                // this will be useful to display download percentage
-                // might be -1: server did not report the length
-                int fileLength = connection.getContentLength();
-                input = connection.getInputStream();
-                output = new FileOutputStream(params[1]);
-
-                byte data[] = new byte[4096];
-                long total = 0;
-                int count;
-                while ((count = input.read(data)) != -1) {
-                    // allow canceling with back button
-                    if (isCancelled()) {
-                        input.close();
-                        return null;
-                    }
-                    total += count;
-                    // publishing the progress....
-                    if (fileLength > 0) // only if total length is known
-                        publishProgress((int) (total * 100 / fileLength));
-                    output.write(data, 0, count);
-                }
-            } catch (Exception e) {
-                LogUtil.d("Exception", e.toString());
-                return e.toString();
-            } finally {
-                try {
-                    if (output != null)
-                        output.close();
-                    if (input != null)
-                        input.close();
-                } catch (IOException ignored) {
-                }
-
-                if (connection != null)
-                    connection.disconnect();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // take CPU lock to prevent CPU from going off if the user
-            // presses the power button during download
-            PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-            mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                    getClass().getName());
-            mWakeLock.acquire();
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... progress) {
-            super.onProgressUpdate(progress);
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            mWakeLock.release();
-
-            if (result != null) {
-                Toast.makeText(context, String.format("静态资源更新失败(%s)", result), Toast.LENGTH_LONG).show();
-            } else {
-                FileUtil.checkAssets(mAppContext, assetFilename, isInAssets);
-                if (isReloadUIThread) {
-                    new Thread(mRunnableForDetecting).start();
-                }
-            }
         }
     }
 

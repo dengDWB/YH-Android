@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:context=".DashboardActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".dashboard.DashboardActivity">
 
     <RelativeLayout
         android:id="@+id/actionBar"
@@ -70,74 +70,51 @@
         android:orientation="horizontal">
 
         <com.intfocus.yonghuitest.view.TabView
-            android:id="@+id/tabKPI"
+            android:id="@+id/tab_kpi"
             style="@style/ToolBarTab"
             app:active_src="@drawable/tab_kpi_s"
             app:src="@drawable/tab_kpi"
             app:text="仪表盘"/>
 
         <com.intfocus.yonghuitest.view.TabView
-            android:id="@+id/tabAnalyse"
+            android:id="@+id/tab_analysis"
             style="@style/ToolBarTab"
             app:active_src="@drawable/tab_analysis_s"
             app:src="@drawable/tab_analysis"
             app:text="分析"/>
 
         <com.intfocus.yonghuitest.view.TabView
-            android:id="@+id/tabApp"
+            android:id="@+id/tab_app"
             style="@style/ToolBarTab"
             app:active_src="@drawable/tab_app_s"
             app:src="@drawable/tab_app"
             app:text="应用"/>
 
         <com.intfocus.yonghuitest.view.TabView
-            android:id="@+id/tabMessage"
+            android:id="@+id/tab_message"
             style="@style/ToolBarTab"
+            app:active="false"
             app:active_src="@drawable/tab_message_s"
             app:src="@drawable/tab_message"
             app:text="消息"/>
 
     </LinearLayout>
 
-    <FrameLayout
+    <android.support.v4.view.ViewPager
+        android:id="@+id/content_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/toolBar"
-        android:layout_below="@id/actionBar">
-
-        <WebView
-            android:id="@+id/browserAd"
-            android:layout_width="match_parent"
-            android:layout_height="140dp"
-            android:layerType="software"
-            android:scrollbars="none"
-            android:visibility="gone"/>
-
-        <com.handmark.pulltorefresh.library.PullToRefreshWebView
-            android:id="@+id/browser"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-        <RelativeLayout
-            android:id="@+id/anim_loading"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/white">
-
-            <com.wang.avi.AVLoadingIndicatorView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:visibility="visible"
-                app:indicatorColor="@color/actionBar"
-                app:indicatorName="BallPulseIndicator"/>
-        </RelativeLayout>
-    </FrameLayout>
+        android:layout_below="@+id/actionBar"
+        android:layout_above="@+id/view"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+    </android.support.v4.view.ViewPager>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_above="@id/toolBar"
-        android:background="@color/divider"/>
+        android:background="@color/divider"
+        android:id="@+id/view" />
 
 </RelativeLayout>

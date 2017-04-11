@@ -9,6 +9,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -33,6 +34,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.intfocus.yonghuitest.util.PrivateURLs.kfrBaseUrl;
 
 /**
  * Created by liuruilin on 2017/3/22.
@@ -152,6 +155,7 @@ public class BaseFragment extends Fragment {
         public void run() {
             Map<String, String> response = HttpUtil.httpGet(urlStringForDetecting,
                     new HashMap<String, String>());
+
             int statusCode = Integer.parseInt(response.get(URLs.kCode));
             if (statusCode == 200 && !urlStringForDetecting.equals(K.kBaseUrl)) {
                 try {

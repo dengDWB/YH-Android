@@ -26,7 +26,7 @@ public class URLs implements Serializable {
     public final static String kJSInterfaceName          = "AndroidJSBridge";
 
     public final static String kAssets                   = "assets";
-    public final static String kLoding                   = "loading";
+    public final static String kLoading                  = "loading";
     public final static String kFonts                    = "fonts";
     public final static String kImages                   = "images";
     public final static String kStylesheets              = "stylesheets";
@@ -52,6 +52,9 @@ public class URLs implements Serializable {
     public final static String kObjType                  = "obj_type";
     public final static String kLink                     = "link";
     public final static String kUserNum                  = "user_num";
+    public final static String kUserName                 = "user_name";
+    public final static String kRoleName                 = "role_name";
+    public final static String kGroupName                = "group_name";
     public final static String kStore                    = "store";
     public final static String kStoreIds                 = "store_ids";
     public final static String kName                     = "name";

@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
@@ -17,6 +18,7 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -29,6 +31,7 @@ import com.intfocus.yonghuitest.R;
 import com.intfocus.yonghuitest.YHApplication;
 import com.intfocus.yonghuitest.setting.SettingActivity;
 import com.intfocus.yonghuitest.util.FileUtil;
+import com.intfocus.yonghuitest.util.HttpUtil;
 import com.intfocus.yonghuitest.util.K;
 import com.intfocus.yonghuitest.util.URLs;
 import com.intfocus.yonghuitest.util.WidgetUtil;
@@ -38,15 +41,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import static com.intfocus.yonghuitest.BaseActivity.dip2px;
 
-/**
- * Created by liuruilin on 2017/3/22.
- */
 public class DashboardActivity extends FragmentActivity implements ViewPager.OnPageChangeListener {
     private DashboardFragmentAdapter mDashboardFragmentAdapter;
     private PopupWindow popupWindow;
@@ -69,14 +68,15 @@ public class DashboardActivity extends FragmentActivity implements ViewPager.OnP
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dashboard_r);
-        mApp = (YHApplication)this.getApplication();
+        setContentView(R.layout.activity_dashboard);
+        mApp = (YHApplication) this.getApplication();
         mAppContext = mApp.getAppContext();
         mContext = this;
         mSharedPreferences = getSharedPreferences("DashboardPreferences", MODE_PRIVATE);
         mDashboardFragmentAdapter = new DashboardFragmentAdapter(getSupportFragmentManager());
         initUserIDColorView();
         bindFragment();
+        HttpUtil.checkAssetsUpdated(mContext);
     }
 
     @Override
@@ -135,11 +135,11 @@ public class DashboardActivity extends FragmentActivity implements ViewPager.OnP
     public void launchDropMenuActivity(View v) {
         initDropMenuItem();
         ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
-        popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -47), dip2px(this, 10));
+        popupWindow.showAsDropDown(mBannerSetting, dip2px(this, -40), dip2px(this, 5));
     }
 
     /*
-	 * 初始化下拉菜单按钮
+     * 初始化下拉菜单按钮
 	 */
     private void initDropMenuItem() {
         listItem = new ArrayList<>();
@@ -226,6 +226,9 @@ public class DashboardActivity extends FragmentActivity implements ViewPager.OnP
         }
     };
 
+    /*
+     * 跳转系统设置页面
+     */
     private void goToAppSetting() {
         Intent intent = new Intent();
         intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -234,6 +237,9 @@ public class DashboardActivity extends FragmentActivity implements ViewPager.OnP
         startActivity(intent);
     }
 
+    /*
+     * 初始化 TabView 和 ViewPaper
+     */
     private void bindFragment() {
         mTabKPI = (TabView) findViewById(R.id.tab_kpi);
         mTabAnalysis = (TabView) findViewById(R.id.tab_analysis);
@@ -276,6 +282,7 @@ public class DashboardActivity extends FragmentActivity implements ViewPager.OnP
                 default:
                     break;
             }
+            refreshTabView();
         }
     };
 
@@ -308,13 +315,15 @@ public class DashboardActivity extends FragmentActivity implements ViewPager.OnP
                     mTabMessage.setActive(true);
                     break;
             }
-            refreshTabView();
-            mSharedPreferences.edit().putInt("LastTab", mViewPager.getCurrentItem()).commit();
         }
+        refreshTabView();
+        mSharedPreferences.edit().putInt("LastTab", mViewPager.getCurrentItem()).commit();
     }
 
+    /*
+     * 刷新 TabView 高亮状态
+     */
     private void refreshTabView() {
-        TabView[] mTabView = {mTabKPI, mTabAnalysis, mTabAPP, mTabMessage};
         for (int i = 0; i < mTabView.length; i++) {
             if (i != mViewPager.getCurrentItem()) {
                 mTabView[i].setActive(false);

@@ -11,7 +11,7 @@ import com.intfocus.yonghuitest.dashboard.fragment.KpiFragment;
 import com.intfocus.yonghuitest.dashboard.fragment.MessageFragment;
 
 /**
- * Created by liuruilin on 2017/3/28.
+ * Created by liuruilin on 2017/3/23.
  */
 
 public class DashboardFragmentAdapter extends FragmentPagerAdapter {
@@ -42,7 +42,6 @@ public class DashboardFragmentAdapter extends FragmentPagerAdapter {
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-        System.out.println("position Destory" + position);
         super.destroyItem(container, position, object);
     }
 

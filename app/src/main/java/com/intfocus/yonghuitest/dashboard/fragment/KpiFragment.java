@@ -17,10 +17,6 @@ import org.json.JSONException;
 
 import static com.intfocus.yonghuitest.util.URLs.kGroupId;
 
-/**
- * Created by liuruilin on 2017/3/26.
- */
-
 public class KpiFragment extends WebViewFragment {
 
     @Override

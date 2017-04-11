@@ -15,10 +15,6 @@ import com.intfocus.yonghuitest.view.CustomWebView;
 
 import org.json.JSONException;
 
-/**
- * Created by liuruilin on 2017/3/26.
- */
-
 public class AppFragment extends WebViewFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

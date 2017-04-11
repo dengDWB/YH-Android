@@ -33,31 +33,17 @@
             android:text="扫一扫"
             style="@style/BannerTitle" />
 
-        <RelativeLayout
-            android:id="@+id/colorViewLayout"
-            android:layout_width="35dp"
-            android:layout_height="5dp"
-            android:layout_alignParentBottom="true"
+        <TextView
+            android:id="@+id/bannerHistory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:layout_marginBottom="5dp"
-            android:layout_marginRight="6dp">
-
-            <ImageView
-                android:id="@+id/colorView0"
-                style="@style/ColorViewStyle0" />
-            <ImageView
-                android:id="@+id/colorView1"
-                style="@style/ColorViewStyle1" />
-            <ImageView
-                android:id="@+id/colorView2"
-                style="@style/ColorViewStyle2" />
-            <ImageView
-                android:id="@+id/colorView3"
-                style="@style/ColorViewStyle3" />
-            <ImageView
-                android:id="@+id/colorView4"
-                style="@style/ColorViewStyle4" />
-        </RelativeLayout>
+            android:padding="8dp"
+            android:textSize="18sp"
+            android:textColor="@color/white"
+            android:text="历史记录"
+            android:visibility="visible"/>
 
     </RelativeLayout>
 

@@ -34,7 +34,7 @@ public class ShowListMsgActivity extends BaseActivity {
         bannerTitle = (TextView) findViewById(R.id.bannerTitle);
         listItem = new ArrayList<>();
         Intent intent = getIntent();
-        bannerTitle.setText("title");
+        bannerTitle.setText(intent.getStringExtra("title"));
         if (intent.hasExtra("response")){
             response = intent.getStringExtra("response");
             try {

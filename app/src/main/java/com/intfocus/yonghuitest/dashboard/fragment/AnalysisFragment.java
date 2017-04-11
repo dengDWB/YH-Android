@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.RelativeLayout;
 
 import com.intfocus.yonghuitest.R;
@@ -14,10 +13,6 @@ import com.intfocus.yonghuitest.util.URLs;
 import com.intfocus.yonghuitest.view.CustomWebView;
 
 import org.json.JSONException;
-
-/**
- * Created by liuruilin on 2017/3/26.
- */
 
 public class AnalysisFragment extends WebViewFragment {
     @Override

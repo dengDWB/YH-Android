@@ -76,7 +76,7 @@ public class FileUtil {
         return false;
     }
 
-    private static String userspace(Context context) {
+    public static String userspace(Context context) {
         String spacePath = "";
         try {
             String userConfigPath = String.format("%s/%s", FileUtil.basePath(context), K.kUserConfigFileName);

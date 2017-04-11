@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.RelativeLayout;
 
 import com.intfocus.yonghuitest.R;
@@ -17,10 +16,6 @@ import org.json.JSONException;
 
 import static com.intfocus.yonghuitest.util.K.kUserId;
 import static com.intfocus.yonghuitest.util.URLs.kGroupId;
-
-/**
- * Created by liuruilin on 2017/3/26.
- */
 
 public class MessageFragment extends WebViewFragment {
     @Override

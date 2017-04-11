@@ -10,9 +10,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.intfocus.yonghuitest.BaseActivity;
+import com.intfocus.yonghuitest.LoginActivity;
 import com.intfocus.yonghuitest.R;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -56,7 +58,7 @@ public class SettingActivity extends BaseActivity {
      */
     private void initSettingListItem() {
         ArrayList<String> listItem = new ArrayList<>();
-        String[] itemName = {"个人资料", "应用信息", "选项配置", "消息推送", "小四说", "开发者选项"};
+        String[] itemName = {"基本信息", "应用信息", "选项配置", "消息推送", "更新日志"};
 
         for (int i = 0; i < itemName.length; i++) {
             listItem.add(itemName[i]);
@@ -77,9 +79,9 @@ public class SettingActivity extends BaseActivity {
         public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
             TextView mItemText = (TextView) arg1.findViewById(R.id.item_setting);
             switch (mItemText.getText().toString()) {
-                case "个人资料" :
+                case "基本信息" :
                     Intent userInfoIntent = new Intent(mContext, SettingListActivity.class);
-                    userInfoIntent.putExtra("type", "个人资料");
+                    userInfoIntent.putExtra("type", "基本信息");
                     startActivity(userInfoIntent);
                     break;
 
@@ -95,7 +97,7 @@ public class SettingActivity extends BaseActivity {
                     startActivity(pushIntent);
                     break;
 
-                case "小四说" :
+                case "更新日志" :
                     Intent thursdaySayIntent = new Intent(SettingActivity.this,ThursdaySayActivity.class);
                     thursdaySayIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     startActivity(thursdaySayIntent);
@@ -108,4 +110,15 @@ public class SettingActivity extends BaseActivity {
             }
         }
     };
+
+    /*
+     * 退出登录
+     */
+    public void loginOut(View v) {
+        modifiedUserConfig(false);
+        Intent intent = new Intent();
+        intent.setClass(SettingActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+    }
 }

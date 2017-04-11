@@ -15,8 +15,10 @@ import android.widget.TextView;
 
 import com.intfocus.yonghuitest.BaseActivity;
 import com.intfocus.yonghuitest.R;
+import com.intfocus.yonghuitest.ResetPasswordActivity;
 import com.intfocus.yonghuitest.util.HttpUtil;
 import com.intfocus.yonghuitest.util.K;
+import com.intfocus.yonghuitest.util.URLs;
 import com.umeng.message.PushAgent;
 
 import org.json.JSONException;
@@ -50,9 +52,18 @@ public class SettingListActivity extends BaseActivity {
 
     private void initListInfo(String type) {
         switch (type) {
-            case "个人资料" :
-                mItemNameList = new String[]{};
-                mItemContentList = new String[]{};
+            case "基本信息" :
+                try {
+                    mItemNameList = new String[]{"用户名", "用户角色", "所属商行", "手机号码", "邮箱", "修改密码"};
+                    mItemContentList = new String[]{user.getString(URLs.kUserName),
+                                                    user.getString(URLs.kRoleName),
+                                                    user.getString(URLs.kGroupName),
+                                                    "暂未提供",
+                                                    "暂未提供",
+                                                    ""};
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 break;
 
             case "应用信息" :
@@ -67,8 +78,8 @@ public class SettingListActivity extends BaseActivity {
                 String apiDomain = K.kBaseUrl.replace("http://", "").replace("https://", "");
                 String versionInfo = String.format("%s(%d)", packageInfo.versionName, packageInfo.versionCode);
                 String appPackageInfo = packageInfo.packageName;
-                mItemNameList = new String[]{"应用名称", "版本号", "设备型号", "数据接口", "应用标识"};
-                mItemContentList = new String[]{appName, versionInfo, deviceInfo, apiDomain, appPackageInfo};
+                mItemNameList = new String[]{"应用名称", "检测更新", "设备型号", "数据接口", "应用标识"};
+                mItemContentList = new String[]{appName, "当前版本: " + versionInfo, deviceInfo, apiDomain, appPackageInfo};
                 break;
 
             case "消息推送" :
@@ -134,7 +145,7 @@ public class SettingListActivity extends BaseActivity {
                     }
                     break;
 
-                case "版本号" :
+                case "检测更新" :
                     checkPgyerVersionUpgrade(SettingListActivity.this, true);
                     break;
 
@@ -186,6 +197,10 @@ public class SettingListActivity extends BaseActivity {
                         e.printStackTrace();
                     }
                     break;
+
+                case "修改密码" :
+                    Intent intent = new Intent(SettingListActivity.this, ResetPasswordActivity.class);
+                    startActivity(intent);
             }
         }
     };

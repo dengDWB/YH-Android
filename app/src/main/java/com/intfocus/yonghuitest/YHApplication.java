@@ -87,7 +87,7 @@ public class YHApplication extends Application {
          *  不一致时，则删除原解压后文件夹，重新解压 zip
          */
         FileUtil.checkAssets(appContext, URLs.kAssets, false);
-        FileUtil.checkAssets(appContext, URLs.kLoding, false);
+        FileUtil.checkAssets(appContext, URLs.kLoading, false);
         FileUtil.checkAssets(appContext, URLs.kFonts, true);
         FileUtil.checkAssets(appContext, URLs.kImages, true);
         FileUtil.checkAssets(appContext, URLs.kStylesheets, true);
@@ -307,7 +307,7 @@ public class YHApplication extends Application {
 
             String assetZipPath;
             File assetZipFile;
-            String[] assetsName = {URLs.kAssets,URLs.kLoding,URLs.kFonts,URLs.kImages,URLs.kStylesheets,URLs.kJavaScripts,URLs.kBarCodeScan}; // ,URLs.kAdvertisement
+            String[] assetsName = {URLs.kAssets,URLs.kLoading,URLs.kFonts,URLs.kImages,URLs.kStylesheets,URLs.kJavaScripts,URLs.kBarCodeScan}; // ,URLs.kAdvertisement
 
             for (String string : assetsName) {
                 assetZipPath = String.format("%s/%s.zip", sharedPath, string);

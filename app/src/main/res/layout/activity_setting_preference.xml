@@ -27,7 +27,8 @@
 
     </RelativeLayout>
 
-    <RelativeLayout style="@style/SettingGroup">
+    <RelativeLayout style="@style/SettingGroup"
+        android:paddingLeft="10dp">
 
         <TextView
             style="@style/SettingKey"
@@ -42,11 +43,12 @@
 
     <View style="@style/Divider"/>
 
-    <RelativeLayout style="@style/SettingGroup">
+    <RelativeLayout style="@style/SettingGroup"
+                    android:paddingLeft="10dp">
 
         <TextView
             style="@style/SettingKey"
-            android:text="微信分析长图"/>
+            android:text="微信分享长图"/>
 
         <Switch
             android:id="@+id/switch_screenshot"
@@ -57,7 +59,8 @@
 
     <View style="@style/Divider"/>
 
-    <RelativeLayout style="@style/SettingGroup">
+    <RelativeLayout style="@style/SettingGroup"
+                    android:paddingLeft="10dp">
 
         <TextView
             style="@style/SettingKey"
@@ -72,7 +75,8 @@
 
     <View style="@style/Divider"/>
 
-    <RelativeLayout style="@style/SettingGroup">
+    <RelativeLayout style="@style/SettingGroup"
+                    android:paddingLeft="10dp">
 
         <TextView
             style="@style/SettingKey"
@@ -89,11 +93,13 @@
 
     <RelativeLayout
         android:id="@+id/item_clear_cache"
-        style="@style/SettingGroup">
+        style="@style/SettingGroup"
+        android:paddingLeft="10dp"
+        android:onClick="clearUserCache">
 
         <TextView
             style="@style/SettingKey"
-            android:text="清理缓存(缓存列表)"/>
+            android:text="清理缓存"/>
     </RelativeLayout>
 
     <View style="@style/Divider"/>

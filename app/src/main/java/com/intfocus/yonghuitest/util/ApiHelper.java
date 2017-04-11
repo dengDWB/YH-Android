@@ -27,6 +27,7 @@ import static com.intfocus.yonghuitest.util.K.kImagesMd5;
 import static com.intfocus.yonghuitest.util.K.kInfo;
 import static com.intfocus.yonghuitest.util.K.kUserName;
 import static com.intfocus.yonghuitest.util.PrivateURLs.kAppCode;
+import static com.intfocus.yonghuitest.util.PrivateURLs.kfrBaseUrl;
 
 public class ApiHelper {
     /*

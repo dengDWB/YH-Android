@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 import com.intfocus.yonghuitest.util.ApiHelper;
 import com.intfocus.yonghuitest.util.K;
 import com.intfocus.yonghuitest.util.URLs;
@@ -37,9 +37,8 @@ public class CommentActivity extends BaseActivity {
         setContentView(R.layout.activity_comment);
 
         TextView mTitle = (TextView) findViewById(R.id.bannerTitle);
-        pullToRefreshWebView = (PullToRefreshWebView) findViewById(R.id.browser);
-        initPullWebView();
-        setPullToRefreshWebView(true);
+        mWebView = (WebView) findViewById(R.id.browser);
+        initSubWebView();
 
         mWebView.requestFocus();
         mWebView.addJavascriptInterface(new JavaScriptInterface(), URLs.kJSInterfaceName);

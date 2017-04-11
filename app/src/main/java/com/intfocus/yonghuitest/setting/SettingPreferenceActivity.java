@@ -4,16 +4,20 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import com.intfocus.yonghuitest.BaseActivity;
 import com.intfocus.yonghuitest.R;
 import com.intfocus.yonghuitest.screen_lock.InitPassCodeActivity;
+import com.intfocus.yonghuitest.util.FileUtil;
+
+import java.io.File;
 
 /**
  * Created by liuruilin on 2017/3/28.
- * 用户选项配置页面
  */
 
 public class SettingPreferenceActivity extends BaseActivity {
@@ -104,4 +108,13 @@ public class SettingPreferenceActivity extends BaseActivity {
             mEditor.commit();
         }
     };
+
+    /*
+     * 清理缓存
+     */
+    public void clearUserCache(View v) {
+        String userspace = FileUtil.userspace(mContext);
+        new File(userspace).delete();
+        Toast.makeText(mContext, "缓存已清理", Toast.LENGTH_SHORT).show();
+    }
 }
