@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -63,6 +64,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	private ArrayList<HashMap<String, Object>> listItem;
 	private Context mContext;
 	private int loadCount = 0;
+	private TextView mTitle;
 
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
@@ -111,7 +113,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 	private void initActiongBar(){
 		bannerView = (RelativeLayout) findViewById(R.id.actionBar);
 		ImageView mBannerSetting = (ImageView) findViewById(R.id.bannerSetting);
-		TextView mTitle = (TextView) findViewById(R.id.bannerTitle);
+		mTitle = (TextView) findViewById(R.id.bannerTitle);
 
 		/*
          * Intent Data || JSON Data
@@ -219,6 +221,24 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 		 * 判断是否允许浏览器复制
 		 */
 		isAllowBrowerCopy();
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						if (isOffline){
+							mTitle.setTextColor(Color.YELLOW);
+						}
+					}
+				});
+			}
+		}).start();
 		super.onResume();
 	}
 
@@ -351,11 +371,12 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 				@Override
 				public void run() {
 					boolean reportDataState = ApiHelper.reportData(mAppContext, String.format("%d", groupID), templateID, reportID);
-					if (reportDataState) {
-						new Thread(mRunnableForDetecting).start();
-					} else {
-						showWebViewExceptionForWithoutNetwork();
-					}
+					new Thread(mRunnableForDetecting).start();
+//					if (reportDataState) {
+//						new Thread(mRunnableForDetecting).start();
+//					} else {
+//						showWebViewExceptionForWithoutNetwork();
+//					}
 				}
 			}).start();
 		} else {
