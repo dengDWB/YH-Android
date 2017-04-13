@@ -6,6 +6,11 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
+
+import org.OpenUDID.OpenUDID_manager;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -17,17 +22,12 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import org.OpenUDID.OpenUDID_manager;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import static com.intfocus.yonghuitest.util.K.kAppVersion;
 import static com.intfocus.yonghuitest.util.K.kFontsMd5;
 import static com.intfocus.yonghuitest.util.K.kImagesMd5;
 import static com.intfocus.yonghuitest.util.K.kInfo;
 import static com.intfocus.yonghuitest.util.K.kUserName;
-import static com.intfocus.yonghuitest.util.PrivateURLs.kAppCode;
-import static com.intfocus.yonghuitest.util.PrivateURLs.kfrBaseUrl;
 
 public class ApiHelper {
     /*
