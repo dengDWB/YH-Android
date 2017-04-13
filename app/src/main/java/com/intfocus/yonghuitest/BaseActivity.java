@@ -98,6 +98,7 @@ public class BaseActivity extends Activity {
     public Context mAppContext;
     public Toast toast;
     int displayDpi; //屏幕密度
+    boolean isOffline = false;
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -295,7 +296,7 @@ public class BaseActivity extends Activity {
     /**
      * Instances of static inner classes do not hold an implicit reference to their outer class.
      */
-    public static class HandlerForDetecting extends Handler {
+    public class HandlerForDetecting extends Handler {
         private final WeakReference<BaseActivity> weakActivity;
         private final Context mContext;
         private WebView mWebView;
@@ -329,6 +330,12 @@ public class BaseActivity extends Activity {
                     mWebView.loadUrl(urlStringForLoading);
                 }
             });
+        }
+
+        public String getLoadLocalHtmlUrl(){
+            String htmlName = HttpUtil.UrlToFileName(mUrlString);
+            String htmlPath = String.format("%s/%s", mAssetsPath, htmlName);
+            return htmlPath;
         }
 
         private void showDialogForDeviceForbided() {
@@ -398,16 +405,32 @@ public class BaseActivity extends Activity {
                 case 201:
                 case 304:
                     new Thread(mRunnableWithAPI).start();
+                    isOffline = false;
                     break;
                 case 400:
                 case 408:
-                    showWebViewForWithoutNetwork();
+                    if (new File(getLoadLocalHtmlUrl()).exists()){
+                        mWebView.loadUrl("file:///" + getLoadLocalHtmlUrl());
+                        isOffline = true;
+                    }else {
+                        showWebViewForWithoutNetwork();
+                    }
                     break;
                 case 401:
-                    showDialogForDeviceForbided();
+                    if (new File(getLoadLocalHtmlUrl()).exists()){
+                        mWebView.loadUrl("file:///" + getLoadLocalHtmlUrl());
+                        isOffline = true;
+                    }else {
+                        showDialogForDeviceForbided();
+                    }
                     break;
                 default:
-                    showWebViewForWithoutNetwork();
+                    if (new File(getLoadLocalHtmlUrl()).exists()){
+                        mWebView.loadUrl("file:///" + getLoadLocalHtmlUrl());
+                        isOffline = true;
+                    }else {
+                        showWebViewForWithoutNetwork();
+                    }
                     LogUtil.d("UnkownCode", String.format("%d", message.what));
                     break;
             }
@@ -415,7 +438,7 @@ public class BaseActivity extends Activity {
 
     }
 
-    public static class HandlerWithAPI extends Handler {
+    public class HandlerWithAPI extends Handler {
         private final WeakReference<BaseActivity> weakActivity;
         private WebView mWebView;
         private String mSharedPath;
@@ -451,8 +474,17 @@ public class BaseActivity extends Activity {
             }
         }
 
+        public void loadLocalHtml(final String htmlPath){
+            weakActivity.get().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mWebView.loadUrl("file:///" + htmlPath);
+                }
+            });
+        }
+
         @Override
-        public void handleMessage(Message message) {
+        public void handleMessage(final Message message) {
             BaseActivity activity = weakActivity.get();
             if (activity == null || mWebView == null) {
                 return;
@@ -462,23 +494,44 @@ public class BaseActivity extends Activity {
                 case 200:
                 case 304:
                     final String localHtmlPath = String.format("file:///%s", (String) message.obj);
-                    LogUtil.d("localHtmlPath", localHtmlPath);
+                    LogUtil.d("localHtmlPath111", localHtmlPath);
                     weakActivity.get().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             mWebView.loadUrl(localHtmlPath);
                         }
                     });
+                    isOffline = false;
                     break;
                 case 400:
                 case 401:
                 case 408:
-                    showWebViewForWithoutNetwork();
+                    if (new File((String)message.obj).exists()){
+                        weakActivity.get().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mWebView.loadUrl("file:///" + message.obj);
+                            }
+                        });
+                        isOffline = true;
+                    }else {
+                        showWebViewForWithoutNetwork();
+                    }
                     deleteHeadersFile();
                     break;
                 default:
+                    if (new File((String)message.obj).exists()){
+                        weakActivity.get().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mWebView.loadUrl("file:///" + message.obj);
+                            }
+                        });
+                        isOffline = true;
+                    }else {
+                        showWebViewForWithoutNetwork();
+                    }
                     String msg = String.format("访问服务器失败（%d)", message.what);
-                    showWebViewForWithoutNetwork();
                     Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
                     deleteHeadersFile();
                     break;

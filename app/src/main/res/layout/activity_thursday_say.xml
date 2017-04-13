@@ -23,7 +23,7 @@
 
         <TextView
             android:id="@+id/bannerTitle"
-            android:text="小四说"
+            android:text="更新日志"
             style="@style/BannerTitle" />
 
         <RelativeLayout

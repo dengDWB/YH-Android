@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.intfocus.yonghuitest.util.PrivateURLs.kfrBaseUrl;
 
 /**
  * Created by liuruilin on 2017/3/22.

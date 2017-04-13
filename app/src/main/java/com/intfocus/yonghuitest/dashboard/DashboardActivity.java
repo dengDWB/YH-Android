@@ -214,11 +214,11 @@ public class DashboardActivity extends FragmentActivity implements ViewPager.OnP
                     break;
 
                 case "语音播报":
-                    WidgetUtil.showToast(mContext, "功能开发中，敬请期待");
+                    WidgetUtil.showToastShort(mContext, "功能开发中，敬请期待");
                     break;
 
                 case "搜索":
-                    WidgetUtil.showToast(mContext, "功能开发中，敬请期待");
+                    WidgetUtil.showToastShort(mContext, "功能开发中，敬请期待");
                     break;
                 default:
                     break;
