@@ -1,4 +1,4 @@
-package com.intfocus.yonghuitest;
+package com.intfocus.yonghuitest.adapter;
 
 import android.content.Context;
 import android.view.View;
@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.intfocus.yonghuitest.R;
 import com.intfocus.yonghuitest.util.FileUtil;
 import com.intfocus.yonghuitest.util.K;
 import com.intfocus.yonghuitest.util.URLs;
