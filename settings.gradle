@@ -1,7 +1,5 @@
-include ':app', ':pull-to-refresh', ':umeng-social', ':android-pdfview', 'umeng-push', ':PushSDK', ':HomeMetrics', ':MPChartLib', ':tablelib'
+include ':app', ':pull-to-refresh', ':umeng-social', ':android-pdfview', 'umeng-push', ':PushSDK', ':tablelib'
 project(':android-pdfview').projectDir = new File('libs/android-pdfview')
 project(':umeng-social').projectDir = new File('libs/umeng-social')
 project(':pull-to-refresh').projectDir = new File('libs/pull-to-refresh')
-project(':HomeMetrics').projectDir = new File('libs/HomeMetrics')
-project(':MPChartLib').projectDir = new File('libs/MPChartLib')
 project(':tablelib').projectDir = new File('libs/tablelib')
