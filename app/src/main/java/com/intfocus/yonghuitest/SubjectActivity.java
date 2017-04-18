@@ -1,8 +1,10 @@
 package com.intfocus.yonghuitest;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -238,7 +240,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			@Override
 			public void run() {
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(3000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -383,13 +385,36 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					boolean reportDataState = ApiHelper.reportData(mAppContext, String.format("%d", groupID), templateID, reportID);
+				boolean reportDataState = ApiHelper.reportData(mAppContext, String.format("%d", groupID), templateID, reportID);
+				String jsFileName = "";
+
+				// 模板 4 的 groupID 为 0
+				if(Integer.valueOf(templateID) == 4){
+					jsFileName = String.format("group_%s_template_%s_report_%s.js", "0", templateID, reportID);
+				}else{
+					jsFileName = String.format("group_%s_template_%s_report_%s.js", String.format("%d", groupID), templateID, reportID);
+				}
+				String javascriptPath = String.format("%s/assets/javascripts/%s", sharedPath, jsFileName);
+				if(new File(javascriptPath).exists()){
 					new Thread(mRunnableForDetecting).start();
-//					if (reportDataState) {
-//						new Thread(mRunnableForDetecting).start();
-//					} else {
-//						showWebViewExceptionForWithoutNetwork();
-//					}
+				}else{
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							AlertDialog.Builder builder = new AlertDialog.Builder(SubjectActivity.this);
+							builder.setTitle("温馨提示")
+									.setMessage("报表数据下载失败,不再加载网页")
+									.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(DialogInterface dialog, int which) {
+											dialog.dismiss();
+											SubjectActivity.this.finish();
+										}
+									});
+							builder.show();
+						}
+					});
+				}
 				}
 			}).start();
 		} else {

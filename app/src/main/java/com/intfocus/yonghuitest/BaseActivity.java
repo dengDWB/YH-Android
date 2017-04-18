@@ -14,14 +14,13 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -29,7 +28,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -58,14 +56,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -405,7 +398,6 @@ public class BaseActivity extends Activity {
                 case 201:
                 case 304:
                     new Thread(mRunnableWithAPI).start();
-                    isOffline = false;
                     break;
                 case 400:
                 case 408:
@@ -472,15 +464,6 @@ public class BaseActivity extends Activity {
             if ((new File(headersFilePath)).exists()) {
                 new File(headersFilePath).delete();
             }
-        }
-
-        public void loadLocalHtml(final String htmlPath){
-            weakActivity.get().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mWebView.loadUrl("file:///" + htmlPath);
-                }
-            });
         }
 
         @Override
@@ -845,5 +828,21 @@ public class BaseActivity extends Activity {
         Uri uri = Uri.fromParts("package", getPackageName(), null);
         intent.setData(uri);
         startActivity(intent);
+    }
+
+    /*
+     * 判断有无网络
+     */
+    public boolean isNetworkConnected(Context context) {
+        if (context != null) {
+            // 获取手机所有连接管理对象(包括对wi-fi,net等连接的管理)
+            ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            // 获取NetworkInfo对象
+            NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+            //判断NetworkInfo对象是否为空
+            if (networkInfo != null)
+                return networkInfo.isAvailable();
+        }
+        return false;
     }
 }
