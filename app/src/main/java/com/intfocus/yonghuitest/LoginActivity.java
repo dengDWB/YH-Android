@@ -29,6 +29,7 @@ import com.intfocus.yonghuitest.util.K;
 import com.intfocus.yonghuitest.util.URLs;
 import com.pgyersdk.update.PgyUpdateManager;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -113,6 +114,17 @@ public class LoginActivity extends BaseActivity{
                 builder.show();
             }
         });
+
+        /*
+         * 显示记住用户名称
+         */
+        try {
+            if (user.has(URLs.kUserNum)) {
+                usernameEditText.setText(user.getString(URLs.kUserNum));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         /*
          * 显示当前应用版本号
