@@ -9,7 +9,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -362,7 +361,7 @@ public class BaseFragment extends Fragment {
                     intent.putExtra(URLs.kBannerName, bannerName);
                     intent.putExtra(URLs.kLink, link);
                     intent.putExtra(URLs.kObjectId, objectID);
-                    intent.putExtra(URLs.kObjectType, "1");
+                    intent.putExtra(URLs.kObjectType, 1);
                     startActivity(intent);
                 }
             });

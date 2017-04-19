@@ -14,6 +14,7 @@ import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,12 +23,15 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import com.intfocus.yonghuitest.BarCodeScannerActivity;
-import com.intfocus.yonghuitest.adapter.MenuAdapter;
 import com.intfocus.yonghuitest.R;
+import com.intfocus.yonghuitest.SubjectActivity;
 import com.intfocus.yonghuitest.YHApplication;
+import com.intfocus.yonghuitest.adapter.MenuAdapter;
 import com.intfocus.yonghuitest.setting.SettingActivity;
+import com.intfocus.yonghuitest.setting.ThursdaySayActivity;
 import com.intfocus.yonghuitest.util.FileUtil;
 import com.intfocus.yonghuitest.util.HttpUtil;
 import com.intfocus.yonghuitest.util.K;
@@ -39,6 +43,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -80,6 +85,13 @@ public class DashboardActivity extends FragmentActivity implements ViewPager.OnP
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        Log.d("shengming1", "aa");
+        dealSendMessage();
     }
 
     @Override
@@ -326,6 +338,55 @@ public class DashboardActivity extends FragmentActivity implements ViewPager.OnP
             if (i != mViewPager.getCurrentItem()) {
                 mTabView[i].setActive(false);
             }
+        }
+    }
+
+    private void dealSendMessage() {
+        String pushMessagePath = String.format("%s/%s", FileUtil.basePath(mAppContext), K.kPushMessageFileName);
+        JSONObject pushMessageJSON = FileUtil.readConfigFile(pushMessagePath);
+        try {
+            if (pushMessageJSON.has("state") && pushMessageJSON.getBoolean("state")) {
+                return;
+            }
+            if (pushMessageJSON.has("type")) {
+                String type = pushMessageJSON.getString("type");
+                switch (type) {
+                    case "report":
+                        Intent subjectIntent = new Intent(this, SubjectActivity.class);
+                        subjectIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        try{
+                            subjectIntent.putExtra(URLs.kLink, pushMessageJSON.getString("url"));
+                            subjectIntent.putExtra(URLs.kBannerName, pushMessageJSON.getString("title"));
+                            subjectIntent.putExtra(URLs.kObjectId, pushMessageJSON.getInt("object_id"));
+                            subjectIntent.putExtra(URLs.kObjectType, pushMessageJSON.getInt("object_type"));
+                            startActivity(subjectIntent);
+                        }catch (Exception e){
+                            Toast.makeText(DashboardActivity.this, "推送消息的格式有误", Toast.LENGTH_SHORT);
+                            e.printStackTrace();
+                        }
+                        break;
+                    case "analyse":
+                        mViewPager.setCurrentItem(PAGE_ANALYSIS);
+                        mTabView[mViewPager.getCurrentItem()].setActive(true);
+                        break;
+                    case "app":
+                        mViewPager.setCurrentItem(PAGE_APP);
+                        mTabView[mViewPager.getCurrentItem()].setActive(true);
+                        break;
+                    case "message":
+                        mViewPager.setCurrentItem(PAGE_MESSAGE);
+                        mTabView[mViewPager.getCurrentItem()].setActive(true);
+                        break;
+                    case "thursday_say":
+                        Intent blogLinkIntent = new Intent(DashboardActivity.this, ThursdaySayActivity.class);
+                        startActivity(blogLinkIntent);
+                }
+            }
+            refreshTabView();
+            pushMessageJSON.put("state", true);
+            FileUtil.writeFile(pushMessagePath, pushMessageJSON.toString());
+        } catch (JSONException | IOException e) {
+            e.printStackTrace();
         }
     }
 }

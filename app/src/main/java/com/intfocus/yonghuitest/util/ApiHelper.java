@@ -163,9 +163,17 @@ public class ApiHelper {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            deleteHeadersFile(assetsPath);
             return false;
         }
         return true;
+    }
+
+    public static void deleteHeadersFile(String assetsPath) {
+        String headersFilePath = String.format("%s/%s", assetsPath, K.kCachedHeaderConfigFileName);
+        if ((new File(headersFilePath)).exists()) {
+            new File(headersFilePath).delete();
+        }
     }
 
     /*

@@ -33,10 +33,11 @@ import org.OpenUDID.OpenUDID_manager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static com.intfocus.yonghuitest.util.K.kPushDeviceToken;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import static com.intfocus.yonghuitest.util.K.kPushDeviceToken;
 
 
 /**
@@ -183,7 +184,7 @@ public class YHApplication extends Application {
                 }
                 else {
                     String activityName = mCurrentActivity;
-                    if (activityName.equals("LoginActivity") || activityName.equals("ConfirmPassCodeActivity")) {
+                    if (activityName.equals("LoginActivity") || activityName.equals("ConfirmPassCodeActivity") || activityName.equals("DashboardActivity")) {
                         return;
                     }
                     intent = new Intent (appContext,DashboardActivity.class);
