@@ -30,6 +30,7 @@ public class K extends PrivateURLs implements Serializable {
   public final static String kDownloadAssetsAPIPath   = "%s/api/v1/download/%s.zip";
   public final static String kUploadGravatarAPIPath   = "%s/api/v1/device/%s/upload/user/%s/gravatar";
   public final static String kDeviceTokenAPIPath      = "%s/api/v1/user/%s/devices";
+  public final static String kDeleteDeviceIdAPIPath   = "%s/api/v1/android/%s/logout";
 
   /**
    *  Mobile#View Path

@@ -17,7 +17,8 @@
     <color name="colors8">#192162</color>
     <color name="colors9">#000000</color>
 
-
+    <!-- 透明 -->
+    <color name="transparent">#0000</color>
     <!-- 基本色 -->
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
@@ -42,6 +43,42 @@
     <color name="tab_background">#ffffff</color>
     <color name="tab_checked">#53a93f</color>
     <color name="tab_default">#000000</color>
+
+    <color name="halftransparent">#3fffffff</color>
+    <color name="ssss">#e6ffffff</color>
+    <color name="background">@color/grey_241_241_241</color>
+    <color name="text_black">@color/black_52_52_52</color>
+    <color name="text_normal">@color/grey_148_148_148</color>
+    <color name="text_green">@color/green_30_205_160</color>
+    <color name="text_white">@color/white_255_255_255</color>
+    <color name="text_red">@color/red_226_23_23</color>
+    <color name="text_blue">@color/blue_0_191_225</color>
+    <!-- black -->
+    <color name="black_52_52_52">#343434</color>
+    <color name="black_104_104_104">#686868</color>
+    <color name="black_51_51_51">#333333</color>
+    <!-- grey -->
+    <color name="grey_148_148_148">#949494</color>
+    <color name="grey_241_241_241">#F1F1F1</color>
+    <color name="grey_76_76_76">#4C4C4C</color>
+    <!-- white -->
+    <color name="white_244_244_244">#F4F4F4</color>
+    <color name="white_255_255_255">#FFFFFF</color>
+    <!-- green -->
+    <color name="green_30_205_160">#1ECDA0</color>
+    <color name="green_31_199_166">#1FC7A6</color>
+    <color name="green_98_201_154">#62C99A</color>
+    <color name="green_58_159_153">#3A9F99</color>
+
+    <color name="red_242_129_99">#F28163</color>
+    <color name="red_226_23_23">#E21717</color>
+    <!-- purple -->
+    <color name="purple">#7D609C</color>
+    <!-- blue -->
+    <!-- 海军蓝 -->
+    <color name="blue_0_0_128">#000080</color>
+    <!-- 深天蓝 -->
+    <color name="blue_0_191_225">#00BFFF</color>
 
 
     <!-- 主题绿色 -->
@@ -78,5 +115,4 @@
     <color name="co16">#a984d3</color>
     <!-- 红 -->
     <color name="co17">#f44f4f</color>
-
 </resources>
