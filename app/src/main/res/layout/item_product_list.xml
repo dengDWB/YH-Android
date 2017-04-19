@@ -15,7 +15,7 @@
         android:layout_width="8dp"
         android:layout_height="8dp"
         android:layout_gravity="center_vertical"
-        android:src="@mipmap/icon_nowt" />
+        android:src="@drawable/icon_nowt" />
 
     <TextView
         android:id="@+id/tv_product_name"

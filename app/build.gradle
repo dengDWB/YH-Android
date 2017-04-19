@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'android-apt'
 
 android {
     signingConfigs {
@@ -6,7 +7,7 @@ android {
     compileSdkVersion 24
     buildToolsVersion '25.0.0'
     defaultConfig {
-        applicationId 'com.intfocus.yonghuitest'
+        applicationId 'com.intfocus.yh_android'
         minSdkVersion 15
         targetSdkVersion 23
 //        jackOptions {
@@ -98,6 +99,7 @@ dependencies {
     compile files('libs/umeng_social_sdk.jar')
     compile files('libs/android-viewbadger.jar')
     compile 'com.google.code.gson:gson:2.2.4'
+    apt 'com.jakewharton:butterknife-compiler:8.1.0'
     compile 'com.jakewharton:butterknife:8.1.0'
     compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
 }

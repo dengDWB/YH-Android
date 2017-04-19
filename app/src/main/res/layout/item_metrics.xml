@@ -54,7 +54,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:src="@mipmap/icon_redarrow" />
+                    android:src="@drawable/icon_redarrow" />
             </RelativeLayout>
 
             <TextView
@@ -112,7 +112,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:src="@mipmap/icon_redarrow" />
+                    android:src="@drawable/icon_redarrow" />
             </RelativeLayout>
 
             <TextView
@@ -170,7 +170,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:src="@mipmap/icon_redarrow" />
+                    android:src="@drawable/icon_redarrow" />
             </RelativeLayout>
 
             <TextView
@@ -235,7 +235,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:src="@mipmap/icon_redarrow" />
+                    android:src="@drawable/icon_redarrow" />
             </RelativeLayout>
 
             <TextView
@@ -293,7 +293,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:src="@mipmap/icon_redarrow" />
+                    android:src="@drawable/icon_redarrow" />
             </RelativeLayout>
 
             <TextView
@@ -351,7 +351,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:src="@mipmap/icon_redarrow" />
+                    android:src="@drawable/icon_redarrow" />
             </RelativeLayout>
 
             <TextView

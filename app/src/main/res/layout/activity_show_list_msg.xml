@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.intfocus.yonghuitest.setting.ShowListMsgActivity">
+    tools:context="com.intfocus.yh_android.setting.ShowListMsgActivity">
 
     <RelativeLayout
         android:id="@+id/actionBar"
