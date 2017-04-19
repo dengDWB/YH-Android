@@ -30,7 +30,6 @@ public class ValueFormatter implements IAxisValueFormatter {
 
     @Override
     public String getFormattedValue(float value, AxisBase axis) {
-
         int days = (int) value;
         String valueName = mValue[days];
         return days == 0 ? "" : valueName;
