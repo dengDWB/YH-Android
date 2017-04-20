@@ -1,9 +1,12 @@
 package com.intfocus.yonghuitest;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -26,6 +29,7 @@ import com.intfocus.yonghuitest.util.HttpUtil;
 import com.intfocus.yonghuitest.util.K;
 import com.intfocus.yonghuitest.util.LogUtil;
 import com.intfocus.yonghuitest.util.URLs;
+import com.intfocus.yonghuitest.util.WidgetUtil;
 import com.intfocus.yonghuitest.view.CustomWebView;
 
 import org.json.JSONException;
@@ -358,19 +362,43 @@ public class BaseFragment extends Fragment {
                     String message = String.format("%s\n%s\n%d", bannerName, link, objectID);
                     LogUtil.d("JSClick", message);
 
-                    if (link.equals("http://development.shengyiplus.com/api/v1/temp/template/3/report/1/data")) {
+                    String templateID = TextUtils.split(link, "/")[7];
+
+//                    if (link.equals("http://development.shengyiplus.com/api/v1/temp/template/3/report/1/data")) {
+                    if (templateID.equals("3")) {
                         Intent homeTricsIntent = new Intent(mContext, HomeTricsActivity.class);
                         homeTricsIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         mContext.startActivity(homeTricsIntent);
                         return;
                     }
-                    Intent intent = new Intent(getActivity(), SubjectActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                    intent.putExtra(URLs.kBannerName, bannerName);
-                    intent.putExtra(URLs.kLink, link);
-                    intent.putExtra(URLs.kObjectId, objectID);
-                    intent.putExtra(URLs.kObjectType, 1);
-                    startActivity(intent);
+                    else if (templateID.equals("5")) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setTitle("温馨提示")
+                                .setMessage("当前版本暂不支持该模板, 请升级应用后查看")
+                                .setPositiveButton("前去升级", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        WidgetUtil.showToastShort(getActivity(), "升级应用");
+                                    }
+                                })
+                                .setNegativeButton("稍后升级", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // 返回 LoginActivity
+                                    }
+                                });
+                        builder.show();
+                    }
+                    else {
+                        Intent intent = new Intent(getActivity(), SubjectActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        intent.putExtra(URLs.kBannerName, bannerName);
+                        intent.putExtra(URLs.kLink, link);
+                        intent.putExtra(URLs.kObjectId, objectID);
+                        intent.putExtra(URLs.kObjectType, 1);
+                        startActivity(intent);
+                    }
+
                 }
             });
         }
