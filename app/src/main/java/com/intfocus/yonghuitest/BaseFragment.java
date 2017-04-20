@@ -362,23 +362,21 @@ public class BaseFragment extends Fragment {
                     String message = String.format("%s\n%s\n%d", bannerName, link, objectID);
                     LogUtil.d("JSClick", message);
 
-                    String templateID = TextUtils.split(link, "/")[7];
-
-//                    if (link.equals("http://development.shengyiplus.com/api/v1/temp/template/3/report/1/data")) {
-                    if (templateID.equals("3")) {
+                    if (link.equals("http://development.shengyiplus.com/api/v1/temp/template/3/report/1/data")) {
                         Intent homeTricsIntent = new Intent(mContext, HomeTricsActivity.class);
                         homeTricsIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         mContext.startActivity(homeTricsIntent);
                         return;
                     }
-                    else if (templateID.equals("5")) {
+                    else if (link.equals("http://development.shengyiplus.com/api/v1/temp/template/5/report/1/data")) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setTitle("温馨提示")
                                 .setMessage("当前版本暂不支持该模板, 请升级应用后查看")
                                 .setPositiveButton("前去升级", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        WidgetUtil.showToastShort(getActivity(), "升级应用");
+                                        Intent browserIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(K.kPgyerUrl));
+                                        startActivity(browserIntent);
                                     }
                                 })
                                 .setNegativeButton("稍后升级", new DialogInterface.OnClickListener() {
