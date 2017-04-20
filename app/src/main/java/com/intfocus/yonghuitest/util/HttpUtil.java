@@ -1,5 +1,6 @@
 package com.intfocus.yonghuitest.util;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,6 +11,9 @@ import android.os.PowerManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -32,8 +37,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class HttpUtil {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -496,11 +499,16 @@ public class HttpUtil {
         private PowerManager.WakeLock mWakeLock;
         private final String assetFilename;
         private final boolean isInAssets;
+        private ProgressDialog mProgressDialog;
 
         public DownloadAssetsTask(Context context, String assetFilename, boolean isInAssets) {
             this.context = context;
             this.assetFilename = assetFilename;
             this.isInAssets = isInAssets;
+            mProgressDialog = new ProgressDialog(context);
+            mProgressDialog.setTitle("提示信息");
+            mProgressDialog.setMessage("正在下载，请稍候...");
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         }
 
         @Override
@@ -566,11 +574,14 @@ public class HttpUtil {
             mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                     getClass().getName());
             mWakeLock.acquire();
+            mProgressDialog.show();
+            mProgressDialog.setProgress(0);
         }
 
         @Override
         protected void onProgressUpdate(Integer... progress) {
             super.onProgressUpdate(progress);
+            mProgressDialog.setProgress(progress[0]);
         }
 
         @Override
@@ -582,6 +593,7 @@ public class HttpUtil {
             } else {
 
             }
+            mProgressDialog.cancel();
         }
     }
 
@@ -596,6 +608,7 @@ public class HttpUtil {
         checkAssetUpdated(context, URLs.kStylesheets, true);
         checkAssetUpdated(context, URLs.kJavaScripts, true);
         checkAssetUpdated(context, URLs.kBarCodeScan, false);
+        checkAssetUpdated(context, URLs.kAssets, false);
         // checkAssetUpdated(context, URLs.kAdvertisement, false);
     }
 
@@ -611,16 +624,16 @@ public class HttpUtil {
             String localKeyName = String.format("local_%s_md5", assetName);
             String keyName = String.format("%s_md5", assetName);
             isShouldUpdateAssets = !isShouldUpdateAssets && !userJSON.getString(localKeyName).equals(userJSON.getString(keyName));
-
+            LogUtil.d("checkAssetUpdated", String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName), userJSON.getString(keyName)));
             if (!isShouldUpdateAssets) {
                 return false;
             }
 
             LogUtil.d("checkAssetUpdated", String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName), userJSON.getString(keyName)));
             // execute this when the downloader must be fired
-            final HttpUtil.DownloadAssetsTask downloadTask = new HttpUtil.DownloadAssetsTask(context, assetName, isInAssets);
-            downloadTask.execute(String.format(K.kDownloadAssetsAPIPath, K.kBaseUrl, assetName), assetZipPath);
-
+            final HttpUtil.DownloadAssetsTask downloadTask = new DownloadAssetsTask(context, assetName, isInAssets);
+            downloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,String.format(K.kDownloadAssetsAPIPath, K.kBaseUrl, assetName), assetZipPath);
+//            downloadTask.execute(String.format(K.kDownloadAssetsAPIPath, K.kBaseUrl, assetName), assetZipPath);
             return true;
         } catch (JSONException e) {
             e.printStackTrace();
