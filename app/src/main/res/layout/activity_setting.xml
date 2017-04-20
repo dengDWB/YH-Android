@@ -3,7 +3,7 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             tools:context="com.intfocus.yh_android.setting.SettingActivity">
+             tools:context="com.intfocus.yonghuitest.setting.SettingActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
             android:layout_alignParentTop="true"
             android:background="@drawable/bg_user">
 
-            <com.intfocus.yh_android.view.CircleImageView
+            <com.intfocus.yonghuitest.view.CircleImageView
                 android:id="@+id/img_icon"
                 android:layout_width="60dp"
                 android:layout_height="60dp"

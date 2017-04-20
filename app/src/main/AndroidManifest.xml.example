@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.intfocus.yh_android"
+    package="com.intfocus.yonghuitest"
     android:versionCode="93"
     android:versionName="1.2.33">
 
@@ -22,7 +22,7 @@
 
     <application
         tools:replace="android:icon,android:theme"
-        android:name="com.intfocus.yh_android.YHApplication"
+        android:name="com.intfocus.yonghuitest.YHApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -43,7 +43,7 @@
             android:enabled="false" />
         -->
         <activity
-            android:name="com.intfocus.yh_android.LoginActivity"
+            android:name="com.intfocus.yonghuitest.LoginActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/FullscreenTheme" >
@@ -54,32 +54,32 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.intfocus.yh_android.DashboardActivity"
+            android:name="com.intfocus.yonghuitest.DashboardActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yh_android.setting.OldSettingActivity"
+            android:name="com.intfocus.yonghuitest.setting.OldSettingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yh_android.SubjectActivity"
+            android:name="com.intfocus.yonghuitest.SubjectActivity"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yh_android.CommentActivity"
+            android:name="com.intfocus.yonghuitest.CommentActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yh_android.ResetPasswordActivity"
+            android:name="com.intfocus.yonghuitest.ResetPasswordActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yh_android.screen_lock.InitPassCodeActivity"
+            android:name="com.intfocus.yonghuitest.screen_lock.InitPassCodeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.intfocus.yh_android.screen_lock.ConfirmPassCodeActivity"
+            android:name="com.intfocus.yonghuitest.screen_lock.ConfirmPassCodeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
 
