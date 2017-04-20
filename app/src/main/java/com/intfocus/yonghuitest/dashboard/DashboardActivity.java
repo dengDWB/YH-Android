@@ -357,8 +357,8 @@ public class DashboardActivity extends FragmentActivity implements ViewPager.OnP
                         try{
                             subjectIntent.putExtra(URLs.kLink, pushMessageJSON.getString("url"));
                             subjectIntent.putExtra(URLs.kBannerName, pushMessageJSON.getString("title"));
-                            subjectIntent.putExtra(URLs.kObjectId, pushMessageJSON.getInt("object_id"));
-                            subjectIntent.putExtra(URLs.kObjectType, pushMessageJSON.getInt("object_type"));
+                            subjectIntent.putExtra(URLs.kObjectId, pushMessageJSON.getInt("obj_id"));
+                            subjectIntent.putExtra(URLs.kObjectType, pushMessageJSON.getInt("obj_type"));
                             startActivity(subjectIntent);
                         }catch (Exception e){
                             Toast.makeText(DashboardActivity.this, "推送消息的格式有误", Toast.LENGTH_SHORT);
