@@ -505,6 +505,8 @@ public class HttpUtil {
             this.context = context;
             this.assetFilename = assetFilename;
             this.isInAssets = isInAssets;
+
+            // 初始化进度条
             mProgressDialog = new ProgressDialog(context);
             mProgressDialog.setTitle("提示信息");
             mProgressDialog.setMessage("正在下载，请稍候...");
@@ -624,7 +626,6 @@ public class HttpUtil {
             String localKeyName = String.format("local_%s_md5", assetName);
             String keyName = String.format("%s_md5", assetName);
             isShouldUpdateAssets = !isShouldUpdateAssets && !userJSON.getString(localKeyName).equals(userJSON.getString(keyName));
-            LogUtil.d("checkAssetUpdated", String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName), userJSON.getString(keyName)));
             if (!isShouldUpdateAssets) {
                 return false;
             }
@@ -632,6 +633,8 @@ public class HttpUtil {
             LogUtil.d("checkAssetUpdated", String.format("%s: %s != %s", assetZipPath, userJSON.getString(localKeyName), userJSON.getString(keyName)));
             // execute this when the downloader must be fired
             final HttpUtil.DownloadAssetsTask downloadTask = new DownloadAssetsTask(context, assetName, isInAssets);
+
+            // AsyncTask并行下载
             downloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,String.format(K.kDownloadAssetsAPIPath, K.kBaseUrl, assetName), assetZipPath);
 //            downloadTask.execute(String.format(K.kDownloadAssetsAPIPath, K.kBaseUrl, assetName), assetZipPath);
             return true;
