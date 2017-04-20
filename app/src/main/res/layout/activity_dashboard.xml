@@ -69,28 +69,28 @@
         android:background="@color/white"
         android:orientation="horizontal">
 
-        <com.intfocus.yh_android.view.TabView
+        <com.intfocus.yonghuitest.view.TabView
             android:id="@+id/tab_kpi"
             style="@style/ToolBarTab"
             app:active_src="@drawable/tab_kpi_s"
             app:src="@drawable/tab_kpi"
             app:text="仪表盘"/>
 
-        <com.intfocus.yh_android.view.TabView
+        <com.intfocus.yonghuitest.view.TabView
             android:id="@+id/tab_analysis"
             style="@style/ToolBarTab"
             app:active_src="@drawable/tab_analysis_s"
             app:src="@drawable/tab_analysis"
             app:text="分析"/>
 
-        <com.intfocus.yh_android.view.TabView
+        <com.intfocus.yonghuitest.view.TabView
             android:id="@+id/tab_app"
             style="@style/ToolBarTab"
             app:active_src="@drawable/tab_app_s"
             app:src="@drawable/tab_app"
             app:text="应用"/>
 
-        <com.intfocus.yh_android.view.TabView
+        <com.intfocus.yonghuitest.view.TabView
             android:id="@+id/tab_message"
             style="@style/ToolBarTab"
             app:active="false"
