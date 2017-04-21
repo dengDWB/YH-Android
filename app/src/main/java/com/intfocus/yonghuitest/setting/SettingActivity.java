@@ -10,6 +10,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.intfocus.yonghuitest.BaseActivity;
+import com.intfocus.yonghuitest.DeveloperActivity;
 import com.intfocus.yonghuitest.LoginActivity;
 import com.intfocus.yonghuitest.R;
 import com.intfocus.yonghuitest.util.HttpUtil;
@@ -61,7 +62,7 @@ public class SettingActivity extends BaseActivity {
      */
     private void initSettingListItem() {
         ArrayList<String> listItem = new ArrayList<>();
-        String[] itemName = {"基本信息", "应用信息", "选项配置", "消息推送", "更新日志"};
+        String[] itemName = {"基本信息", "应用信息", "选项配置", "消息推送", "更新日志", "开发者选项"};
 
         for (int i = 0; i < itemName.length; i++) {
             listItem.add(itemName[i]);
@@ -109,6 +110,10 @@ public class SettingActivity extends BaseActivity {
                 case "选项配置" :
                     Intent settingPreferenceIntent = new Intent(mContext, SettingPreferenceActivity.class);
                     startActivity(settingPreferenceIntent);
+                    break;
+                case "开发者选项" :
+                    Intent developerActivityIntent = new Intent(SettingActivity.this, DeveloperActivity.class);
+                    startActivity(developerActivityIntent);
                     break;
             }
         }

@@ -88,7 +88,18 @@ public class SettingListActivity extends BaseActivity {
                 mItemNameList = new String[]{"消息推送", "关联的设备列表", "推送的消息列表"};
                 mItemContentList = new String[]{isPushOpened, "", ""};
                 break;
-
+            case "开发者选项" :
+                try {
+                    mItemNameList = new String[]{"报表缓存数据列表", "请求头缓存列表", "所属商行", "手机号码", "邮箱", "修改密码"};
+                    mItemContentList = new String[]{user.getString(URLs.kUserName),
+                            user.getString(URLs.kRoleName),
+                            user.getString(URLs.kGroupName),
+                            "暂未提供",
+                            "暂未提供",
+                            ""};
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             default:
                 mItemNameList = new String[]{};
                 mItemContentList = new String[]{};
