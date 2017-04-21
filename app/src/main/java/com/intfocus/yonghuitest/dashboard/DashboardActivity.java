@@ -26,7 +26,6 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.intfocus.yonghuitest.BarCodeScannerActivity;
-import com.intfocus.yonghuitest.HomeTricsActivity;
 import com.intfocus.yonghuitest.R;
 import com.intfocus.yonghuitest.SubjectActivity;
 import com.intfocus.yonghuitest.YHApplication;

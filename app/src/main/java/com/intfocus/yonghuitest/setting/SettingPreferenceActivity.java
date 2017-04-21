@@ -41,13 +41,17 @@ public class SettingPreferenceActivity extends BaseActivity {
         mScreenShotSwitch.setOnCheckedChangeListener(mSwitchScreenShotListener);
         mReportCopySwitch.setOnCheckedChangeListener(mSwitchReportCopyListener);
         mLandscapeBannerSwitch.setOnCheckedChangeListener(mSwitchBannerListener);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
         initSwitchPreference();
     }
 
     /*
-     * Switch 状态初始化
-     */
+         * Switch 状态初始化
+         */
     private void initSwitchPreference() {
         mSharedPreferences = getSharedPreferences("SettingPreference", MODE_PRIVATE);
         mScreenLockSwitch.setChecked(mSharedPreferences.getBoolean("ScreenLock", false));

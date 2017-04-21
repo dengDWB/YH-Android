@@ -1,8 +1,10 @@
 package com.intfocus.yonghuitest;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -38,6 +40,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.intfocus.yonghuitest.adapter.MetricsAdapter;
 import com.intfocus.yonghuitest.adapter.ProductListAdapter;
+import com.intfocus.yonghuitest.util.HttpUtil;
 import com.yonghui.homemetrics.data.response.HomeData;
 import com.yonghui.homemetrics.data.response.HomeMetrics;
 import com.yonghui.homemetrics.data.response.Item;
@@ -45,9 +48,13 @@ import com.yonghui.homemetrics.data.response.Product;
 import com.yonghui.homemetrics.utils.ReorganizeTheDataUtils;
 import com.yonghui.homemetrics.utils.Utils;
 
+import org.json.JSONException;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -63,6 +70,8 @@ public class HomeTricsActivity extends BaseActivity implements ProductListAdapte
     RecyclerView productRecyclerView;
     @BindView(R.id.tv_title)
     TextView tvTitle;
+    @BindView(R.id.anim_loading)
+    RelativeLayout mAnimLoading;
     @BindView(R.id.metrics_recycler_view)
     RecyclerView metricsRecyclerView;
     @BindView(R.id.iv_back)
@@ -141,6 +150,7 @@ public class HomeTricsActivity extends BaseActivity implements ProductListAdapte
 
     private PopupWindow popupWindow;
     private Context mContext;
+    private String urlString;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -148,9 +158,34 @@ public class HomeTricsActivity extends BaseActivity implements ProductListAdapte
         setContentView(R.layout.activity_hometrics);
         mContext = this;
         ButterKnife.bind(this);
-        initView();
-        initData();
-        setData(false, true);
+
+        Intent intent = getIntent();
+        urlString = intent.getStringExtra("urlString");
+
+        new LoadReportData().execute();
+    }
+
+    /*
+     * 下载数据
+     */
+    class LoadReportData extends AsyncTask<String,Void,Map<String,String>> {
+        @Override
+        protected Map<String,String> doInBackground(String... params) {
+            Map<String,String> response = HttpUtil.httpGet(urlString,new HashMap<String, String>());
+            Log.i("reportData", response.toString());
+                return response;
+        }
+
+        @Override
+        protected void onPostExecute(Map<String,String> response){
+            if (response.get("code").equals("200") || response.get("code").equals("304")) {
+                initView();
+                initData(response.get("body"));
+                setData(false, true);
+                mAnimLoading.setVisibility(View.GONE);
+            }
+            super.onPostExecute(response);
+        }
     }
 
     private void initView() {
@@ -171,7 +206,7 @@ public class HomeTricsActivity extends BaseActivity implements ProductListAdapte
         rlChart.setVisibility(View.GONE);
     }
 
-    private void initData() {
+    private void initData(String mReportData) {
         isShowChartData = false;
         isDoubleClick = false;
         items = new ArrayList<>();
@@ -181,7 +216,7 @@ public class HomeTricsActivity extends BaseActivity implements ProductListAdapte
         gson = new Gson();
         //初始化,获取所有数据
 
-        JsonObject returnData = new JsonParser().parse(Utils.getJson(this)).getAsJsonObject();
+        JsonObject returnData = new JsonParser().parse(mReportData).getAsJsonObject();
         homeData = gson.fromJson(returnData, HomeData.class);
         datas = homeData.data;
         homeMetricses.addAll(datas);
@@ -198,10 +233,7 @@ public class HomeTricsActivity extends BaseActivity implements ProductListAdapte
             xAxisList.add(homeMetrics.getPeriod());
         }
         xAxisValue = xAxisList.toArray(new String[xAxisList.size()]);
-
-
     }
-
 
     @OnClick({R.id.iv_warning, R.id.tv_name_sort, R.id.tv_sale_sort, R.id.iv_back})
     public void onClick(View view) {
@@ -255,55 +287,67 @@ public class HomeTricsActivity extends BaseActivity implements ProductListAdapte
      * @param isNeedSort    是否排序
      * @param showAnimation 是否展示动画
      */
-    private void setData(boolean isNeedSort, boolean showAnimation) {
-        items.clear();
-        homeMetrics = datas.get(dateSelected);
-        if (isNeedSort) {
-            products = ReorganizeTheDataUtils.sortData(homeMetrics.products, itemSelected, isAsc);
-        } else {
-            products = homeMetrics.products;
-        }
-        //排序数据，获取当前数据最大值
-        List<Product> sortProducts = new ArrayList<>();
-        sortProducts.addAll(products);
-        maxValue = ReorganizeTheDataUtils.sortData(sortProducts, itemSelected, false).get(0).items.get(itemSelected).main_data.getData();
-        //给报表使用的数据,已经排序，则提取得报表数据也要排序后得字段
-        for (HomeMetrics homeMetrics : homeMetricses) {
-            Product product = ReorganizeTheDataUtils.sortData(homeMetrics.products, itemSelected, isAsc).get(productSelected);
-            Item item = product.items.get(itemSelected);
-            items.add(item);
-        }
-        initChart(showAnimation);
-        combinedChart.invalidate();
-        if (product == null || lastProductSelected != productSelected) {
-            product = products.get(productSelected);
-            //设置下方选中
-            for (int i = 0; i < products.size(); i++) {
-                if (i == productSelected) {
-                    products.get(i).isSelected = true;
+    private void setData(final boolean isNeedSort, final boolean showAnimation) {
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+                items.clear();
+                homeMetrics = datas.get(dateSelected);
+                if (isNeedSort) {
+                    products = ReorganizeTheDataUtils.sortData(homeMetrics.products, itemSelected, isAsc);
                 } else {
-                    products.get(i).isSelected = false;
+                    products = homeMetrics.products;
                 }
-            }
-        }
-        tvTitle.setText(homeMetrics.getHead());
-        tvDateTime.setText(homeMetrics.getPeriod());
-        tvDataTitle.setText(product.getName());
-        //设置指标选中状态
-        for (int i = 0; i < product.items.size(); i++) {
-            if (i == itemSelected) {
-                product.items.get(i).isSelected = true;
-            } else {
-                product.items.get(i).isSelected = false;
-            }
-        }
-        //重组指标数据
-        homeMetrics = ReorganizeTheDataUtils.groupByNumber(product, 4, true);
-        metricsAdapter.setDatas(homeMetrics);
-        //设置排序栏显示文字
-        tvSaleSort.setText(product.items.get(itemSelected).getName());
-        adapter.setDatas(products, itemSelected, maxValue);
-    }
+                //排序数据，获取当前数据最大值
+                List<Product> sortProducts = new ArrayList<>();
+                sortProducts.addAll(products);
+                maxValue = ReorganizeTheDataUtils.sortData(sortProducts, itemSelected, false).get(0).items.get(itemSelected).main_data.getData();
+                //给报表使用的数据,已经排序，则提取得报表数据也要排序后得字段
+                for (HomeMetrics homeMetrics : homeMetricses) {
+                    Product product = ReorganizeTheDataUtils.sortData(homeMetrics.products, itemSelected, isAsc).get(productSelected);
+                    Item item = product.items.get(itemSelected);
+                    items.add(item);
+                }
+
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+                        initChart(showAnimation);
+                        combinedChart.invalidate();
+                        if (product == null || lastProductSelected != productSelected) {
+                            product = products.get(productSelected);
+                            //设置下方选中
+                            for (int i = 0; i < products.size(); i++) {
+                                if (i == productSelected) {
+                                    products.get(i).isSelected = true;
+                                } else {
+                                    products.get(i).isSelected = false;
+                                }
+                            }
+                        }
+                        tvTitle.setText(homeMetrics.getHead());
+                        tvNameSort.setText(homeMetrics.getHead());
+                        tvDateTime.setText(homeMetrics.getPeriod());
+                        tvDataTitle.setText(product.getName());
+                        //设置指标选中状态
+                        for (int i = 0; i < product.items.size(); i++) {
+                            if (i == itemSelected) {
+                                product.items.get(i).isSelected = true;
+                            } else {
+                                product.items.get(i).isSelected = false;
+                            }
+                        }
+                        //重组指标数据
+                        homeMetrics = ReorganizeTheDataUtils.groupByNumber(product, 4, true);
+                        metricsAdapter.setDatas(homeMetrics);
+                        //设置排序栏显示文字
+                        tvSaleSort.setText(product.items.get(itemSelected).getName());
+                        adapter.setDatas(products, itemSelected, maxValue);
+                    }
+//                });
+//            }
+//        }).start();
+//    }
 
     //显示报表
     void showCombinedChart() {
@@ -361,7 +405,7 @@ public class HomeTricsActivity extends BaseActivity implements ProductListAdapte
         xAxis.setDrawGridLines(false);//设置x轴上每个点对应的线
         xAxis.setDrawLabels(true);//绘制标签  指x轴上的对应数值
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);//设置x轴的显示位置
-        xAxis.setTextSize(12f); //设置X轴文字大小
+        xAxis.setTextSize(8f); //设置X轴文字大小
         xAxis.setGranularityEnabled(true);//是否允许X轴上值重复出现
         xAxis.setTextColor(ContextCompat.getColor(this, R.color.co4));//设置X轴文字颜色
 //        //设置竖线的显示样式为虚线
@@ -502,7 +546,7 @@ public class HomeTricsActivity extends BaseActivity implements ProductListAdapte
         tvMainDataName.setText(item.getName());
         BigDecimal bigDecimal = new BigDecimal(item.main_data.getData());
         double mainData = bigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-        tvMainData.setText(mainData + "");
+        tvMainData.setText(item.main_data.getData() + "");
         BigDecimal bigDecimal1 = new BigDecimal(item.sub_data.getData());
         double subData = bigDecimal1.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
         tvSubData.setText(subData + "");
@@ -516,10 +560,43 @@ public class HomeTricsActivity extends BaseActivity implements ProductListAdapte
         result = f1 + "%";
         tvRateOfChange.setText(result);
         if ("up".equalsIgnoreCase(item.state.getArrow())) {
-            ivRateOfChange.setImageResource(R.drawable.icon_greenarrow);
-        } else {
-            ivRateOfChange.setImageResource(R.drawable.icon_redarrow);
+            Log.i("arrow", item.state.getArrow() + "  " + item.state.getColor());
+            switch (item.state.getColor()) {
+                case "#F2E1AC" :
+                    ivRateOfChange.setImageResource(R.drawable.up_yellowarrow);
+                    break;
 
+                case "#F2836B" :
+                    ivRateOfChange.setImageResource(R.drawable.up_redarrow);
+                    break;
+
+                case "#63A69F" :
+                    ivRateOfChange.setImageResource(R.drawable.up_greenarrow);
+                    break;
+
+                default:
+                    ivRateOfChange.setVisibility(View.GONE);
+                    break;
+            }
+        } else {
+            Log.i("arrow", item.state.getArrow() + "  " + item.state.getColor());
+            switch (item.state.getColor()) {
+                case "#F2E1AC" :
+                    ivRateOfChange.setImageResource(R.drawable.down_yellowarrow);
+                    break;
+
+                case "#F2836B" :
+                    ivRateOfChange.setImageResource(R.drawable.down_redarrow);
+                    break;
+
+                case "#63A69F" :
+                    ivRateOfChange.setImageResource(R.drawable.down_greenarrow);
+                    break;
+
+                default:
+                    ivRateOfChange.setVisibility(View.GONE);
+                    break;
+            }
         }
     }
 

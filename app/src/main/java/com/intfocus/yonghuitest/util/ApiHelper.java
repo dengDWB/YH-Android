@@ -105,8 +105,8 @@ public class ApiHelper {
     }
 
     /*
-         *  获取报表网页数据
-         */
+     *  获取报表网页数据
+     */
     public static boolean reportData(Context context, String groupID, String templateID, String reportID) {
         String urlString = String.format(K.kReportDataAPIPath, K.kBaseUrl, groupID, templateID, reportID);
         String assetsPath = FileUtil.sharedPath(context);
@@ -225,7 +225,6 @@ public class ApiHelper {
 
     public static Map<String, String> resetPassword(String userID, String newPassword) {
         Map<String, String> retMap = new HashMap<>();
-
         try {
             String urlString = String.format(K.kRsetPwdAPIPath, K.kBaseUrl, userID);
 

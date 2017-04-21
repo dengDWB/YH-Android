@@ -60,7 +60,7 @@ public class BaseFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
-        mMyApp = (YHApplication)getActivity().getApplication();
+        mMyApp = (YHApplication) getActivity().getApplication();
         mAppContext = mMyApp.getAppContext();
         sharedPath = FileUtil.sharedPath(mContext);
         assetsPath = sharedPath;
@@ -131,13 +131,13 @@ public class BaseFragment extends Fragment {
             }
         });
 
-        mWebView.setOnScrollChangedCallback(new CustomWebView.OnScrollChangedCallback(){
-            public void onScroll(int horizontal, int vertical){
-                System.out.println("=="+horizontal+"---"+vertical);
+        mWebView.setOnScrollChangedCallback(new CustomWebView.OnScrollChangedCallback() {
+            public void onScroll(int horizontal, int vertical) {
+                System.out.println("==" + horizontal + "---" + vertical);
                 //this is to check webview scroll
-                if (vertical<50){
+                if (vertical < 50) {
                     mSwipeLayout.setEnabled(true);
-                }else{
+                } else {
                     mSwipeLayout.setEnabled(false);
                 }
             }
@@ -206,7 +206,8 @@ public class BaseFragment extends Fragment {
 
         private void showWebViewForWithoutNetwork() {
             mWebView.post(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     String urlStringForLoading = loadingPath("400");
                     mWebView.loadUrl(urlStringForLoading);
                 }
@@ -261,7 +262,7 @@ public class BaseFragment extends Fragment {
         private String mSharedPath;
         private String mAssetsPath;
 
-        public void setVariables(WebView webView, String sharedPath, String assetsPath ) {
+        public void setVariables(WebView webView, String sharedPath, String assetsPath) {
             mWebView = webView;
             mSharedPath = sharedPath;
             mAssetsPath = assetsPath;
@@ -273,7 +274,8 @@ public class BaseFragment extends Fragment {
 
         private void showWebViewForWithoutNetwork() {
             mWebView.post(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     String urlStringForLoading = loadingPath("400");
                     mWebView.loadUrl(urlStringForLoading);
                 }
@@ -338,7 +340,8 @@ public class BaseFragment extends Fragment {
         @JavascriptInterface
         public void openURLWithSystemBrowser(final String url) {
             getActivity().runOnUiThread(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     if (url == null || (!url.startsWith("http://") && !url.startsWith("https://"))) {
                         return;
                     }
@@ -362,30 +365,43 @@ public class BaseFragment extends Fragment {
                     String message = String.format("%s\n%s\n%d", bannerName, link, objectID);
                     LogUtil.d("JSClick", message);
 
-                    if (link.equals("http://development.shengyiplus.com/api/v1/temp/template/3/report/1/data")) {
-                        Intent homeTricsIntent = new Intent(mContext, HomeTricsActivity.class);
-                        homeTricsIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                        mContext.startActivity(homeTricsIntent);
-                        return;
-                    }
-                    else if (link.equals("http://development.shengyiplus.com/api/v1/temp/template/5/report/1/data")) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                        builder.setTitle("温馨提示")
-                                .setMessage("当前版本暂不支持该模板, 请升级应用后查看")
-                                .setPositiveButton("前去升级", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Intent browserIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(K.kPgyerUrl));
-                                        startActivity(browserIntent);
-                                    }
-                                })
-                                .setNegativeButton("稍后升级", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        // 返回 LoginActivity
-                                    }
-                                });
-                        builder.show();
+                    if (link.indexOf("template") > 0) {
+                        String templateID = TextUtils.split(link, "/")[7];
+
+                        if (templateID.equals("3")) {
+                            Intent homeTricsIntent = new Intent(mContext, HomeTricsActivity.class);
+                            homeTricsIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                            homeTricsIntent.putExtra("urlString", link);
+                            mContext.startActivity(homeTricsIntent);
+                        }
+                        else if (templateID.equals("5")) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            builder.setTitle("温馨提示")
+                                    .setMessage("当前版本暂不支持该模板, 请升级应用后查看")
+                                    .setPositiveButton("前去升级", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent browserIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(K.kPgyerUrl));
+                                            startActivity(browserIntent);
+                                        }
+                                    })
+                                    .setNegativeButton("稍后升级", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // 返回 LoginActivity
+                                        }
+                                    });
+                            builder.show();
+                        }
+                        else {
+                            Intent intent = new Intent(getActivity(), SubjectActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                            intent.putExtra(URLs.kBannerName, bannerName);
+                            intent.putExtra(URLs.kLink, link);
+                            intent.putExtra(URLs.kObjectId, objectID);
+                            intent.putExtra(URLs.kObjectType, 1);
+                            startActivity(intent);
+                        }
                     }
                     else {
                         Intent intent = new Intent(getActivity(), SubjectActivity.class);
@@ -396,7 +412,6 @@ public class BaseFragment extends Fragment {
                         intent.putExtra(URLs.kObjectType, 1);
                         startActivity(intent);
                     }
-
                 }
             });
         }
@@ -411,7 +426,7 @@ public class BaseFragment extends Fragment {
                     JSONObject jsonObject = new JSONObject(fileContent);
                     JSONObject config = new JSONObject(jsonObject.getString("dashboard"));
                     config.put(pageName, tabIndex);
-                    jsonObject.put("dashboard",config.toString());
+                    jsonObject.put("dashboard", config.toString());
 
                     FileUtil.writeFile(filePath, jsonObject.toString());
                 }
@@ -430,7 +445,7 @@ public class BaseFragment extends Fragment {
                     String fileContent = FileUtil.readFile(filePath);
                     JSONObject jsonObject = new JSONObject(fileContent);
                     JSONObject config = new JSONObject(jsonObject.getString("dashboard"));
-                    if (config.has(pageName)){
+                    if (config.has(pageName)) {
                         tabIndex = config.getInt(pageName);
                     }
                 }

@@ -2,6 +2,7 @@ package com.intfocus.yonghuitest.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,6 +75,7 @@ public class MetricsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 }
             });
             viewHolder.tvHead6.setText(item.getName());
+            viewHolder.ivArrow6.setImageResource(getArrowImg(item));
             viewHolder.tvMainData6.setText(item.main_data.getData() + "");
             viewHolder.tvSubData6.setText(item.sub_data.getData() + "");
         } else {
@@ -98,6 +100,7 @@ public class MetricsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 }
             });
             viewHolder.tvHead5.setText(item.getName());
+            viewHolder.ivArrow5.setImageResource(getArrowImg(item));
             viewHolder.tvMainData5.setText(item.main_data.getData() + "");
             viewHolder.tvSubData5.setText(item.sub_data.getData() + "");
         } else {
@@ -128,6 +131,7 @@ public class MetricsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 }
             });
             viewHolder.tvHead4.setText(item.getName());
+            viewHolder.ivArrow4.setImageResource(getArrowImg(item));
             viewHolder.tvMainData4.setText(item.main_data.getData() + "");
             viewHolder.tvSubData4.setText(item.sub_data.getData() + "");
         } else {
@@ -159,6 +163,7 @@ public class MetricsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 }
             });
             viewHolder.tvHead3.setText(item.getName());
+            viewHolder.ivArrow3.setImageResource(getArrowImg(item));
             viewHolder.tvMainData3.setText(item.main_data.getData() + "");
             viewHolder.tvSubData3.setText(item.sub_data.getData() + "");
         } else {
@@ -193,6 +198,7 @@ public class MetricsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 }
             });
             viewHolder.tvHead2.setText(item.getName());
+            viewHolder.ivArrow1.setImageResource(getArrowImg(item));
             viewHolder.tvMainData2.setText(item.main_data.getData() + "");
             viewHolder.tvSubData2.setText(item.sub_data.getData() + "");
         } else {
@@ -226,8 +232,43 @@ public class MetricsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             }
         });
         viewHolder.tvHead1.setText(item.getName());
+        viewHolder.ivArrow1.setImageResource(getArrowImg(item));
         viewHolder.tvMainData1.setText(item.main_data.getData() + "");
         viewHolder.tvSubData1.setText(item.sub_data.getData() + "");
+    }
+
+    public int getArrowImg(Item item) {
+        if ("up".equalsIgnoreCase(item.state.getArrow())) {
+            Log.i("arrow", item.state.getArrow() + "  " + item.state.getColor());
+            switch (item.state.getColor()) {
+                case "#F2E1AC" :
+                    return R.drawable.up_yellowarrow;
+
+                case "#F2836B" :
+                    return R.drawable.up_redarrow;
+
+                case "#63A69F" :
+                    return R.drawable.up_greenarrow;
+
+                default:
+                    return R.drawable.up_redarrow;
+            }
+        } else {
+            Log.i("arrow", item.state.getArrow() + "  " + item.state.getColor());
+            switch (item.state.getColor()) {
+                case "#F2E1AC" :
+                    return R.drawable.down_yellowarrow;
+
+                case "#F2836B" :
+                    return R.drawable.down_redarrow;
+
+                case "#63A69F" :
+                    return R.drawable.down_greenarrow;
+
+                default:
+                    return R.drawable.up_redarrow;
+            }
+        }
     }
 
     @Override

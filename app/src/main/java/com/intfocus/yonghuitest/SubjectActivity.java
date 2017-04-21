@@ -248,7 +248,7 @@ public class SubjectActivity extends BaseActivity implements OnPageChangeListene
 					@Override
 					public void run() {
 						if (isOffline){
-							mTitle.setTextColor(Color.YELLOW);
+							mTitle.setText(bannerName + "(离线)");
 						}
 					}
 				});

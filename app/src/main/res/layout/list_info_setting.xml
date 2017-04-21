@@ -12,4 +12,7 @@
         style="@style/SettingValue"
         android:textColor="@color/gray"
         android:text="内容"/>
+
+    <!--<ImageView-->
+        <!--style="@style/SettingArrow"/>-->
 </RelativeLayout>

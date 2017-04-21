@@ -49,7 +49,7 @@ public class TabView extends LinearLayout {
 
         setOrientation(VERTICAL);
         mImageView = new ImageView(context);
-//        mImageView.setPadding(0 - 10, 0 - 10, 0 - 10, 0 - 10);
+        mImageView.setPadding(0 - 8, 0 - 8, 0 - 8, 0 - 8);
         LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, srcHeight);
         addView(mImageView, layoutParams);
         mTextView = new TextView(context);

@@ -49,9 +49,9 @@ public class ShowListMsgActivity extends BaseActivity {
                         map.put("ItemState", "Android" + "(" + json.getString("os_version") + ")");
                     }
                     listItem.add(map);
-                    mSimpleAdapter = new SimpleAdapter(this, listItem, R.layout.layout_push_list, new String[]{"ItemTile", "ItemState"}, new int[]{R.id.titleItem, R.id.stateItem});
-                    pushListView.setAdapter(mSimpleAdapter);
                 }
+                mSimpleAdapter = new SimpleAdapter(this, listItem, R.layout.list_info_setting, new String[]{"ItemTile", "ItemState"}, new int[]{R.id.item_setting_key, R.id.item_setting_info});
+                pushListView.setAdapter(mSimpleAdapter);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -64,9 +64,9 @@ public class ShowListMsgActivity extends BaseActivity {
                     map.put("ItemTile", json.getString(""+i));
                     map.put("ItemState", json.getString(""+i));
                     listItem.add(map);
-                    mSimpleAdapter = new SimpleAdapter(this, listItem, R.layout.layout_push_list, new String[]{"ItemTile", "ItemState"}, new int[]{R.id.titleItem, R.id.stateItem});
-                    pushListView.setAdapter(mSimpleAdapter);
                 }
+                mSimpleAdapter = new SimpleAdapter(this, listItem, R.layout.layout_push_list, new String[]{"ItemTile", "ItemState"}, new int[]{R.id.item_setting_key, R.id.item_setting_info});
+                pushListView.setAdapter(mSimpleAdapter);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

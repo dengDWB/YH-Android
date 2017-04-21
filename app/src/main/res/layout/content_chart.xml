@@ -94,9 +94,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="5dp"
-            android:rotation="60"
-            android:src="@drawable/icon_greenarrow" />
+            android:layout_marginLeft="5dp" />
     </LinearLayout>
 
     <com.github.mikephil.charting.charts.CombinedChart

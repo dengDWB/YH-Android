@@ -509,7 +509,7 @@ public class HttpUtil {
             // 初始化进度条
             mProgressDialog = new ProgressDialog(context);
             mProgressDialog.setTitle("提示信息");
-            mProgressDialog.setMessage("正在下载，请稍候...");
+            mProgressDialog.setMessage("正在更新静态资源，请稍候...");
             mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         }
 
