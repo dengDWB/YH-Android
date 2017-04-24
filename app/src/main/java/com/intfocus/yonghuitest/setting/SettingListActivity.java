@@ -200,7 +200,7 @@ public class SettingListActivity extends BaseActivity {
                             toast("从未接收到推送消息");
                         }else {
                             Intent intent = new Intent(SettingListActivity.this, ShowListMsgActivity.class);
-                            intent.putExtra("pushMessage", true);
+                            intent.putExtra("type", "pushMessage");
                             intent.putExtra("title", "推送的消息列表");
                             startActivity(intent);
                         }
