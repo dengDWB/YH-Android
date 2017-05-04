@@ -14,7 +14,6 @@ import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,7 +89,6 @@ public class DashboardActivity extends FragmentActivity implements ViewPager.OnP
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        Log.d("shengming1", "aa");
         dealSendMessage();
     }
 
@@ -265,7 +263,7 @@ public class DashboardActivity extends FragmentActivity implements ViewPager.OnP
         mViewPager = (ViewPager) findViewById(R.id.content_view);
         mViewPager.setAdapter(mDashboardFragmentAdapter);
         mViewPager.setOffscreenPageLimit(4);
-        mViewPager.setCurrentItem(mSharedPreferences.getInt("LastTab", 0));
+        mViewPager.setCurrentItem(mSharedPreferences.getInt("LastTab", 2));
         mTabView[mViewPager.getCurrentItem()].setActive(true);
         mViewPager.addOnPageChangeListener(this);
     }

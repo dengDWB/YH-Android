@@ -78,8 +78,8 @@ public class SettingListActivity extends BaseActivity {
                 String apiDomain = K.kBaseUrl.replace("http://", "").replace("https://", "");
                 String versionInfo = String.format("%s(%d)", packageInfo.versionName, packageInfo.versionCode);
                 String appPackageInfo = packageInfo.packageName;
-                mItemNameList = new String[]{"应用名称", "检测更新", "设备型号", "数据接口", "应用标识"};
-                mItemContentList = new String[]{appName, "当前版本: " + versionInfo, deviceInfo, apiDomain, appPackageInfo};
+                mItemNameList = new String[]{"应用名称", "检测更新", "设备型号", "数据接口", "应用标识", "静态资源更新"};
+                mItemContentList = new String[]{appName, "当前版本: " + versionInfo, deviceInfo, apiDomain, appPackageInfo, "手动更新"};
                 break;
 
             case "消息推送" :
@@ -158,6 +158,10 @@ public class SettingListActivity extends BaseActivity {
 
                 case "检测更新" :
                     checkPgyerVersionUpgrade(SettingListActivity.this, true);
+                    break;
+
+                case "静态资源更新" :
+                    HttpUtil.checkAssetsUpdated(SettingListActivity.this);
                     break;
 
                 case "关联的设备列表":

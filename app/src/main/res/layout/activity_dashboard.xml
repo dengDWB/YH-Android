@@ -74,14 +74,16 @@
             style="@style/ToolBarTab"
             app:active_src="@drawable/tab_kpi_s"
             app:src="@drawable/tab_kpi"
-            app:text="仪表盘"/>
+            app:text="仪表盘"
+            android:visibility="gone"/>
 
         <com.intfocus.yonghuitest.view.TabView
             android:id="@+id/tab_analysis"
             style="@style/ToolBarTab"
             app:active_src="@drawable/tab_analysis_s"
             app:src="@drawable/tab_analysis"
-            app:text="分析"/>
+            app:text="分析"
+            android:visibility="gone"/>
 
         <com.intfocus.yonghuitest.view.TabView
             android:id="@+id/tab_app"
@@ -96,7 +98,8 @@
             app:active="false"
             app:active_src="@drawable/tab_message_s"
             app:src="@drawable/tab_message"
-            app:text="消息"/>
+            app:text="消息"
+            android:visibility="gone"/>
 
     </LinearLayout>
 

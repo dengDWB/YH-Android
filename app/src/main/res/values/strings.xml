@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">永辉应用(测试)</string>
+    <string name="app_name">HDDC</string>
     <string name="title_activity_main">永辉应用(测试)</string>
     <string name="image_error">错误</string>
     <string name="cansel">取消</string>
