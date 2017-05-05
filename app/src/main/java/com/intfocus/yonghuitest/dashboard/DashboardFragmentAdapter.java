@@ -24,15 +24,15 @@ public class DashboardFragmentAdapter extends FragmentPagerAdapter {
 
     public DashboardFragmentAdapter(FragmentManager fragmentManager) {
         super(fragmentManager);
-//        mKpiFragment = new KpiFragment();
-//        mAnalysisFragment = new AnalysisFragment();
+        mKpiFragment = new KpiFragment();
+        mAnalysisFragment = new AnalysisFragment();
         mAppFragment = new AppFragment();
-//        mMessageFragment = new MessageFragment();
+        mMessageFragment = new MessageFragment();
     }
 
     @Override
     public int getCount() {
-        return 1;
+        return PAGER_COUNT;
     }
 
     @Override
@@ -49,18 +49,18 @@ public class DashboardFragmentAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         Fragment fragment = null;
         switch (position) {
-//            case DashboardActivity.PAGE_KPI:
-//                fragment = mKpiFragment;
-//                break;
-//            case DashboardActivity.PAGE_ANALYSIS:
-//                fragment = mAnalysisFragment;
-//                break;
             case DashboardActivity.PAGE_KPI:
+                fragment = mKpiFragment;
+                break;
+            case DashboardActivity.PAGE_ANALYSIS:
+                fragment = mAnalysisFragment;
+                break;
+            case DashboardActivity.PAGE_APP:
                 fragment = mAppFragment;
                 break;
-//            case DashboardActivity.PAGE_MESSAGE:
-//                fragment = mMessageFragment;
-//                break;
+            case DashboardActivity.PAGE_MESSAGE:
+                fragment = mMessageFragment;
+                break;
         }
         return fragment;
     }
