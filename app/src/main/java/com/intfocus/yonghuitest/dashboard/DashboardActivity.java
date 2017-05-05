@@ -165,8 +165,8 @@ public class DashboardActivity extends FragmentActivity implements ViewPager.OnP
     }
 
     /*
-	 * 标题栏设置按钮下拉菜单样式
-	 */
+         * 标题栏设置按钮下拉菜单样式
+         */
     public void initDropMenu(SimpleAdapter adapter, AdapterView.OnItemClickListener itemClickListener) {
         View contentView = LayoutInflater.from(this).inflate(R.layout.menu_dialog, null);
 
@@ -263,8 +263,8 @@ public class DashboardActivity extends FragmentActivity implements ViewPager.OnP
         mViewPager = (ViewPager) findViewById(R.id.content_view);
         mViewPager.setAdapter(mDashboardFragmentAdapter);
         mViewPager.setOffscreenPageLimit(4);
-        mViewPager.setCurrentItem(mSharedPreferences.getInt("LastTab", 2));
-        mTabView[mViewPager.getCurrentItem()].setActive(true);
+        mViewPager.setCurrentItem(0);
+        mTabView[2].setActive(true);
         mViewPager.addOnPageChangeListener(this);
     }
 
@@ -305,27 +305,27 @@ public class DashboardActivity extends FragmentActivity implements ViewPager.OnP
 
     @Override
     public void onPageScrollStateChanged(int state) {
-        if (state == 2) {
-            switch (mViewPager.getCurrentItem()) {
-                case PAGE_KPI:
-                    mTabKPI.setActive(true);
-                    break;
-
-                case PAGE_ANALYSIS:
-                    mTabAnalysis.setActive(true);
-                    break;
-
-                case PAGE_APP:
-                    mTabAPP.setActive(true);
-                    break;
-
-                case PAGE_MESSAGE:
-                    mTabMessage.setActive(true);
-                    break;
-            }
-        }
-        refreshTabView();
-        mSharedPreferences.edit().putInt("LastTab", mViewPager.getCurrentItem()).commit();
+//        if (state == 2) {
+//            switch (mViewPager.getCurrentItem()) {
+//                case PAGE_KPI:
+//                    mTabKPI.setActive(true);
+//                    break;
+//
+//                case PAGE_ANALYSIS:
+//                    mTabAnalysis.setActive(true);
+//                    break;
+//
+//                case PAGE_APP:
+//                    mTabAPP.setActive(true);
+//                    break;
+//
+//                case PAGE_MESSAGE:
+//                    mTabMessage.setActive(true);
+//                    break;
+//            }
+//        }
+//        refreshTabView();
+//        mSharedPreferences.edit().putInt("LastTab", mViewPager.getCurrentItem()).commit();
     }
 
     /*
